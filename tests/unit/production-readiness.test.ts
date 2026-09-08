@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import config from '../../astro.config.mjs?raw';
 import favicon from '../../public/favicon.svg?raw';
+import atlasMark from '../../public/atlas-mark.svg?raw';
 import headers from '../../public/_headers?raw';
 import manifestSource from '../../public/site.webmanifest?raw';
 import redirects from '../../public/_redirects?raw';
@@ -14,7 +15,7 @@ describe('production launch configuration', () => {
   });
 
   it('publishes a single root locale redirect', () => {
-    expect(redirects.trim()).toBe('/ /en/fitment-studio/ 302');
+    expect(redirects.trim()).toBe('/ /en/ 302');
   });
 
   it('sets defensive static-site security headers without unsafe eval', () => {
@@ -34,13 +35,15 @@ describe('production launch configuration', () => {
   it('keeps the 404 page non-indexable and provides recovery paths', () => {
     expect(notFoundPage).toContain('noindex,follow');
     expect(notFoundPage).toContain('/en/fitment-studio/');
-    expect(notFoundPage).toContain('/en/tools/tire-size-calculator/');
+    expect(notFoundPage).toContain('/en/tools/');
   });
 
-  it('ships temporary brand icon metadata without external assets', () => {
+  it('ships the final geometric brand mark without external assets', () => {
     const manifest = JSON.parse(manifestSource) as { start_url: string; icons: Array<{ src: string }> };
-    expect(manifest.start_url).toBe('/en/fitment-studio/');
-    expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/favicon.svg' })]));
-    expect(favicon).toContain('>AG</text>');
+    expect(manifest.start_url).toBe('/en/');
+    expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/atlas-mark.svg' })]));
+    expect(atlasMark).toContain('M13 51 29.2 13.8');
+    expect(favicon).toContain('M13 51 29.2 13.8');
+    expect(atlasMark).not.toContain('<text');
   });
 });

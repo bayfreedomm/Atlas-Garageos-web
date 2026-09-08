@@ -5,6 +5,11 @@ export type SiteLocale = (typeof SUPPORTED_LOCALES)[number];
 export type ToolId = 'fitment-studio' | 'tire-size-calculator' | 'tire-size-comparison' | 'wheel-offset-calculator' | 'speedometer-error-calculator' | 'fitment-map' | 'measure-my-car';
 export type ToolCategory = 'Fitment' | 'Tires & Wheels';
 
+export const platformPageRegistry = Object.freeze([
+  { id: 'home', pathname: '/en/', title: 'Atlas GarageOS', description: 'Your car, every tool: compare fitment, remember setups, and use focused automotive calculators.' },
+  { id: 'tools-hub', pathname: '/en/tools/', title: 'Automotive Tools', description: 'Focused tire, wheel, speedometer, measurement, and fitment tools powered by transparent geometry.' },
+] as const);
+
 export interface ToolDefinition {
   readonly id: ToolId;
   readonly slug: string;
@@ -47,7 +52,10 @@ export function relatedTools(tool: ToolDefinition): readonly ToolDefinition[] {
   return tool.relatedToolIds.map(toolById);
 }
 
-export const indexableRoutes = Object.freeze(toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented').map(routeForTool));
+export const indexableRoutes = Object.freeze([
+  ...platformPageRegistry.map(({ pathname }) => pathname),
+  ...toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented').map(routeForTool),
+]);
 
 export interface SeoPageModel {
   readonly locale: SiteLocale;

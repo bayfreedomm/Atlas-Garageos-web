@@ -11,7 +11,8 @@ import { createSetupShareHash, decodeSetupShareHash, type SetupShareV1 } from '.
 import { translate } from '../localization/catalog';
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
 import { formatNumber } from './format-number';
-import { activeGaragePresentation, mapCellPresentation, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress, type ProductSection } from './presentation-model';
+import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
+import { activeGaragePresentation, fitmentComparisonSummary, mapCellPresentation, measurementErrorGuidance, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress, type ProductSection } from './presentation-model';
 
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -70,6 +71,16 @@ function showIssues(container: HTMLElement, issues: readonly ValidationIssue[]):
     list.append(item);
   }
   container.append(list);
+  const guidance = measurementErrorGuidance(issues);
+  if (guidance) {
+    const message = document.createElement('p');
+    message.textContent = guidance.message;
+    const link = document.createElement('a');
+    link.className = 'button secondary error-cta';
+    link.href = guidance.href;
+    link.textContent = guidance.ctaLabel;
+    container.append(message, link);
+  }
   container.hidden = false;
 }
 
@@ -409,14 +420,30 @@ export async function initializeFitmentPage(): Promise<void> {
     }
     errors.hidden = true;
     const value = comparison.value;
-    const visual = required<HTMLElement>('#comparison-visual');
-    const maximumDiameter = Math.max(value.current.overallDiameterMm, value.proposed.overallDiameterMm);
-    visual.style.setProperty('--current-diameter-width', `${(value.current.overallDiameterMm / maximumDiameter) * 100}%`);
-    visual.style.setProperty('--new-diameter-width', `${(value.proposed.overallDiameterMm / maximumDiameter) * 100}%`);
-    required<HTMLElement>('.diameter-line--current').style.width = 'var(--current-diameter-width)';
-    required<HTMLElement>('.diameter-line--new').style.width = 'var(--new-diameter-width)';
-    required<HTMLElement>('#visual-current').textContent = `Current · ${formatNumber(value.current.overallDiameterMm)} mm`;
-    required<HTMLElement>('#visual-new').textContent = `New · ${formatNumber(value.proposed.overallDiameterMm)} mm`;
+    const currentSetup = readSetup('current');
+    const proposedSetup = readSetup('proposed');
+    const visual = required<HTMLElement>('[data-fitment-visualizer]');
+    const tireScale = tireScaleMapping({
+      currentDiameterMm: value.current.overallDiameterMm,
+      currentRimDiameterInches: currentSetup.rimDiameterInches,
+      proposedDiameterMm: value.proposed.overallDiameterMm,
+      proposedRimDiameterInches: proposedSetup.rimDiameterInches,
+    });
+    const wheelScale = wheelOffsetVisualMapping(value.wheelInnerPositionChangeMm, value.wheelOuterPokeChangeMm);
+    visual.querySelector<SVGCircleElement>('[data-current-tire]')?.setAttribute('r', String(tireScale.currentTireRadius));
+    visual.querySelector<SVGCircleElement>('[data-new-tire]')?.setAttribute('r', String(tireScale.proposedTireRadius));
+    visual.querySelector<SVGCircleElement>('[data-current-rim]')?.setAttribute('r', String(tireScale.currentRimRadius));
+    visual.querySelector<SVGCircleElement>('[data-new-rim]')?.setAttribute('r', String(tireScale.proposedRimRadius));
+    const proposedWheel = visual.querySelector<SVGRectElement>('[data-new-wheel]');
+    proposedWheel?.setAttribute('x', String(wheelScale.proposedX));
+    proposedWheel?.setAttribute('width', String(wheelScale.proposedWidth));
+    const summary = fitmentComparisonSummary(value);
+    required<HTMLElement>('#comparison-summary').textContent = summary;
+    visual.querySelector<HTMLElement>('[data-visual-summary]')!.textContent = summary;
+    visual.querySelector<HTMLElement>('[data-current-tire-label]')!.textContent = `Current · ${formatNumber(value.current.overallDiameterMm)} mm`;
+    visual.querySelector<HTMLElement>('[data-new-tire-label]')!.textContent = `New · ${formatNumber(value.proposed.overallDiameterMm)} mm`;
+    visual.querySelector<HTMLElement>('[data-inner-label]')!.textContent = `Inner · ${formatNumber(value.wheelInnerPositionChangeMm)} mm`;
+    visual.querySelector<HTMLElement>('[data-outer-label]')!.textContent = `Outer · ${formatNumber(value.wheelOuterPokeChangeMm)} mm`;
     const rows: readonly [string, number, string][] = [
         ['Current sidewall', value.current.sidewallHeightMm, 'mm'],
         ['New sidewall', value.proposed.sidewallHeightMm, 'mm'],
@@ -458,8 +485,9 @@ export async function initializeFitmentPage(): Promise<void> {
     const vehicleStatus = document.createElement('div');
     vehicleStatus.className = 'vehicle-card__status';
     vehicleTitle.textContent = presentation.vehicle?.displayName ?? 'Your garage is ready';
-    vehicleCopy.textContent = presentation.clearance
-      ? `Current measurement baseline · ${presentation.clearance.baselineSetup.tire.widthMm}/${presentation.clearance.baselineSetup.tire.aspectRatio} R${presentation.clearance.baselineSetup.tire.rimDiameterInches} · ${presentation.clearance.baselineSetup.wheel.widthInches}J ET${presentation.clearance.baselineSetup.wheel.offsetMm}`
+    const currentSetup = presentation.currentSetup;
+    vehicleCopy.textContent = currentSetup
+      ? `Current setup · ${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches} · ${currentSetup.wheel.widthInches}J ET${currentSetup.wheel.offsetMm}`
       : 'Save a setup or complete Measure My Car to create a vehicle record.';
     const measurementBadge = document.createElement('span');
     measurementBadge.className = 'source-badge';
@@ -469,6 +497,30 @@ export async function initializeFitmentPage(): Promise<void> {
     setupBadge.textContent = `${presentation.setups.length} saved setup${presentation.setups.length === 1 ? '' : 's'}`;
     vehicleStatus.append(measurementBadge, setupBadge);
     vehicleSummary.append(vehicleTitle, vehicleCopy, vehicleStatus);
+    if (currentSetup) {
+      const miniVisual = document.createElement('div');
+      miniVisual.className = 'garage-mini-visual';
+      miniVisual.setAttribute('aria-hidden', 'true');
+      miniVisual.innerHTML = '<span class="garage-mini-visual__tire"><span></span></span><i></i>';
+      const metrics = document.createElement('dl');
+      metrics.className = 'garage-metrics';
+      const entries: readonly (readonly [string, string])[] = [
+        ['Tire', `${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches}`],
+        ['Wheel', `${currentSetup.wheel.widthInches}J · ET${currentSetup.wheel.offsetMm}`],
+        ['Measurements', presentation.isMeasured ? 'Recorded' : 'Not recorded'],
+        ['Saved setups', String(presentation.setups.length)],
+      ];
+      for (const [label, detail] of entries) {
+        const row = document.createElement('div');
+        const term = document.createElement('dt');
+        const value = document.createElement('dd');
+        term.textContent = label;
+        value.textContent = detail;
+        row.append(term, value);
+        metrics.append(row);
+      }
+      vehicleSummary.append(miniVisual, metrics);
+    }
     activeVehicle.replaceChildren();
     const noVehicle = document.createElement('option');
     noVehicle.value = '';

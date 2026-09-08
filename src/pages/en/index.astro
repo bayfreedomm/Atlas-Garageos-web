@@ -1,0 +1,16 @@
+---
+import SiteLayout from '../../components/SiteLayout.astro';
+import { routeForTool, toolById } from '../../seo/tool-registry';
+---
+<SiteLayout title="Atlas GarageOS" description="Your car, every tool: compare fitment, remember setups, and use focused automotive calculators." pathname="/en/" active="home">
+  <section class="home-hero" aria-labelledby="home-heading">
+    <div class="home-hero__copy"><p class="eyebrow">Automotive tools, one system</p><h1 id="home-heading">Your car.<br /><span>Every tool.</span></h1><p>Compare tire and wheel geometry, keep setups with your vehicle, and move from numbers to a clear next step.</p><div class="hero-actions"><a class="button" href="/en/fitment-studio/">Open Fitment Studio</a><a class="button secondary" href="/en/tools/">Explore tools</a></div></div>
+    <div class="home-hero__schematic" aria-label="A technical tire and wheel geometry schematic"><div class="schematic-axis"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div><div class="schematic-wheel"><span class="schematic-rim"></span><span class="schematic-center"></span></div><p><strong>One setup</strong><span>Measured · compared · remembered</span></p></div>
+  </section>
+  <section class="platform-grid" aria-label="Atlas GarageOS products">
+    <a class="platform-card platform-card--feature" href="/en/fitment-studio/"><span class="platform-card__index">01 / FLAGSHIP</span><h2>Fitment Studio</h2><p>Compare setups, find geometric matches, measure real gaps, and explore the Fitment Map.</p><span class="text-link">Open the workspace →</span></a>
+    <a class="platform-card" href="/en/fitment-studio/#garage"><span class="platform-card__index">02 / MEMORY</span><h2>My Garage</h2><p>Keep vehicle-specific measurements and named setups in this browser.</p><span class="text-link">View your garage →</span></a>
+    <a class="platform-card" href="/en/tools/"><span class="platform-card__index">03 / TOOLS</span><h2>Focused calculators</h2><p>Use six working tools for tire, wheel, speed, and measured fitment questions.</p><span class="text-link">Browse all tools →</span></a>
+  </section>
+  <section class="home-task-strip" aria-labelledby="task-heading"><div><p class="eyebrow">Start with the question</p><h2 id="task-heading">What are you trying to understand?</h2></div><div class="task-links"><a href={routeForTool(toolById('tire-size-comparison'))}>How much does this tire size change?</a><a href={routeForTool(toolById('wheel-offset-calculator'))}>Where will the new wheel sit?</a><a href={routeForTool(toolById('measure-my-car'))}>How do I measure my available space?</a></div></section>
+</SiteLayout>

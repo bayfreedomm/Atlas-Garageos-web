@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activeGaragePresentation, mapCellPresentation, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress } from '../../src/ui/presentation-model';
+import { activeGaragePresentation, fitmentComparisonSummary, mapCellPresentation, measurementErrorGuidance, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress } from '../../src/ui/presentation-model';
 import type { CombinedFitmentCandidate } from '../../src/core/fitment/combined-candidate';
 import type { GarageState } from '../../src/domain/garage';
 
@@ -32,11 +32,30 @@ describe('responsive presentation models', () => {
     expect(validationIssueText({ code: 'out-of-range', field: 'current.widthMm', message: 'widthMm must be between 80 and 500.' })).toBe('Original tire width: tire width must be between 80 and 500.');
   });
 
+  it('maps missing numeric measurements to friendly guidance', () => {
+    const issue = { code: 'not-a-number' as const, field: 'measuredInnerClearanceMm', message: 'measuredInnerClearanceMm must be a finite number.' };
+    expect(validationIssueText(issue)).toBe('Enter a valid inner clearance.');
+    expect(measurementErrorGuidance([issue])).toEqual({ message: 'We need your inner and outer clearance measurements first.', ctaLabel: 'Measure my car', href: '#measure-flow' });
+  });
+
+  it('summarizes calculated fitment changes without a safety verdict', () => {
+    const summary = fitmentComparisonSummary({ diameterDifferenceMm: 12.4, wheelOuterPokeChangeMm: 11.35, wheelInnerPositionChangeMm: 1.35 } as Parameters<typeof fitmentComparisonSummary>[0]);
+    expect(summary).toContain('12.4 mm larger');
+    expect(summary).toContain('11.35 mm farther outward');
+    expect(summary.toLowerCase()).not.toContain('safe');
+  });
+
   it('filters Garage content to the active vehicle', () => {
     const state = { schemaVersion: 2, activeVehicleId: 'car-2', vehicles: [{ id: 'car-1' }, { id: 'car-2', displayName: 'Project car' }], savedSetups: [{ id: 'one', vehicleId: 'car-1' }, { id: 'two', vehicleId: 'car-2' }], clearanceProfiles: [{ vehicleId: 'car-1' }] } as unknown as GarageState;
     const model = activeGaragePresentation(state);
     expect(model.vehicle?.id).toBe('car-2');
     expect(model.setups.map(({ id }) => id)).toEqual(['two']);
     expect(model.isMeasured).toBe(false);
+  });
+
+  it('selects a real active setup for the Garage summary', () => {
+    const activeSetup = { tire: { widthMm: 225, aspectRatio: 45, rimDiameterInches: 18 }, wheel: { diameterInches: 18, widthInches: 8, offsetMm: 40 } };
+    const state = { schemaVersion: 2, activeVehicleId: 'car', vehicles: [{ id: 'car', displayName: 'Daily', activeSetup }], savedSetups: [], clearanceProfiles: [] } as unknown as GarageState;
+    expect(activeGaragePresentation(state).currentSetup).toBe(activeSetup);
   });
 });

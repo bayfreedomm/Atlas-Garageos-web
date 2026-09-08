@@ -1,0 +1,11 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { routeForTool, toolRegistry } from '../../../seo/tool-registry';
+const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
+---
+<SiteLayout title="Automotive Tools" description="Focused tire, wheel, speedometer, measurement, and fitment tools powered by transparent geometry." pathname="/en/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Tools</span></nav>
+  <header class="hub-intro"><p class="eyebrow">Tools</p><h1>Use the right tool for the question.</h1><p class="hero-copy">Six focused experiences, one transparent geometry foundation. No hidden fitment verdicts.</p></header>
+  <section class="tools-hub" aria-labelledby="tools-heading"><div class="section-heading"><div><p class="eyebrow">Tires & wheels</p><h2 id="tools-heading">Working tools</h2></div><span class="count-chip">{tools.length} available</span></div><div class="tool-hub-grid">{tools.map((tool, index) => <a class="tool-hub-card" href={routeForTool(tool)}><span class="tool-hub-card__number">{String(index + 1).padStart(2, '0')}</span><div><span>{tool.category}</span><h3>{tool.title}</h3><p>{tool.description}</p></div><span class="tool-hub-card__arrow" aria-hidden="true">↗</span></a>)}</div></section>
+  <aside class="hub-note"><strong>Built around your Garage</strong><p>Measurements and saved setups stay connected to Fitment Studio. More tool categories will appear only when they are real and useful.</p></aside>
+</SiteLayout>

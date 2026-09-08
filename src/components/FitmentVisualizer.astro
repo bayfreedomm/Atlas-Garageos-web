@@ -1,0 +1,30 @@
+---
+interface Props { mode?: 'tire-single' | 'tire-comparison' | 'wheel' | 'full'; title?: string; }
+const { mode = 'full', title = 'Visual fitment comparison' } = Astro.props;
+---
+<figure class="fitment-visualizer" data-fitment-visualizer data-mode={mode} aria-labelledby={`visual-${mode}-title`}>
+  <figcaption><span class="visual-kicker">Calculated geometry</span><strong id={`visual-${mode}-title`}>{title}</strong><p data-visual-summary>Enter a setup to see the geometry.</p></figcaption>
+  <div class="visualizer-panels">
+    <section class="visual-panel visual-panel--tire" aria-label="Scaled side view">
+      <span class="visual-panel__label">Side view · scaled diameter</span>
+      <svg viewBox="0 0 360 190" role="img" aria-label="Current and new tire and rim diameters shown to scale">
+        <path class="measure-axis" d="M16 168H344M22 164v8M90 164v8M180 164v8M270 164v8M338 164v8" />
+        <g class="tire-set tire-set--current"><circle data-current-tire cx="103" cy="91" r="62" /><circle data-current-rim cx="103" cy="91" r="35" /><path d="M103 20v142M32 91h142" /></g>
+        <g class="tire-set tire-set--new"><circle data-new-tire cx="257" cy="91" r="62" /><circle data-new-rim cx="257" cy="91" r="35" /><path d="M257 20v142M186 91h142" /></g>
+        <text x="103" y="184" text-anchor="middle">CURRENT</text><text class="new-label" x="257" y="184" text-anchor="middle">NEW</text>
+      </svg>
+      <div class="visual-values"><span data-current-tire-label>Current</span><span data-new-tire-label>New</span></div>
+    </section>
+    <section class="visual-panel visual-panel--wheel" aria-label="Wheel position view">
+      <span class="visual-panel__label">Axle view · relative movement</span>
+      <svg viewBox="0 0 360 190" role="img" aria-label="Current and new wheel edges relative to the hub mounting plane">
+        <path class="measure-axis" d="M24 166H336M32 162v8M106 162v8M180 160v12M254 162v8M328 162v8" />
+        <path class="hub-plane" d="M180 19V171" /><text x="180" y="14" text-anchor="middle">HUB PLANE</text>
+        <rect class="wheel-bar wheel-bar--current" data-current-wheel x="82" y="58" width="196" height="32" rx="8" />
+        <rect class="wheel-bar wheel-bar--new" data-new-wheel x="76" y="105" width="212" height="32" rx="8" />
+        <text x="32" y="80">CURRENT</text><text class="new-label" x="32" y="127">NEW</text>
+      </svg>
+      <div class="visual-values"><span data-inner-label>Inner position</span><span data-outer-label>Outer position</span></div>
+    </section>
+  </div>
+</figure>

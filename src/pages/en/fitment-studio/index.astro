@@ -1,6 +1,10 @@
 ---
 import { canonicalForPath, toolById } from '../../../seo/tool-registry';
 import { translate } from '../../../localization/catalog';
+import Brand from '../../../components/Brand.astro';
+import ThemeBoot from '../../../components/ThemeBoot.astro';
+import ThemeControl from '../../../components/ThemeControl.astro';
+import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
 import '../../../styles/global.css';
 
 const seo = toolById('fitment-studio');
@@ -10,6 +14,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeBoot />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={seo.description} />
@@ -17,9 +22,9 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
     <link rel="canonical" href={canonicalForPath('/en/fitment-studio/')} />
     <link rel="alternate" hreflang="en" href={canonicalForPath('/en/fitment-studio/')} />
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#173f38" />
+    <meta name="theme-color" content="#123d36" />
     <title>{seo.title} — Atlas GarageOS</title>
   </head>
   <body>
@@ -27,16 +32,14 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 
     <header class="app-header">
       <div class="app-header__inner">
-        <a class="brand" href="/en/fitment-studio/" aria-label="Atlas GarageOS Fitment Studio">
-          <span class="brand-mark" aria-hidden="true">AG</span>
-          <span class="brand-copy"><strong>Atlas GarageOS</strong><span>Fitment Studio</span></span>
-        </a>
+        <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand subtitle="Fitment Studio" /></a>
         <nav class="desktop-nav" aria-label="Primary navigation">
+          <a href="/en/">Home</a>
           <a href="#garage" data-product-nav="garage">Garage</a>
           <a href="#fitment" data-product-nav="fitment" aria-current="page">Fitment</a>
-          <a href="/en/tools/tire-size-calculator/">Tools</a>
+          <a href="/en/tools/">Tools</a>
         </nav>
-        <span id="shell-vehicle" class="active-vehicle-chip">No vehicle selected</span>
+        <div class="shell-controls"><span id="shell-vehicle" class="active-vehicle-chip">No vehicle selected</span><ThemeControl /></div>
       </div>
     </header>
 
@@ -101,12 +104,9 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
           <div class="form-actions"><button type="submit">Compare setups</button><button id="copy-share" type="button" class="secondary">Share comparison</button></div>
         </form>
         <div id="errors" class="inline-errors" role="alert" aria-live="assertive" hidden></div>
+        <p id="comparison-summary" class="result-summary" aria-live="polite"></p>
         <div class="comparison-layout" aria-labelledby="results-heading">
-          <figure id="comparison-visual" class="comparison-visual">
-            <figcaption><p class="eyebrow">Side-view foundation</p><h3 id="results-heading">Diameter comparison</h3><p>Schematic scale reflects calculated overall diameter only.</p></figcaption>
-            <div class="diameter-track" aria-hidden="true"><span class="diameter-line diameter-line--current"></span><span class="diameter-line diameter-line--new"></span></div>
-            <div class="visual-legend"><span id="visual-current">Current</span><span id="visual-new">New</span></div>
-          </figure>
+          <div id="results-heading"><FitmentVisualizer mode="full" title="Current and new geometry" /></div>
           <dl id="results" class="metric-grid" aria-live="polite"></dl>
         </div>
       </section>
@@ -152,7 +152,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
       <section class="product-section subtle-panel" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">Related tools</p><h2 id="tools-heading">Continue with one focused calculation</h2><p>Use the same transparent geometry engines through a task-specific entry point.</p><div class="related-grid"><a class="related-card" href="/en/tools/tire-size-comparison/"><span>Tires & wheels</span><strong>Tire Size Comparison</strong><p>Compare diameter, sidewall, circumference, and speedometer changes.</p></a><a class="related-card" href="/en/tools/wheel-offset-calculator/"><span>Fitment</span><strong>Wheel Offset Calculator</strong><p>See inner-position and outer-poke changes before using measured clearance.</p></a><a class="related-card" href="#garage"><span>Vehicle memory</span><strong>My Garage</strong><p>Return to measurements and setups stored for your active vehicle.</p></a></div></section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Mobile navigation"><a href="#garage" data-product-nav="garage">Garage</a><a href="#fitment" data-product-nav="fitment" aria-current="page">Fitment</a><a href="/en/tools/tire-size-calculator/">Tools</a></nav>
+    <nav class="bottom-nav" aria-label="Mobile navigation"><a href="/en/">Home</a><a href="#garage" data-product-nav="garage">Garage</a><a href="#fitment" data-product-nav="fitment" aria-current="page">Fitment</a><a href="/en/tools/">Tools</a></nav>
 
     <script>
       import { initializeFitmentPage } from '../../../ui/fitment-page';

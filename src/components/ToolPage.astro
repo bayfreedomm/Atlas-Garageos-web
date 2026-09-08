@@ -8,7 +8,7 @@ const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/en/fit
 const related = relatedTools(definition);
 ---
 <SiteLayout {definition} active="tools">
-  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/fitment-studio/">Fitment Studio</a><span aria-hidden="true">/</span><span aria-current="page">{definition.title}</span></nav>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><a href="/en/tools/">Tools</a><span aria-hidden="true">/</span><span aria-current="page">{definition.title}</span></nav>
   <header class="tool-intro"><p class="eyebrow">{eyebrow}</p><h1>{definition.title}</h1><p class="hero-copy">{intro}</p></header>
   <section class="tool-workspace" aria-label={`${definition.title} calculator`}><slot name="tool" /></section>
   <section class="tool-explanation"><div><p class="eyebrow">How to read it</p><slot name="explanation" /></div><aside class="limitation-card"><strong>Calculation boundary</strong><p>{limitation}</p></aside></section>

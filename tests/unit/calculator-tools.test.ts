@@ -11,7 +11,7 @@ describe('indexable calculator flows', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.overallDiameterMm).toBeCloseTo(659.7, 10);
-    expect(tireCalculatorMetrics(result.value).map(({ label }) => label)).toEqual(['Sidewall height', 'Overall diameter', 'Circumference', 'Revolutions per mile', 'Revolutions per kilometer']);
+    expect(tireCalculatorMetrics(result.value).map(({ label }) => label)).toEqual(['Overall diameter', 'Sidewall height', 'Circumference', 'Revolutions per mile', 'Revolutions per kilometer']);
   });
 
   it('runs the tire comparison flow without a fitment verdict', () => {

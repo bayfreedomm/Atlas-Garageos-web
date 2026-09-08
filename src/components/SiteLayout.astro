@@ -1,43 +1,53 @@
 ---
 import type { ToolDefinition } from '../seo/tool-registry';
-import { canonicalForPath, routeForTool, SITE_ORIGIN, toolById } from '../seo/tool-registry';
+import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registry';
+import Brand from './Brand.astro';
+import ThemeBoot from './ThemeBoot.astro';
+import ThemeControl from './ThemeControl.astro';
 import '../styles/global.css';
 
-interface Props { definition: ToolDefinition; active?: 'fitment' | 'tools'; }
-const { definition, active = definition.kind === 'flagship' ? 'fitment' : 'tools' } = Astro.props;
-const pathname = routeForTool(definition);
+interface Breadcrumb { readonly name: string; readonly href: string; }
+interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string; active?: 'home' | 'garage' | 'fitment' | 'tools'; breadcrumbs?: readonly Breadcrumb[]; }
+const props = Astro.props;
+const definition = props.definition;
+const title = props.title ?? definition?.title;
+const description = props.description ?? definition?.description;
+const pathname = props.pathname ?? (definition ? routeForTool(definition) : undefined);
+if (!title || !description || !pathname) throw new Error('SiteLayout requires definition or explicit page metadata.');
+const active = props.active ?? (definition?.kind === 'flagship' ? 'fitment' : definition ? 'tools' : undefined);
 const canonical = canonicalForPath(pathname);
 const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
-const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: definition.kind === 'flagship'
-  ? [{ '@type': 'ListItem', position: 1, name: definition.title, item: canonical }]
-  : [{ '@type': 'ListItem', position: 1, name: 'Fitment Studio', item: canonicalForPath('/en/fitment-studio/') }, { '@type': 'ListItem', position: 2, name: definition.title, item: canonical }]
-});
+const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
+  ? [{ name: definition.title, href: pathname }]
+  : definition ? [{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
+const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
-<html lang={definition.locale}>
+<html lang={definition?.locale ?? 'en'}>
   <head>
+    <ThemeBoot />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content={definition.description} />
+    <meta name="description" content={description} />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={canonical} />
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#173f38" />
+    <meta name="theme-color" content="#123d36" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
-    <title>{definition.title} — Atlas GarageOS</title>
+    <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href={routeForTool(toolById('fitment-studio'))} aria-label="Atlas GarageOS home"><span class="brand-mark" aria-hidden="true">AG</span><span class="brand-copy"><strong>Atlas GarageOS</strong><span>Automotive tools</span></span></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/fitment-studio/#garage">Garage</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment</a><a href="/en/tools/tire-size-calculator/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a></nav>
-      <span class="locale-chip">EN</span>
+      <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/fitment-studio/#garage" aria-current={active === 'garage' ? 'page' : undefined}>Garage</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a></nav>
+      <div class="shell-controls"><ThemeControl /><span class="locale-chip">EN</span></div>
     </div></header>
     <main id="main-content"><slot /></main>
-    <nav class="bottom-nav" aria-label="Mobile navigation"><a href="/en/fitment-studio/#garage">Garage</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment</a><a href="/en/tools/tire-size-calculator/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a></nav>
+    <nav class="bottom-nav" aria-label="Mobile navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/fitment-studio/#garage" aria-current={active === 'garage' ? 'page' : undefined}>Garage</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a></nav>
   </body>
 </html>

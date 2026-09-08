@@ -1,5 +1,6 @@
 import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, type TireToolInput } from '../features/tools/calculator-tools';
-import { speedometerMetrics, tireCalculatorMetrics, tireComparisonMetrics, toolIssueText, wheelOffsetMetrics, type PresentedMetric } from './tool-presentation';
+import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
+import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
 const tireValue = (form: HTMLFormElement, prefix: string): TireToolInput => ({ widthMm: numberValue(form, `${prefix}widthMm`), aspectRatio: numberValue(form, `${prefix}aspectRatio`), rimDiameterInches: numberValue(form, `${prefix}rimDiameterInches`) });
@@ -19,26 +20,62 @@ function renderIssues(container: HTMLElement, issues: readonly Parameters<typeof
   container.replaceChildren(list); container.hidden = false;
 }
 
+function setSummary(form: HTMLFormElement, summary: string): void {
+  const element = form.querySelector<HTMLElement>('[data-result-summary]');
+  if (element) { element.textContent = summary; element.classList.remove('is-pending'); }
+}
+
+function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiameterMm: number, proposed?: TireToolInput, proposedDiameterMm?: number): void {
+  const visual = form.querySelector<HTMLElement>('[data-fitment-visualizer]');
+  if (!visual) return;
+  const model = proposed && proposedDiameterMm !== undefined
+    ? tireScaleMapping({ currentDiameterMm, currentRimDiameterInches: input.rimDiameterInches, proposedDiameterMm, proposedRimDiameterInches: proposed.rimDiameterInches })
+    : tireScaleMapping({ currentDiameterMm, currentRimDiameterInches: input.rimDiameterInches });
+  visual.querySelector<SVGCircleElement>('[data-current-tire]')?.setAttribute('r', String(model.currentTireRadius));
+  visual.querySelector<SVGCircleElement>('[data-current-rim]')?.setAttribute('r', String(model.currentRimRadius));
+  visual.querySelector<SVGCircleElement>('[data-new-tire]')?.setAttribute('r', String(model.proposedTireRadius));
+  visual.querySelector<SVGCircleElement>('[data-new-rim]')?.setAttribute('r', String(model.proposedRimRadius));
+  const currentLabel = visual.querySelector<HTMLElement>('[data-current-tire-label]');
+  const proposedLabel = visual.querySelector<HTMLElement>('[data-new-tire-label]');
+  if (currentLabel) currentLabel.textContent = `${input.widthMm}/${input.aspectRatio} R${input.rimDiameterInches} · ${currentDiameterMm.toFixed(1)} mm`;
+  if (proposedLabel && proposed && proposedDiameterMm !== undefined) proposedLabel.textContent = `${proposed.widthMm}/${proposed.aspectRatio} R${proposed.rimDiameterInches} · ${proposedDiameterMm.toFixed(1)} mm`;
+}
+
+function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): void {
+  const visual = form.querySelector<HTMLElement>('[data-fitment-visualizer]');
+  if (!visual) return;
+  const model = wheelOffsetVisualMapping(inner, outer);
+  const proposed = visual.querySelector<SVGRectElement>('[data-new-wheel]');
+  proposed?.setAttribute('x', String(model.proposedX)); proposed?.setAttribute('width', String(model.proposedWidth));
+  const innerLabel = visual.querySelector<HTMLElement>('[data-inner-label]'); const outerLabel = visual.querySelector<HTMLElement>('[data-outer-label]');
+  if (innerLabel) innerLabel.textContent = `${Math.abs(inner).toFixed(2)} mm ${inner >= 0 ? 'farther inward' : 'less inward'}`;
+  if (outerLabel) outerLabel.textContent = `${Math.abs(outer).toFixed(2)} mm ${outer >= 0 ? 'farther outward' : 'less outward'}`;
+}
+
 export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach((form) => {
     const results = form.querySelector<HTMLDListElement>('[data-results]')!;
     const errors = form.querySelector<HTMLElement>('[data-errors]')!;
     const calculate = () => {
-      const result = calculateTireSizeTool({ widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') });
+      const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
+      const result = calculateTireSizeTool(input);
       if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
-      errors.hidden = true; errors.replaceChildren(); renderMetrics(results, tireCalculatorMetrics(result.value));
+      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); renderMetrics(results, tireCalculatorMetrics(result.value));
     };
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate();
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-comparison"]').forEach((form) => {
     bindCalculator(form, () => {
-      const result = compareTireSizesTool(tireValue(form, 'original-'), tireValue(form, 'new-'));
+      const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
+      const result = compareTireSizesTool(original, proposed);
+      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); }
       return result.ok ? { ok: true as const, metrics: tireComparisonMetrics(result.value) } : result;
     });
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach((form) => {
     bindCalculator(form, () => {
       const result = calculateWheelOffsetTool({ originalWidthInches: numberValue(form, 'originalWidthInches'), originalOffsetMm: numberValue(form, 'originalOffsetMm'), newWidthInches: numberValue(form, 'newWidthInches'), newOffsetMm: numberValue(form, 'newOffsetMm') });
+      if (result.ok) { setSummary(form, wheelOffsetSummary(result.value)); setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm); }
       return result.ok ? { ok: true as const, metrics: wheelOffsetMetrics(result.value) } : result;
     });
   });
@@ -46,6 +83,7 @@ export function initializeToolCalculators(): void {
     bindCalculator(form, () => {
       const unit = new FormData(form).get('unit') === 'mph' ? 'mph' : 'km/h';
       const result = calculateSpeedometerTool(tireValue(form, 'original-'), tireValue(form, 'new-'), numberValue(form, 'indicatedSpeed'), unit);
+      if (result.ok) setSummary(form, speedometerSummary(result.value));
       return result.ok ? { ok: true as const, metrics: speedometerMetrics(result.value) } : result;
     });
   });

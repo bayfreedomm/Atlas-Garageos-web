@@ -3,6 +3,8 @@ import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, ro
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
 
 const intendedRoutes = [
+  '/en/',
+  '/en/tools/',
   '/en/fitment-studio/',
   '/en/tools/tire-size-calculator/',
   '/en/tools/tire-size-comparison/',
@@ -19,7 +21,7 @@ describe('SEO tool registry', () => {
     expect(new Set(toolRegistry.map(routeForTool)).size).toBe(toolRegistry.length);
   });
 
-  it('exposes only implemented tool pages as indexable routes', () => {
+  it('exposes only real platform and implemented tool pages as indexable routes', () => {
     expect(indexableRoutes).toEqual(intendedRoutes);
     expect(toolRegistry.every(({ status, indexable }) => status === 'implemented' && indexable)).toBe(true);
   });

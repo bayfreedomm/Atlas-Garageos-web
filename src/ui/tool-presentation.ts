@@ -5,10 +5,30 @@ import { validationIssueText } from './presentation-model';
 
 export interface PresentedMetric { readonly label: string; readonly value: string; }
 
+const direction = (value: number, positive: string, negative: string): string => `${formatNumber(Math.abs(value))} mm ${value >= 0 ? positive : negative}`;
+
+export function tireCalculatorSummary(result: Parameters<typeof tireCalculatorMetrics>[0]): string {
+  return `Overall diameter is ${formatNumber(result.overallDiameterMm)} mm, with a ${formatNumber(result.sidewallHeightMm)} mm sidewall.`;
+}
+
+export function tireComparisonSummary(result: ValidValue<typeof compareTireSizesTool>): string {
+  const sizeDirection = result.diameterDifferenceMm >= 0 ? 'taller' : 'shorter';
+  const rideDirection = result.rideHeightDifferenceMm >= 0 ? 'raises' : 'lowers';
+  return `The new tire is ${formatNumber(Math.abs(result.diameterDifferenceMm))} mm ${sizeDirection} overall and ${rideDirection} the vehicle by approximately ${formatNumber(Math.abs(result.rideHeightDifferenceMm))} mm.`;
+}
+
+export function wheelOffsetSummary(result: ValidValue<typeof calculateWheelOffsetTool>): string {
+  return `The new wheel reaches ${direction(result.outerPokeChangeMm, 'farther outward', 'less outward')} and ${direction(result.innerPositionChangeMm, 'farther inward', 'less inward')}.`;
+}
+
+export function speedometerSummary(result: ValidValue<typeof calculateSpeedometerTool>): string {
+  return `At an indicated ${formatNumber(result.indicatedSpeed)} ${result.unit}, calculated actual speed is ${formatNumber(result.actualSpeed)} ${result.unit}.`;
+}
+
 export function tireCalculatorMetrics(result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): readonly PresentedMetric[] {
   return Object.freeze([
-    { label: 'Sidewall height', value: `${formatNumber(result.sidewallHeightMm)} mm` },
     { label: 'Overall diameter', value: `${formatNumber(result.overallDiameterMm)} mm` },
+    { label: 'Sidewall height', value: `${formatNumber(result.sidewallHeightMm)} mm` },
     { label: 'Circumference', value: `${formatNumber(result.circumferenceMm)} mm` },
     { label: 'Revolutions per mile', value: formatNumber(result.revolutionsPerMile) },
     { label: 'Revolutions per kilometer', value: formatNumber(result.revolutionsPerKilometer) },
