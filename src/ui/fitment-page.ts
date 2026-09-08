@@ -4,7 +4,8 @@ import { GarageService } from '../features/garage/garage-service';
 import { compareSetupInputs, type SetupInput } from '../features/compare/compare-setups';
 import { createSetupFromInput } from '../features/compare/compare-setups';
 import { createVehicleClearanceProfile, type VehicleClearanceProfile } from '../domain/clearance';
-import { createFitmentMap, type FitmentMapCell } from '../core/fitment/map';
+import { createFitmentMap, findNearestGreenAlternatives, type FitmentMapCell, type FitmentMapResult } from '../core/fitment/map';
+import { searchWhatFits, type RankingExplanation, type WhatFitsRanking } from '../core/fitment/search';
 import { createSetupShareHash, decodeSetupShareHash, type SetupShareV1 } from '../features/share/setup-share';
 import { translate } from '../localization/catalog';
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
@@ -78,12 +79,17 @@ export async function initializeFitmentPage(): Promise<void> {
   const mapContainer = required<HTMLDivElement>('#fitment-map');
   const mapDetail = required<HTMLElement>('#map-detail');
   const mapErrors = required<HTMLDivElement>('#map-errors');
+  const whatFitsSummary = required<HTMLParagraphElement>('#what-fits-summary');
+  const whatFitsErrors = required<HTMLDivElement>('#what-fits-errors');
+  const whatFitsResults = required<HTMLDivElement>('#what-fits-results');
   const repository = createBrowserGarageRepository();
   const service = new GarageService(repository, {
     createId: () => crypto.randomUUID(),
     nowIso: () => new Date().toISOString(),
   });
   let shared: SetupShareV1 | undefined;
+  let activeMap: FitmentMapResult | undefined;
+  let activeMapProfile: VehicleClearanceProfile | undefined;
 
   const optionalNumber = (name: string): number | null => input(name).value.trim() === '' ? null : Number(input(name).value);
 
@@ -122,7 +128,54 @@ export async function initializeFitmentPage(): Promise<void> {
     const reason = document.createElement('p');
     reason.textContent = reasonText(cell, profile);
     mapDetail.append(heading, metrics, reason);
+    if (cell.state !== 'green' && activeMap && activeMapProfile === profile) {
+      const nearest = findNearestGreenAlternatives({ widthInches: cell.wheelWidthInches, offsetMm: cell.offsetMm }, activeMap, 3);
+      const nearestHeading = document.createElement('h4');
+      nearestHeading.textContent = 'Closest geometric matches';
+      const list = document.createElement('ol');
+      list.className = 'nearest-list';
+      for (const alternative of nearest) {
+        const item = document.createElement('li');
+        const widthSteps = Math.abs(alternative.cell.wheelWidthInches - cell.wheelWidthInches) / activeMap.widthStepInches;
+        const offsetSteps = Math.abs(alternative.cell.offsetMm - cell.offsetMm) / activeMap.offsetStepMm;
+        const label = document.createElement('span');
+        label.textContent = `${alternative.cell.wheelWidthInches}J ET${alternative.cell.offsetMm} — GREEN · inner ${formatNumber(alternative.cell.projectedInnerClearanceMm)} mm · outer ${formatNumber(alternative.cell.projectedOuterClearanceMm)} mm · ${formatNumber(alternative.distanceInGridSteps)} grid steps (${formatNumber(widthSteps)} width + ${formatNumber(offsetSteps)} offset)`;
+        item.append(label);
+        appendButton(item, 'Load into comparison', () => loadWheelCandidate(alternative.cell, rimDiameter), 'secondary');
+        list.append(item);
+      }
+      if (nearest.length === 0) {
+        const empty = document.createElement('p');
+        empty.textContent = 'No green alternatives exist in the current map range.';
+        mapDetail.append(nearestHeading, empty);
+      } else {
+        mapDetail.append(nearestHeading, list);
+      }
+    }
     mapDetail.hidden = false;
+  }
+
+  function candidateSetup(cell: FitmentMapCell, rimDiameter: number): SetupInput {
+    const baseline = readSetup('current');
+    return { ...baseline, rimDiameterInches: rimDiameter, wheelWidthInches: cell.wheelWidthInches, wheelOffsetMm: cell.offsetMm };
+  }
+
+  function loadWheelCandidate(cell: FitmentMapCell, rimDiameter: number): void {
+    writeSetup('proposed', candidateSetup(cell, rimDiameter));
+    input('proposed-setup-name').value = `${cell.wheelWidthInches}J ET${cell.offsetMm}`;
+    renderComparison();
+    status.textContent = 'Candidate loaded into comparison. It has not been saved.';
+  }
+
+  async function saveWheelCandidate(cell: FitmentMapCell, rimDiameter: number): Promise<void> {
+    const result = await service.saveSetup({
+      name: `What Fits ${cell.wheelWidthInches}J ET${cell.offsetMm}`,
+      vehicleNickname: input('vehicle-nickname').value,
+      setup: candidateSetup(cell, rimDiameter),
+    });
+    if (!result.ok) { showIssues(whatFitsErrors, result.issues); return; }
+    renderGarage(result.value);
+    status.textContent = 'Selected What Fits candidate saved explicitly to Garage.';
   }
 
   function generateMap(): void {
@@ -135,6 +188,8 @@ export async function initializeFitmentPage(): Promise<void> {
     });
     if (!result.ok) { showIssues(mapErrors, result.issues); mapContainer.replaceChildren(); return; }
     mapErrors.hidden = true;
+    activeMap = result.value;
+    activeMapProfile = profile.value;
     const table = document.createElement('table');
     table.className = 'fitment-table';
     const head = document.createElement('thead');
@@ -150,6 +205,7 @@ export async function initializeFitmentPage(): Promise<void> {
     }
     head.append(headerRow);
     const body = document.createElement('tbody');
+    let cellIndex = 0;
     for (const width of result.value.widthValuesInches) {
       const row = document.createElement('tr');
       const header = document.createElement('th');
@@ -157,7 +213,7 @@ export async function initializeFitmentPage(): Promise<void> {
       header.textContent = `${width}J`;
       row.append(header);
       for (const offset of result.value.offsetValuesMm) {
-        const cell = result.value.cells.find((item) => item.wheelWidthInches === width && item.offsetMm === offset)!;
+        const cell = result.value.cells[cellIndex++]!;
         const data = document.createElement('td');
         appendButton(data, cell.state === 'green' ? '●' : cell.state === 'yellow' ? '▲' : '×', () => showMapDetail(cell, result.value.rimDiameterInches, profile.value), `map-cell state-${cell.state}`);
         const button = data.querySelector('button')!;
@@ -169,6 +225,55 @@ export async function initializeFitmentPage(): Promise<void> {
     table.append(head, body);
     mapContainer.replaceChildren(table);
     mapDetail.hidden = true;
+  }
+
+  function readWhatFitsRanking(): WhatFitsRanking {
+    const mode = required<HTMLSelectElement>('[name="wf-ranking"]').value;
+    if (mode === 'maximizeClearance') return { mode };
+    if (mode === 'minimizeGeometryChange') return { mode };
+    if (mode === 'targetOuterClearance') return { mode, targetOuterClearanceMm: Number(input('wf-target-outer').value) };
+    return { mode: 'nearestToCandidate', targetWidthInches: Number(input('wf-target-width').value), targetOffsetMm: Number(input('wf-target-offset').value) };
+  }
+
+  function rankingText(explanation: RankingExplanation): string {
+    switch (explanation.mode) {
+      case 'nearestToCandidate': return `${formatNumber(explanation.distanceInGridSteps)} normalized grid steps: ${formatNumber(explanation.widthSteps)} width + ${formatNumber(explanation.offsetSteps)} offset.`;
+      case 'maximizeClearance': return `Minimum projected clearance is ${formatNumber(explanation.minimumProjectedClearanceMm)} mm; higher values rank first.`;
+      case 'minimizeGeometryChange': return `Total absolute wheel-position change is ${formatNumber(explanation.totalAbsolutePositionChangeMm)} mm; lower values rank first.`;
+      case 'targetOuterClearance': return `Projected outer clearance is ${formatNumber(explanation.distanceFromOuterTargetMm)} mm from the ${formatNumber(explanation.targetOuterClearanceMm)} mm target.`;
+    }
+  }
+
+  function searchWhatFitsFromInputs(): void {
+    const profile = readClearanceProfile();
+    if (!profile.ok) { showIssues(whatFitsErrors, profile.issues); whatFitsResults.replaceChildren(); return; }
+    const result = searchWhatFits({
+      clearanceProfile: profile.value,
+      widthRangeInches: { min: Number(input('wf-width-min').value), max: Number(input('wf-width-max').value), step: Number(input('wf-width-step').value) },
+      offsetRangeMm: { min: Number(input('wf-offset-min').value), max: Number(input('wf-offset-max').value), step: Number(input('wf-offset-step').value) },
+      ranking: readWhatFitsRanking(),
+      maxResults: Number(input('wf-max-results').value),
+    });
+    if (!result.ok) { showIssues(whatFitsErrors, result.issues); whatFitsResults.replaceChildren(); return; }
+    whatFitsErrors.hidden = true;
+    whatFitsSummary.textContent = `Evaluated: ${result.value.evaluatedCandidateCount} · Green: ${result.value.greenCount} · Yellow: ${result.value.yellowCount} · Red overlap rejected: ${result.value.rejectedOverlapCount}`;
+    const rimDiameter = profile.value.baselineSetup.wheel.diameterInches;
+    whatFitsResults.replaceChildren(...result.value.candidates.map((candidate) => {
+      const card = document.createElement('article');
+      const heading = document.createElement('h3');
+      const geometry = document.createElement('p');
+      const explanation = document.createElement('p');
+      const actions = document.createElement('div');
+      heading.textContent = `#${candidate.rank} · ${rimDiameter}x${candidate.cell.wheelWidthInches} ET${candidate.cell.offsetMm} — ${candidate.cell.state.toUpperCase()}`;
+      geometry.textContent = `Projected inner ${formatNumber(candidate.cell.projectedInnerClearanceMm)} mm · outer ${formatNumber(candidate.cell.projectedOuterClearanceMm)} mm`;
+      explanation.textContent = rankingText(candidate.explanation);
+      actions.className = 'actions';
+      appendButton(actions, 'Inspect geometry', () => showMapDetail(candidate.cell, rimDiameter, profile.value), 'secondary');
+      appendButton(actions, 'Load candidate', () => loadWheelCandidate(candidate.cell, rimDiameter));
+      appendButton(actions, 'Save to Garage', () => saveWheelCandidate(candidate.cell, rimDiameter), 'secondary');
+      card.append(heading, geometry, explanation, actions);
+      return card;
+    }));
   }
 
   function populateClearance(profile: VehicleClearanceProfile): void {
@@ -291,6 +396,7 @@ export async function initializeFitmentPage(): Promise<void> {
     renderGarage(result.value);
     generateMap();
   });
+  required('#search-what-fits').addEventListener('click', searchWhatFitsFromInputs);
 
   const loaded = await service.load();
   renderGarage(loaded.state);
@@ -313,4 +419,5 @@ export async function initializeFitmentPage(): Promise<void> {
   }
   renderComparison();
   generateMap();
+  searchWhatFitsFromInputs();
 }

@@ -7,4 +7,6 @@ export const en = {
   sharedNotice: 'This setup has not been saved to My Garage.',
   fitmentMapTitle: 'Wheel Geometry Map',
   fitmentMapDisclaimer: 'Colors describe projected wheel clearance from your measurements. They are not road-safety verdicts.',
+  whatFitsTitle: 'What Fits?',
+  whatFitsDisclaimer: 'Search and ranking reflect wheel geometry preferences, not road safety or verified vehicle compatibility.',
 } as const;

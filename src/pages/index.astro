@@ -100,6 +100,35 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <article id="map-detail" class="map-detail" hidden aria-live="polite"></article>
       </section>
 
+      <section aria-labelledby="what-fits-heading" id="what-fits-section">
+        <h2 id="what-fits-heading">{t('whatFitsTitle')}</h2>
+        <p>{t('whatFitsDisclaimer')}</p>
+        <div class="map-inputs">
+          <label>Width minimum (J)<input name="wf-width-min" type="number" value="7" step="0.5" /></label>
+          <label>Width maximum (J)<input name="wf-width-max" type="number" value="10" step="0.5" /></label>
+          <label>Width step (J)<input name="wf-width-step" type="number" value="0.5" min="0.1" step="0.1" /></label>
+          <label>Offset minimum (ET)<input name="wf-offset-min" type="number" value="20" step="1" /></label>
+          <label>Offset maximum (ET)<input name="wf-offset-max" type="number" value="55" step="1" /></label>
+          <label>Offset step (mm)<input name="wf-offset-step" type="number" value="5" min="1" step="1" /></label>
+          <label>Ranking
+            <select name="wf-ranking">
+              <option value="nearestToCandidate">Nearest to candidate</option>
+              <option value="maximizeClearance">Maximize minimum clearance</option>
+              <option value="minimizeGeometryChange">Minimize geometry change</option>
+              <option value="targetOuterClearance">Target outer clearance</option>
+            </select>
+          </label>
+          <label>Target width (J)<input name="wf-target-width" type="number" value="8.5" step="0.5" /></label>
+          <label>Target offset (ET)<input name="wf-target-offset" type="number" value="35" step="1" /></label>
+          <label>Target outer clearance (mm)<input name="wf-target-outer" type="number" value="7" step="0.1" /></label>
+          <label>Maximum results<input name="wf-max-results" type="number" value="10" min="1" max="100" step="1" /></label>
+        </div>
+        <button id="search-what-fits" type="button">Search</button>
+        <p id="what-fits-summary" class="search-summary" aria-live="polite"></p>
+        <div id="what-fits-errors" hidden></div>
+        <div id="what-fits-results" class="search-results"></div>
+      </section>
+
       <section aria-labelledby="garage-heading">
         <h2 id="garage-heading">{t('garageTitle')}</h2>
         <label class="nickname">Vehicle nickname<input name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label>

@@ -3,12 +3,9 @@ import type { VehicleClearanceProfile } from '../../domain/clearance';
 import type { ValidationIssue, ValidationResult } from '../../domain/validation';
 import { invalid, valid } from '../../domain/validation';
 import { evaluateWheelGeometry, type GeometryEvaluation } from './clearance';
+import { createNumericRangeValues, type NumericRange } from '../units/numeric-range';
 
-export interface NumericRange {
-  readonly min: number;
-  readonly max: number;
-  readonly step: number;
-}
+export type { NumericRange } from '../units/numeric-range';
 
 export interface FitmentMapRequest {
   readonly clearanceProfile: VehicleClearanceProfile;
@@ -30,20 +27,9 @@ export interface FitmentMapResult {
   readonly cells: readonly FitmentMapCell[];
 }
 
-function valuesForRange(range: NumericRange, field: string): ValidationResult<readonly number[]> {
-  const issue = (message: string): ValidationResult<readonly number[]> => invalid({ code: 'out-of-range', field, message, received: range });
-  if (![range.min, range.max, range.step].every(Number.isFinite)) return issue(`${field} values must be finite numbers.`);
-  if (range.step <= 0) return issue(`${field} step must be greater than zero.`);
-  if (range.max < range.min) return issue(`${field} maximum must be greater than or equal to its minimum.`);
-  const count = Math.floor((range.max - range.min) / range.step + 1e-9) + 1;
-  if (count > 100) return issue(`${field} may contain at most 100 values.`);
-  const decimals = Math.min(8, Math.max(0, String(range.step).split('.')[1]?.length ?? 0));
-  return valid(Object.freeze(Array.from({ length: count }, (_, index) => Number((range.min + index * range.step).toFixed(decimals)))));
-}
-
 export function createFitmentMap(request: FitmentMapRequest): ValidationResult<FitmentMapResult> {
-  const widths = valuesForRange(request.widthRangeInches, 'widthRangeInches');
-  const offsets = valuesForRange(request.offsetRangeMm, 'offsetRangeMm');
+  const widths = createNumericRangeValues(request.widthRangeInches, 'widthRangeInches');
+  const offsets = createNumericRangeValues(request.offsetRangeMm, 'offsetRangeMm');
   const issues: ValidationIssue[] = [];
   if (!widths.ok) issues.push(...widths.issues);
   if (!offsets.ok) issues.push(...offsets.issues);

@@ -55,6 +55,27 @@ Green never means road-safe, and yellow is not a danger verdict. The map models 
 
 Nearest-green ranking uses Manhattan distance measured in the map's own grid steps: `|width difference| / width step + |offset difference| / offset step`. Deterministic tie-breakers prefer unchanged width, then unchanged offset, then ascending width and offset. There are no hidden weights.
 
+## What Fits search
+
+`core/fitment/search` is a pure TypeScript query engine over the Fitment Map. It constructs the requested width/offset grid through `createFitmentMap`, then ranks the non-red cells; it does not maintain a second copy of wheel-position or clearance geometry. Red cells are counted as rejected geometric overlaps and never appear as recommendations. Green and yellow keep exactly the map meanings above, so a recommendation remains a transparent geometric result rather than a safety verdict.
+
+Every ranking mode is explicit in the input and produces structured explanation data for the UI:
+
+- `nearestToCandidate`: `|width - target width| / width step + |offset - target offset| / offset step`.
+- `maximizeClearance`: maximize `min(projected inner clearance, projected outer clearance)`.
+- `minimizeGeometryChange`: minimize `|inner position change| + |outer-poke change|` relative to the measured baseline.
+- `targetOuterClearance`: minimize `|projected outer clearance - requested outer clearance|`.
+
+Equal scores use one shared deterministic order: smallest absolute width change from the baseline, smallest absolute offset change, ascending width, then ascending offset. Search ranges are validated and capped before expansion, and the result count is capped, keeping the browser workload bounded and predictable. There are no implicit mode switches, safety margins, or hidden weights.
+
+The UI treats search results as transient. Inspecting or loading a candidate changes only the current comparison workspace. Persistence still occurs solely through the user's explicit Garage save action and the existing repository boundary; Milestone 4 does not change the Garage schema.
+
+## Tire candidate foundation and combined seam
+
+`core/tire/search` enumerates validated tire sizes for a requested rim diameter and orders them by absolute diameter difference from a baseline tire. It reports diameter, circumference, sidewall, and speedometer differences by calling the existing tire geometry functions. An absolute diameter-percentage limit is applied only when the caller supplies one; the core invents no compatibility or safety threshold.
+
+`core/fitment/combined-candidate` defines the future composition boundary for a wheel recommendation and a tire-size candidate. It deliberately performs no Cartesian search and introduces no new geometry. A later combined tool can coordinate the two independent engines through this typed seam without coupling wheel-clearance calculations to tire enumeration.
+
 ## Growth seams
 
 `VehicleProfile` is the shared My Garage identity used by future tools. `VehicleEvent` is a discriminated, extensible base for a later Car Timeline without implementing timeline behavior now. Storage is accessed through repository ports and browser-specific implementations live only in `src/storage`.
