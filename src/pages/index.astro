@@ -1,0 +1,111 @@
+---
+import { seoRoutes } from '../seo/routes';
+import '../styles/global.css';
+
+const seo = seoRoutes[0]!;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={seo.description} />
+    <meta name="robots" content="index,follow" />
+    <title>{seo.title}</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Atlas GarageOS / Development Surface</p>
+        <h1>Fitment Studio</h1>
+        <p>Geometry comparison only. Results are not a safety, clearance, or compatibility verdict.</p>
+      </header>
+
+      <form id="fitment-form">
+        <fieldset data-setup="current">
+          <legend>Current setup</legend>
+          <div class="grid">
+            <label>Tire width (mm)<input name="current-tireWidthMm" type="number" value="225" step="1" required /></label>
+            <label>Aspect ratio (%)<input name="current-tireAspectRatio" type="number" value="45" step="1" required /></label>
+            <label>Rim diameter (in)<input name="current-rimDiameterInches" type="number" value="18" step="0.5" required /></label>
+            <label>Wheel width (in)<input name="current-wheelWidthInches" type="number" value="8" step="0.5" required /></label>
+            <label>Offset ET (mm)<input name="current-wheelOffsetMm" type="number" value="40" step="1" required /></label>
+          </div>
+        </fieldset>
+
+        <fieldset data-setup="proposed">
+          <legend>New setup</legend>
+          <div class="grid">
+            <label>Tire width (mm)<input name="proposed-tireWidthMm" type="number" value="235" step="1" required /></label>
+            <label>Aspect ratio (%)<input name="proposed-tireAspectRatio" type="number" value="40" step="1" required /></label>
+            <label>Rim diameter (in)<input name="proposed-rimDiameterInches" type="number" value="19" step="0.5" required /></label>
+            <label>Wheel width (in)<input name="proposed-wheelWidthInches" type="number" value="8.5" step="0.5" required /></label>
+            <label>Offset ET (mm)<input name="proposed-wheelOffsetMm" type="number" value="35" step="1" required /></label>
+          </div>
+        </fieldset>
+
+        <button type="submit">Calculate comparison</button>
+      </form>
+
+      <section aria-labelledby="results-heading" aria-live="polite">
+        <h2 id="results-heading">Raw results</h2>
+        <div id="errors" hidden></div>
+        <dl id="results"></dl>
+      </section>
+    </main>
+
+    <script>
+      import { compareSetupInputs, type SetupInput } from '../features/compare/compare-setups';
+      import { formatNumber } from '../ui/format-number';
+
+      const form = document.querySelector<HTMLFormElement>('#fitment-form')!;
+      const results = document.querySelector<HTMLDListElement>('#results')!;
+      const errors = document.querySelector<HTMLDivElement>('#errors')!;
+
+      const number = (data: FormData, name: string) => Number(data.get(name));
+      const readSetup = (data: FormData, prefix: string): SetupInput => ({
+        tireWidthMm: number(data, `${prefix}-tireWidthMm`),
+        tireAspectRatio: number(data, `${prefix}-tireAspectRatio`),
+        rimDiameterInches: number(data, `${prefix}-rimDiameterInches`),
+        wheelWidthInches: number(data, `${prefix}-wheelWidthInches`),
+        wheelOffsetMm: number(data, `${prefix}-wheelOffsetMm`),
+      });
+
+      function render(): void {
+        const data = new FormData(form);
+        const comparison = compareSetupInputs(readSetup(data, 'current'), readSetup(data, 'proposed'));
+        if (!comparison.ok) {
+          errors.hidden = false;
+          errors.innerHTML = `<ul>${comparison.issues.map((issue) => `<li><strong>${issue.field}</strong>: ${issue.message}</li>`).join('')}</ul>`;
+          results.replaceChildren();
+          return;
+        }
+        errors.hidden = true;
+        const value = comparison.value;
+        const rows: readonly [string, number, string][] = [
+          ['Current sidewall', value.current.sidewallHeightMm, 'mm'],
+          ['New sidewall', value.proposed.sidewallHeightMm, 'mm'],
+          ['Current diameter', value.current.overallDiameterMm, 'mm'],
+          ['New diameter', value.proposed.overallDiameterMm, 'mm'],
+          ['Diameter difference', value.diameterDifferenceMm, 'mm'],
+          ['Diameter difference', value.diameterDifferencePercent, '%'],
+          ['Ride-height difference', value.rideHeightDifferenceMm, 'mm'],
+          ['Speed at same wheel RPM', value.speedometerDifferencePercent, '%'],
+          ['Inner-position change', value.wheelInnerPositionChangeMm, 'mm'],
+          ['Outer-poke change', value.wheelOuterPokeChangeMm, 'mm'],
+          ['Current circumference', value.current.circumferenceMm, 'mm'],
+          ['New circumference', value.proposed.circumferenceMm, 'mm'],
+          ['Current revolutions', value.current.revolutionsPerKilometer, '/km'],
+          ['New revolutions', value.proposed.revolutionsPerKilometer, '/km'],
+          ['Current revolutions', value.current.revolutionsPerMile, '/mile'],
+          ['New revolutions', value.proposed.revolutionsPerMile, '/mile'],
+        ];
+        results.innerHTML = rows.map(([label, amount, unit]) => `<div><dt>${label}</dt><dd>${formatNumber(amount, 3)} ${unit}</dd></div>`).join('');
+      }
+
+      form.addEventListener('submit', (event) => { event.preventDefault(); render(); });
+      render();
+    </script>
+  </body>
+</html>
