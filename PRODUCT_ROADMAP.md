@@ -101,6 +101,46 @@ Distribution should compound the value of the core product rather than fork its 
 
 Every surface should consume shared engines and versioned contracts instead of reimplementing fitment logic.
 
+## Commerce and Product Discovery
+
+Fitment results may eventually connect geometric exploration to real products without turning Atlas GarageOS into an opaque recommendation marketplace. Future layers include:
+
+- Vehicle-to-OEM tire-size discovery where authoritative data and licensing justify it
+- A real tire brand and model catalog with dedicated tire product pages
+- Price comparison, retailer links, and an affiliate commerce layer
+- Deals and promotions with clear commercial disclosure
+- A “find real tires in this setup” flow
+- Fitment-result-to-purchasable-tire discovery
+
+Commercial availability must remain separate from geometric fitment, compatibility, and safety claims. Product data must retain source, market, freshness, and commercial relationship metadata.
+
+## Community and Real-World Data
+
+Future community features may include:
+
+- User vehicle and build galleries with real setup photos
+- User-submitted wheel and tire setups
+- Community fitment observations
+- Properly sourced rubbing and modification notes
+- Explicit community-data provenance and moderation state
+
+Community evidence can add useful real-world context, but it must never silently replace measurements, official data, or calculated geometry.
+
+## SEO and Product Graph
+
+The long-term information architecture should support explicit relationships between:
+
+- Vehicle
+- Tire Size
+- Wheel Size
+- Tire Brand
+- Tire Model
+- Fitment Setup
+- Tool
+- Product
+
+This graph is a future content and discovery boundary, not authorization to create a database or mass-generated pages before the underlying data and user value meet the project's quality standard.
+
 ## Product Principles
 
 - Modern, premium, fast, and mobile-first

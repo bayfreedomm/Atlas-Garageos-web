@@ -11,6 +11,7 @@ import { createSetupShareHash, decodeSetupShareHash, type SetupShareV1 } from '.
 import { translate } from '../localization/catalog';
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
 import { formatNumber } from './format-number';
+import { activeGaragePresentation, mapCellPresentation, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress, type ProductSection } from './presentation-model';
 
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -36,6 +37,8 @@ function writeSetup(prefix: string, setup: SetupInput): void {
   input(`${prefix}-rimDiameterInches`).value = String(setup.rimDiameterInches);
   input(`${prefix}-wheelWidthInches`).value = String(setup.wheelWidthInches);
   input(`${prefix}-wheelOffsetMm`).value = String(setup.wheelOffsetMm);
+  const wheelDiameter = document.querySelector<HTMLInputElement>(`[data-wheel-diameter="${prefix}"]`);
+  if (wheelDiameter) wheelDiameter.value = String(setup.rimDiameterInches);
 }
 
 const setupToInput = (saved: SavedSetup): SetupInput => ({
@@ -63,7 +66,7 @@ function showIssues(container: HTMLElement, issues: readonly ValidationIssue[]):
   const list = document.createElement('ul');
   for (const issue of issues) {
     const item = document.createElement('li');
-    item.textContent = `${issue.field}: ${issue.message}`;
+    item.textContent = validationIssueText(issue);
     list.append(item);
   }
   container.append(list);
@@ -210,12 +213,23 @@ export async function initializeFitmentPage(): Promise<void> {
       header.scope = 'row';
       header.textContent = `${width}J`;
       row.append(header);
-      for (const offset of result.value.offsetValuesMm) {
+      for (let offsetIndex = 0; offsetIndex < result.value.offsetValuesMm.length; offsetIndex += 1) {
         const cell = result.value.cells[cellIndex++]!;
         const data = document.createElement('td');
-        appendButton(data, cell.state === 'green' ? '●' : cell.state === 'yellow' ? '▲' : '×', () => showMapDetail(cell, result.value.rimDiameterInches, profile.value), `map-cell state-${cell.state}`);
-        const button = data.querySelector('button')!;
-        button.setAttribute('aria-label', `${width}J ET${offset}: ${cell.state}`);
+        const presentation = mapCellPresentation(cell, false);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `map-cell state-${cell.state}`;
+        button.textContent = presentation.symbol;
+        button.setAttribute('aria-label', presentation.ariaLabel);
+        button.setAttribute('aria-pressed', 'false');
+        button.addEventListener('click', () => {
+          mapContainer.querySelectorAll<HTMLButtonElement>('.map-cell').forEach((item) => { item.classList.remove('is-selected'); item.setAttribute('aria-pressed', 'false'); });
+          button.classList.add('is-selected');
+          button.setAttribute('aria-pressed', 'true');
+          showMapDetail(cell, result.value.rimDiameterInches, profile.value);
+        });
+        data.append(button);
         row.append(data);
       }
       body.append(row);
@@ -302,21 +316,72 @@ export async function initializeFitmentPage(): Promise<void> {
     whatFitsErrors.hidden = true;
     searchPreflight.textContent = `Preflight: ${result.value.preflight.wheelCandidateCount} wheel × ${result.value.preflight.tireCandidateCount} tire = ${result.value.preflight.combinationCount} combinations (technical ceiling ${result.value.preflight.maximumCombinationCount}).`;
     whatFitsSummary.textContent = `Preflight ${result.value.preflight.combinationCount} · eligible wheel ${result.value.eligibleWheelCandidateCount} · eligible tire ${result.value.eligibleTireCandidateCount} · overlap wheels rejected ${result.value.rejectedOverlapWheelCount} · showing ${result.value.candidates.length}`;
+    if (result.value.candidates.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      const title = document.createElement('strong');
+      const copy = document.createElement('span');
+      title.textContent = 'No geometric matches in this range';
+      copy.textContent = 'Review your explicit constraints or narrow a different part of the search range.';
+      empty.append(title, copy);
+      whatFitsResults.replaceChildren(empty);
+      return;
+    }
     whatFitsResults.replaceChildren(...result.value.candidates.map((candidate) => {
+      const model = resultCardModel(candidate);
       const card = document.createElement('article');
+      card.className = 'result-card';
+      const top = document.createElement('div');
+      top.className = 'result-card__top';
       const heading = document.createElement('h3');
-      const geometry = document.createElement('p');
-      const explanation = document.createElement('p');
+      heading.className = 'result-card__spec';
+      heading.textContent = `#${model.rank} · ${model.wheelPrimary}`;
+      const statusBadge = document.createElement('span');
+      statusBadge.className = `status-badge status-${model.state}`;
+      statusBadge.textContent = `${model.state === 'green' ? '✓' : '!'} ${model.stateLabel}`;
+      top.append(heading, statusBadge);
+      const offset = document.createElement('div');
+      offset.className = 'result-card__offset';
+      offset.textContent = model.wheelOffset;
+      const tireSize = document.createElement('p');
+      tireSize.className = 'result-card__tire';
+      tireSize.textContent = model.tireSize;
+      const summary = document.createElement('p');
+      summary.className = 'result-card__summary';
+      summary.textContent = model.stateSummary;
+      const metrics = document.createElement('div');
+      metrics.className = 'result-metrics';
+      const metricValues = [
+        ['Inner clearance', candidate.wheelGeometry.projectedInnerClearanceMm, 'mm'],
+        ['Outer clearance', candidate.wheelGeometry.projectedOuterClearanceMm, 'mm'],
+        ['Diameter change', candidate.tireGeometry.diameterDifferencePercent, '%'],
+        ['Speedometer', candidate.tireGeometry.speedometerDifferencePercent, '%'],
+      ] as const;
+      for (const [label, value, unit] of metricValues) {
+        const item = document.createElement('div');
+        item.className = 'result-metric';
+        const name = document.createElement('span');
+        const amount = document.createElement('strong');
+        name.textContent = label;
+        amount.textContent = `${formatNumber(value)} ${unit}`;
+        item.append(name, amount);
+        metrics.append(item);
+      }
+      const provenance = document.createElement('div');
+      provenance.className = 'provenance-row';
+      for (const label of ['CALCULATED', 'USER MEASURED']) {
+        const badge = document.createElement('span');
+        badge.className = 'source-badge';
+        badge.textContent = label;
+        provenance.append(badge);
+      }
       const actions = document.createElement('div');
-      heading.textContent = `#${candidate.rank} · ${candidate.setup.tire.widthMm}/${candidate.setup.tire.aspectRatio}R${candidate.setup.tire.rimDiameterInches} · ${candidate.setup.wheel.widthInches}J ET${candidate.setup.wheel.offsetMm} — ${candidate.wheelGeometry.state.toUpperCase()}`;
-      geometry.textContent = `Inner ${formatNumber(candidate.wheelGeometry.projectedInnerClearanceMm)} mm · outer ${formatNumber(candidate.wheelGeometry.projectedOuterClearanceMm)} mm · tire diameter ${formatNumber(candidate.tireGeometry.diameterDifferencePercent)}%`;
-      explanation.textContent = candidate.explanation.orderedCriteria.map(criterionText).join(' → ');
       actions.className = 'actions';
-      appendButton(actions, 'Inspect result', () => showCombinedDetail(candidate), 'secondary');
-      appendButton(actions, 'Compare with current', () => loadCombinedCandidate(candidate));
-      appendButton(actions, 'Save to My Garage', () => saveCombinedCandidate(candidate), 'secondary');
-      appendButton(actions, 'Load and share', async () => { loadCombinedCandidate(candidate); await copyShare(); }, 'secondary');
-      card.append(heading, geometry, explanation, actions);
+      appendButton(actions, 'Compare', () => loadCombinedCandidate(candidate));
+      appendButton(actions, 'Save to Garage', () => saveCombinedCandidate(candidate));
+      appendButton(actions, 'See geometry details', () => showCombinedDetail(candidate), 'secondary');
+      appendButton(actions, 'Share', async () => { loadCombinedCandidate(candidate); await copyShare(); }, 'tertiary');
+      card.append(top, offset, tireSize, summary, metrics, provenance, actions);
       return card;
     }));
   }
@@ -344,6 +409,14 @@ export async function initializeFitmentPage(): Promise<void> {
     }
     errors.hidden = true;
     const value = comparison.value;
+    const visual = required<HTMLElement>('#comparison-visual');
+    const maximumDiameter = Math.max(value.current.overallDiameterMm, value.proposed.overallDiameterMm);
+    visual.style.setProperty('--current-diameter-width', `${(value.current.overallDiameterMm / maximumDiameter) * 100}%`);
+    visual.style.setProperty('--new-diameter-width', `${(value.proposed.overallDiameterMm / maximumDiameter) * 100}%`);
+    required<HTMLElement>('.diameter-line--current').style.width = 'var(--current-diameter-width)';
+    required<HTMLElement>('.diameter-line--new').style.width = 'var(--new-diameter-width)';
+    required<HTMLElement>('#visual-current').textContent = `Current · ${formatNumber(value.current.overallDiameterMm)} mm`;
+    required<HTMLElement>('#visual-new').textContent = `New · ${formatNumber(value.proposed.overallDiameterMm)} mm`;
     const rows: readonly [string, number, string][] = [
         ['Current sidewall', value.current.sidewallHeightMm, 'mm'],
         ['New sidewall', value.proposed.sidewallHeightMm, 'mm'],
@@ -375,6 +448,27 @@ export async function initializeFitmentPage(): Promise<void> {
 
   function renderGarage(state: GarageState): void {
     garageState = state;
+    const presentation = activeGaragePresentation(state);
+    const shellVehicle = required<HTMLElement>('#shell-vehicle');
+    const vehicleSummary = required<HTMLElement>('#vehicle-summary');
+    shellVehicle.textContent = presentation.vehicle?.displayName ?? 'No vehicle selected';
+    vehicleSummary.replaceChildren();
+    const vehicleTitle = document.createElement('h3');
+    const vehicleCopy = document.createElement('p');
+    const vehicleStatus = document.createElement('div');
+    vehicleStatus.className = 'vehicle-card__status';
+    vehicleTitle.textContent = presentation.vehicle?.displayName ?? 'Your garage is ready';
+    vehicleCopy.textContent = presentation.clearance
+      ? `Current measurement baseline · ${presentation.clearance.baselineSetup.tire.widthMm}/${presentation.clearance.baselineSetup.tire.aspectRatio} R${presentation.clearance.baselineSetup.tire.rimDiameterInches} · ${presentation.clearance.baselineSetup.wheel.widthInches}J ET${presentation.clearance.baselineSetup.wheel.offsetMm}`
+      : 'Save a setup or complete Measure My Car to create a vehicle record.';
+    const measurementBadge = document.createElement('span');
+    measurementBadge.className = 'source-badge';
+    measurementBadge.textContent = presentation.isMeasured ? '✓ Measured' : 'Not measured';
+    const setupBadge = document.createElement('span');
+    setupBadge.className = 'source-badge';
+    setupBadge.textContent = `${presentation.setups.length} saved setup${presentation.setups.length === 1 ? '' : 's'}`;
+    vehicleStatus.append(measurementBadge, setupBadge);
+    vehicleSummary.append(vehicleTitle, vehicleCopy, vehicleStatus);
     activeVehicle.replaceChildren();
     const noVehicle = document.createElement('option');
     noVehicle.value = '';
@@ -387,10 +481,15 @@ export async function initializeFitmentPage(): Promise<void> {
       return option;
     }));
     garageList.replaceChildren();
-    const visibleSetups = state.savedSetups.filter((setup) => setup.vehicleId === state.activeVehicleId);
+    const visibleSetups = presentation.setups;
     if (visibleSetups.length === 0) {
-      const empty = document.createElement('p');
-      empty.textContent = translate('en', 'garageEmpty');
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      const title = document.createElement('strong');
+      const copy = document.createElement('span');
+      title.textContent = translate('en', 'garageEmpty');
+      copy.textContent = 'A setup appears here only after you choose Save.';
+      empty.append(title, copy);
       garageList.append(empty);
       return;
     }
@@ -399,12 +498,14 @@ export async function initializeFitmentPage(): Promise<void> {
       const title = document.createElement('h3');
       const detail = document.createElement('p');
       const actions = document.createElement('div');
+      card.className = 'saved-setup-card';
       title.textContent = saved.name;
       detail.textContent = describeSetup(saved);
       actions.className = 'actions';
       appendButton(actions, 'Load as current', () => { writeSetup('current', setupToInput(saved)); renderComparison(); });
       appendButton(actions, 'Load as new', () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); });
-      appendButton(actions, 'Delete', async () => renderGarage(await service.deleteSetup(saved.id)), 'secondary');
+      appendButton(actions, 'Share', async () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); await copyShare(); }, 'secondary');
+      appendButton(actions, 'Delete', async () => { if (window.confirm(`Delete “${saved.name}”?`)) renderGarage(await service.deleteSetup(saved.id)); }, 'danger');
       card.append(title, detail, actions);
       garageList.append(card);
     }
@@ -451,12 +552,15 @@ export async function initializeFitmentPage(): Promise<void> {
   }
 
   function showMeasurementStep(step: number): void {
-    measurementStep = Math.min(5, Math.max(1, step));
+    const progress = wizardProgress(step);
+    measurementStep = progress.current;
     document.querySelectorAll<HTMLElement>('[data-measure-step]').forEach((panel) => { panel.hidden = Number(panel.dataset.measureStep) !== measurementStep; });
     document.querySelectorAll<HTMLButtonElement>('[data-measure-go]').forEach((button) => { button.classList.toggle('secondary', Number(button.dataset.measureGo) !== measurementStep); });
-    required<HTMLButtonElement>('#measure-back').disabled = measurementStep === 1;
+    required<HTMLElement>('#measure-progress').style.width = `${progress.percent}%`;
+    required<HTMLElement>('#measure-step-label').textContent = `Step ${progress.current} of ${progress.total}`;
+    required<HTMLButtonElement>('#measure-back').disabled = !progress.canGoBack;
     const next = required<HTMLButtonElement>('#measure-next');
-    next.disabled = measurementStep === 5;
+    next.disabled = !progress.canContinue;
     if (measurementStep === 5) updateMeasurementReview();
   }
 
@@ -492,6 +596,21 @@ export async function initializeFitmentPage(): Promise<void> {
   document.querySelectorAll<HTMLButtonElement>('[data-measure-go]').forEach((button) => button.addEventListener('click', () => showMeasurementStep(Number(button.dataset.measureGo))));
   required('#what-fits-section').addEventListener('input', updatePreflight);
   required('#measure-flow').addEventListener('input', updatePreflight);
+  for (const prefix of ['current', 'proposed'] as const) {
+    input(`${prefix}-rimDiameterInches`).addEventListener('input', () => {
+      const wheelDiameter = required<HTMLInputElement>(`[data-wheel-diameter="${prefix}"]`);
+      wheelDiameter.value = input(`${prefix}-rimDiameterInches`).value;
+    });
+  }
+  const setProductSection = (section: ProductSection): void => {
+    document.querySelectorAll<HTMLElement>('[data-product-nav]').forEach((item) => {
+      if (item.dataset.productNav === section) item.setAttribute('aria-current', 'page');
+      else item.removeAttribute('aria-current');
+    });
+  };
+  for (const item of PRODUCT_NAVIGATION) {
+    document.querySelectorAll<HTMLAnchorElement>(`[data-product-nav="${item.id}"]`).forEach((link) => link.addEventListener('click', () => setProductSection(item.id)));
+  }
   activeVehicle.addEventListener('change', async () => {
     if (activeVehicle.value === '') return;
     const selected = await service.selectVehicle(activeVehicle.value);

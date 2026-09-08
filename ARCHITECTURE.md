@@ -116,6 +116,14 @@ Result provenance is intentionally small and extensible: physical gaps are `USER
 
 Combined search state and inspected candidates are transient. Vehicle selection updates only `activeVehicleId`; clearance profiles and explicitly saved setups remain keyed to that vehicle. Garage lists are filtered to the active vehicle, and saving a recommendation uses the active vehicle through `GarageService`. No schema migration is required.
 
+## Product shell and presentation boundary
+
+The Milestone 6 product shell is a static Astro page enhanced by the existing TypeScript controller. `src/ui/presentation-model.ts` owns testable navigation, wizard-progress, result-card, map-cell accessibility, and active-Garage view models. It may format already-calculated values for display, but it cannot calculate fitment or reinterpret domain state. Responsive layout, badges, sticky mobile actions, the bottom navigation, and the diameter illustration live in CSS and semantic HTML.
+
+The diameter illustration is deliberately schematic: its line lengths scale only from the canonical overall-diameter results and it makes no clearance claim. Map and result status is always expressed with text and symbols as well as color. GREEN retains its geometry-only meaning and is never presented as a safety verdict.
+
+The built stylesheet uses Astro's root-relative hashed asset URL under `/_astro/`. That URL is correct for an HTTP deployment and production preview. Opening `dist/index.html` directly through `file://` cannot resolve the site-root URL and is not a supported production serving mode; the production base configuration must not be changed to disguise that local-file limitation.
+
 ## Growth seams
 
 `VehicleProfile` is the shared My Garage identity used by future tools. `VehicleEvent` is a discriminated, extensible base for a later Car Timeline without implementing timeline behavior now. Storage is accessed through repository ports and browser-specific implementations live only in `src/storage`.
