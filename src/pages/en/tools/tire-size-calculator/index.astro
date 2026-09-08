@@ -1,0 +1,13 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+const definition = toolById('tire-size-calculator');
+---
+<ToolPage {definition} eyebrow="Tires & wheels" intro="Enter the three numbers printed on a metric tire sidewall to calculate its physical dimensions and rolling distance." limitation="These are nominal geometric calculations. Real dimensions vary by tire model, rim width, pressure, load, and manufacturer tolerances." studioCta="Open Fitment Studio">
+  <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
+    <fieldset><legend>Tire size</legend><div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
+    <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation"><h2>What the numbers describe</h2><p>Width is the nominal section width in millimetres. Profile is the sidewall height as a percentage of that width. Rim is the wheel diameter in inches.</p><p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p></div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>

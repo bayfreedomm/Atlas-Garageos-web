@@ -1,0 +1,11 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireInputGroup from '../../../../components/TireInputGroup.astro';
+import { toolById } from '../../../../seo/tool-registry';
+const definition = toolById('speedometer-error-calculator');
+---
+<ToolPage {definition} eyebrow="Tire rolling geometry" intro="Estimate actual speed after a tire diameter change at any indicated speed, in kilometres per hour or miles per hour." limitation="This is a theoretical tire-geometry result. Vehicle calibration, tire wear, pressure, load, and real tire dimensions can change observed speed." studioCta="Open Fitment Studio">
+  <form slot="tool" class="calculator-form" data-calculator="speedometer" novalidate><div class="calculator-columns"><TireInputGroup prefix="original-" title="Original tire" width={225} aspect={45} rim={18} /><TireInputGroup prefix="new-" title="New tire" width={235} aspect={40} rim={19} /></div><fieldset class="speed-inputs"><legend>Speed reading</legend><div class="grid"><label>Indicated speed<input name="indicatedSpeed" type="number" value="100" min="0" inputmode="decimal" /></label><label>Unit<select name="unit"><option value="km/h">km/h</option><option value="mph">mph</option></select></label></div></fieldset><button type="submit">Calculate actual speed</button><div class="inline-errors" data-errors role="alert" hidden></div><dl class="tool-results" data-results aria-live="polite"></dl></form>
+  <div slot="explanation"><h2>Why the reading changes</h2><p>A larger tire travels farther per wheel revolution, so actual speed is higher than the indicated speed when calibration is unchanged. A smaller tire produces the opposite direction.</p><p>The chosen speed unit changes presentation only; tire calculations remain canonical metric geometry.</p></div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>

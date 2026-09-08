@@ -14,7 +14,10 @@ const FIELD_NAMES: Readonly<Record<string, string>> = Object.freeze({
   aspectRatio: 'tire profile',
   rimDiameterInches: 'rim diameter',
   wheelWidthInches: 'wheel width',
+  widthInches: 'wheel width',
+  diameterInches: 'wheel diameter',
   offsetMm: 'wheel offset',
+  indicatedSpeed: 'indicated speed',
   measuredInnerClearanceMm: 'inner clearance',
   measuredOuterClearanceMm: 'outer clearance',
   minimumDesiredInnerClearanceMm: 'desired inner clearance',
@@ -24,7 +27,7 @@ const FIELD_NAMES: Readonly<Record<string, string>> = Object.freeze({
 export function validationIssueText(issue: ValidationIssue): string {
   const parts = issue.field.split('.');
   const field = parts.at(-1) ?? issue.field;
-  const context = parts[0] === 'current' ? 'Current' : parts[0] === 'proposed' ? 'New' : '';
+  const context = parts[0] === 'current' || parts[0] === 'original' ? 'Original' : parts[0] === 'proposed' || parts[0] === 'new' ? 'New' : parts[0] === 'tire' ? 'Tire' : '';
   const label = `${context} ${FIELD_NAMES[field] ?? field}`.trim();
   const message = issue.message.replace(field, FIELD_NAMES[field] ?? field);
   return `${label}: ${message}`;

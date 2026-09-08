@@ -30,6 +30,16 @@ Indexable content uses stable, curated route metadata from `src/seo`. Calculator
 
 V1 links emitted from Milestone 2 use compact numeric tuples, but the decoder also accepts the verbose V1 shape emitted by Milestone 1. A decoded shared workspace is transient: opening it never writes to storage. Only the explicit “Save shared setup” action may persist its proposed setup.
 
+## Locale routes and tool registry
+
+English indexable experiences live below `/en/`. The root is a non-indexable locale entry that redirects to `/en/fitment-studio/`; it is the `x-default` alternate, not a duplicate content page. Language remains a path concern while unit system and currency remain independent preferences.
+
+`src/seo/tool-registry.ts` is the single source for implemented tool identity, locale slug, route kind, metadata, category, indexability, and related-tool edges. Canonicals and the XML sitemap are derived from this registry, so application fragments, queries, unfinished roadmap tools, and the root redirect cannot enter the indexable route set accidentally. Tool relationships are intentional task continuations, not a sitewide keyword list.
+
+Tool pages share `SiteLayout.astro` and `ToolPage.astro`. Each page supplies unique metadata, one H1, working utility or a controlled entry into the relevant flagship flow, original explanatory content, limitations, contextual related links, and a Fitment Studio continuation. Visible breadcrumbs are paired with factual `BreadcrumbList` data; the shared shell emits factual `WebSite` data. No calculator, FAQ, rating, product, or offer schema is invented.
+
+The `SeoPageModel` seam validates deliberate future tire-size, comparison, and vehicle pathnames but creates no routes by itself. A page becomes indexable only after a real implementation is registered and meets the SEO playbook quality threshold.
+
 ## Garage and storage ownership
 
 `GarageState` is schema-versioned and supports multiple `VehicleProfile` records and multiple named `SavedSetup` records per vehicle. V2 adds one `VehicleClearanceProfile` per vehicle. Each clearance profile stores a validated baseline setup snapshot, an optional saved-setup reference, user-measured inner/outer clearance, optional user-selected targets, and update metadata. Referential integrity and duplicate identifiers are checked by domain factories.
@@ -127,3 +137,5 @@ The built stylesheet uses Astro's root-relative hashed asset URL under `/_astro/
 ## Growth seams
 
 `VehicleProfile` is the shared My Garage identity used by future tools. `VehicleEvent` is a discriminated, extensible base for a later Car Timeline without implementing timeline behavior now. Storage is accessed through repository ports and browser-specific implementations live only in `src/storage`.
+
+Future OEM and commerce data belongs behind a dedicated data/provider boundary outside `core`: provider adapters may resolve sourced `Vehicle`, `TireSize`, `WheelSpec`, `TireBrand`, `TireModel`, `Product`, and `RetailerOffer` records into validated domain-facing contracts. Source, market, license, freshness, and commercial relationship metadata must travel with those records. Core calculations continue to receive only validated numeric domain values and never import catalogs, providers, network clients, or SEO models.

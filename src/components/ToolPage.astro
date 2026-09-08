@@ -1,0 +1,17 @@
+---
+import SiteLayout from './SiteLayout.astro';
+import type { ToolDefinition } from '../seo/tool-registry';
+import { relatedTools, routeForTool } from '../seo/tool-registry';
+
+interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta: string; studioHref?: string; }
+const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/en/fitment-studio/' } = Astro.props;
+const related = relatedTools(definition);
+---
+<SiteLayout {definition} active="tools">
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/fitment-studio/">Fitment Studio</a><span aria-hidden="true">/</span><span aria-current="page">{definition.title}</span></nav>
+  <header class="tool-intro"><p class="eyebrow">{eyebrow}</p><h1>{definition.title}</h1><p class="hero-copy">{intro}</p></header>
+  <section class="tool-workspace" aria-label={`${definition.title} calculator`}><slot name="tool" /></section>
+  <section class="tool-explanation"><div><p class="eyebrow">How to read it</p><slot name="explanation" /></div><aside class="limitation-card"><strong>Calculation boundary</strong><p>{limitation}</p></aside></section>
+  <section class="studio-cta"><div><p class="eyebrow">Fitment Studio</p><h2>Continue with wheel and clearance geometry</h2><p>Tire dimensions are one part of fitment. Use wheel specs and real measurements for the next step.</p></div><a class="button" href={studioHref}>{studioCta}</a></section>
+  <section class="related-tools" aria-labelledby="related-heading"><p class="eyebrow">Related tools</p><h2 id="related-heading">Keep working with the same setup</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={routeForTool(tool)}><span>{tool.category}</span><strong>{tool.title}</strong><p>{tool.description}</p></a>)}</div></section>
+</SiteLayout>

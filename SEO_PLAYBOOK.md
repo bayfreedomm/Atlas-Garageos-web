@@ -24,6 +24,8 @@ Use short, stable, human-readable paths organized around user intent and durable
 
 Internal links should help a person continue a task: from a vehicle to relevant tools, from a tire size to meaningful comparisons, and from a calculated fitment result to supporting explanations or legitimate product discovery. Breadcrumbs and contextual links should reflect actual hierarchy rather than keyword variants.
 
+Implemented indexable tools must be registered in the typed tool registry. Locale routes, canonical URLs, sitemap entries, and related-tool edges derive from that source. The non-indexable root locale entry is the intentional `x-default`; it must not compete with the English flagship canonical.
+
 ## Mobile-first and Core Web Vitals
 
 - Design and test the primary experience mobile-first.

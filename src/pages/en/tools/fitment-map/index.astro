@@ -1,0 +1,9 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+const definition = toolById('fitment-map');
+---
+<ToolPage {definition} eyebrow="Advanced fitment geometry" intro="Explore a bounded grid of wheel widths and offsets against measurements from your own vehicle." limitation="Map states describe calculated static geometry from supplied measurements. GREEN is not a road-safety, compatibility, rubbing, or legal verdict." studioCta="Open the working Fitment Map" studioHref="/en/fitment-studio/#fitment-map-section">
+  <div slot="tool" class="entry-workspace"><div><p class="eyebrow">Before you open the map</p><h2>Bring a measured baseline</h2><p>The working map needs your current wheel width and offset, measured inner and outer gaps, and the range you want to explore.</p><ol class="entry-steps"><li><strong>Measure</strong><span>Record the shortest static inner and outer gaps.</span></li><li><strong>Set a range</strong><span>Choose deliberate width and offset bounds.</span></li><li><strong>Inspect cells</strong><span>Read projected clearances and the reason for each state.</span></li></ol></div><a class="button" href="/en/fitment-studio/#fitment-map-section">Start with the interactive map</a></div>
+  <div slot="explanation"><h2>How the map classifies geometry</h2><p>GREEN means projected clearances are non-negative and any targets you supplied are met. YELLOW means no calculated overlap but at least one supplied target is missed. RED means a projected inner or outer clearance is negative.</p><p>Every selected cell exposes the calculated inner movement, outer poke, remaining gaps, and geometry-only explanation.</p></div>
+</ToolPage>

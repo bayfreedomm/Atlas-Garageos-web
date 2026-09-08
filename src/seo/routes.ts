@@ -1,17 +1,3 @@
-export interface SeoRoute {
-  readonly pathname: string;
-  readonly title: string;
-  readonly description: string;
-  readonly indexable: true;
-}
-
-export const seoRoutes: readonly SeoRoute[] = [
-  {
-    pathname: '/',
-    title: 'Fitment Studio — Atlas GarageOS',
-    description: 'Compare tire and wheel geometry with transparent calculations.',
-    indexable: true,
-  },
-];
-
 export const APP_STATE_HASH_KEY = 'setup';
+export { SITE_ORIGIN, SUPPORTED_LOCALES, canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, routeForTool, toolById, toolRegistry } from './tool-registry';
+export type { SeoPageModel, SiteLocale, ToolCategory, ToolDefinition, ToolId } from './tool-registry';

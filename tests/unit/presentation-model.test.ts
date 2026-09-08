@@ -29,7 +29,7 @@ describe('responsive presentation models', () => {
   });
 
   it('renders field-specific validation copy without internal paths', () => {
-    expect(validationIssueText({ code: 'out-of-range', field: 'current.widthMm', message: 'widthMm must be between 80 and 500.' })).toBe('Current tire width: tire width must be between 80 and 500.');
+    expect(validationIssueText({ code: 'out-of-range', field: 'current.widthMm', message: 'widthMm must be between 80 and 500.' })).toBe('Original tire width: tire width must be between 80 and 500.');
   });
 
   it('filters Garage content to the active vehicle', () => {

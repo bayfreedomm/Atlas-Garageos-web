@@ -1,0 +1,11 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireInputGroup from '../../../../components/TireInputGroup.astro';
+import { toolById } from '../../../../seo/tool-registry';
+const definition = toolById('tire-size-comparison');
+---
+<ToolPage {definition} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Check wheel clearance in Fitment Studio">
+  <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate><div class="calculator-columns"><TireInputGroup prefix="original-" title="Original tire" width={225} aspect={45} rim={18} /><TireInputGroup prefix="new-" title="New tire" width={235} aspect={40} rim={19} /></div><button type="submit">Compare tire sizes</button><div class="inline-errors" data-errors role="alert" hidden></div><dl class="tool-results" data-results aria-live="polite"></dl></form>
+  <div slot="explanation"><h2>What changes between the sizes</h2><p>Positive diameter and circumference differences mean the new tire is larger. Ride-height difference is half of the diameter change. The speedometer percentage shows the theoretical change at the same wheel rotation rate.</p><p>No percentage is treated as an automatic compatibility or safety limit.</p></div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>
