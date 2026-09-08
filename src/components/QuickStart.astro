@@ -1,0 +1,35 @@
+<section class="quick-start" aria-labelledby="quick-start-heading">
+  <header class="quick-start__header"><div><p class="eyebrow">Quick Start</p><h2 id="quick-start-heading">Calculate something now.</h2></div><span>10–30 sec</span></header>
+  <div class="quick-start__tabs" role="tablist" aria-label="Quick calculators">
+    <button id="quick-tab-tire" type="button" role="tab" aria-controls="quick-panel-tire" aria-selected="true" data-quick-tab="tire">Tire Size</button>
+    <button id="quick-tab-fuel" type="button" role="tab" aria-controls="quick-panel-fuel" aria-selected="false" tabindex="-1" data-quick-tab="fuel">Fuel Cost</button>
+    <button id="quick-tab-trip" type="button" role="tab" aria-controls="quick-panel-trip" aria-selected="false" tabindex="-1" data-quick-tab="trip">Road Trip</button>
+    <button id="quick-tab-convert" type="button" role="tab" aria-controls="quick-panel-convert" aria-selected="false" tabindex="-1" data-quick-tab="convert">Unit Converter</button>
+  </div>
+  <div id="quick-panel-tire" class="quick-start__panel" role="tabpanel" aria-labelledby="quick-tab-tire" data-quick-panel="tire">
+    <form class="quick-tire-form" data-calculator="tire-size" novalidate>
+      <div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div>
+      <button type="submit">Calculate</button><div class="inline-errors" data-errors role="alert" hidden></div>
+      <p class="quick-result is-pending" data-result-summary aria-live="polite">Enter the tire size printed on the sidewall.</p><dl class="tool-results quick-metrics" data-results aria-live="polite"></dl>
+      <a class="text-link" href="/en/tools/tire-size-calculator/">Open full tool →</a>
+    </form>
+  </div>
+  <div id="quick-panel-fuel" class="quick-start__panel" role="tabpanel" aria-labelledby="quick-tab-fuel" data-quick-panel="fuel" hidden>
+    <form class="quick-utility-form" data-utility-calculator="fuel-cost" novalidate>
+      <div class="quick-fields"><label>Units<select name="system"><option value="metric">Metric</option><option value="imperial">US</option></select></label><label><span data-distance-label>Distance · km</span><input name="distance" type="number" value="500" min="0" step="any" inputmode="decimal" /></label><label><span data-economy-label>Economy · L/100km</span><input name="economy" type="number" value="7.2" min="0" step="any" inputmode="decimal" /></label><label><span data-price-label>Fuel price · per litre</span><input name="price" type="number" value="1.8" min="0" step="any" inputmode="decimal" /></label><label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option></select></label></div>
+      <button type="submit">Calculate fuel cost</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="quick-result is-pending" data-result-summary aria-live="polite">Add your distance, economy, and local fuel price.</p><dl class="tool-results quick-metrics" data-results></dl><a class="text-link" href="/en/tools/fuel-cost-calculator/">Open full tool →</a>
+    </form>
+  </div>
+  <div id="quick-panel-trip" class="quick-start__panel" role="tabpanel" aria-labelledby="quick-tab-trip" data-quick-panel="trip" hidden>
+    <form class="quick-utility-form" data-utility-calculator="road-trip" novalidate>
+      <div class="quick-fields"><label>Units<select name="system"><option value="metric">Metric</option><option value="imperial">US</option></select></label><label><span data-distance-label>One-way distance · km</span><input name="distance" type="number" value="420" min="0" step="any" inputmode="decimal" /></label><label><span data-economy-label>Economy · L/100km</span><input name="economy" type="number" value="6.5" min="0" step="any" inputmode="decimal" /></label><label><span data-price-label>Fuel price · per litre</span><input name="price" type="number" value="1.8" min="0" step="any" inputmode="decimal" /></label><label>Trip<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label><label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option></select></label><input name="extraCost" type="hidden" value="0" /><input name="people" type="hidden" value="1" /></div>
+      <button type="submit">Estimate trip</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="quick-result is-pending" data-result-summary aria-live="polite">Estimate a one-way or return journey.</p><dl class="tool-results quick-metrics" data-results></dl><a class="text-link" href="/en/tools/road-trip-cost-calculator/">Open full tool →</a>
+    </form>
+  </div>
+  <div id="quick-panel-convert" class="quick-start__panel" role="tabpanel" aria-labelledby="quick-tab-convert" data-quick-panel="convert" hidden>
+    <form class="quick-utility-form" data-utility-calculator="pressure" novalidate>
+      <div class="instant-input"><label>Pressure<input name="value" type="number" value="32" min="0" step="any" inputmode="decimal" /></label><label>From<select name="unit"><option value="psi">PSI</option><option value="bar">Bar</option><option value="kpa">kPa</option></select></label></div>
+      <div class="inline-errors" data-errors role="alert" hidden></div><p class="quick-result is-pending" data-result-summary aria-live="polite">Enter a pressure to convert instantly.</p><dl class="tool-results quick-metrics" data-results></dl><a class="text-link" href="/en/tools/psi-bar-converter/">Open full tool →</a>
+    </form>
+  </div>
+</section>

@@ -32,11 +32,17 @@ V1 links emitted from Milestone 2 use compact numeric tuples, but the decoder al
 
 ## Locale routes and tool registry
 
-English indexable experiences live below `/en/`. The root is a non-indexable locale entry that redirects to `/en/fitment-studio/`; it is the `x-default` alternate, not a duplicate content page. Language remains a path concern while unit system and currency remain independent preferences.
+English indexable experiences live below `/en/`. The root is a non-indexable locale entry that redirects to `/en/`; it is the `x-default` alternate, not a duplicate content page. Language remains a path concern while unit system and currency remain independent preferences.
 
 `src/seo/tool-registry.ts` is the single source for implemented tool identity, locale slug, route kind, metadata, category, indexability, and related-tool edges. Canonicals and the XML sitemap are derived from this registry, so application fragments, queries, unfinished roadmap tools, and the root redirect cannot enter the indexable route set accidentally. Tool relationships are intentional task continuations, not a sitewide keyword list.
 
 Tool pages share `SiteLayout.astro` and `ToolPage.astro`. Each page supplies unique metadata, one H1, working utility or a controlled entry into the relevant flagship flow, original explanatory content, limitations, contextual related links, and a Fitment Studio continuation. Visible breadcrumbs are paired with factual `BreadcrumbList` data; the shared shell emits factual `WebSite` data. No calculator, FAQ, rating, product, or offer schema is invented.
+
+## Traffic-first utility calculation boundary
+
+Small automotive utilities follow `ui -> features/tools -> domain + core/units`. Domain factories validate finite positive or non-negative quantities before core functions receive them. `core/units/automotive.ts` contains deterministic fuel, trip, pressure, economy, power, torque, and power-to-weight calculations without display rounding or browser concerns. Feature functions translate untrusted form numbers into validated branded quantities; UI modules own currency labels, human-readable summaries, and rounding.
+
+Fuel tools keep metric and US inputs explicit. Currency remains an independent display label and no exchange-rate behavior is implied. Fuel economy distinguishes US and Imperial gallons. Power uses mechanical horsepower explicitly and never silently aliases PS. Traffic, weather, load, and driving style remain outside the deterministic estimate.
 
 The `SeoPageModel` seam validates deliberate future tire-size, comparison, and vehicle pathnames but creates no routes by itself. A page becomes indexable only after a real implementation is registered and meets the SEO playbook quality threshold.
 

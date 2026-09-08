@@ -2,6 +2,8 @@
 
 This roadmap protects the long-term product direction. It is not a promise to build every item immediately and it is not a milestone changelog. New work should strengthen shared foundations, preserve explainability, and earn its complexity through clear user benefit.
 
+Near-term execution is traffic-first: focused utilities provide useful answers within seconds and create high-quality search entry points. This sequencing does not narrow the long-term platform vision. Fitment Studio remains the flagship, My Garage remains the shared memory backbone, and the broader OEM, commerce, EV, finance, maintenance, VIN, recall, TCO, Timeline, and Vehicle Passport directions remain intact.
+
 ## Core Product
 
 Fitment Studio is the flagship experience: a precise, understandable workspace for exploring vehicle setup geometry. My Garage is the shared vehicle-data backbone that lets every Atlas GarageOS tool build on the same vehicle memory.

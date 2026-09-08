@@ -1,11 +1,15 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
-import { routeForTool, toolRegistry } from '../../../seo/tool-registry';
+import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry } from '../../../seo/tool-registry';
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
+const glyphs = new Map([['Fuel & Trips', 'F'], ['Tires & Wheels', 'T'], ['Converters', '↔'], ['Performance', 'P']]);
+const toolGlyphs = new Map([
+  ['fuel-cost-calculator', 'FC'], ['road-trip-cost-calculator', 'RT'], ['tire-size-calculator', 'TS'], ['tire-size-comparison', 'TC'], ['wheel-offset-calculator', 'ET'], ['speedometer-error-calculator', 'SP'], ['fitment-map', 'FM'], ['measure-my-car', 'MM'], ['mpg-l100km-converter', 'MP'], ['psi-bar-converter', 'PB'], ['hp-kw-converter', 'HP'], ['nm-lb-ft-converter', 'NM'], ['power-to-weight-calculator', 'PW'],
+]);
 ---
-<SiteLayout title="Automotive Tools" description="Focused tire, wheel, speedometer, measurement, and fitment tools powered by transparent geometry." pathname="/en/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }]}>
+<SiteLayout title="Automotive Tools" description="Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment." pathname="/en/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Tools</span></nav>
-  <header class="hub-intro"><p class="eyebrow">Tools</p><h1>Use the right tool for the question.</h1><p class="hero-copy">Six focused experiences, one transparent geometry foundation. No hidden fitment verdicts.</p></header>
-  <section class="tools-hub" aria-labelledby="tools-heading"><div class="section-heading"><div><p class="eyebrow">Tires & wheels</p><h2 id="tools-heading">Working tools</h2></div><span class="count-chip">{tools.length} available</span></div><div class="tool-hub-grid">{tools.map((tool, index) => <a class="tool-hub-card" href={routeForTool(tool)}><span class="tool-hub-card__number">{String(index + 1).padStart(2, '0')}</span><div><span>{tool.category}</span><h3>{tool.title}</h3><p>{tool.description}</p></div><span class="tool-hub-card__arrow" aria-hidden="true">↗</span></a>)}</div></section>
-  <aside class="hub-note"><strong>Built around your Garage</strong><p>Measurements and saved setups stay connected to Fitment Studio. More tool categories will appear only when they are real and useful.</p></aside>
+  <header class="hub-intro"><p class="eyebrow">Tools</p><h1>Choose the job. Get the answer.</h1><p>Fuel, trips, tires, fitment, pressure, power, and torque—each tool opens ready to use.</p></header>
+  <div class="tool-directory">{TOOL_CATEGORY_ORDER.map((category) => { const categoryTools = tools.filter((tool) => tool.category === category); const categoryId = `category-${category.toLowerCase().replaceAll('&', 'and').replaceAll(' ', '-')}`; return <section class="tool-category" aria-labelledby={categoryId}><header><span class="category-glyph" aria-hidden="true">{glyphs.get(category)}</span><div><h2 id={categoryId}>{category}</h2><p>{categoryTools.length} {categoryTools.length === 1 ? 'tool' : 'tools'}</p></div></header><div class="compact-tool-grid">{categoryTools.map((tool) => <a href={routeForTool(tool)}><span class="tool-glyph" aria-hidden="true">{toolGlyphs.get(tool.id)}</span><div><strong>{tool.title}</strong><span>{tool.description}</span></div><i aria-hidden="true">↗</i></a>)}</div></section> })}</div>
+  <aside class="hub-note"><strong>Need deeper tire and wheel work?</strong><p>Fitment Studio remains the advanced workspace for setup comparison, real measurements, and geometric search.</p><a class="text-link" href="/en/fitment-studio/">Open Fitment Studio →</a></aside>
 </SiteLayout>

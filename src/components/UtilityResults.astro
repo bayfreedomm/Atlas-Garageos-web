@@ -1,0 +1,7 @@
+---
+interface Props { pending: string; }
+const { pending } = Astro.props;
+---
+<div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+<p class="result-summary is-pending" data-result-summary aria-live="polite">{pending}</p>
+<dl class="tool-results" data-results aria-live="polite"></dl>

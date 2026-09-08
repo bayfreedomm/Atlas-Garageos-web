@@ -1,8 +1,8 @@
 import type { SupportedLocale } from './catalog';
+import type { CurrencyCode, UnitSystem } from '../domain/preferences';
 
 export type { SupportedLocale } from './catalog';
-export type UnitSystem = 'metric' | 'imperial';
-export type CurrencyCode = string;
+export type { CurrencyCode, UnitSystem } from '../domain/preferences';
 
 export interface UserPreferences {
   readonly locale: SupportedLocale;

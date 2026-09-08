@@ -1,0 +1,12 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import UtilityResults from '../../../../components/UtilityResults.astro';
+import { toolById } from '../../../../seo/tool-registry';
+const definition = toolById('fuel-cost-calculator');
+---
+<ToolPage {definition} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
+  <form slot="tool" class="calculator-form" data-utility-calculator="fuel-cost" novalidate><FuelFields /><button type="submit">Calculate fuel cost</button><UtilityResults pending="Your fuel estimate will appear here." /></form>
+  <div slot="explanation"><h2>One calculation, two unit systems</h2><p>Metric mode uses kilometres, litres per 100 kilometres, and price per litre. US mode uses miles, US MPG, and price per US gallon.</p><p>The currency is a label only. Atlas does not fetch exchange rates or change the price you enter.</p></div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>
