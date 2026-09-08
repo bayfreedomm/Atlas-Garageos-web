@@ -5,7 +5,9 @@ export type ValidationCode =
   | 'out-of-range'
   | 'incompatible-values'
   | 'invalid-format'
-  | 'unsupported-version';
+  | 'unsupported-version'
+  | 'duplicate'
+  | 'invalid-reference';
 
 export interface ValidationIssue {
   readonly code: ValidationCode;

@@ -1,4 +1,6 @@
-export type SupportedLocale = 'en';
+import type { SupportedLocale } from './catalog';
+
+export type { SupportedLocale } from './catalog';
 export type UnitSystem = 'metric' | 'imperial';
 export type CurrencyCode = string;
 

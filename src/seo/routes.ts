@@ -14,4 +14,4 @@ export const seoRoutes: readonly SeoRoute[] = [
   },
 ];
 
-export const APP_STATE_QUERY_PARAMETER = 'setup';
+export const APP_STATE_HASH_KEY = 'setup';

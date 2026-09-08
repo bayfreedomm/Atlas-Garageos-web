@@ -9,6 +9,14 @@ export interface SetupShareV1 {
   readonly proposed: SetupInput;
 }
 
+type CompactSetup = readonly [number, number, number, number, number];
+
+interface CompactSetupShareV1 {
+  readonly v: 1;
+  readonly c: CompactSetup;
+  readonly n: CompactSetup;
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
 function readSetup(value: unknown): SetupInput | undefined {
@@ -19,7 +27,26 @@ function readSetup(value: unknown): SetupInput | undefined {
 }
 
 export function encodeSetupShare(payload: SetupShareV1): string {
-  return encodeURIComponent(JSON.stringify(payload));
+  const tuple = (setup: SetupInput): CompactSetup => [
+    setup.tireWidthMm,
+    setup.tireAspectRatio,
+    setup.rimDiameterInches,
+    setup.wheelWidthInches,
+    setup.wheelOffsetMm,
+  ];
+  const compact: CompactSetupShareV1 = { v: 1, c: tuple(payload.current), n: tuple(payload.proposed) };
+  return encodeURIComponent(JSON.stringify(compact));
+}
+
+function readCompactSetup(value: unknown): SetupInput | undefined {
+  if (!Array.isArray(value) || value.length !== 5 || !value.every((entry) => typeof entry === 'number')) return undefined;
+  return {
+    tireWidthMm: value[0]!,
+    tireAspectRatio: value[1]!,
+    rimDiameterInches: value[2]!,
+    wheelWidthInches: value[3]!,
+    wheelOffsetMm: value[4]!,
+  };
 }
 
 export function decodeSetupShare(encoded: string): ValidationResult<SetupShareV1> {
@@ -31,10 +58,18 @@ export function decodeSetupShare(encoded: string): ValidationResult<SetupShareV1
   }
   if (!isRecord(value)) return invalid({ code: 'invalid-format', field: 'share', message: 'Share setup must be an object.' });
   if (value.v !== 1) return invalid({ code: 'unsupported-version', field: 'v', message: 'Share setup version is not supported.', received: value.v });
-  const current = readSetup(value.current);
-  const proposed = readSetup(value.proposed);
+  // Accept both the compact V1 representation and Milestone 1's verbose V1.
+  const current = readCompactSetup(value.c) ?? readSetup(value.current);
+  const proposed = readCompactSetup(value.n) ?? readSetup(value.proposed);
   if (!current || !proposed) return invalid({ code: 'invalid-format', field: 'share', message: 'Share setup fields are incomplete or invalid.' });
   const comparison = compareSetupInputs(current, proposed);
   if (!comparison.ok) return invalid(...comparison.issues);
   return valid({ v: 1, current, proposed });
+}
+
+export const createSetupShareHash = (payload: SetupShareV1): string => `#setup=${encodeSetupShare(payload)}`;
+
+export function decodeSetupShareHash(hash: string): ValidationResult<SetupShareV1> | undefined {
+  const match = /^#setup=(.+)$/.exec(hash);
+  return match?.[1] === undefined ? undefined : decodeSetupShare(match[1]);
 }

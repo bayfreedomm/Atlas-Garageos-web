@@ -14,22 +14,36 @@ h1 { margin: .35rem 0; font-size: clamp(2rem, 6vw, 4.5rem); letter-spacing: -.05
 h2 { font-size: 1.15rem; }
 p { color: #b7c2cc; line-height: 1.6; }
 form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-fieldset, section { border: 1px solid #26323d; border-radius: .65rem; background: #111820; }
+fieldset, section, aside { border: 1px solid #26323d; border-radius: .65rem; background: #111820; }
 fieldset { padding: 1.25rem; }
+aside { margin-bottom: 1rem; padding: 1.25rem; border-color: #f1b24a; }
 legend { padding: 0 .45rem; color: #f1b24a; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
 label { display: grid; gap: .4rem; color: #b7c2cc; font-size: .875rem; }
 input { width: 100%; padding: .7rem .75rem; border: 1px solid #354453; border-radius: .35rem; background: #0b1015; color: inherit; font: inherit; }
 input:focus { outline: 2px solid #f1b24a; outline-offset: 2px; }
-button { grid-column: 1 / -1; justify-self: start; padding: .75rem 1rem; border: 0; border-radius: .35rem; background: #f1b24a; color: #15100a; font: inherit; font-weight: 800; cursor: pointer; }
+button { justify-self: start; padding: .75rem 1rem; border: 0; border-radius: .35rem; background: #f1b24a; color: #15100a; font: inherit; font-weight: 800; cursor: pointer; }
+button.secondary { background: #283542; color: #e8edf2; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+.setup-save { display: flex; align-items: end; gap: .75rem; margin-top: 1rem; }
+.setup-save label { flex: 1; }
+.form-actions { grid-column: 1 / -1; display: flex; gap: .75rem; }
 section { margin-top: 1rem; padding: 1.25rem; }
 dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid #26323d; border-radius: .4rem; background: #26323d; }
 dl div { padding: .85rem; background: #0f161d; }
 dt { color: #91a0ae; font-size: .8rem; }
 dd { margin: .25rem 0 0; font-variant-numeric: tabular-nums; font-weight: 700; }
 #errors { color: #ffb4ab; }
+.nickname { max-width: 24rem; }
+#garage-status { min-height: 1.5rem; color: #f1b24a; }
+#saved-setups { display: grid; gap: .75rem; }
+#saved-setups article { padding: 1rem; border: 1px solid #26323d; border-radius: .4rem; background: #0f161d; }
+#saved-setups h3, #saved-setups p { margin: 0 0 .5rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.actions button { padding: .5rem .7rem; font-size: .85rem; }
 
 @media (max-width: 46rem) {
   main { padding-top: 1.5rem; }
   form, .grid, dl { grid-template-columns: 1fr; }
+  .setup-save { align-items: stretch; flex-direction: column; }
 }

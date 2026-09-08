@@ -1,8 +1,10 @@
 ---
 import { seoRoutes } from '../seo/routes';
+import { translate } from '../localization/catalog';
 import '../styles/global.css';
 
 const seo = seoRoutes[0]!;
+const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 ---
 
 <!doctype html>
@@ -12,15 +14,23 @@ const seo = seoRoutes[0]!;
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={seo.description} />
     <meta name="robots" content="index,follow" />
+    <link rel="canonical" href={seo.pathname} />
     <title>{seo.title}</title>
   </head>
   <body>
     <main>
       <header>
         <p class="eyebrow">Atlas GarageOS / Development Surface</p>
-        <h1>Fitment Studio</h1>
-        <p>Geometry comparison only. Results are not a safety, clearance, or compatibility verdict.</p>
+        <h1>{t('appName')}</h1>
+        <p>{t('geometryDisclaimer')}</p>
       </header>
+
+      <aside id="shared-setup" hidden aria-labelledby="shared-heading">
+        <h2 id="shared-heading">{t('sharedTitle')}</h2>
+        <p id="shared-message">{t('sharedNotice')}</p>
+        <label>Saved setup name<input name="shared-setup-name" value="Shared setup" maxlength="80" /></label>
+        <button id="save-shared" type="button">Save shared new setup to Garage</button>
+      </aside>
 
       <form id="fitment-form">
         <fieldset data-setup="current">
@@ -31,6 +41,10 @@ const seo = seoRoutes[0]!;
             <label>Rim diameter (in)<input name="current-rimDiameterInches" type="number" value="18" step="0.5" required /></label>
             <label>Wheel width (in)<input name="current-wheelWidthInches" type="number" value="8" step="0.5" required /></label>
             <label>Offset ET (mm)<input name="current-wheelOffsetMm" type="number" value="40" step="1" required /></label>
+          </div>
+          <div class="setup-save">
+            <label>Setup name<input name="current-setup-name" value="Current setup" maxlength="80" /></label>
+            <button id="save-current" type="button">Save Current Setup</button>
           </div>
         </fieldset>
 
@@ -43,9 +57,16 @@ const seo = seoRoutes[0]!;
             <label>Wheel width (in)<input name="proposed-wheelWidthInches" type="number" value="8.5" step="0.5" required /></label>
             <label>Offset ET (mm)<input name="proposed-wheelOffsetMm" type="number" value="35" step="1" required /></label>
           </div>
+          <div class="setup-save">
+            <label>Setup name<input name="proposed-setup-name" value="New setup" maxlength="80" /></label>
+            <button id="save-proposed" type="button">Save New Setup</button>
+          </div>
         </fieldset>
 
-        <button type="submit">Calculate comparison</button>
+        <div class="form-actions">
+          <button type="submit">Calculate comparison</button>
+          <button id="copy-share" type="button" class="secondary">Copy Share Link</button>
+        </div>
       </form>
 
       <section aria-labelledby="results-heading" aria-live="polite">
@@ -53,59 +74,18 @@ const seo = seoRoutes[0]!;
         <div id="errors" hidden></div>
         <dl id="results"></dl>
       </section>
+
+      <section aria-labelledby="garage-heading">
+        <h2 id="garage-heading">{t('garageTitle')}</h2>
+        <label class="nickname">Vehicle nickname<input name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label>
+        <p id="garage-status" role="status"></p>
+        <div id="saved-setups"></div>
+      </section>
     </main>
 
     <script>
-      import { compareSetupInputs, type SetupInput } from '../features/compare/compare-setups';
-      import { formatNumber } from '../ui/format-number';
-
-      const form = document.querySelector<HTMLFormElement>('#fitment-form')!;
-      const results = document.querySelector<HTMLDListElement>('#results')!;
-      const errors = document.querySelector<HTMLDivElement>('#errors')!;
-
-      const number = (data: FormData, name: string) => Number(data.get(name));
-      const readSetup = (data: FormData, prefix: string): SetupInput => ({
-        tireWidthMm: number(data, `${prefix}-tireWidthMm`),
-        tireAspectRatio: number(data, `${prefix}-tireAspectRatio`),
-        rimDiameterInches: number(data, `${prefix}-rimDiameterInches`),
-        wheelWidthInches: number(data, `${prefix}-wheelWidthInches`),
-        wheelOffsetMm: number(data, `${prefix}-wheelOffsetMm`),
-      });
-
-      function render(): void {
-        const data = new FormData(form);
-        const comparison = compareSetupInputs(readSetup(data, 'current'), readSetup(data, 'proposed'));
-        if (!comparison.ok) {
-          errors.hidden = false;
-          errors.innerHTML = `<ul>${comparison.issues.map((issue) => `<li><strong>${issue.field}</strong>: ${issue.message}</li>`).join('')}</ul>`;
-          results.replaceChildren();
-          return;
-        }
-        errors.hidden = true;
-        const value = comparison.value;
-        const rows: readonly [string, number, string][] = [
-          ['Current sidewall', value.current.sidewallHeightMm, 'mm'],
-          ['New sidewall', value.proposed.sidewallHeightMm, 'mm'],
-          ['Current diameter', value.current.overallDiameterMm, 'mm'],
-          ['New diameter', value.proposed.overallDiameterMm, 'mm'],
-          ['Diameter difference', value.diameterDifferenceMm, 'mm'],
-          ['Diameter difference', value.diameterDifferencePercent, '%'],
-          ['Ride-height difference', value.rideHeightDifferenceMm, 'mm'],
-          ['Speed at same wheel RPM', value.speedometerDifferencePercent, '%'],
-          ['Inner-position change', value.wheelInnerPositionChangeMm, 'mm'],
-          ['Outer-poke change', value.wheelOuterPokeChangeMm, 'mm'],
-          ['Current circumference', value.current.circumferenceMm, 'mm'],
-          ['New circumference', value.proposed.circumferenceMm, 'mm'],
-          ['Current revolutions', value.current.revolutionsPerKilometer, '/km'],
-          ['New revolutions', value.proposed.revolutionsPerKilometer, '/km'],
-          ['Current revolutions', value.current.revolutionsPerMile, '/mile'],
-          ['New revolutions', value.proposed.revolutionsPerMile, '/mile'],
-        ];
-        results.innerHTML = rows.map(([label, amount, unit]) => `<div><dt>${label}</dt><dd>${formatNumber(amount, 3)} ${unit}</dd></div>`).join('');
-      }
-
-      form.addEventListener('submit', (event) => { event.preventDefault(); render(); });
-      render();
+      import { initializeFitmentPage } from '../ui/fitment-page';
+      void initializeFitmentPage();
     </script>
   </body>
 </html>

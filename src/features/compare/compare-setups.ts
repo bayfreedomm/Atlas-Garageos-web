@@ -11,7 +11,7 @@ export interface SetupInput {
   readonly wheelOffsetMm: number;
 }
 
-function buildSetup(input: SetupInput, prefix: string) {
+export function createSetupFromInput(input: SetupInput, prefix = 'setup') {
   const tire = createTireSize({
     widthMm: input.tireWidthMm,
     aspectRatio: input.tireAspectRatio,
@@ -30,8 +30,8 @@ function buildSetup(input: SetupInput, prefix: string) {
 }
 
 export function compareSetupInputs(current: SetupInput, proposed: SetupInput): ValidationResult<FitmentComparisonResult> {
-  const currentSetup = buildSetup(current, 'current');
-  const proposedSetup = buildSetup(proposed, 'proposed');
+  const currentSetup = createSetupFromInput(current, 'current');
+  const proposedSetup = createSetupFromInput(proposed, 'proposed');
   const issues: ValidationIssue[] = [];
   if (!currentSetup.ok) issues.push(...currentSetup.issues);
   if (!proposedSetup.ok) issues.push(...proposedSetup.issues);
