@@ -75,14 +75,104 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <dl id="results"></dl>
       </section>
 
+      <section aria-labelledby="measure-heading" id="measure-flow">
+        <p class="eyebrow">Steps 1–5</p>
+        <h2 id="measure-heading">Measure My Car</h2>
+        <p>These measurements come from you. They describe static wheel clearance geometry and are not a road-safety inspection.</p>
+        <nav class="step-nav" aria-label="Measurement steps">
+          <button type="button" data-measure-go="1">1 · Current setup</button>
+          <button type="button" data-measure-go="2" class="secondary">2 · Inner</button>
+          <button type="button" data-measure-go="3" class="secondary">3 · Outer</button>
+          <button type="button" data-measure-go="4" class="secondary">4 · Targets</button>
+          <button type="button" data-measure-go="5" class="secondary">5 · Review</button>
+        </nav>
+        <div class="measure-panel" data-measure-step="1">
+          <h3>Step 1 · Confirm current wheel and tire</h3>
+          <p>The Current Setup above is the baseline for every projection. Correct it before measuring.</p>
+        </div>
+        <div class="measure-panel" data-measure-step="2" hidden>
+          <h3>Step 2 · Measure inner clearance</h3>
+          <p>Measure the shortest static gap from the inner wheel/tire area to the nearest fixed suspension or body component. Record millimetres; do not estimate a safety margin.</p>
+          <label>Measured inner clearance (mm)<input name="measured-inner" type="number" min="0" max="1000" step="0.1" placeholder="Required" /></label>
+        </div>
+        <div class="measure-panel" data-measure-step="3" hidden>
+          <h3>Step 3 · Measure outer/fender clearance</h3>
+          <p>Measure the shortest static gap from the outer wheel/tire area to the fender boundary you are evaluating. Record millimetres.</p>
+          <label>Measured outer clearance (mm)<input name="measured-outer" type="number" min="0" max="1000" step="0.1" placeholder="Required" /></label>
+        </div>
+        <div class="measure-panel" data-measure-step="4" hidden>
+          <h3>Step 4 · Optional desired clearance targets</h3>
+          <p>Leave either target empty if you do not have one. Atlas will not invent a minimum margin.</p>
+          <div class="grid">
+            <label>Desired inner clearance (mm)<input name="desired-inner" type="number" min="0" max="1000" step="0.1" placeholder="No target" /></label>
+            <label>Desired outer clearance (mm)<input name="desired-outer" type="number" min="0" max="1000" step="0.1" placeholder="No target" /></label>
+          </div>
+        </div>
+        <div class="measure-panel" data-measure-step="5" hidden>
+          <h3>Step 5 · Review measurements</h3>
+          <div id="measurement-review" aria-live="polite"></div>
+          <div id="measurement-errors" hidden></div>
+          <button id="save-clearance" type="button">Save measurements to selected vehicle</button>
+        </div>
+        <div class="step-actions">
+          <button id="measure-back" type="button" class="secondary">Back</button>
+          <button id="measure-next" type="button">Next</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="what-fits-heading" id="what-fits-section">
+        <p class="eyebrow">Steps 3–6</p>
+        <h2 id="what-fits-heading">Combined wheel + tire explorer</h2>
+        <p>Choose your intent and explicit bounds. Results combine wheel geometry with tire-size calculations; GREEN is not a road-safety verdict.</p>
+        <label class="goal-select">What are you trying to do?
+          <select name="explorer-goal">
+            <option value="closestToCurrent">Stay closest to current geometry</option>
+            <option value="moreOuterPresence">Increase outer presence</option>
+            <option value="moreInnerClearance">Prioritize inner clearance</option>
+            <option value="balancedClearance">Balance inner and outer clearance</option>
+            <option value="targetOuterClearance">Reach my outer-clearance target</option>
+          </select>
+        </label>
+        <div class="range-groups">
+          <fieldset>
+            <legend>Wheel range</legend>
+            <div class="grid">
+              <label>Width min (J)<input name="wf-width-min" type="number" value="7" step="0.5" /></label>
+              <label>Width max (J)<input name="wf-width-max" type="number" value="10" step="0.5" /></label>
+              <label>Width step (J)<input name="wf-width-step" type="number" value="0.5" min="0.1" step="0.1" /></label>
+              <label>Offset min (ET)<input name="wf-offset-min" type="number" value="20" step="1" /></label>
+              <label>Offset max (ET)<input name="wf-offset-max" type="number" value="55" step="1" /></label>
+              <label>Offset step (mm)<input name="wf-offset-step" type="number" value="5" min="1" step="1" /></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Tire range</legend>
+            <div class="grid">
+              <label>Target rim (in)<input name="explorer-rim" type="number" value="19" step="0.5" /></label>
+              <label>Tire width min<input name="tire-width-min" type="number" value="215" step="10" /></label>
+              <label>Tire width max<input name="tire-width-max" type="number" value="255" step="10" /></label>
+              <label>Tire width step<input name="tire-width-step" type="number" value="10" min="1" step="1" /></label>
+              <label>Aspect min<input name="aspect-min" type="number" value="35" step="5" /></label>
+              <label>Aspect max<input name="aspect-max" type="number" value="50" step="5" /></label>
+              <label>Aspect step<input name="aspect-step" type="number" value="5" min="1" step="1" /></label>
+              <label>Max absolute diameter difference (%)<input name="max-diameter-difference" type="number" min="0" step="0.1" placeholder="No constraint" /></label>
+              <label>Maximum results<input name="wf-max-results" type="number" value="10" min="1" max="100" step="1" /></label>
+            </div>
+          </fieldset>
+        </div>
+        <p id="search-preflight" class="search-summary" aria-live="polite"></p>
+        <button id="search-what-fits" type="button">Search combined candidates</button>
+        <p id="what-fits-summary" class="search-summary" aria-live="polite"></p>
+        <div id="what-fits-errors" hidden></div>
+        <div id="what-fits-results" class="search-results"></div>
+        <article id="explorer-detail" class="map-detail" hidden aria-live="polite"></article>
+      </section>
+
       <section aria-labelledby="map-heading" id="fitment-map-section">
+        <p class="eyebrow">Advanced view</p>
         <h2 id="map-heading">{t('fitmentMapTitle')}</h2>
         <p>{t('fitmentMapDisclaimer')}</p>
         <div class="map-inputs">
-          <label>Measured inner clearance (mm)<input name="measured-inner" type="number" value="12" min="0" step="0.1" /></label>
-          <label>Measured outer clearance (mm)<input name="measured-outer" type="number" value="15" min="0" step="0.1" /></label>
-          <label>Desired inner margin (mm, optional)<input name="desired-inner" type="number" min="0" step="0.1" placeholder="No target" /></label>
-          <label>Desired outer margin (mm, optional)<input name="desired-outer" type="number" min="0" step="0.1" placeholder="No target" /></label>
           <label>Width minimum (J)<input name="map-width-min" type="number" value="7" step="0.5" /></label>
           <label>Width maximum (J)<input name="map-width-max" type="number" value="10" step="0.5" /></label>
           <label>Width step (J)<input name="map-width-step" type="number" value="0.5" min="0.1" step="0.1" /></label>
@@ -92,7 +182,6 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         </div>
         <div class="form-actions map-actions">
           <button id="generate-map" type="button">Generate Fitment Map</button>
-          <button id="save-clearance" type="button" class="secondary">Save measurements to Garage</button>
         </div>
         <p class="map-legend"><span>● Green: meets supplied targets</span><span>● Yellow: positive clearance below a target</span><span>● Red: projected overlap</span></p>
         <div id="map-errors" hidden></div>
@@ -100,37 +189,9 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <article id="map-detail" class="map-detail" hidden aria-live="polite"></article>
       </section>
 
-      <section aria-labelledby="what-fits-heading" id="what-fits-section">
-        <h2 id="what-fits-heading">{t('whatFitsTitle')}</h2>
-        <p>{t('whatFitsDisclaimer')}</p>
-        <div class="map-inputs">
-          <label>Width minimum (J)<input name="wf-width-min" type="number" value="7" step="0.5" /></label>
-          <label>Width maximum (J)<input name="wf-width-max" type="number" value="10" step="0.5" /></label>
-          <label>Width step (J)<input name="wf-width-step" type="number" value="0.5" min="0.1" step="0.1" /></label>
-          <label>Offset minimum (ET)<input name="wf-offset-min" type="number" value="20" step="1" /></label>
-          <label>Offset maximum (ET)<input name="wf-offset-max" type="number" value="55" step="1" /></label>
-          <label>Offset step (mm)<input name="wf-offset-step" type="number" value="5" min="1" step="1" /></label>
-          <label>Ranking
-            <select name="wf-ranking">
-              <option value="nearestToCandidate">Nearest to candidate</option>
-              <option value="maximizeClearance">Maximize minimum clearance</option>
-              <option value="minimizeGeometryChange">Minimize geometry change</option>
-              <option value="targetOuterClearance">Target outer clearance</option>
-            </select>
-          </label>
-          <label>Target width (J)<input name="wf-target-width" type="number" value="8.5" step="0.5" /></label>
-          <label>Target offset (ET)<input name="wf-target-offset" type="number" value="35" step="1" /></label>
-          <label>Target outer clearance (mm)<input name="wf-target-outer" type="number" value="7" step="0.1" /></label>
-          <label>Maximum results<input name="wf-max-results" type="number" value="10" min="1" max="100" step="1" /></label>
-        </div>
-        <button id="search-what-fits" type="button">Search</button>
-        <p id="what-fits-summary" class="search-summary" aria-live="polite"></p>
-        <div id="what-fits-errors" hidden></div>
-        <div id="what-fits-results" class="search-results"></div>
-      </section>
-
       <section aria-labelledby="garage-heading">
         <h2 id="garage-heading">{t('garageTitle')}</h2>
+        <label class="nickname">Current vehicle<select id="active-vehicle"><option value="">No saved vehicle</option></select></label>
         <label class="nickname">Vehicle nickname<input name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label>
         <p id="garage-status" role="status"></p>
         <div id="saved-setups"></div>

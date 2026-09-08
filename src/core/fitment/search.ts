@@ -6,12 +6,16 @@ import { createFitmentMap, type FitmentMapCell, type NumericRange } from './map'
 export type WhatFitsRanking =
   | { readonly mode: 'nearestToCandidate'; readonly targetWidthInches: number; readonly targetOffsetMm: number }
   | { readonly mode: 'maximizeClearance' }
+  | { readonly mode: 'maximizeInnerClearance' }
+  | { readonly mode: 'maximizeOuterPresence' }
   | { readonly mode: 'minimizeGeometryChange' }
   | { readonly mode: 'targetOuterClearance'; readonly targetOuterClearanceMm: number };
 
 export type RankingExplanation =
   | { readonly mode: 'nearestToCandidate'; readonly distanceInGridSteps: number; readonly widthSteps: number; readonly offsetSteps: number }
   | { readonly mode: 'maximizeClearance'; readonly minimumProjectedClearanceMm: number }
+  | { readonly mode: 'maximizeInnerClearance'; readonly projectedInnerClearanceMm: number }
+  | { readonly mode: 'maximizeOuterPresence'; readonly outerPokeChangeMm: number }
   | { readonly mode: 'minimizeGeometryChange'; readonly totalAbsolutePositionChangeMm: number }
   | { readonly mode: 'targetOuterClearance'; readonly distanceFromOuterTargetMm: number; readonly targetOuterClearanceMm: number };
 
@@ -46,6 +50,10 @@ function explanationFor(cell: FitmentMapCell, request: WhatFitsRequest): Ranking
     }
     case 'maximizeClearance':
       return { mode: request.ranking.mode, minimumProjectedClearanceMm: Math.min(cell.projectedInnerClearanceMm, cell.projectedOuterClearanceMm) };
+    case 'maximizeInnerClearance':
+      return { mode: request.ranking.mode, projectedInnerClearanceMm: cell.projectedInnerClearanceMm };
+    case 'maximizeOuterPresence':
+      return { mode: request.ranking.mode, outerPokeChangeMm: cell.outerPokeChangeMm };
     case 'minimizeGeometryChange':
       return { mode: request.ranking.mode, totalAbsolutePositionChangeMm: Math.abs(cell.innerPositionChangeMm) + Math.abs(cell.outerPokeChangeMm) };
     case 'targetOuterClearance':
@@ -61,6 +69,8 @@ const metric = (explanation: RankingExplanation): number => {
   switch (explanation.mode) {
     case 'nearestToCandidate': return explanation.distanceInGridSteps;
     case 'maximizeClearance': return -explanation.minimumProjectedClearanceMm;
+    case 'maximizeInnerClearance': return -explanation.projectedInnerClearanceMm;
+    case 'maximizeOuterPresence': return -explanation.outerPokeChangeMm;
     case 'minimizeGeometryChange': return explanation.totalAbsolutePositionChangeMm;
     case 'targetOuterClearance': return explanation.distanceFromOuterTargetMm;
   }

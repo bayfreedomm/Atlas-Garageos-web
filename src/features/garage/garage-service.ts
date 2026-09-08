@@ -27,6 +27,17 @@ export class GarageService {
     return this.repository.load();
   }
 
+  public async selectVehicle(vehicleId: string): Promise<ValidationResult<GarageState>> {
+    const loaded = await this.repository.load();
+    if (!loaded.state.vehicles.some((vehicle) => vehicle.id === vehicleId)) {
+      return invalid({ code: 'invalid-reference', field: 'vehicleId', message: 'Selected vehicle does not exist in My Garage.', received: vehicleId });
+    }
+    const next = createGarageState({ ...loaded.state, activeVehicleId: vehicleId });
+    if (!next.ok) return next;
+    await this.repository.save(next.value);
+    return valid(next.value);
+  }
+
   public async saveSetup(command: SaveSetupCommand): Promise<ValidationResult<GarageState>> {
     const setup = createSetupFromInput(command.setup);
     if (!setup.ok) return setup;

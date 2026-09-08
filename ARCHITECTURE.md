@@ -74,7 +74,47 @@ The UI treats search results as transient. Inspecting or loading a candidate cha
 
 `core/tire/search` enumerates validated tire sizes for a requested rim diameter and orders them by absolute diameter difference from a baseline tire. It reports diameter, circumference, sidewall, and speedometer differences by calling the existing tire geometry functions. An absolute diameter-percentage limit is applied only when the caller supplies one; the core invents no compatibility or safety threshold.
 
-`core/fitment/combined-candidate` defines the future composition boundary for a wheel recommendation and a tire-size candidate. It deliberately performs no Cartesian search and introduces no new geometry. A later combined tool can coordinate the two independent engines through this typed seam without coupling wheel-clearance calculations to tire enumeration.
+`core/fitment/combined-candidate` defines the shared result contract for a wheel recommendation and a tire-size candidate. It introduces no new geometry; the bounded orchestration described below composes the independent engines through this typed seam.
+
+## Guided measurement and FitmentGoal
+
+`features/fitment-explorer` is the boundary between untrusted UI fields and the combined core. It requires both inner and outer measurements, constructs the baseline through the existing domain factories, preserves measurement source as `userMeasured`, validates optional targets, and only then creates a combined-search request. Without both measurements, projected clearance and combined exploration do not run. Empty optional targets remain `null`; no default margin is substituted.
+
+`FitmentGoal` expresses user intent without presenting a safety verdict or relying on style presets. Its mapping to wheel ranking is explicit:
+
+- `closestToCurrent` → minimize absolute inner-position change plus absolute outer-poke change.
+- `moreOuterPresence` → maximize outer-poke change among non-red wheel candidates.
+- `moreInnerClearance` → maximize projected inner clearance.
+- `balancedClearance` → maximize the smaller of projected inner and projected outer clearance.
+- `targetOuterClearance` → minimize absolute distance from the user's required outer-clearance target; the target is mandatory for this goal.
+
+Future labels such as “stock-like” or “flush” may map to this API only when their numeric parameters are exposed. They must not introduce hidden thresholds.
+
+## Bounded combined wheel and tire search
+
+`core/fitment/combined-search` composes the existing What Fits and tire candidate engines. Wheel geometry still comes only from the Fitment Map path; tire metrics still come only from the tire geometry path. Each tire and wheel is reconstructed as one validated `VehicleSetup`, which enforces matching rim diameters.
+
+Preflight counts the raw Cartesian space before either engine enumerates candidates. The exported `COMBINED_SEARCH_LIMITS` configuration permits at most 100 wheel candidates, 500 tire candidates, 25,000 combined candidates, and 100 returned results. These are synchronous browser-performance guards, not fitment or safety rules. An oversized request returns a structured range error asking the caller to narrow its ranges. A Web Worker remains unnecessary while supported searches stay within this measured, explicit bound.
+
+RED wheel-overlap candidates are counted and excluded before wheel/tire composition. Optional diameter constraints are applied only when supplied. The candidate result contains the validated setup, complete wheel-clearance geometry, complete tire deltas, geometric state, ordered criteria, evaluated explicit constraints, and lightweight provenance.
+
+Combined ordering is lexicographic rather than a weighted score:
+
+- `closestToCurrent`: geometry change, absolute tire-diameter percentage, deterministic tie-breaks.
+- `moreOuterPresence`: outer presence descending, tire-diameter percentage, geometry change, deterministic tie-breaks.
+- `moreInnerClearance`: projected inner clearance descending, tire-diameter percentage, geometry change, deterministic tie-breaks.
+- `balancedClearance`: minimum projected clearance descending, tire-diameter percentage, geometry change, deterministic tie-breaks.
+- `targetOuterClearance`: absolute distance from the explicit outer target, tire-diameter percentage, geometry change, deterministic tie-breaks.
+
+Final ties use absolute baseline wheel-width difference, absolute baseline offset difference, ascending width, ascending offset, absolute baseline tire-width difference, absolute baseline aspect-ratio difference, ascending tire width, then ascending aspect ratio.
+
+## UI state and provenance
+
+The guided development flow is organized as current setup, inner measurement, outer measurement, optional targets, review, goal/ranges, search, inspect, compare, explicit Garage save, and share. Fitment Map remains an advanced presentation over the same independent data model. UI controllers render cards or tables from core results; neither representation is encoded in core APIs, so a mobile-first production layout can replace them without changing calculations.
+
+Result provenance is intentionally small and extensible: physical gaps are `USER MEASURED`, optional constraints are `USER TARGET`, and projections plus tire/wheel deltas are `CALCULATED`. The vocabulary already allows later official, community, and estimate sources without building a heavy provenance framework now.
+
+Combined search state and inspected candidates are transient. Vehicle selection updates only `activeVehicleId`; clearance profiles and explicitly saved setups remain keyed to that vehicle. Garage lists are filtered to the active vehicle, and saving a recommendation uses the active vehicle through `GarageService`. No schema migration is required.
 
 ## Growth seams
 

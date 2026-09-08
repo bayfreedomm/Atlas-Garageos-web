@@ -65,10 +65,20 @@ dd { margin: .25rem 0 0; font-variant-numeric: tabular-nums; font-weight: 700; }
 .search-summary { color: #e8edf2; font-weight: 700; }
 .search-results article { padding: 1rem; border: 1px solid #26323d; border-radius: .4rem; background: #0f161d; }
 .search-results h3, .search-results p { margin: 0 0 .55rem; }
+.step-nav, .step-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.step-nav { margin: 1rem 0; }
+.step-nav button { padding: .55rem .7rem; }
+.measure-panel { min-height: 10rem; padding: 1rem; border: 1px solid #26323d; border-radius: .4rem; background: #0f161d; }
+.measure-panel > label { max-width: 28rem; }
+.step-actions { justify-content: space-between; margin-top: 1rem; }
+.goal-select { max-width: 34rem; margin-bottom: 1rem; }
+.range-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+#measurement-errors { color: #ffb4ab; }
 
 @media (max-width: 46rem) {
   main { padding-top: 1.5rem; }
-  form, .grid, dl { grid-template-columns: 1fr; }
+  form, .grid, dl, .range-groups { grid-template-columns: 1fr; }
   .setup-save { align-items: stretch; flex-direction: column; }
   .map-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step-nav button { flex: 1 1 9rem; }
 }

@@ -58,4 +58,22 @@ describe('garage service', () => {
       expect(state.value.savedSetups.map((item) => item.vehicleId)).toEqual(['car-1', 'car-2']);
     }
   });
+
+  it('switches active vehicles explicitly and keeps new recommendations attached to that vehicle', async () => {
+    const timestamp = '2026-09-08T10:00:00.000Z';
+    const first = createVehicleProfile({ id: 'car-1', displayName: 'Daily car', createdAt: timestamp, updatedAt: timestamp });
+    const second = createVehicleProfile({ id: 'car-2', displayName: 'Project car', createdAt: timestamp, updatedAt: timestamp });
+    if (!first.ok || !second.ok) throw new Error('Fixtures must be valid');
+    const state = createGarageState({ vehicles: [first.value, second.value], activeVehicleId: 'car-1', savedSetups: [], clearanceProfiles: [] });
+    if (!state.ok) throw new Error('Garage fixture must be valid');
+    const repository = new InMemoryGarageRepository(state.value);
+    const garage = service(repository);
+    expect((await garage.selectVehicle('missing')).ok).toBe(false);
+    expect((await garage.load()).state.activeVehicleId).toBe('car-1');
+    expect((await garage.selectVehicle('car-2')).ok).toBe(true);
+    expect((await garage.load()).state.savedSetups).toHaveLength(0);
+    const saved = await garage.saveSetup({ name: 'Explicit recommendation', vehicleNickname: 'ignored', setup: daily });
+    expect(saved.ok).toBe(true);
+    if (saved.ok) expect(saved.value.savedSetups[0]?.vehicleId).toBe('car-2');
+  });
 });
