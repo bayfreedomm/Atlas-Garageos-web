@@ -32,9 +32,28 @@ V1 links emitted from Milestone 2 use compact numeric tuples, but the decoder al
 
 ## Garage and storage ownership
 
-`GarageState` is schema-versioned and supports multiple `VehicleProfile` records and multiple named `SavedSetup` records per vehicle. Each setup references its vehicle by id and has creation/update metadata. Referential integrity and duplicate identifiers are checked by domain factories.
+`GarageState` is schema-versioned and supports multiple `VehicleProfile` records and multiple named `SavedSetup` records per vehicle. V2 adds one `VehicleClearanceProfile` per vehicle. Each clearance profile stores a validated baseline setup snapshot, an optional saved-setup reference, user-measured inner/outer clearance, optional user-selected targets, and update metadata. Referential integrity and duplicate identifiers are checked by domain factories.
 
-`GarageRepository` is the only persistence boundary. `LocalStorageGarageRepository` owns all browser-storage calls; feature and UI modules only call repository methods. `InMemoryGarageRepository` supports deterministic tests. Serialized values are parsed as unknown and reconstructed through tire, wheel, setup, profile, and garage validators. Corrupt, invalid, missing, older-without-a-migration, or future schemas return a safe empty garage plus an explicit recovery status. `garageMigrations` is the extension point for future stepwise migrations.
+`GarageRepository` is the only persistence boundary. `LocalStorageGarageRepository` owns all browser-storage calls; feature and UI modules only call repository methods. `InMemoryGarageRepository` supports deterministic tests. Serialized values are parsed as unknown and reconstructed through tire, wheel, setup, clearance-profile, vehicle-profile, and garage validators. Corrupt, invalid, missing, older-without-a-migration, or future schemas return a safe empty garage plus an explicit recovery status. The first real migration upgrades V1 to V2 by preserving vehicles and saved setups and adding an empty `clearanceProfiles` collection. `garageMigrations` remains the stepwise extension point.
+
+## Fitment geometry profile and map
+
+Clearance measurements are explicitly `source: userMeasured`; they are not OEM specifications. A profile belongs to a garage vehicle and snapshots the exact baseline setup used when the measurements were taken.
+
+Wheel position signs remain the same as Milestone 1: positive inner change means the candidate moves farther inward; positive outer-poke change means it moves farther outward. Projection uses:
+
+- `projected inner clearance = measured inner clearance - inner position change`
+- `projected outer clearance = measured outer clearance - outer poke change`
+
+Map states are geometry-only:
+
+- Green: no projected overlap and every supplied user target is met. With no targets, green means only that projected clearances are non-negative; no extra margin is invented.
+- Yellow: both projected clearances are non-negative, but at least one supplied target is missed.
+- Red: at least one projected clearance is negative, indicating calculated geometric overlap from the supplied measurements.
+
+Green never means road-safe, and yellow is not a danger verdict. The map models wheel width/offset geometry. Tire sidewall bulge, tire manufacturer/model variation, stretch, suspension travel, alignment, body shape, brake and legal constraints are not modeled because no reliable source data exists in this milestone.
+
+Nearest-green ranking uses Manhattan distance measured in the map's own grid steps: `|width difference| / width step + |offset difference| / offset step`. Deterministic tie-breakers prefer unchanged width, then unchanged offset, then ascending width and offset. There are no hidden weights.
 
 ## Growth seams
 

@@ -17,7 +17,11 @@ export class LocalStorageGarageRepository implements GarageRepository {
 
   public async load(): Promise<GarageLoadResult> {
     try {
-      return deserializeGarageState(this.storage.getItem(this.key));
+      const result = deserializeGarageState(this.storage.getItem(this.key));
+      if (result.status === 'migrated') {
+        try { this.storage.setItem(this.key, serializeGarageState(result.state)); } catch { /* Keep the valid in-memory migration. */ }
+      }
+      return result;
     } catch {
       return { state: createEmptyGarageState(), status: 'recovered-corrupt' };
     }

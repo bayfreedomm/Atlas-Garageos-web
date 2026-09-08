@@ -51,7 +51,7 @@ describe('garage service', () => {
     const firstSetup = createSavedSetup({ id: 'setup-1', vehicleId: 'car-1', name: 'Daily', setup: validSetup.value, createdAt: timestamp, updatedAt: timestamp });
     const secondSetup = createSavedSetup({ id: 'setup-2', vehicleId: 'car-2', name: 'Stock', setup: validSetup.value, createdAt: timestamp, updatedAt: timestamp });
     if (!firstSetup.ok || !secondSetup.ok) throw new Error('Saved setup fixtures must be valid');
-    const state = createGarageState({ vehicles: [first.value, second.value], activeVehicleId: 'car-2', savedSetups: [firstSetup.value, secondSetup.value] });
+    const state = createGarageState({ vehicles: [first.value, second.value], activeVehicleId: 'car-2', savedSetups: [firstSetup.value, secondSetup.value], clearanceProfiles: [] });
     expect(state.ok).toBe(true);
     if (state.ok) {
       expect(state.value.vehicles).toHaveLength(2);

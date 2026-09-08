@@ -2,6 +2,9 @@ import type { GarageState, SavedSetup } from '../domain/garage';
 import type { ValidationIssue } from '../domain/validation';
 import { GarageService } from '../features/garage/garage-service';
 import { compareSetupInputs, type SetupInput } from '../features/compare/compare-setups';
+import { createSetupFromInput } from '../features/compare/compare-setups';
+import { createVehicleClearanceProfile, type VehicleClearanceProfile } from '../domain/clearance';
+import { createFitmentMap, type FitmentMapCell } from '../core/fitment/map';
 import { createSetupShareHash, decodeSetupShareHash, type SetupShareV1 } from '../features/share/setup-share';
 import { translate } from '../localization/catalog';
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
@@ -72,12 +75,108 @@ export async function initializeFitmentPage(): Promise<void> {
   const status = required<HTMLParagraphElement>('#garage-status');
   const garageList = required<HTMLDivElement>('#saved-setups');
   const sharedPanel = required<HTMLElement>('#shared-setup');
+  const mapContainer = required<HTMLDivElement>('#fitment-map');
+  const mapDetail = required<HTMLElement>('#map-detail');
+  const mapErrors = required<HTMLDivElement>('#map-errors');
   const repository = createBrowserGarageRepository();
   const service = new GarageService(repository, {
     createId: () => crypto.randomUUID(),
     nowIso: () => new Date().toISOString(),
   });
   let shared: SetupShareV1 | undefined;
+
+  const optionalNumber = (name: string): number | null => input(name).value.trim() === '' ? null : Number(input(name).value);
+
+  function readClearanceProfile(vehicleId = 'map-preview'): ReturnType<typeof createVehicleClearanceProfile> {
+    const baseline = createSetupFromInput(readSetup('current'), 'baseline');
+    if (!baseline.ok) return baseline;
+    return createVehicleClearanceProfile({
+      vehicleId,
+      baselineSetupId: null,
+      baselineSetup: baseline.value,
+      measuredInnerClearanceMm: Number(input('measured-inner').value),
+      measuredOuterClearanceMm: Number(input('measured-outer').value),
+      minimumDesiredInnerClearanceMm: optionalNumber('desired-inner'),
+      minimumDesiredOuterClearanceMm: optionalNumber('desired-outer'),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  function reasonText(cell: FitmentMapCell, profile: VehicleClearanceProfile): string {
+    const messages: string[] = [];
+    if (cell.reasons.includes('inner-overlap')) messages.push(`Calculated inner overlap: ${formatNumber(Math.abs(cell.projectedInnerClearanceMm))} mm.`);
+    if (cell.reasons.includes('outer-overlap')) messages.push(`Calculated outer overlap: ${formatNumber(Math.abs(cell.projectedOuterClearanceMm))} mm.`);
+    if (cell.reasons.includes('inner-below-target') && profile.minimumDesiredInnerClearanceMm !== null) messages.push(`Inner clearance is ${formatNumber(profile.minimumDesiredInnerClearanceMm - cell.projectedInnerClearanceMm)} mm below your target.`);
+    if (cell.reasons.includes('outer-below-target') && profile.minimumDesiredOuterClearanceMm !== null) messages.push(`Outer clearance is ${formatNumber(profile.minimumDesiredOuterClearanceMm - cell.projectedOuterClearanceMm)} mm below your target.`);
+    if (cell.reasons.includes('meets-targets')) messages.push('Both projected clearances meet your supplied targets. This is not a road-safety verdict.');
+    if (cell.reasons.includes('no-targets')) messages.push('No desired margins were supplied; only non-negative geometric clearance was checked.');
+    return messages.join(' ');
+  }
+
+  function showMapDetail(cell: FitmentMapCell, rimDiameter: number, profile: VehicleClearanceProfile): void {
+    mapDetail.replaceChildren();
+    const heading = document.createElement('h3');
+    heading.textContent = `${rimDiameter}x${cell.wheelWidthInches} ET${cell.offsetMm} — ${cell.state.toUpperCase()}`;
+    const metrics = document.createElement('p');
+    metrics.textContent = `Inner change: ${formatNumber(cell.innerPositionChangeMm)} mm · Outer poke change: ${formatNumber(cell.outerPokeChangeMm)} mm · Projected inner: ${formatNumber(cell.projectedInnerClearanceMm)} mm · Projected outer: ${formatNumber(cell.projectedOuterClearanceMm)} mm`;
+    const reason = document.createElement('p');
+    reason.textContent = reasonText(cell, profile);
+    mapDetail.append(heading, metrics, reason);
+    mapDetail.hidden = false;
+  }
+
+  function generateMap(): void {
+    const profile = readClearanceProfile();
+    if (!profile.ok) { showIssues(mapErrors, profile.issues); mapContainer.replaceChildren(); return; }
+    const result = createFitmentMap({
+      clearanceProfile: profile.value,
+      widthRangeInches: { min: Number(input('map-width-min').value), max: Number(input('map-width-max').value), step: Number(input('map-width-step').value) },
+      offsetRangeMm: { min: Number(input('map-offset-min').value), max: Number(input('map-offset-max').value), step: Number(input('map-offset-step').value) },
+    });
+    if (!result.ok) { showIssues(mapErrors, result.issues); mapContainer.replaceChildren(); return; }
+    mapErrors.hidden = true;
+    const table = document.createElement('table');
+    table.className = 'fitment-table';
+    const head = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const corner = document.createElement('th');
+    corner.textContent = 'Width / Offset';
+    headerRow.append(corner);
+    for (const offset of result.value.offsetValuesMm) {
+      const header = document.createElement('th');
+      header.scope = 'col';
+      header.textContent = `ET${offset}`;
+      headerRow.append(header);
+    }
+    head.append(headerRow);
+    const body = document.createElement('tbody');
+    for (const width of result.value.widthValuesInches) {
+      const row = document.createElement('tr');
+      const header = document.createElement('th');
+      header.scope = 'row';
+      header.textContent = `${width}J`;
+      row.append(header);
+      for (const offset of result.value.offsetValuesMm) {
+        const cell = result.value.cells.find((item) => item.wheelWidthInches === width && item.offsetMm === offset)!;
+        const data = document.createElement('td');
+        appendButton(data, cell.state === 'green' ? '●' : cell.state === 'yellow' ? '▲' : '×', () => showMapDetail(cell, result.value.rimDiameterInches, profile.value), `map-cell state-${cell.state}`);
+        const button = data.querySelector('button')!;
+        button.setAttribute('aria-label', `${width}J ET${offset}: ${cell.state}`);
+        row.append(data);
+      }
+      body.append(row);
+    }
+    table.append(head, body);
+    mapContainer.replaceChildren(table);
+    mapDetail.hidden = true;
+  }
+
+  function populateClearance(profile: VehicleClearanceProfile): void {
+    input('measured-inner').value = String(profile.measuredInnerClearance.valueMm);
+    input('measured-outer').value = String(profile.measuredOuterClearance.valueMm);
+    input('desired-inner').value = profile.minimumDesiredInnerClearanceMm === null ? '' : String(profile.minimumDesiredInnerClearanceMm);
+    input('desired-outer').value = profile.minimumDesiredOuterClearanceMm === null ? '' : String(profile.minimumDesiredOuterClearanceMm);
+  }
 
   function renderComparison(): void {
     const comparison = compareSetupInputs(readSetup('current'), readSetup('proposed'));
@@ -177,9 +276,26 @@ export async function initializeFitmentPage(): Promise<void> {
     status.textContent = 'Shared new setup saved to this browser.';
     renderGarage(result.value);
   });
+  required('#generate-map').addEventListener('click', generateMap);
+  required('#save-clearance').addEventListener('click', async () => {
+    const result = await service.saveClearanceProfile({
+      vehicleNickname: input('vehicle-nickname').value,
+      baselineSetup: readSetup('current'),
+      measuredInnerClearanceMm: Number(input('measured-inner').value),
+      measuredOuterClearanceMm: Number(input('measured-outer').value),
+      minimumDesiredInnerClearanceMm: optionalNumber('desired-inner'),
+      minimumDesiredOuterClearanceMm: optionalNumber('desired-outer'),
+    });
+    if (!result.ok) { showIssues(mapErrors, result.issues); return; }
+    status.textContent = 'User-measured clearance profile saved to this vehicle.';
+    renderGarage(result.value);
+    generateMap();
+  });
 
   const loaded = await service.load();
   renderGarage(loaded.state);
+  const storedClearance = loaded.state.clearanceProfiles.find((profile) => profile.vehicleId === loaded.state.activeVehicleId);
+  if (storedClearance) populateClearance(storedClearance);
   if (loaded.status.startsWith('recovered-')) status.textContent = 'Invalid garage data was ignored and a safe empty garage was opened.';
 
   const decoded = decodeSetupShareHash(window.location.hash);
@@ -196,4 +312,5 @@ export async function initializeFitmentPage(): Promise<void> {
     }
   }
   renderComparison();
+  generateMap();
 }

@@ -5,4 +5,6 @@ export const en = {
   garageEmpty: 'No saved setups yet.',
   sharedTitle: 'Shared setup opened',
   sharedNotice: 'This setup has not been saved to My Garage.',
+  fitmentMapTitle: 'Wheel Geometry Map',
+  fitmentMapDisclaimer: 'Colors describe projected wheel clearance from your measurements. They are not road-safety verdicts.',
 } as const;

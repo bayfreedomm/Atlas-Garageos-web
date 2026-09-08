@@ -4,6 +4,7 @@ import { invalid, valid } from '../../domain/validation';
 import type { GarageLoadResult, GarageRepository } from '../../storage/garage-repository';
 import { createSetupFromInput, type SetupInput } from '../compare/compare-setups';
 import type { SetupShareV1 } from '../share/setup-share';
+import { createVehicleClearanceProfile } from '../../domain/clearance';
 
 export interface GarageServiceDependencies {
   readonly createId: () => string;
@@ -56,7 +57,7 @@ export class GarageService {
       updatedAt: now,
     });
     if (!savedSetup.ok) return invalid(...savedSetup.issues);
-    const next = createGarageState({ vehicles, activeVehicleId: vehicleId, savedSetups: [...state.savedSetups, savedSetup.value] });
+    const next = createGarageState({ vehicles, activeVehicleId: vehicleId, savedSetups: [...state.savedSetups, savedSetup.value], clearanceProfiles: state.clearanceProfiles });
     if (!next.ok) return next;
     await this.repository.save(next.value);
     return valid(next.value);
@@ -72,9 +73,54 @@ export class GarageService {
       vehicles: state.vehicles,
       activeVehicleId: state.activeVehicleId,
       savedSetups: state.savedSetups.filter((setup) => setup.id !== id),
+      clearanceProfiles: state.clearanceProfiles.map((profile) => profile.baselineSetupId === id ? { ...profile, baselineSetupId: null } : profile),
     });
     if (!next.ok) return state;
     await this.repository.save(next.value);
     return next.value;
+  }
+
+  public async saveClearanceProfile(command: {
+    readonly vehicleNickname: string;
+    readonly baselineSetup: SetupInput;
+    readonly baselineSetupId?: string | null;
+    readonly measuredInnerClearanceMm: number;
+    readonly measuredOuterClearanceMm: number;
+    readonly minimumDesiredInnerClearanceMm: number | null;
+    readonly minimumDesiredOuterClearanceMm: number | null;
+  }): Promise<ValidationResult<GarageState>> {
+    const baseline = createSetupFromInput(command.baselineSetup, 'baseline');
+    if (!baseline.ok) return baseline;
+    const loaded = await this.repository.load();
+    const state = loaded.state;
+    const now = this.dependencies.nowIso();
+    let vehicleId = state.activeVehicleId;
+    const vehicles = [...state.vehicles];
+    if (vehicleId === null) {
+      const vehicle = createVehicleProfile({ id: this.dependencies.createId(), displayName: command.vehicleNickname, createdAt: now, updatedAt: now });
+      if (!vehicle.ok) return invalid(...vehicle.issues);
+      vehicles.push(vehicle.value);
+      vehicleId = vehicle.value.id;
+    }
+    const profile = createVehicleClearanceProfile({
+      vehicleId,
+      baselineSetupId: command.baselineSetupId ?? null,
+      baselineSetup: baseline.value,
+      measuredInnerClearanceMm: command.measuredInnerClearanceMm,
+      measuredOuterClearanceMm: command.measuredOuterClearanceMm,
+      minimumDesiredInnerClearanceMm: command.minimumDesiredInnerClearanceMm,
+      minimumDesiredOuterClearanceMm: command.minimumDesiredOuterClearanceMm,
+      updatedAt: now,
+    });
+    if (!profile.ok) return invalid(...profile.issues);
+    const next = createGarageState({
+      vehicles,
+      activeVehicleId: vehicleId,
+      savedSetups: state.savedSetups,
+      clearanceProfiles: [...state.clearanceProfiles.filter((item) => item.vehicleId !== vehicleId), profile.value],
+    });
+    if (!next.ok) return next;
+    await this.repository.save(next.value);
+    return valid(next.value);
   }
 }

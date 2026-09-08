@@ -1,6 +1,6 @@
 import type { GarageState } from '../domain/garage';
 
-export type GarageLoadStatus = 'empty' | 'loaded' | 'recovered-corrupt' | 'recovered-unsupported' | 'recovered-invalid';
+export type GarageLoadStatus = 'empty' | 'loaded' | 'migrated' | 'recovered-corrupt' | 'recovered-unsupported' | 'recovered-invalid';
 
 export interface GarageLoadResult {
   readonly state: GarageState;

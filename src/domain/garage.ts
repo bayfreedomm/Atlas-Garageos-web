@@ -1,8 +1,9 @@
 import type { ValidationIssue, ValidationResult } from './validation';
 import { invalid, valid } from './validation';
 import type { VehicleProfile, VehicleSetup } from './vehicle';
+import type { VehicleClearanceProfile } from './clearance';
 
-export const GARAGE_SCHEMA_VERSION = 1 as const;
+export const GARAGE_SCHEMA_VERSION = 2 as const;
 
 export interface SavedSetup {
   readonly id: string;
@@ -18,6 +19,7 @@ export interface GarageState {
   readonly vehicles: readonly VehicleProfile[];
   readonly activeVehicleId: string | null;
   readonly savedSetups: readonly SavedSetup[];
+  readonly clearanceProfiles: readonly VehicleClearanceProfile[];
 }
 
 export interface VehicleProfileInput {
@@ -97,6 +99,7 @@ export function createGarageState(input: Omit<GarageState, 'schemaVersion'>): Va
   const issues: ValidationIssue[] = [];
   const vehicleIds = new Set<string>();
   const setupIds = new Set<string>();
+  const clearanceVehicleIds = new Set<string>();
 
   for (const vehicle of input.vehicles) {
     if (vehicleIds.has(vehicle.id)) issues.push({ code: 'duplicate', field: 'vehicles.id', message: `Duplicate vehicle id: ${vehicle.id}.`, received: vehicle.id });
@@ -110,6 +113,15 @@ export function createGarageState(input: Omit<GarageState, 'schemaVersion'>): Va
   if (input.activeVehicleId !== null && !vehicleIds.has(input.activeVehicleId)) {
     issues.push({ code: 'invalid-reference', field: 'activeVehicleId', message: 'Active vehicle id must reference an existing vehicle.', received: input.activeVehicleId });
   }
+  for (const profile of input.clearanceProfiles) {
+    if (!vehicleIds.has(profile.vehicleId)) issues.push({ code: 'invalid-reference', field: 'clearanceProfiles.vehicleId', message: 'Clearance profile must reference an existing vehicle.', received: profile.vehicleId });
+    if (clearanceVehicleIds.has(profile.vehicleId)) issues.push({ code: 'duplicate', field: 'clearanceProfiles.vehicleId', message: 'A vehicle may have only one active clearance profile.', received: profile.vehicleId });
+    clearanceVehicleIds.add(profile.vehicleId);
+    if (profile.baselineSetupId !== null) {
+      const baseline = input.savedSetups.find((setup) => setup.id === profile.baselineSetupId);
+      if (!baseline || baseline.vehicleId !== profile.vehicleId) issues.push({ code: 'invalid-reference', field: 'clearanceProfiles.baselineSetupId', message: 'Baseline setup id must reference a saved setup for the same vehicle.', received: profile.baselineSetupId });
+    }
+  }
   if (issues.length > 0) return invalid(...issues);
 
   return valid(Object.freeze({
@@ -117,6 +129,7 @@ export function createGarageState(input: Omit<GarageState, 'schemaVersion'>): Va
     vehicles: Object.freeze([...input.vehicles]),
     activeVehicleId: input.activeVehicleId,
     savedSetups: Object.freeze([...input.savedSetups]),
+    clearanceProfiles: Object.freeze([...input.clearanceProfiles]),
   }));
 }
 
@@ -126,5 +139,6 @@ export function createEmptyGarageState(): GarageState {
     vehicles: Object.freeze([]),
     activeVehicleId: null,
     savedSetups: Object.freeze([]),
+    clearanceProfiles: Object.freeze([]),
   });
 }

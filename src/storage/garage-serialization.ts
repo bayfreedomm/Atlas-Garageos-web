@@ -2,11 +2,13 @@ import { createEmptyGarageState, createGarageState, createSavedSetup, createVehi
 import { createTireSize, createVehicleSetup, createWheelSpec, type VehicleProfile, type VehicleSetup } from '../domain/vehicle';
 import type { SavedSetup } from '../domain/garage';
 import type { GarageLoadResult } from './garage-repository';
+import { createVehicleClearanceProfile, type VehicleClearanceProfile } from '../domain/clearance';
 
 type Migration = (value: Record<string, unknown>) => Record<string, unknown>;
 
-// Add migrations by their source schema version. V1 has no predecessors yet.
-export const garageMigrations: Readonly<Partial<Record<number, Migration>>> = Object.freeze({});
+export const garageMigrations: Readonly<Partial<Record<number, Migration>>> = Object.freeze({
+  1: (value) => ({ ...value, schemaVersion: 2, clearanceProfiles: [] }),
+});
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
@@ -28,7 +30,7 @@ function parseSetup(value: unknown): VehicleSetup | undefined {
 }
 
 function parseCurrentSchema(value: Record<string, unknown>): GarageState | undefined {
-  if (!Array.isArray(value.vehicles) || !Array.isArray(value.savedSetups)) return undefined;
+  if (!Array.isArray(value.vehicles) || !Array.isArray(value.savedSetups) || !Array.isArray(value.clearanceProfiles)) return undefined;
   const vehicles: VehicleProfile[] = [];
   for (const candidate of value.vehicles) {
     if (!isRecord(candidate)) return undefined;
@@ -66,10 +68,31 @@ function parseCurrentSchema(value: Record<string, unknown>): GarageState | undef
     savedSetups.push(saved.value);
   }
 
+  const clearanceProfiles: VehicleClearanceProfile[] = [];
+  for (const candidate of value.clearanceProfiles) {
+    if (!isRecord(candidate) || !isRecord(candidate.measuredInnerClearance) || !isRecord(candidate.measuredOuterClearance)) return undefined;
+    if (candidate.measuredInnerClearance.source !== 'userMeasured' || candidate.measuredOuterClearance.source !== 'userMeasured') return undefined;
+    const baselineSetup = parseSetup(candidate.baselineSetup);
+    if (!baselineSetup) return undefined;
+    const profile = createVehicleClearanceProfile({
+      vehicleId: typeof candidate.vehicleId === 'string' ? candidate.vehicleId : '',
+      baselineSetupId: typeof candidate.baselineSetupId === 'string' ? candidate.baselineSetupId : null,
+      baselineSetup,
+      measuredInnerClearanceMm: Number(candidate.measuredInnerClearance.valueMm),
+      measuredOuterClearanceMm: Number(candidate.measuredOuterClearance.valueMm),
+      minimumDesiredInnerClearanceMm: candidate.minimumDesiredInnerClearanceMm === null ? null : Number(candidate.minimumDesiredInnerClearanceMm),
+      minimumDesiredOuterClearanceMm: candidate.minimumDesiredOuterClearanceMm === null ? null : Number(candidate.minimumDesiredOuterClearanceMm),
+      updatedAt: typeof candidate.updatedAt === 'string' ? candidate.updatedAt : '',
+    });
+    if (!profile.ok) return undefined;
+    clearanceProfiles.push(profile.value);
+  }
+
   const state = createGarageState({
     vehicles,
     activeVehicleId: typeof value.activeVehicleId === 'string' ? value.activeVehicleId : null,
     savedSetups,
+    clearanceProfiles,
   });
   return state.ok ? state.value : undefined;
 }
@@ -89,17 +112,19 @@ export function deserializeGarageState(raw: string | null): GarageLoadResult {
   if (!isRecord(value)) return { state: createEmptyGarageState(), status: 'recovered-invalid' };
 
   let record = value;
+  let migrated = false;
   let version = record.schemaVersion;
   if (typeof version !== 'number' || !Number.isInteger(version)) return { state: createEmptyGarageState(), status: 'recovered-invalid' };
   while (version < GARAGE_SCHEMA_VERSION) {
     const migrate = garageMigrations[version];
     if (!migrate) return { state: createEmptyGarageState(), status: 'recovered-unsupported' };
     record = migrate(record);
+    migrated = true;
     version = record.schemaVersion;
     if (typeof version !== 'number' || !Number.isInteger(version)) return { state: createEmptyGarageState(), status: 'recovered-invalid' };
   }
   if (version !== GARAGE_SCHEMA_VERSION) return { state: createEmptyGarageState(), status: 'recovered-unsupported' };
 
   const state = parseCurrentSchema(record);
-  return state ? { state, status: 'loaded' } : { state: createEmptyGarageState(), status: 'recovered-invalid' };
+  return state ? { state, status: migrated ? 'migrated' : 'loaded' } : { state: createEmptyGarageState(), status: 'recovered-invalid' };
 }

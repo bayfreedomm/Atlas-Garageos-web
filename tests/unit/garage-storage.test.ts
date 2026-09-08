@@ -28,6 +28,15 @@ describe('garage storage', () => {
     const first = new GarageService(new LocalStorageGarageRepository(storage), dependencies());
     const saved = await first.saveSetup({ name: 'Daily', vehicleNickname: 'Roadster', setup });
     expect(saved.ok).toBe(true);
+    const measured = await first.saveClearanceProfile({
+      vehicleNickname: 'Roadster',
+      baselineSetup: setup,
+      measuredInnerClearanceMm: 12,
+      measuredOuterClearanceMm: 15,
+      minimumDesiredInnerClearanceMm: 7,
+      minimumDesiredOuterClearanceMm: null,
+    });
+    expect(measured.ok).toBe(true);
 
     const reopened = new LocalStorageGarageRepository(storage);
     const loaded = await reopened.load();
@@ -36,6 +45,8 @@ describe('garage storage', () => {
     expect(loaded.state.vehicles[0]?.displayName).toBe('Roadster');
     expect(loaded.state.savedSetups[0]?.name).toBe('Daily');
     expect(loaded.state.savedSetups[0]?.setup.tire.widthMm).toBe(225);
+    expect(loaded.state.clearanceProfiles[0]?.measuredInnerClearance).toEqual({ valueMm: 12, source: 'userMeasured' });
+    expect(loaded.state.clearanceProfiles[0]?.minimumDesiredOuterClearanceMm).toBeNull();
   });
 
   it('recovers safely from corrupted JSON', async () => {
@@ -53,5 +64,23 @@ describe('garage storage', () => {
 
     storage.values.set(GARAGE_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, vehicles: 'invalid', activeVehicleId: null, savedSetups: [] }));
     expect((await new LocalStorageGarageRepository(storage).load()).status).toBe('recovered-invalid');
+  });
+
+  it('migrates Garage v1 to v2 without losing saved setups', async () => {
+    const storage = new MemoryStorage();
+    const garage = new GarageService(new LocalStorageGarageRepository(storage), dependencies());
+    await garage.saveSetup({ name: 'Milestone 2 Daily', vehicleNickname: 'Legacy car', setup });
+    const v2 = JSON.parse(storage.values.get(GARAGE_STORAGE_KEY)!);
+    const v1 = { ...v2, schemaVersion: 1 };
+    delete v1.clearanceProfiles;
+    storage.values.set(GARAGE_STORAGE_KEY, JSON.stringify(v1));
+
+    const migrated = await new LocalStorageGarageRepository(storage).load();
+    expect(migrated.status).toBe('migrated');
+    expect(migrated.state.schemaVersion).toBe(2);
+    expect(migrated.state.savedSetups).toHaveLength(1);
+    expect(migrated.state.savedSetups[0]?.name).toBe('Milestone 2 Daily');
+    expect(migrated.state.clearanceProfiles).toEqual([]);
+    expect(JSON.parse(storage.values.get(GARAGE_STORAGE_KEY)!).schemaVersion).toBe(2);
   });
 });

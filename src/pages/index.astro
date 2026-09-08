@@ -75,6 +75,31 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <dl id="results"></dl>
       </section>
 
+      <section aria-labelledby="map-heading" id="fitment-map-section">
+        <h2 id="map-heading">{t('fitmentMapTitle')}</h2>
+        <p>{t('fitmentMapDisclaimer')}</p>
+        <div class="map-inputs">
+          <label>Measured inner clearance (mm)<input name="measured-inner" type="number" value="12" min="0" step="0.1" /></label>
+          <label>Measured outer clearance (mm)<input name="measured-outer" type="number" value="15" min="0" step="0.1" /></label>
+          <label>Desired inner margin (mm, optional)<input name="desired-inner" type="number" min="0" step="0.1" placeholder="No target" /></label>
+          <label>Desired outer margin (mm, optional)<input name="desired-outer" type="number" min="0" step="0.1" placeholder="No target" /></label>
+          <label>Width minimum (J)<input name="map-width-min" type="number" value="7" step="0.5" /></label>
+          <label>Width maximum (J)<input name="map-width-max" type="number" value="10" step="0.5" /></label>
+          <label>Width step (J)<input name="map-width-step" type="number" value="0.5" min="0.1" step="0.1" /></label>
+          <label>Offset minimum (ET)<input name="map-offset-min" type="number" value="20" step="1" /></label>
+          <label>Offset maximum (ET)<input name="map-offset-max" type="number" value="55" step="1" /></label>
+          <label>Offset step (mm)<input name="map-offset-step" type="number" value="5" min="1" step="1" /></label>
+        </div>
+        <div class="form-actions map-actions">
+          <button id="generate-map" type="button">Generate Fitment Map</button>
+          <button id="save-clearance" type="button" class="secondary">Save measurements to Garage</button>
+        </div>
+        <p class="map-legend"><span>● Green: meets supplied targets</span><span>● Yellow: positive clearance below a target</span><span>● Red: projected overlap</span></p>
+        <div id="map-errors" hidden></div>
+        <div id="fitment-map" class="map-scroll" aria-live="polite"></div>
+        <article id="map-detail" class="map-detail" hidden aria-live="polite"></article>
+      </section>
+
       <section aria-labelledby="garage-heading">
         <h2 id="garage-heading">{t('garageTitle')}</h2>
         <label class="nickname">Vehicle nickname<input name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label>
