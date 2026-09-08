@@ -243,6 +243,11 @@ dd { margin: var(--space-2) 0 0; font-family: var(--font-mono); font-size: var(-
 .bottom-nav a { display: grid; min-height: var(--touch-target); place-items: center; border-radius: var(--radius-sm); color: var(--color-ink-muted); font-size: var(--text-sm); font-weight: 700; text-decoration: none; }
 .bottom-nav a[aria-current="page"] { background: var(--color-brand); color: white; }
 
+.error-page { display: grid; min-height: calc(100vh - 4.25rem); place-items: center; }
+.error-panel { width: min(100%, 48rem); padding: clamp(2rem, 7vw, 5rem); border: var(--border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-lg); }
+.error-panel h1 { max-width: 11ch; }
+.error-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+
 @media (hover: hover) {
   .intent-card:hover { border-color: var(--color-line-strong); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
 }

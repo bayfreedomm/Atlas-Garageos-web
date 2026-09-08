@@ -23,6 +23,9 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={canonical} />
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#173f38" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
     <title>{definition.title} — Atlas GarageOS</title>
