@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import brand from '../../src/components/Brand.astro?raw';
 import home from '../../src/pages/en/index.astro?raw';
+import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
 import toolsHub from '../../src/pages/en/tools/index.astro?raw';
 import siteLayout from '../../src/components/SiteLayout.astro?raw';
 import navigationDrawer from '../../src/components/NavigationDrawer.astro?raw';
@@ -21,17 +22,20 @@ describe('Milestone 8 product experience', () => {
     expect(resolveTheme('light', true)).toBe('light');
   });
 
-  it('uses the responsive Atlas glyph and the four-part product shell', () => {
-    expect(brand).toContain('brand-glyph');
-    expect(brand).toContain('Atlas');
+  it('uses the restrained Atlas wordmark and the four-part product shell', () => {
+    expect(brand).not.toContain('brand-glyph');
+    expect(brand).toContain('ATLAS');
+    expect(brand).toContain('GarageOS');
     for (const label of ['Home', 'My Garage', 'Fitment Studio', 'Tools']) expect(`${siteLayout}${navigationDrawer}`).toContain(`>${label}</a>`);
   });
 
   it('publishes a useful home and maps every implemented tool into the hub', () => {
     expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/en/', '/en/tools/']);
-    expect(home).toContain('Every automotive tool in one place.');
+    expect(home).toContain('<HomeLauncher');
+    expect(homeLauncher).toContain('What do you need to do?');
+    expect(homeLauncher).toContain('tool-launch-row');
     expect(home).toContain('/en/fitment-studio/');
-    expect(`${home}${toolDirectory}`).toContain('/en/tools/');
+    expect(`${home}${homeLauncher}${toolDirectory}`).toContain('/en/tools/');
     expect(toolsHub).toContain('<ToolDirectory mode="all"');
     expect(toolDirectory).toContain("toolRegistry.filter(({ kind }) => kind === 'tool')");
     for (const tool of toolRegistry.filter(({ kind }) => kind === 'tool')) expect(routeForTool(tool)).toMatch(/^\/en\/tools\/.+\/$/);

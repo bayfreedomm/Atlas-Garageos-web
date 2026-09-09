@@ -1,0 +1,50 @@
+---
+import ToolIcon from './ToolIcon.astro';
+import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
+
+const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
+const homeIds: readonly ToolId[] = ['fuel-cost-calculator', 'tire-size-calculator', 'road-trip-cost-calculator', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
+const ordered = [...homeIds.map((id) => tools.find((tool) => tool.id === id)!), ...tools.filter((tool) => !homeIds.includes(tool.id))];
+const shortNames = new Map<ToolId, string>([
+  ['fuel-cost-calculator', 'Calculate fuel cost'],
+  ['tire-size-calculator', 'Calculate tire size'],
+  ['road-trip-cost-calculator', 'Plan a road trip'],
+  ['wheel-offset-calculator', 'Compare wheel offset'],
+  ['psi-bar-converter', 'Convert tire pressure'],
+  ['mpg-l100km-converter', 'Convert fuel economy'],
+  ['power-to-weight-calculator', 'Check power-to-weight'],
+  ['tire-size-comparison', 'Compare tire sizes'],
+  ['speedometer-error-calculator', 'Check speedometer error'],
+  ['fitment-map', 'Explore wheel fitment'],
+  ['measure-my-car', 'Record vehicle measurements'],
+  ['hp-kw-converter', 'Convert horsepower'],
+  ['nm-lb-ft-converter', 'Convert torque'],
+]);
+---
+<section class="home-launcher" data-toolbox data-mode="home" aria-labelledby="home-heading">
+  <header class="launcher-copy">
+    <p class="launcher-kicker">ATLAS GARAGEOS TOOLBOX</p>
+    <h1 id="home-heading">What do you need to do?</h1>
+    <p>Choose a tool. Get a clear answer.</p>
+  </header>
+
+  <form class="launcher-search" data-tool-search-form>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+    <label class="sr-only" for="tool-search-home">Search tools</label>
+    <input id="tool-search-home" type="search" placeholder="What do you need to do?" autocomplete="off" data-tool-search />
+    <button type="submit">Find tool</button>
+  </form>
+
+  <div class="launcher-results" data-tool-rows>
+    <div class="tool-launch-list" aria-label="Popular automotive tools">
+      {ordered.map((tool) =>
+        <a class:list={['tool-launch-row', { 'is-secondary': !homeIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={homeIds.includes(tool.id) ? 'true' : 'false'}>
+          <ToolIcon id={tool.id} category={tool.category}/><strong>{shortNames.get(tool.id) ?? tool.title}</strong><i aria-hidden="true">›</i>
+        </a>
+      )}
+    </div>
+    <a class="launcher-all" href="/en/tools/">Browse all tools <span aria-hidden="true">›</span></a>
+  </div>
+  <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
+</section>
+<script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

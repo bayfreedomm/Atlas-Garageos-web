@@ -11,6 +11,7 @@ export function initializeToolboxes(): void {
     if (toolbox.dataset.ready === 'true') return;
     toolbox.dataset.ready = 'true';
     const search = toolbox.querySelector<HTMLInputElement>('[data-tool-search]');
+    const searchForm = toolbox.querySelector<HTMLFormElement>('[data-tool-search-form]');
     const buttons = [...toolbox.querySelectorAll<HTMLButtonElement>('[data-tool-category]')];
     const rows = [...toolbox.querySelectorAll<HTMLAnchorElement>('[data-tool-row]')];
     const empty = toolbox.querySelector<HTMLElement>('[data-tool-empty]');
@@ -34,6 +35,11 @@ export function initializeToolboxes(): void {
       apply();
     }));
     search?.addEventListener('input', apply);
+    searchForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      apply();
+      rows.find((row) => !row.hidden)?.click();
+    });
     const initialCategory = new URLSearchParams(window.location.search).get('category');
     const initial = buttons.find((button) => button.dataset.toolCategory === initialCategory);
     initial?.click();

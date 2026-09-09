@@ -4,6 +4,7 @@ import drawer from '../../src/components/NavigationDrawer.astro?raw';
 import layout from '../../src/components/SiteLayout.astro?raw';
 import toolPage from '../../src/components/ToolPage.astro?raw';
 import home from '../../src/pages/en/index.astro?raw';
+import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
 import hub from '../../src/pages/en/tools/index.astro?raw';
 import { TOOL_CATEGORY_ORDER, routeForTool, toolById, toolRegistry } from '../../src/seo/tool-registry';
 import { toolMatchesFilter } from '../../src/ui/toolbox-filter';
@@ -28,7 +29,9 @@ describe('toolbox-first product surfaces', () => {
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
     expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(13);
     expect(hub).toContain('<ToolDirectory mode="all"');
-    expect(home).toContain('<ToolDirectory mode="home"');
+    expect(home).toContain('<HomeLauncher');
+    expect(homeLauncher).toContain('data-tool-search-form');
+    expect(homeLauncher).toContain('toolRegistry.filter');
     expect(directory).toContain('View all tools');
   });
 

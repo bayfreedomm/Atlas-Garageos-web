@@ -4,32 +4,30 @@ import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry, type ToolId } from '..
 interface Props { mode?: 'home' | 'all'; }
 const { mode = 'all' } = Astro.props;
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
-const popularIds: readonly ToolId[] = ['fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator', 'tire-size-comparison', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator', 'speedometer-error-calculator'];
+const popularIds: readonly ToolId[] = ['fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
 const displayedTools = mode === 'home'
   ? [...popularIds.map((id) => tools.find((tool) => tool.id === id)!), ...tools.filter((tool) => !popularIds.includes(tool.id))]
   : [...tools].sort((left, right) => TOOL_CATEGORY_ORDER.indexOf(left.category) - TOOL_CATEGORY_ORDER.indexOf(right.category));
 const helper = new Map<ToolId, string>([
-  ['fuel-cost-calculator', 'Estimate fuel used and total cost'], ['road-trip-cost-calculator', 'Fuel, extras, and cost per person'],
-  ['tire-size-calculator', 'Calculate tire dimensions'], ['tire-size-comparison', 'Compare diameter and ride height'],
-  ['wheel-offset-calculator', 'See inner clearance and outer poke'], ['speedometer-error-calculator', 'Check calculated actual speed'],
+  ['fuel-cost-calculator', 'Fuel used and total journey cost'], ['road-trip-cost-calculator', 'Trips, extras, and cost per person'],
+  ['tire-size-calculator', 'See the tire behind the numbers'], ['tire-size-comparison', 'Compare diameter and ride height'],
+  ['wheel-offset-calculator', 'See inner clearance and outer position'], ['speedometer-error-calculator', 'Compare indicated and actual speed'],
   ['fitment-map', 'Explore width and offset geometry'], ['measure-my-car', 'Record real clearance measurements'],
-  ['mpg-l100km-converter', 'Convert fuel economy standards'], ['psi-bar-converter', 'Convert tire pressure instantly'],
-  ['hp-kw-converter', 'Convert mechanical power instantly'], ['nm-lb-ft-converter', 'Convert torque instantly'],
-  ['power-to-weight-calculator', 'Normalize power against vehicle mass'],
+  ['power-to-weight-calculator', 'Power relative to vehicle weight'],
 ]);
 ---
 <section class:list={['toolbox', { 'toolbox--home': mode === 'home' }]} data-toolbox data-mode={mode} aria-labelledby="toolbox-heading">
   <div class="toolbox-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for={`tool-search-${mode}`}>Search automotive tools</label><input id={`tool-search-${mode}`} type="search" placeholder="Search automotive tools..." autocomplete="off" data-tool-search /></div>
-  <div class="category-filters" role="group" aria-label="Filter tools by category">
+  {mode === 'all' && <div class="category-filters" role="group" aria-label="Filter tools by category">
     <button type="button" aria-pressed="true" data-tool-category="All">All</button>
     {TOOL_CATEGORY_ORDER.map((category) => <button type="button" aria-pressed="false" data-tool-category={category}>{category}</button>)}
-  </div>
+  </div>}
   {mode === 'all' && <div class="tool-list-heading"><h2 id="toolbox-heading">All automotive tools</h2><span data-tool-count>{tools.length} tools</span></div>}
-  {mode === 'home' && <h2 id="toolbox-heading" class="sr-only">Automotive tools</h2>}
+  {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">Quick tools</h2><a href="/en/tools/">All tools</a></div>}
   <div class="tool-rows" data-tool-rows>
     {displayedTools.map((tool) => <a class:list={['tool-row', { 'is-secondary': mode === 'home' && !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${helper.get(tool.id)} ${tool.id}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
       <ToolIcon id={tool.id} category={tool.category} />
-      <span class="tool-row__copy"><strong>{tool.title}</strong><small>{helper.get(tool.id)}</small></span><span class="tool-row__arrow" aria-hidden="true">›</span>
+      <span class="tool-row__copy"><strong>{tool.title}</strong>{helper.get(tool.id) && <small>{helper.get(tool.id)}</small>}</span><span class="tool-row__arrow" aria-hidden="true">›</span>
     </a>)}
   </div>
   <p class="toolbox-empty" data-tool-empty hidden>No matching tools. Try a broader search.</p>

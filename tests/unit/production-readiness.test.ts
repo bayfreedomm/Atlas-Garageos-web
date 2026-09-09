@@ -38,13 +38,14 @@ describe('production launch configuration', () => {
     expect(notFoundPage).toContain('/en/tools/');
   });
 
-  it('ships the final geometric brand mark without external assets', () => {
+  it('ships the restrained Atlas monogram without external assets', () => {
     const manifest = JSON.parse(manifestSource) as { start_url: string; icons: Array<{ src: string }> };
     expect(manifest.start_url).toBe('/en/');
     expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/atlas-mark.svg' })]));
-    expect(atlasMark).toContain('M16 49V31l12-16h8l12 16v18');
-    expect(favicon).toContain('M16 49V31l12-16h8l12 16v18');
-    expect(atlasMark).toContain('#D7894C');
+    expect(atlasMark).toContain('aria-label="Atlas A monogram"');
+    expect(atlasMark).toContain('M17 48 29 15h7l12 33');
+    expect(favicon).toContain('M17 48 29 15h7l12 33');
+    expect(atlasMark).toContain('#E1A15E');
     expect(atlasMark).not.toContain('<text');
   });
 });
