@@ -11,7 +11,7 @@ const related = relatedTools(definition);
 const hasLongTitle = definition.title.length > 24;
 ---
 <SiteLayout {definition} active="tools">
-  <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href="/en/">← Toolbox</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
+  <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href="/en/tools/">← Toolbox</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
   <article class:list={['tool-machine', `tool-machine--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, `tool-machine--${definition.id}`]}>
     <header class:list={['tool-intro', { 'tool-intro--long': hasLongTitle }]}><ToolIcon id={definition.id} category={definition.category}/><div><p class="eyebrow">{eyebrow}</p><h1>{definition.title}</h1><p class="hero-copy">{intro}</p></div></header>
     <div class:list={['tool-stage', { 'tool-stage--single': !visual }]}>
