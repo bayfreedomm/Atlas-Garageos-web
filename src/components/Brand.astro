@@ -1,10 +1,10 @@
 ---
-interface Props { compact?: boolean; }
-const { compact = false } = Astro.props;
+interface Props { compact?: boolean; subtitle?: string; }
+const { compact = false, subtitle } = Astro.props;
 ---
 <span class:list={['brand-lockup', { 'brand-lockup--compact': compact }]}>
   <span class="brand-wordmark">
-    <span class="brand-wordmark__kicker">Atlas</span>
+    <span class="brand-wordmark__kicker">Atlas{subtitle && <span class="brand-wordmark__context"> · {subtitle}</span>}</span>
     <strong>Garage<span class="brand-wordmark__os">OS</span></strong>
   </span>
 </span>
