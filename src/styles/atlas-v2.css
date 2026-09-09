@@ -31,7 +31,9 @@ main{width:min(100% - 1rem,var(--content-wide));padding-top:.75rem}.home-launche
 .tool-machine .tool-intro .tool-icon{width:3rem;height:3rem;background:var(--color-surface-subtle)}
 .tool-machine .tool-intro h1{max-width:20ch;color:var(--color-ink);font-size:clamp(1.9rem,6vw,2.6rem)}
 .tool-machine .tool-intro .hero-copy{max-width:42rem;color:var(--color-ink-muted);font-size:1rem}
-.tool-machine .tool-stage{overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
+.tool-machine .tool-stage{overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none;max-width:100%}
+.tool-machine .calculator-form,.tool-machine form{max-width:100%;overflow-wrap:anywhere}
+.result-summary,.tool-results dt,.tool-results dd,.rpm-matrix>div p,.rpm-matrix>div h2,.rpm-matrix .eyebrow{overflow-wrap:anywhere;word-break:break-word}
 .tool-machine .tool-workspace{padding:1.2rem 0}
 .tool-machine .tool-visual{background:var(--color-surface-subtle)}
 .tool-machine .calculator-form>button,.tool-machine .entry-workspace .button{min-height:3.8rem;border-color:var(--color-accent)!important;background:var(--color-accent)!important;color:var(--color-accent-ink)!important;font-size:1.05rem;box-shadow:none}
@@ -45,6 +47,8 @@ main{width:min(100% - 1rem,var(--content-wide));padding-top:.75rem}.home-launche
 .tool-machine .tool-visual{background:var(--color-surface-subtle)}
 :root[data-theme="dark"] .tool-machine .tool-visual{background:var(--color-surface-subtle);border-color:var(--color-line)}
 .scene-wheel-block{fill:var(--color-surface-strong);stroke:var(--color-ink-soft)}
+
+.site-footer{margin-top:3rem;padding:2rem 0 2.5rem;border-top:1px solid var(--color-line)}.site-footer__inner{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:space-between;width:min(100% - 1rem,var(--content-wide));margin-inline:auto}.site-footer__brand p{margin:.4rem 0 0;max-width:24rem;color:var(--color-ink-muted);font-size:.85rem}.site-footer__links{display:flex;flex-wrap:wrap;gap:1.2rem}.site-footer__links a{color:var(--color-ink-muted);font-size:.85rem;font-weight:600;text-decoration:none}.site-footer__links a:hover{color:var(--color-ink)}.site-footer__copy{width:min(100% - 1rem,var(--content-wide));margin:1.5rem auto 0;color:var(--color-ink-soft);font-size:.75rem}
 
 /* Fitment Studio becomes an application workspace with a decisive entry deck. */
 .studio-hero{position:relative;max-width:78rem;margin-inline:auto;padding:clamp(2rem,7vw,5rem);overflow:hidden;border:1px solid #31473f;border-radius:1.5rem;background:radial-gradient(circle at 88% 20%,rgb(137 207 184 / 24%),transparent 26%),linear-gradient(130deg,#12231f,#10171b);color:#f4f3ed;box-shadow:0 28px 75px rgb(0 0 0 / 22%)}.studio-hero h1{max-width:10ch;color:#f4f3ed}.studio-hero .hero-copy{color:#b9c9c3}.studio-hero>.active-vehicle-chip{position:absolute;top:1rem;right:1rem;border-color:rgb(255 255 255 / 15%);background:rgb(255 255 255 / 8%);color:#d8e5e0}.studio-hero .intent-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.studio-hero .intent-card,.studio-hero .intent-card:first-child{min-height:8.5rem;border-color:rgb(255 255 255 / 12%);background:rgb(255 255 255 / 7%);color:#fff;box-shadow:none}.studio-hero .intent-card p,.studio-hero .intent-card:first-child p{color:#b9c8c4}.studio-hero .intent-card__number,.studio-hero .intent-card:first-child .intent-card__number{color:#9fcfbe}

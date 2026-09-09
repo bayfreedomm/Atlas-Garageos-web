@@ -4,6 +4,7 @@ import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registr
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
+import Footer from './Footer.astro';
 import '../styles/global.css';
 import '../styles/atlas-v2.css';
 
@@ -49,5 +50,6 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
       <NavigationDrawer />
     </div></header>
     <main id="main-content"><slot /></main>
+    <Footer />
   </body>
 </html>
