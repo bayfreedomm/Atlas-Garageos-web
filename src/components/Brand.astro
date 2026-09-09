@@ -2,12 +2,6 @@
 interface Props { compact?: boolean; subtitle?: string; }
 const { compact = false, subtitle = 'GarageOS' } = Astro.props;
 ---
-<span class:list={['brand-lockup', { 'brand-lockup--compact': compact }]} aria-hidden="true">
-  <svg class="brand-glyph" viewBox="0 0 48 48" focusable="false">
-    <path class="brand-glyph__garage" d="M8 22 24 10l16 12v17H8V22Z" />
-    <circle class="brand-glyph__tire" cx="24" cy="29" r="9" />
-    <circle class="brand-glyph__hub" cx="24" cy="29" r="3" />
-    <path class="brand-glyph__spokes" d="M24 20v18M15 29h18M18 23l12 12M30 23 18 35" />
-  </svg>
+<span class:list={['brand-lockup', { 'brand-lockup--compact': compact }]}>
   <span class="brand-wordmark"><strong>ATLAS</strong><span>{subtitle}</span></span>
 </span>
