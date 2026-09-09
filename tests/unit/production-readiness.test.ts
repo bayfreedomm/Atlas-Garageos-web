@@ -42,8 +42,9 @@ describe('production launch configuration', () => {
     const manifest = JSON.parse(manifestSource) as { start_url: string; icons: Array<{ src: string }> };
     expect(manifest.start_url).toBe('/en/');
     expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/atlas-mark.svg' })]));
-    expect(atlasMark).toContain('M13 51 29.2 13.8');
-    expect(favicon).toContain('M13 51 29.2 13.8');
+    expect(atlasMark).toContain('M16 49V31l12-16h8l12 16v18');
+    expect(favicon).toContain('M16 49V31l12-16h8l12 16v18');
+    expect(atlasMark).toContain('#D7894C');
     expect(atlasMark).not.toContain('<text');
   });
 });

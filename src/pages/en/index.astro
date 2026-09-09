@@ -1,21 +1,13 @@
 ---
 import SiteLayout from '../../components/SiteLayout.astro';
-import QuickStart from '../../components/QuickStart.astro';
-import { routeForTool, toolById } from '../../seo/tool-registry';
-const popular = [
-  ['fuel-cost-calculator', 'Fuel Cost', 'Estimate fuel and spend'],
-  ['road-trip-cost-calculator', 'Road Trip', 'Price a journey'],
-  ['tire-size-calculator', 'Tire Size', 'Decode the sidewall'],
-  ['wheel-offset-calculator', 'Wheel Offset', 'See position change'],
-  ['mpg-l100km-converter', 'MPG ↔ L/100km', 'Convert economy'],
-  ['psi-bar-converter', 'PSI ↔ Bar', 'Convert pressure'],
-  ['power-to-weight-calculator', 'Power / Weight', 'Normalize performance'],
-] as const;
+import ToolDirectory from '../../components/ToolDirectory.astro';
+import ToolIcon from '../../components/ToolIcon.astro';
 ---
 <SiteLayout title="Atlas GarageOS" description="Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment." pathname="/en/" active="home">
-  <header class="home-intro" aria-labelledby="home-heading"><p class="eyebrow">Atlas GarageOS</p><h1 id="home-heading">Your car. <span>Every tool.</span></h1><p>Fast automotive answers, with the deeper workspace ready when you need it.</p></header>
-  <QuickStart />
-  <section class="popular-tools" aria-labelledby="popular-heading"><div class="section-heading"><div><p class="eyebrow">Popular tools</p><h2 id="popular-heading">Start with a question.</h2></div><a class="text-link" href="/en/tools/">All 13 tools →</a></div><div class="popular-grid">{popular.map(([id, name, description], index) => <a href={routeForTool(toolById(id))}><span>{String(index + 1).padStart(2, '0')}</span><strong>{name}</strong><small>{description}</small><i aria-hidden="true">↗</i></a>)}</div></section>
-  <section class="product-paths" aria-label="Atlas GarageOS product areas"><a class="fitment-feature" href="/en/fitment-studio/"><span class="platform-card__index">FLAGSHIP WORKSPACE</span><h2>Fitment Studio</h2><p>Advanced tire and wheel fitment: compare setups, measure real gaps, search combinations, and inspect geometry.</p><span class="text-link">Open Fitment Studio →</span></a><a class="garage-secondary" href="/en/fitment-studio/#garage"><span class="platform-card__index">SHARED MEMORY</span><h2>My Garage</h2><p>Your vehicles, measurements, and saved setups—ready when you choose to use them.</p><span class="text-link">View Garage →</span></a></section>
+  <header class="toolbox-identity" aria-labelledby="home-heading"><h1 id="home-heading">Atlas GarageOS</h1><p>Every automotive tool in one place.</p></header>
+  <ToolDirectory mode="home" />
+  <section class="product-rows" aria-label="Atlas GarageOS product areas">
+    <a href="/en/fitment-studio/"><ToolIcon id="fitment-studio" category="Advanced"/><span><small>Flagship workspace</small><strong>Fitment Studio</strong><em>Compare · What Fits · Measure · Map</em></span><i aria-hidden="true">›</i></a>
+    <a href="/en/fitment-studio/#garage"><ToolIcon id="garage" category="Advanced"/><span><small>Shared vehicle memory</small><strong>My Garage</strong><em>Save vehicles and reuse their setup data</em></span><i aria-hidden="true">›</i></a>
+  </section>
 </SiteLayout>
-<script>import { initializeToolCalculators } from '../../ui/tool-calculators'; import { initializeQuickStart, initializeUtilityCalculators } from '../../ui/utility-calculators'; initializeToolCalculators(); initializeUtilityCalculators(); initializeQuickStart();</script>

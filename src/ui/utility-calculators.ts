@@ -81,25 +81,5 @@ export function initializeUtilityCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="pressure"]').forEach((form) => bindInstant(form, () => { const result = convertPressureTool(value(form, 'value'), textValue(form, 'unit') as PressureUnit); render(form, result.ok ? { ok: true, ...pressurePresentation(result.value) } : result); }));
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power"]').forEach((form) => bindInstant(form, () => { const result = convertPowerTool(value(form, 'value'), textValue(form, 'unit') as PowerUnit); render(form, result.ok ? { ok: true, ...powerPresentation(result.value) } : result); }));
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="torque"]').forEach((form) => bindInstant(form, () => { const result = convertTorqueTool(value(form, 'value'), textValue(form, 'unit') as TorqueUnit); render(form, result.ok ? { ok: true, ...torquePresentation(result.value) } : result); }));
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power-weight"]').forEach((form) => bindInstant(form, () => { const power = value(form, 'power'); const weight = value(form, 'weight'); const powerUnit = textValue(form, 'powerUnit') as PowerUnit; const weightUnit = textValue(form, 'weightUnit') as WeightUnit; const result = calculatePowerToWeightTool({ power, powerUnit, weight, weightUnit }); render(form, result.ok ? { ok: true, ...powerToWeightPresentation(result.value, power, powerUnit, weight, weightUnit) } : result); }));
-}
-
-export function initializeQuickStart(): void {
-  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-quick-tab]')];
-  const panels = [...document.querySelectorAll<HTMLElement>('[data-quick-panel]')];
-  const select = (tab: HTMLButtonElement): void => {
-    tabs.forEach((candidate) => { const selected = candidate === tab; candidate.setAttribute('aria-selected', String(selected)); candidate.tabIndex = selected ? 0 : -1; });
-    panels.forEach((panel) => { panel.hidden = panel.dataset.quickPanel !== tab.dataset.quickTab; });
-    panels.find((panel) => !panel.hidden)?.querySelector<HTMLElement>('input, select')?.focus();
-  };
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => select(tab));
-    tab.addEventListener('keydown', (event) => {
-      const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
-      if (!direction) return;
-      event.preventDefault();
-      const next = tabs[(index + direction + tabs.length) % tabs.length]!;
-      select(next); next.focus();
-    });
-  });
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power-weight"]').forEach((form) => bindSubmit(form, () => { const power = value(form, 'power'); const weight = value(form, 'weight'); const powerUnit = textValue(form, 'powerUnit') as PowerUnit; const weightUnit = textValue(form, 'weightUnit') as WeightUnit; const result = calculatePowerToWeightTool({ power, powerUnit, weight, weightUnit }); render(form, result.ok ? { ok: true, ...powerToWeightPresentation(result.value, power, powerUnit, weight, weightUnit) } : result); }));
 }

@@ -1,0 +1,14 @@
+---
+import ThemeControl from './ThemeControl.astro';
+---
+<button class="menu-button" type="button" aria-label="Open menu" aria-controls="navigation-drawer" aria-expanded="false" data-menu-open><span></span><span></span><span></span></button>
+<div class="drawer-layer" data-drawer-layer hidden>
+  <button class="drawer-backdrop" type="button" aria-label="Close menu" data-menu-close></button>
+  <aside id="navigation-drawer" class="navigation-drawer" aria-label="Menu" aria-hidden="true" tabindex="-1">
+    <header><strong>Menu</strong><button class="drawer-close" type="button" aria-label="Close menu" data-menu-close>×</button></header>
+    <nav aria-label="Tool navigation"><p>Tools</p><a href="/en/tools/">All tools</a><a href="/en/tools/?category=Fuel%20%26%20Trips">Fuel &amp; Trips</a><a href="/en/tools/?category=Tires%20%26%20Wheels">Tires &amp; Wheels</a><a href="/en/tools/?category=Converters">Converters</a><a href="/en/tools/?category=Performance">Performance</a></nav>
+    <nav aria-label="Product navigation"><p>Product</p><a href="/en/fitment-studio/">Fitment Studio</a><a href="/en/fitment-studio/#garage">My Garage</a></nav>
+    <section class="drawer-settings" aria-labelledby="settings-heading"><p id="settings-heading">Settings</p><ThemeControl /><div class="language-setting"><span>Language</span><strong>English</strong></div></section>
+  </aside>
+</div>
+<script>import { initializeNavigationDrawer } from '../ui/navigation-drawer'; initializeNavigationDrawer();</script>

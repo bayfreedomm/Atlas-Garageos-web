@@ -42,8 +42,8 @@ export function validationIssueText(issue: ValidationIssue): string {
   const label = `${context} ${FIELD_NAMES[field] ?? field}`.trim();
   if (issue.code === 'not-a-number') return `Enter a valid ${label.toLowerCase()}.`;
   if (issue.code === 'not-an-integer') return `${label} must be a whole number.`;
-  const message = issue.message.replace(field, FIELD_NAMES[field] ?? field);
-  return `${label}: ${message}`;
+  const message = issue.message.replace(field, label.toLowerCase());
+  return `${message.charAt(0).toUpperCase()}${message.slice(1)}`;
 }
 
 export function measurementErrorGuidance(issues: readonly ValidationIssue[]) {
