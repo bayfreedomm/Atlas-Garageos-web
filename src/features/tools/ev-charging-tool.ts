@@ -1,5 +1,26 @@
-import { calculateEvChargingCost, type EvChargingInput } from '../../core/energy/ev-charging';
 import { invalid, valid, type ValidationIssue } from '../../domain/validation';
+
+export interface EvChargingInput {
+  readonly batteryCapacityKwh: number;
+  readonly startPercent: number;
+  readonly endPercent: number;
+  readonly pricePerKwh: number;
+  readonly chargerPowerKw: number;
+}
+
+export interface EvChargingResult {
+  readonly energyAddedKwh: number;
+  readonly cost: number;
+  readonly hours: number;
+}
+
+function calculateEvChargingCost(input: EvChargingInput): EvChargingResult {
+  const percentAdded = Math.max(0, input.endPercent - input.startPercent);
+  const energyAddedKwh = input.batteryCapacityKwh * (percentAdded / 100);
+  const cost = energyAddedKwh * input.pricePerKwh;
+  const hours = input.chargerPowerKw > 0 ? energyAddedKwh / input.chargerPowerKw : 0;
+  return { energyAddedKwh, cost, hours };
+}
 
 const check = (value: number, field: string, min: number, max: number): ValidationIssue | null => {
   if (Number.isNaN(value)) return { code: 'not-a-number', field, message: `${field} must be a number.` };

@@ -30,7 +30,7 @@ export function initializeEvChargingCalculators(): void {
       paintBattery(form, input.startPercent, input.endPercent);
       const result = calculateEvChargingCostTool(input);
       if (!result.ok) {
-        errors.textContent = result.issues.map((issue) => issue.message).join(' ');
+        errors.textContent = result.issues.map((issue: { message: string }) => issue.message).join(' ');
         errors.hidden = false;
         summary.classList.add('is-pending');
         metrics.replaceChildren();

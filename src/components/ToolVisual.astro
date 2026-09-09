@@ -20,13 +20,13 @@ const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'hp-kw-converter': ['One output, two units', 'Mechanical hp · kilowatts'],
   'nm-lb-ft-converter': ['Torque, translated', 'Newton-metres · pound-feet'],
   'power-to-weight-calculator': ['Power meets mass', 'A ratio you can compare'],
+  'ev-charging-cost-calculator': ['Battery meets price', 'Energy, cost, and time'],
 };
 const [title, copy] = labels[definition.id];
 ---
 <figure class:list={['tool-visual', `tool-visual--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, { 'tool-visual--compact': compact }]} aria-label={`${definition.title} visual`}>
   {!compact && <div class="tool-visual__top"><ToolIcon id={definition.id} category={definition.category}/><span><strong>{title}</strong><small>{copy}</small></span></div>}
   <svg class="tool-visual__scene" viewBox="0 0 360 180" role="img" aria-label={title}>
-    <path class="scene-grid" d="M20 150H340M45 30V158M105 30V158M165 30V158M225 30V158M285 30V158M20 65H340M20 108H340" />
     {(definition.id === 'fuel-cost-calculator' || definition.id === 'road-trip-cost-calculator' || definition.id === 'mpg-l100km-converter') && <>
       <path class="scene-road" d="M18 139C91 142 102 86 168 96s82 57 174 13" />
       <path class="scene-car" d="M122 101h69l20 19h21c8 0 14 6 14 14v5H94v-8c0-7 5-13 12-14l16-16Z" />
