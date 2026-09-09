@@ -37,6 +37,14 @@ const jobCopy = new Map<ToolId, string>([
     <div class="launcher-hero__shade"></div>
     <header class="launcher-copy"><p class="launcher-kicker">ATLAS GARAGEOS</p><h1 id="home-heading">Your car.<br/>One clear answer.</h1><p>Fast tools for the decisions every driver makes.</p></header>
     <form class="launcher-search" data-tool-search-form><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for="tool-search-home">Search tools</label><input id="tool-search-home" type="search" placeholder="What do you need to do?" autocomplete="off" data-tool-search /><button type="submit">Find tool</button></form>
+    <div class="quick-convert">
+      <span class="quick-convert__label">TRY IT — NO TAP NEEDED</span>
+      <div class="quick-convert__row">
+        <label class="quick-convert__field"><input type="text" inputmode="decimal" value="32" data-quick-psi /><span>psi</span></label>
+        <span class="quick-convert__eq">=</span>
+        <label class="quick-convert__field"><input type="text" inputmode="decimal" value="2.2" data-quick-bar /><span>bar</span></label>
+      </div>
+    </div>
   </div>
 
   <div class="launcher-results" data-tool-rows>
@@ -52,4 +60,11 @@ const jobCopy = new Map<ToolId, string>([
   </div>
   <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
 </section>
-<script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>
+<script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();
+const psi = document.querySelector<HTMLInputElement>('[data-quick-psi]');
+const bar = document.querySelector<HTMLInputElement>('[data-quick-bar]');
+if (psi && bar) {
+  psi.addEventListener('input', () => { const v = parseFloat(psi.value); if (!Number.isNaN(v)) bar.value = (v * 0.0689476).toFixed(2); });
+  bar.addEventListener('input', () => { const v = parseFloat(bar.value); if (!Number.isNaN(v)) psi.value = (v / 0.0689476).toFixed(1); });
+}
+</script>
