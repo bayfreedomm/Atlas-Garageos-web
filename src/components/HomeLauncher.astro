@@ -21,26 +21,30 @@ const shortNames = new Map<ToolId, string>([
   ['hp-kw-converter', 'Convert horsepower'],
   ['nm-lb-ft-converter', 'Convert torque'],
 ]);
+const jobCopy = new Map<ToolId, string>([
+  ['fuel-cost-calculator', 'Distance, consumption and local fuel price'],
+  ['tire-size-calculator', 'Decode the numbers printed on your tire'],
+  ['road-trip-cost-calculator', 'Fuel, extras and cost per traveller'],
+  ['wheel-offset-calculator', 'See inner clearance and outer movement'],
+  ['psi-bar-converter', 'Convert PSI, bar and kPa instantly'],
+  ['mpg-l100km-converter', 'Move between MPG and L/100km'],
+  ['power-to-weight-calculator', 'Put vehicle performance in context'],
+]);
 ---
 <section class="home-launcher" data-toolbox data-mode="home" aria-labelledby="home-heading">
-  <header class="launcher-copy">
-    <p class="launcher-kicker">ATLAS GARAGEOS TOOLBOX</p>
-    <h1 id="home-heading">What do you need to do?</h1>
-    <p>Choose a tool. Get a clear answer.</p>
-  </header>
-
-  <form class="launcher-search" data-tool-search-form>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
-    <label class="sr-only" for="tool-search-home">Search tools</label>
-    <input id="tool-search-home" type="search" placeholder="What do you need to do?" autocomplete="off" data-tool-search />
-    <button type="submit">Find tool</button>
-  </form>
+  <div class="launcher-hero">
+    <img src="/atlas-hero-car.png" width="1680" height="945" alt="A dark premium sedan in warm sunrise light" fetchpriority="high" />
+    <div class="launcher-hero__shade"></div>
+    <header class="launcher-copy"><p class="launcher-kicker">ATLAS GARAGEOS</p><h1 id="home-heading">Your car.<br/>One clear answer.</h1><p>Fast tools for the decisions every driver makes.</p></header>
+    <form class="launcher-search" data-tool-search-form><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for="tool-search-home">Search tools</label><input id="tool-search-home" type="search" placeholder="What do you need to do?" autocomplete="off" data-tool-search /><button type="submit">Find tool</button></form>
+  </div>
 
   <div class="launcher-results" data-tool-rows>
+    <div class="launcher-results__heading"><div><span>START HERE</span><h2>Choose a job</h2></div><a href="/en/tools/">All 14 tools <i>›</i></a></div>
     <div class="tool-launch-list" aria-label="Popular automotive tools">
       {ordered.map((tool) =>
         <a class:list={['tool-launch-row', { 'is-secondary': !homeIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={homeIds.includes(tool.id) ? 'true' : 'false'}>
-          <ToolIcon id={tool.id} category={tool.category}/><strong>{shortNames.get(tool.id) ?? tool.title}</strong><i aria-hidden="true">›</i>
+          <ToolIcon id={tool.id} category={tool.category}/><span><strong>{shortNames.get(tool.id) ?? tool.title}</strong>{jobCopy.get(tool.id) && <small>{jobCopy.get(tool.id)}</small>}</span><i aria-hidden="true">›</i>
         </a>
       )}
     </div>

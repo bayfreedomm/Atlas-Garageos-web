@@ -3,9 +3,10 @@ import { canonicalForPath, toolById } from '../../../seo/tool-registry';
 import { translate } from '../../../localization/catalog';
 import Brand from '../../../components/Brand.astro';
 import ThemeBoot from '../../../components/ThemeBoot.astro';
-import ThemeControl from '../../../components/ThemeControl.astro';
+import NavigationDrawer from '../../../components/NavigationDrawer.astro';
 import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
 import '../../../styles/global.css';
+import '../../../styles/atlas-v2.css';
 
 const seo = toolById('fitment-studio');
 const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
@@ -33,18 +34,13 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
     <header class="app-header">
       <div class="app-header__inner">
         <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand subtitle="Fitment Studio" /></a>
-        <nav class="desktop-nav" aria-label="Primary navigation">
-          <a href="/en/">Home</a>
-          <a href="#garage" data-product-nav="garage">Garage</a>
-          <a href="#fitment" data-product-nav="fitment" aria-current="page">Fitment</a>
-          <a href="/en/tools/">Tools</a>
-        </nav>
-        <div class="shell-controls"><span id="shell-vehicle" class="active-vehicle-chip">No vehicle selected</span><ThemeControl /></div>
+        <NavigationDrawer />
       </div>
     </header>
 
     <main id="main-content">
       <section class="studio-hero" id="fitment" aria-labelledby="studio-heading">
+        <span id="shell-vehicle" class="active-vehicle-chip">No vehicle selected</span>
         <p class="eyebrow">Fitment Studio</p>
         <h1 id="studio-heading">What do you want to do?</h1>
         <p class="hero-copy">Start with your goal. Technical wheel, tire, and measurement details appear only when you need them.</p>
