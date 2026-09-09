@@ -12,6 +12,7 @@ const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'tire-size-comparison': ['See both sizes', 'Not just the percentage'],
   'wheel-offset-calculator': ['See the wheel move', 'Inner position · outer face'],
   'speedometer-error-calculator': ['Indicated vs actual', 'A clearer speed comparison'],
+  'gear-ratio-calculator': ['Tire meets drivetrain', 'Effective ratio · road RPM'],
   'fitment-map': ['Explore the geometry', 'Width and offset together'],
   'measure-my-car': ['Measure your own car', 'Real gaps, recorded clearly'],
   'mpg-l100km-converter': ['Two ways to read economy', 'Distance per fuel · fuel per distance'],
@@ -53,11 +54,12 @@ const [title, copy] = labels[definition.id];
       <path class="scene-gauge" d="M72 139a108 108 0 0 1 216 0"/><path class="scene-ticks" d="M84 127l17-4M105 82l15 11M148 51l6 18M201 48l-4 19M248 72l-13 14M280 112l-17 7"/>
       <path class="scene-needle" d="M180 137l69-58"/><circle class="scene-accent-fill" cx="180" cy="137" r="10"/><text class="scene-text scene-text--large" x="151" y="115">100</text>
     </>}
-    {(definition.id === 'hp-kw-converter' || definition.id === 'nm-lb-ft-converter' || definition.id === 'power-to-weight-calculator') && <>
-      <path class="scene-engine" d="M78 78h55l18-18h55l20 18h41v61H78V78Zm32-21v21m124-21v21M98 139v17m149-17v17"/>
+    {(definition.id === 'hp-kw-converter' || definition.id === 'nm-lb-ft-converter' || definition.id === 'power-to-weight-calculator' || definition.id === 'gear-ratio-calculator') && <>
+      {definition.id !== 'gear-ratio-calculator' && <path class="scene-engine" d="M78 78h55l18-18h55l20 18h41v61H78V78Zm32-21v21m124-21v21M98 139v17m149-17v17"/>}
       {definition.id === 'hp-kw-converter' && <path class="scene-bolt" d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/>}
       {definition.id === 'nm-lb-ft-converter' && <><path class="scene-accent" d="M148 41a62 62 0 1 1-25 95M148 41h-31m31 0V12"/><circle class="scene-accent-fill" cx="180" cy="99" r="12"/></>}
       {definition.id === 'power-to-weight-calculator' && <><path class="scene-scale" d="M53 153h254M180 36v117M119 65h122M85 65l-28 54h56L85 65Zm190 0-28 54h56l-28-54Z"/><path class="scene-bolt" d="m184 72-18 29h15l-6 25 23-36h-16l2-18Z"/></>}
+      {definition.id === 'gear-ratio-calculator' && <><circle class="scene-tire" cx="145" cy="103" r="43"/><circle class="scene-rim" cx="145" cy="103" r="21"/><circle class="scene-accent" cx="224" cy="103" r="29"/><circle class="scene-hub" cx="224" cy="103" r="7"/><path class="scene-dash" d="M174 103h21M145 60V44M224 74V51"/><text class="scene-text" x="124" y="164">TIRE</text><text class="scene-text" x="204" y="164">GEAR</text></>}
     </>}
   </svg>
 </figure>

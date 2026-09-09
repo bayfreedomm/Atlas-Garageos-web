@@ -1,0 +1,22 @@
+<section class="tire-code-explainer" data-tire-code-explainer aria-labelledby="tire-code-heading">
+  <div class="tire-code-explainer__heading"><p class="eyebrow">READ THE SIDEWALL</p><h2 id="tire-code-heading">One code. Three physical clues.</h2><p>The numbers are not three measurements in the same unit. Atlas separates them before doing the geometry.</p></div>
+  <div class="tire-code" aria-label="Example tire size"><strong data-tire-width>225</strong><b>/</b><strong data-tire-aspect>45</strong><b>R</b><strong data-tire-rim>18</strong></div>
+  <div class="tire-code-legend">
+    <article><span>225</span><strong>Width</strong><p>Section width in millimetres.</p></article>
+    <article><span>45</span><strong>Sidewall ratio</strong><p>Sidewall height is 45% of width.</p></article>
+    <article><span>R18</span><strong>Rim</strong><p>Radial construction on an 18-inch rim.</p></article>
+  </div>
+</section>
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-calculator="tire-single"]');
+  const explainer = document.querySelector<HTMLElement>('[data-tire-code-explainer]');
+  if (form && explainer) {
+    const update = () => {
+      const data = new FormData(form);
+      explainer.querySelector<HTMLElement>('[data-tire-width]')!.textContent = String(data.get('widthMm') ?? '225');
+      explainer.querySelector<HTMLElement>('[data-tire-aspect]')!.textContent = String(data.get('aspectRatio') ?? '45');
+      explainer.querySelector<HTMLElement>('[data-tire-rim]')!.textContent = String(data.get('rimDiameterInches') ?? '18');
+    };
+    form.addEventListener('input', update); update();
+  }
+</script>

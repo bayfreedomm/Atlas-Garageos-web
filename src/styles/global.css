@@ -475,6 +475,66 @@ dd { margin: var(--space-2) 0 0; font-family: var(--font-mono); font-size: var(-
   .tools-hub { padding: var(--space-8); }
 }
 
+/* Unified Atlas tool system: compact shell, category character, independent actions. */
+.brand-garage { display: inline-flex; align-items: baseline; margin-left: .05rem; padding-left: .38rem; border-left: 1px solid var(--color-accent); color: var(--color-ink) !important; font-family: var(--font-sans) !important; font-weight: 760 !important; letter-spacing: -.035em !important; }
+.brand-wheel { position: relative; display: inline-grid; width: .68rem; height: .68rem; margin-inline: .04rem; place-items: center; border: 1.5px solid currentColor; border-radius: 50%; font-size: 0; transform: translateY(.04rem); }
+.brand-wheel::before, .brand-wheel::after, .brand-wheel i { position: absolute; width: 64%; height: 1px; border-radius: 2px; background: var(--color-accent); content: ''; }
+.brand-wheel::after { transform: rotate(60deg); }.brand-wheel i { transform: rotate(-60deg); }
+
+.toolbox .tool-rows { display: grid; gap: .65rem; border: 0; }
+.toolbox .tool-row { min-height: 4.8rem; padding: .7rem .75rem; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-surface); box-shadow: 0 8px 24px rgb(20 25 23 / 4%); }
+.toolbox .tool-row + .tool-row { border-top: 1px solid var(--color-line); }
+:root[data-theme="dark"] .toolbox .tool-row { border-color: #35404a; background: linear-gradient(145deg, #20272e, #1b2127); box-shadow: 0 10px 28px rgb(0 0 0 / 18%); }
+
+.tool-breadcrumbs a { display: inline-flex; min-height: 2.75rem; align-items: center; color: var(--color-brand); font-size: .86rem; font-weight: 800; text-decoration: none; }
+.tool-machine { --machine-accent: #d9864e; --machine-accent-ink: #17201d; border-color: color-mix(in srgb, var(--color-line) 82%, transparent); border-radius: 1rem; box-shadow: 0 12px 38px rgb(20 25 23 / 5%); }
+.tool-machine--tires-wheels { --machine-accent: #668fba; --machine-accent-ink: #fff; }
+.tool-machine--converters { --machine-accent: #4e9d90; --machine-accent-ink: #fff; }
+.tool-machine--performance { --machine-accent: #8878ad; --machine-accent-ink: #fff; }
+.tool-machine::before { background: linear-gradient(90deg, var(--machine-accent), transparent 78%); }
+.tool-machine .tool-intro { grid-template-columns: 2.65rem minmax(0,1fr); gap: .7rem; padding: .9rem .9rem .65rem; }
+.tool-machine .tool-intro .tool-icon { width: 2.5rem; height: 2.5rem; }
+.tool-machine .tool-intro .eyebrow { margin-bottom: .35rem; font-size: .68rem; }
+.tool-machine .tool-intro h1 { max-width: 18ch; margin-bottom: .45rem; font-size: clamp(2rem, 8.7vw, 2.55rem); line-height: .98; }
+.tool-machine .tool-intro--long h1 { font-size: clamp(1.8rem, 7.8vw, 2.35rem); }
+.tool-machine .tool-intro .hero-copy { margin-bottom: 0; font-size: .94rem; line-height: 1.45; }
+.tool-machine .tool-workspace { padding: .85rem .9rem 1rem; }
+.tool-machine .calculator-form { gap: .85rem; }
+.tool-machine label { gap: .38rem; font-size: .82rem; }
+.tool-machine input, .tool-machine select { height: 3.15rem; font-size: 1rem; }
+.tool-machine .calculator-form > button, .tool-machine .entry-workspace .button { min-height: 3.5rem; border-color: var(--machine-accent) !important; background: var(--machine-accent) !important; color: var(--machine-accent-ink) !important; font-size: 1.05rem; }
+.tire-code-explainer .eyebrow { color: #668fba; }
+.tool-machine .result-summary:not(.is-pending) { border-left-color: var(--machine-accent); }
+:root[data-theme="dark"] .tool-machine { border-color: #303a43; box-shadow: 0 18px 52px rgb(0 0 0 / 25%); }
+:root[data-theme="dark"] .tool-machine .result-summary:not(.is-pending) { box-shadow: inset 3px 0 var(--machine-accent), 0 12px 34px rgb(0 0 0 / 22%); }
+
+.tire-code-explainer { margin: 0 0 1.5rem; padding: 1rem; border: 1px solid color-mix(in srgb, #668fba 42%, var(--color-line)); border-radius: 1rem; background: color-mix(in srgb, #668fba 8%, var(--color-surface)); }
+.tire-code-explainer__heading > p:last-child { margin-bottom: .8rem; }
+.tire-code { display: flex; align-items: baseline; justify-content: center; gap: .22rem; padding: 1rem .5rem; color: var(--color-ink); font-family: var(--font-mono); font-size: clamp(2.1rem, 10vw, 3.8rem); letter-spacing: -.08em; }
+.tire-code strong { color: #668fba; }.tire-code b { color: var(--color-ink-soft); font-size: .72em; }
+.tire-code-legend { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .45rem; }
+.tire-code-legend article { min-width: 0; padding: .65rem; border-radius: .7rem; background: var(--color-surface); }
+.tire-code-legend span, .tire-code-legend strong { display: block; }.tire-code-legend span { color: #668fba; font-family: var(--font-mono); font-weight: 800; }.tire-code-legend strong { margin-top: .2rem; font-size: .76rem; }.tire-code-legend p { margin: .25rem 0 0; font-size: .68rem; line-height: 1.35; }
+
+.gear-ratio-inputs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.rpm-matrix { margin-top: .35rem; padding-top: 1rem; border-top: var(--border); }
+.rpm-matrix h2 { margin-bottom: .3rem; font-size: 1.2rem; }.rpm-matrix > div > p:last-child { margin-bottom: .8rem; font-size: .78rem; }
+.rpm-matrix__scroll { overflow-x: auto; overscroll-behavior-inline: contain; border: var(--border); border-radius: .8rem; }
+.rpm-matrix table { width: 100%; min-width: 35rem; border-collapse: collapse; font-family: var(--font-mono); font-size: .72rem; font-variant-numeric: tabular-nums; text-align: center; }
+.rpm-matrix th, .rpm-matrix td { min-width: 4.5rem; padding: .55rem .45rem; border: 1px solid color-mix(in srgb, var(--color-line) 72%, transparent); }
+.rpm-matrix thead th, .rpm-matrix tbody th { position: sticky; left: 0; z-index: 1; background: var(--color-surface-strong); color: var(--color-ink); }
+.rpm-matrix thead th { top: 0; z-index: 2; }.rpm-matrix td { color: #172028; }
+.rpm-matrix__legend { display: grid; grid-template-columns: auto minmax(4rem,1fr) auto; align-items: center; gap: .5rem; margin: .65rem 0 0; font-size: .68rem; }
+.rpm-matrix__legend i { height: .45rem; border-radius: 1rem; background: linear-gradient(90deg, color-mix(in srgb,#8878ad 12%,var(--color-surface)), #8878ad); }
+
+@media (min-width: 48rem) {
+  .toolbox .tool-rows { gap: .75rem; }
+  .toolbox .tool-row + .tool-row { border: 1px solid var(--color-line); }
+  .tool-machine .tool-intro { padding: 1.25rem 1.4rem .85rem; }
+  .tool-machine .tool-intro h1 { font-size: 2.7rem; }
+  .tool-machine .tool-workspace { padding: 1.25rem 1.4rem 1.5rem; }
+}
+
 @media (min-width: 75rem) {
   .search-results { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .result-card:first-child { grid-column: span 2; }
@@ -779,4 +839,36 @@ body { background: var(--color-canvas); }
   .tool-machine .tool-visual__scene { height: auto; max-height: 24rem; }
   .tool-machine .tool-workspace { padding: 1.5rem; }
   .tool-machine .tool-stage--single .tool-workspace { max-width: 52rem; }
+}
+
+/* Final cascade: the shared shell above intentionally stays global. */
+.toolbox .tool-rows { display: grid; gap: .65rem; border: 0; }
+.toolbox .tool-row, .toolbox .tool-row + .tool-row { min-height: 4.8rem; padding: .7rem .75rem; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-surface); box-shadow: 0 8px 24px rgb(20 25 23 / 4%); }
+:root[data-theme="dark"] .toolbox .tool-row { border-color: #35404a; background: linear-gradient(145deg, #20272e, #1b2127); box-shadow: 0 10px 28px rgb(0 0 0 / 18%); }
+.tool-machine { --machine-accent: #d9864e; --machine-accent-ink: #17201d; border-color: color-mix(in srgb, var(--color-line) 82%, transparent); border-radius: 1rem; box-shadow: 0 12px 38px rgb(20 25 23 / 5%); }
+.tool-machine--tires-wheels { --machine-accent: #668fba; --machine-accent-ink: #fff; }
+.tool-machine--converters { --machine-accent: #4e9d90; --machine-accent-ink: #fff; }
+.tool-machine--performance { --machine-accent: #8878ad; --machine-accent-ink: #fff; }
+.tool-machine::before { background: linear-gradient(90deg, var(--machine-accent), transparent 78%); }
+.tool-machine .tool-intro { grid-template-columns: 2.65rem minmax(0,1fr); gap: .7rem; padding: .9rem .9rem .65rem; }
+.tool-machine .tool-intro .tool-icon { width: 2.5rem; height: 2.5rem; }
+.tool-machine .tool-intro .eyebrow { margin-bottom: .35rem; font-size: .68rem; }
+.tool-machine .tool-intro h1 { max-width: 18ch; margin-bottom: .45rem; font-size: clamp(2rem, 8.7vw, 2.55rem); line-height: .98; }
+.tool-machine .tool-intro--long h1 { font-size: clamp(1.8rem, 7.8vw, 2.35rem); }
+.tool-machine .tool-intro .hero-copy { margin-bottom: 0; font-size: .94rem; line-height: 1.45; }
+.tool-machine .tool-workspace { padding: .85rem .9rem 1rem; }
+.tool-machine .calculator-form { gap: .85rem; }
+.tool-machine label { gap: .38rem; font-size: .82rem; }
+.tool-machine input, .tool-machine select { height: 3.15rem; font-size: 1rem; }
+.tool-machine .calculator-form > button, .tool-machine .entry-workspace .button { min-height: 3.5rem; border-color: var(--machine-accent); background: var(--machine-accent); color: var(--machine-accent-ink); font-size: 1.05rem; }
+.tool-machine .result-summary:not(.is-pending) { border-left-color: var(--machine-accent); }
+:root[data-theme="dark"] .tool-machine { border-color: #303a43; box-shadow: 0 18px 52px rgb(0 0 0 / 25%); }
+:root[data-theme="dark"] .tool-machine .result-summary:not(.is-pending) { box-shadow: inset 3px 0 var(--machine-accent), 0 12px 34px rgb(0 0 0 / 22%); }
+.tool-machine--tires-wheels .fitment-visualizer { border-color: color-mix(in srgb, #668fba 38%, var(--color-line)); background: linear-gradient(155deg, #1c3145, #142434); }
+@media (min-width: 48rem) {
+  .toolbox .tool-rows { gap: .75rem; }
+  .tool-machine .tool-intro { padding: 1.25rem 1.4rem .85rem; }
+  .tool-machine .tool-intro h1 { font-size: 2.7rem; }
+  .tool-machine .tool-workspace { padding: 1.25rem 1.4rem 1.5rem; }
+  .tool-machine .tool-visual__scene { width: 100%; height: 18rem; max-height: 18rem; }
 }

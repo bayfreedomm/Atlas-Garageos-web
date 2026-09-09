@@ -3,5 +3,5 @@ interface Props { compact?: boolean; subtitle?: string; }
 const { compact = false, subtitle = 'GarageOS' } = Astro.props;
 ---
 <span class:list={['brand-lockup', { 'brand-lockup--compact': compact }]} aria-hidden="true">
-  <span class="brand-wordmark"><strong>ATLAS</strong><span>{subtitle}</span></span>
+  <span class="brand-wordmark"><strong>ATLAS</strong>{subtitle === 'GarageOS' ? <span class="brand-garage">Garage<span class="brand-wheel">O<i></i></span>S</span> : <span>{subtitle}</span>}</span>
 </span>

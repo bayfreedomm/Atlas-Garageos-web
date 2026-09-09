@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import FitmentVisualizer from '../../../../components/FitmentVisualizer.astro';
+import TireCodeExplainer from '../../../../components/TireCodeExplainer.astro';
 import { toolById } from '../../../../seo/tool-registry';
 const definition = toolById('tire-size-calculator');
 ---
@@ -9,6 +10,6 @@ const definition = toolById('tire-size-calculator');
     <fieldset><legend>Tire size</legend><div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
     <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p><FitmentVisualizer mode="tire-single" title="Tire profile" /><dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
-  <div slot="explanation"><h2>What the numbers describe</h2><p>Width is the nominal section width in millimetres. Profile is the sidewall height as a percentage of that width. Rim is the wheel diameter in inches.</p><p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p></div>
+  <div slot="explanation"><TireCodeExplainer /><h2>How the geometry is calculated</h2><p>Sidewall height is width multiplied by the profile percentage. Two sidewalls plus the rim diameter, converted from inches to millimetres, gives overall diameter.</p><p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p></div>
 </ToolPage>
 <script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>

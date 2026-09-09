@@ -10,6 +10,7 @@ const intendedRoutes = [
   '/en/tools/tire-size-comparison/',
   '/en/tools/wheel-offset-calculator/',
   '/en/tools/speedometer-error-calculator/',
+  '/en/tools/gear-ratio-calculator/',
   '/en/tools/fitment-map/',
   '/en/tools/measure-my-car/',
   '/en/tools/fuel-cost-calculator/',

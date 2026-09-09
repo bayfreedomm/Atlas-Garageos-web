@@ -45,7 +45,7 @@ function initializeFuelPreferences(form: HTMLFormElement): void {
     if (!result.ok) return;
     for (const [name, next] of [['distance', result.value.distance], ['economy', result.value.economy], ['price', result.value.price]] as const) {
       const field = form.elements.namedItem(name) as HTMLInputElement | null;
-      if (field) field.value = String(Number(next.toFixed(6)));
+      if (field) field.value = String(Number(next.toFixed(name === 'distance' ? 1 : 2)));
     }
   };
   const initialSystem = parseUnitSystem(system?.value);
