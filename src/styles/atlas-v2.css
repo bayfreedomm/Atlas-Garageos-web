@@ -1,5 +1,5 @@
 /* Atlas GarageOS structural product layer. Loaded after the legacy foundation. */
-.app-header{border-bottom-color:rgb(255 255 255 / 8%);background:color-mix(in srgb,var(--color-canvas) 94%,transparent);backdrop-filter:blur(24px) saturate(150%)}
+.app-header{border-bottom-color:rgb(255 255 255 / 8%);background:var(--color-canvas)}
 .app-header__inner{min-height:4.8rem}.desktop-nav{display:none!important}.brand-lockup{gap:.58rem}
 .brand-wordmark{grid-template-columns:1fr;align-items:start;row-gap:.15rem}.brand-wordmark strong{font-family:var(--font-display);font-size:1.04rem;letter-spacing:.13em}.brand-wordmark>span{color:var(--color-accent);font-family:var(--font-sans);font-size:.62rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
 .menu-button{width:3rem;height:3rem;border-color:color-mix(in srgb,var(--color-line-strong) 75%,transparent);border-radius:.85rem;background:var(--color-surface);box-shadow:0 8px 24px rgb(0 0 0 / 8%)}.menu-button span{width:1.25rem;height:2px}
