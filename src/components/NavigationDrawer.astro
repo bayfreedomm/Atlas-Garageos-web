@@ -1,15 +1,15 @@
 ---
-import Brand from './Brand.astro';
 import ThemeControl from './ThemeControl.astro';
 ---
 <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navigation-drawer" aria-expanded="false" data-menu-open><span></span><span></span><span></span></button>
-<dialog id="navigation-drawer" class="nav-dialog" aria-label="Atlas menu" data-navigation-dialog>
-  <div class="nav-dialog__shell">
-    <header><a href="/" aria-label="Atlas GarageOS home"><Brand /></a><button class="nav-dialog__close" type="button" aria-label="Close menu" data-menu-close>Close</button></header>
-    <div class="nav-dialog__body">
-      <nav class="nav-dialog__primary" aria-label="Main navigation"><p>TOOLS</p><a href="/"><span><strong>Toolbox</strong><small>All automotive tools</small></span><i>01</i></a><a href="/en/tools/"><span><strong>Browse by category</strong><small>Search and filter tools</small></span><i>02</i></a></nav>
-      <nav class="nav-dialog__secondary" aria-label="Atlas products"><p>PRODUCT</p><a href="/en/fitment-studio/">Fitment Studio <span>›</span></a><a href="/en/fitment-studio/#garage">My Garage <span>›</span></a></nav>
-      <section class="nav-dialog__settings" aria-labelledby="settings-heading"><p id="settings-heading">SETTINGS</p><ThemeControl /><div><span>Language</span><strong>English</strong></div></section>
+<dialog id="navigation-drawer" class="drawer-layer" data-drawer-layer aria-label="Atlas menu">
+  <div class="navigation-drawer">
+    <div class="drawer-shell">
+      <header><a href="/en/" class="drawer-home"><span>ATLAS</span><small>GarageOS</small></a><button class="drawer-close" type="button" aria-label="Close menu" data-menu-close>×</button></header>
+      <div class="drawer-grid">
+        <nav class="drawer-primary" aria-label="Main navigation"><p>GO STRAIGHT TO</p><a href="/en/"><strong>Toolbox home</strong><span>Choose a job and get an answer</span><i>01</i></a><a href="/en/tools/"><strong>All automotive tools</strong><span>Browse the complete collection</span><i>02</i></a><a href="/en/fitment-studio/"><strong>Fitment Studio</strong><span>Explore wheel and tire geometry</span><i>03</i></a><a href="/en/fitment-studio/#garage"><strong>My Garage</strong><span>Your vehicles and saved setups</span><i>04</i></a></nav>
+        <div class="drawer-secondary"><nav aria-label="Tool categories"><p>TOOLS BY JOB</p><a href="/en/tools/?category=Fuel%20%26%20Trips">Fuel &amp; trips <span>›</span></a><a href="/en/tools/?category=Tires%20%26%20Wheels">Tires &amp; wheels <span>›</span></a><a href="/en/tools/?category=Converters">Converters <span>›</span></a><a href="/en/tools/?category=Performance">Performance <span>›</span></a></nav><section class="drawer-settings" aria-labelledby="settings-heading"><p id="settings-heading">DISPLAY</p><ThemeControl /><div class="language-setting"><span>Language</span><strong>English</strong></div></section></div>
+      </div>
     </div>
   </div>
 </dialog>

@@ -1,80 +1,65 @@
-const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
 
-function numberField(root: ParentNode, name: string, fallback = 0): number {
-  const value = Number(root.querySelector<HTMLInputElement>(`[name="${name}"]`)?.value);
-  return Number.isFinite(value) ? value : fallback;
+function numeric(form: HTMLFormElement, name: string): number {
+  const field = form.elements.namedItem(name) as HTMLInputElement | null;
+  const value = Number(field?.value);
+  return Number.isFinite(value) ? value : 0;
 }
 
-function tireDiameter(root: ParentNode, prefix: string): number {
-  return numberField(root, `${prefix}rimDiameterInches`, 18) * 25.4
-    + 2 * numberField(root, `${prefix}widthMm`, 225) * (numberField(root, `${prefix}aspectRatio`, 45) / 100);
+function rotate(element: SVGGraphicsElement | null, degrees: number, x: number, y: number): void {
+  element?.setAttribute('transform', `rotate(${degrees} ${x} ${y})`);
 }
 
-function setText(visual: HTMLElement, selector: string, text: string): void {
-  const node = visual.querySelector<SVGTextElement>(selector);
-  if (node) node.textContent = text;
-}
-
-function paint(container: HTMLElement): void {
-  const id = container.dataset.toolId;
-  if (!id) return;
-  const visual = container.querySelector<HTMLElement>(`[data-live-tool="${id}"]`);
-  const form = container.querySelector<HTMLFormElement>('form');
+function sync(machine: HTMLElement): void {
+  const visual = machine.querySelector<HTMLElement>('[data-tool-visual]');
+  const form = machine.querySelector<HTMLFormElement>('form');
   if (!visual || !form) return;
-  const motion = visual.querySelector<SVGElement>('[data-live-motion]');
-  const needle = visual.querySelector<SVGElement>('[data-live-needle]');
-
+  const id = machine.dataset.toolId;
   if (id === 'fuel-cost-calculator' || id === 'road-trip-cost-calculator') {
-    const distance = numberField(form, 'distance', 500);
-    motion?.setAttribute('transform', `translate(${clamp(distance / 20, 4, 46) - 24} 0)`);
-    setText(visual, '[data-live-value]', `${Math.round(distance)} ${form.querySelector<HTMLSelectElement>('[name="system"]')?.value === 'imperial' ? 'mi' : 'km'}`);
+    const progress = clamp(Math.log10(numeric(form, 'distance') + 1) / 4, 0, 1);
+    visual.querySelectorAll<SVGGraphicsElement>('[data-car-part]').forEach((part) => part.setAttribute('transform', `translate(${(-18 + progress * 36).toFixed(1)} 0)`));
   }
-  if (id === 'mpg-l100km-converter') {
-    setText(visual, '[data-live-value]', String(numberField(form, 'value', 30)));
-    const unit = form.querySelector<HTMLSelectElement>('[name="unit"]')?.selectedOptions[0]?.textContent ?? 'MPG';
-    setText(visual, '[data-live-unit]', unit.replace('Imperial ', '').replace('US ', '').toUpperCase());
-  }
-  if (id === 'psi-bar-converter') {
-    const pressure = numberField(form, 'value', 32);
-    const unit = form.querySelector<HTMLSelectElement>('[name="unit"]')?.value ?? 'psi';
-    const psi = unit === 'bar' ? pressure * 14.5038 : unit === 'kpa' ? pressure * .145038 : pressure;
-    needle?.setAttribute('transform', `rotate(${clamp((psi - 32) * 1.2, -35, 35)} 261 112)`);
-    setText(visual, '[data-live-value]', String(Number(pressure.toFixed(1))));
-    setText(visual, '[data-live-unit]', unit.toUpperCase());
+  if (id === 'mpg-l100km-converter' || id === 'psi-bar-converter') {
+    const raw = numeric(form, 'value');
+    const max = id === 'psi-bar-converter' ? 60 : 70;
+    const degrees = -65 + clamp(raw / max, 0, 1) * 130;
+    const needle = visual.querySelector<SVGGraphicsElement>('[data-gauge-needle]');
+    rotate(needle, degrees, id === 'psi-bar-converter' ? 261 : 302, id === 'psi-bar-converter' ? 112 : 91);
+    const reading = visual.querySelector<SVGTextElement>('[data-gauge-value]');
+    if (reading) reading.textContent = String(Math.round(raw));
+    const unit = visual.querySelector<SVGTextElement>('[data-gauge-unit]');
+    const select = form.elements.namedItem('unit') as HTMLSelectElement | null;
+    if (unit && select) unit.textContent = select.value.toUpperCase();
+    if (id === 'psi-bar-converter') {
+      const pressure = select?.value === 'bar' ? raw * 14.5038 : select?.value === 'kpa' ? raw * 0.145038 : raw;
+      const scale = 0.96 + clamp(pressure / 60, 0, 1) * 0.06;
+      visual.querySelector<SVGCircleElement>('[data-tire-ring]')?.setAttribute('transform', `translate(${178 * (1 - scale)} ${98 * (1 - scale)}) scale(${scale})`);
+    }
   }
   if (id === 'speedometer-error-calculator') {
-    const indicated = numberField(form, 'indicatedSpeed', 100);
-    const original = tireDiameter(form, 'original-');
-    const proposed = tireDiameter(form, 'new-');
-    const actual = original > 0 ? indicated * proposed / original : indicated;
-    needle?.setAttribute('transform', `rotate(${clamp((actual - 100) * .8, -38, 38)} 180 137)`);
-    setText(visual, '[data-live-value]', String(Number(actual.toFixed(1))));
+    const readingValue = numeric(form, 'indicatedSpeed');
+    rotate(visual.querySelector<SVGGraphicsElement>('[data-gauge-needle]'), -70 + clamp(readingValue / 200, 0, 1) * 140, 180, 137);
+    const reading = visual.querySelector<SVGTextElement>('[data-gauge-value]');
+    if (reading) reading.textContent = String(Math.round(readingValue));
   }
   if (id === 'hp-kw-converter') {
-    const power = numberField(form, 'value', 180);
-    motion?.setAttribute('transform', `translate(0 ${clamp(12 - power / 40, -8, 8)}) scale(${clamp(.8 + power / 1000, .85, 1.15)})`);
+    const pulse = 0.88 + clamp(numeric(form, 'value') / 500, 0, 1) * 0.22;
+    visual.querySelector<SVGGraphicsElement>('[data-power-pulse]')?.setAttribute('transform', `translate(${190 * (1 - pulse)} ${95 * (1 - pulse)}) scale(${pulse})`);
   }
-  if (id === 'nm-lb-ft-converter') {
-    needle?.setAttribute('transform', `rotate(${clamp(numberField(form, 'value', 300) / 12, 0, 120)} 180 99)`);
-  }
+  if (id === 'nm-lb-ft-converter') rotate(visual.querySelector<SVGGraphicsElement>('[data-torque-ring]'), clamp(numeric(form, 'value') / 1000, 0, 1) * 210, 180, 99);
   if (id === 'power-to-weight-calculator') {
-    const ratio = numberField(form, 'power', 180) / Math.max(numberField(form, 'weight', 1350), 1);
-    visual.querySelector<SVGElement>('[data-live-scale]')?.setAttribute('transform', `rotate(${clamp((ratio - .13) * 80, -8, 8)} 180 100)`);
-  }
-  if (id === 'gear-ratio-calculator') {
-    const current = numberField(form, 'currentDiameter', 31);
-    const next = numberField(form, 'newDiameter', 35);
-    visual.querySelector<SVGElement>('[data-live-primary]')?.setAttribute('transform', `rotate(${current * 4} 145 103)`);
-    visual.querySelector<SVGElement>('[data-live-secondary]')?.setAttribute('transform', `rotate(${-next * 5} 224 103)`);
+    const ratio = numeric(form, 'power') / Math.max(1, numeric(form, 'weight'));
+    rotate(visual.querySelector<SVGGraphicsElement>('[data-power-scale]'), clamp((ratio - .12) * 70, -8, 8), 180, 65);
   }
 }
 
 export function initializeToolVisualMotion(): void {
-  document.querySelectorAll<HTMLElement>('[data-tool-id]').forEach((container) => {
-    const form = container.querySelector<HTMLFormElement>('form');
-    if (!form || container.dataset.visualReady === 'true') return;
-    container.dataset.visualReady = 'true';
-    const update = (): void => paint(container);
+  document.querySelectorAll<HTMLElement>('.tool-machine').forEach((machine) => {
+    if (machine.dataset.visualMotionReady === 'true') return;
+    machine.dataset.visualMotionReady = 'true';
+    const form = machine.querySelector<HTMLFormElement>('form');
+    if (!form) return;
+    const update = (): void => sync(machine);
     form.addEventListener('input', update);
     form.addEventListener('change', update);
     form.addEventListener('submit', () => requestAnimationFrame(update));

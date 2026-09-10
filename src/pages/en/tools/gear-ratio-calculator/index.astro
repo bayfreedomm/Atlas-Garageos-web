@@ -4,7 +4,7 @@ import { toolById } from '../../../../seo/tool-registry';
 const definition = toolById('gear-ratio-calculator');
 const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
 ---
-<ToolPage {definition} eyebrow="Drivetrain geometry" intro="See how a tire diameter change alters effective axle ratio, then scan RPM across common tire and gear combinations." limitation="RPM uses a direct 1.00:1 transmission ratio and excludes converter slip. It is a transparent comparison, not a gearing recommendation.">
+<ToolPage {definition} visual={false} eyebrow="Drivetrain geometry" intro="See how a tire diameter change alters effective axle ratio, then scan RPM across common tire and gear combinations." limitation="RPM uses a direct 1.00:1 transmission ratio and excludes converter slip. It is a transparent comparison, not a gearing recommendation.">
   <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
     <div class="utility-fields gear-ratio-inputs"><label>Current tire diameter · in<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>New tire diameter · in<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Current axle ratio<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Road speed · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
     <button type="submit">Compare gearing</button><div class="inline-errors" data-errors role="alert" hidden></div>

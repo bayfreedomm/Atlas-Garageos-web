@@ -4,19 +4,23 @@ import type { ToolDefinition } from '../seo/tool-registry';
 import { relatedTools, routeForTool } from '../seo/tool-registry';
 import ToolIcon from './ToolIcon.astro';
 import ToolVisual from './ToolVisual.astro';
+
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string; studioHref?: string; visual?: boolean; }
 const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/en/fitment-studio/', visual = true } = Astro.props;
 const related = relatedTools(definition);
+const hasLongTitle = definition.title.length > 24;
 ---
 <SiteLayout {definition} active="tools">
-  <nav class="tool-return" aria-label="Breadcrumb"><a href="/">← Toolbox</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
-  <article class:list={['simple-tool', `simple-tool--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`]} data-tool-id={definition.id}>
-    <header class="simple-tool__header"><ToolIcon id={definition.id} category={definition.category}/><div><p class="section-kicker">{eyebrow}</p><h1>{definition.title}</h1><p>{intro}</p></div></header>
-    <section class="simple-tool__work" aria-label={`${definition.title} calculator`}><slot name="tool" /></section>
-    {visual && <section class="simple-tool__visual" aria-label={`${definition.title} live visual`}><p class="section-kicker">LIVE VIEW</p><ToolVisual {definition} /></section>}
+  <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href="/en/tools/">← Toolbox</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
+  <article class:list={['tool-machine', `tool-machine--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, `tool-machine--${definition.id}`]} data-tool-id={definition.id}>
+    <header class:list={['tool-intro', { 'tool-intro--long': hasLongTitle }]}><ToolIcon id={definition.id} category={definition.category}/><div><p class="eyebrow">{eyebrow}</p><h1>{definition.title}</h1><p class="hero-copy">{intro}</p></div></header>
+    <div class:list={['tool-stage', { 'tool-stage--single': !visual }]}>
+      {visual && <ToolVisual {definition} />}
+      <section class="tool-workspace" aria-label={`${definition.title} calculator`}><slot name="tool" /></section>
+    </div>
   </article>
-  <section class="tool-facts"><div><p class="section-kicker">QUICK FACTS</p><slot name="explanation" /></div><aside><strong>Keep in mind</strong><p>{limitation}</p></aside></section>
-  {studioCta && <a class="studio-link" href={studioHref}><span><small>FITMENT STUDIO</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
-  <section class="related-tools" aria-labelledby="related-heading"><p class="section-kicker">KEEP GOING</p><h2 id="related-heading">Related tools</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={routeForTool(tool)}><ToolIcon id={tool.id} category={tool.category}/><span><strong>{tool.title}</strong><small>{tool.category}</small></span><i aria-hidden="true">›</i></a>)}</div></section>
+  <section class="tool-explanation"><div><p class="eyebrow">How it works</p><slot name="explanation" /></div><aside class="limitation-card"><strong>Keep in mind</strong><p>{limitation}</p></aside></section>
+  {studioCta && <a class="studio-cta studio-cta--row" href={studioHref}><span><small>Fitment Studio</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
+  <section class="related-tools" aria-labelledby="related-heading"><h2 id="related-heading">Related tools</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={routeForTool(tool)}><ToolIcon id={tool.id} category={tool.category}/><span><strong>{tool.title}</strong><small>{tool.category}</small></span><i aria-hidden="true">›</i></a>)}</div></section>
 </SiteLayout>
 <script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; initializeToolVisualMotion();</script>

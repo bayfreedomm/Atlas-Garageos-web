@@ -35,18 +35,10 @@ function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiame
   visual.querySelector<SVGCircleElement>('[data-current-rim]')?.setAttribute('r', String(model.currentRimRadius));
   visual.querySelector<SVGCircleElement>('[data-new-tire]')?.setAttribute('r', String(model.proposedTireRadius));
   visual.querySelector<SVGCircleElement>('[data-new-rim]')?.setAttribute('r', String(model.proposedRimRadius));
-  const widthBlock = visual.querySelector<SVGRectElement>('[data-current-width]');
-  const widthPixels = Math.min(78, Math.max(38, input.widthMm / 4));
-  widthBlock?.setAttribute('x', String(257 - widthPixels / 2));
-  widthBlock?.setAttribute('width', String(widthPixels));
-  const widthLabel = visual.querySelector<SVGTextElement>('[data-current-width-label]');
-  if (widthLabel) widthLabel.textContent = `${input.widthMm} MM WIDE`;
   const currentLabel = visual.querySelector<HTMLElement>('[data-current-tire-label]');
   const proposedLabel = visual.querySelector<HTMLElement>('[data-new-tire-label]');
   if (currentLabel) currentLabel.textContent = `${input.widthMm}/${input.aspectRatio} R${input.rimDiameterInches} · ${currentDiameterMm.toFixed(1)} mm`;
   if (proposedLabel && proposed && proposedDiameterMm !== undefined) proposedLabel.textContent = `${proposed.widthMm}/${proposed.aspectRatio} R${proposed.rimDiameterInches} · ${proposedDiameterMm.toFixed(1)} mm`;
-  const summary = visual.querySelector<HTMLElement>('[data-visual-summary]');
-  if (summary) summary.textContent = proposed && proposedDiameterMm !== undefined ? 'Both outlines use the same scale.' : 'Diameter, rim and tread width respond to your numbers.';
 }
 
 function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): void {
@@ -58,8 +50,6 @@ function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): vo
   const innerLabel = visual.querySelector<HTMLElement>('[data-inner-label]'); const outerLabel = visual.querySelector<HTMLElement>('[data-outer-label]');
   if (innerLabel) innerLabel.textContent = `${Math.abs(inner).toFixed(2)} mm ${inner >= 0 ? 'farther inward' : 'less inward'}`;
   if (outerLabel) outerLabel.textContent = `${Math.abs(outer).toFixed(2)} mm ${outer >= 0 ? 'farther outward' : 'less outward'}`;
-  const summary = visual.querySelector<HTMLElement>('[data-visual-summary]');
-  if (summary) summary.textContent = 'The new wheel moves around the fixed hub plane.';
 }
 
 export function initializeToolCalculators(): void {

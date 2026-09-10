@@ -1,15 +1,19 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
 ---
-<SiteLayout title="Privacy Policy" description="How Atlas GarageOS handles calculator inputs and locally saved vehicle data." pathname="/en/privacy-policy/" active="tools" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Privacy Policy', href: '/en/privacy-policy/' }]}>
-  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Toolbox</a><span aria-hidden="true">/</span><span aria-current="page">Privacy Policy</span></nav>
+<SiteLayout title="Privacy Policy" description="How Atlas GarageOS handles calculator inputs and locally saved vehicle data." pathname="/en/privacy-policy/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Privacy Policy', href: '/en/privacy-policy/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Privacy Policy</span></nav>
   <header class="directory-identity"><h1>Privacy policy</h1><p>Last updated September 2026.</p></header>
-  <div class="tool-facts privacy-copy">
-    <div>
-      <h2>Calculator inputs</h2><p>You can use Atlas GarageOS without creating an account. Calculator values are processed in your browser to produce a result.</p>
-      <h2>Saved vehicle data</h2><p>Vehicles, measurements, and setups saved in My Garage stay in your browser’s local storage on that device.</p>
-      <h2>Cookies</h2><p>Atlas does not use advertising cookies. If that changes, this policy will be updated before the change goes live.</p>
-      <h2>Hosting</h2><p>The hosting provider may process standard request information needed to deliver and protect the website.</p>
-    </div>
+  <div class="tool-explanation privacy-copy">
+    <h2>Calculator inputs</h2>
+    <p>No account, login, or email address is required to use the calculators. The values you enter are processed in your browser to produce a result and are not submitted to an Atlas GarageOS application server.</p>
+    <h2>Saved data (My Garage)</h2>
+    <p>Vehicles, measurements, and setups saved to My Garage are stored in your browser's local storage on that device. Clearing browser data can remove them.</p>
+    <h2>Hosting and basic request data</h2>
+    <p>The site is served through Cloudflare. Like other hosting providers, Cloudflare may process standard request information such as IP address, requested URL, browser information, and security signals to deliver and protect the site.</p>
+    <h2>Cookies and advertising</h2>
+    <p>Atlas GarageOS does not currently use advertising cookies or sell personal data. This notice will be updated before advertising or additional tracking technology is introduced.</p>
+    <h2>General audience</h2>
+    <p>Atlas GarageOS is a general-audience automotive utility and is not directed to children under 13.</p>
   </div>
 </SiteLayout>

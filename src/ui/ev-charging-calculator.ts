@@ -31,6 +31,7 @@ export function initializeEvChargingCalculators(): void {
         chargerPowerKw: numberValue(form, 'chargerPowerKw'),
         chargingEfficiency: numberValue(form, 'chargingEfficiency'),
       };
+      const currency = String(new FormData(form).get('currency') ?? 'USD');
       paintBattery(form, input.startPercent, input.endPercent);
       const result = calculateEvChargingCostTool(input);
       if (!result.ok) {
@@ -43,11 +44,10 @@ export function initializeEvChargingCalculators(): void {
       errors.hidden = true;
       errors.replaceChildren();
       summary.classList.remove('is-pending');
-      const currency = String(new FormData(form).get('currency') ?? 'USD');
       summary.textContent = `Charging from ${formatNumber(input.startPercent, 0)}% to ${formatNumber(input.endPercent, 0)}% costs about ${currency} ${formatNumber(result.value.cost, 2)}.`;
       const rows: [string, string][] = [
-        ['Battery energy', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`],
-        ['Grid energy', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`],
+        ['Energy into battery', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`],
+        ['Energy from grid', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`],
         ['Estimated cost', `${currency} ${formatNumber(result.value.cost, 2)}`],
         ['Charging time', `${formatNumber(result.value.hours, 1)} h`],
       ];

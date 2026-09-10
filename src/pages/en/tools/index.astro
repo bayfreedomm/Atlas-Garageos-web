@@ -2,8 +2,8 @@
 import SiteLayout from '../../../components/SiteLayout.astro';
 import ToolDirectory from '../../../components/ToolDirectory.astro';
 ---
-<SiteLayout title="Automotive Tools" description="Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment." pathname="/en/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Tools', href: '/en/tools/' }]}>
-  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Toolbox</a><span aria-hidden="true">/</span><span aria-current="page">All tools</span></nav>
+<SiteLayout title="Automotive Tools" description="Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment." pathname="/en/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Tools</span></nav>
   <header class="directory-identity"><h1>Automotive tools</h1><p>Choose a job and get a clear answer.</p></header>
   <ToolDirectory mode="all" />
   <a class="fitment-directory-row" href="/en/fitment-studio/"><strong>Fitment Studio</strong><span>Advanced tire and wheel fitment workspace</span><i aria-hidden="true">›</i></a>

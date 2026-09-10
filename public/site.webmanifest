@@ -1,10 +1,10 @@
 {
   "name": "Atlas GarageOS",
   "short_name": "GarageOS",
-  "start_url": "/",
+  "start_url": "/en/",
   "display": "standalone",
-  "background_color": "#FBFBFA",
-  "theme_color": "#151A20",
+  "background_color": "#FBFBF8",
+  "theme_color": "#1C2926",
   "icons": [
     {
       "src": "/atlas-mark.svg",

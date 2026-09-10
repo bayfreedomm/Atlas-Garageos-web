@@ -1,18 +1,16 @@
 import { invalid, valid, type ValidationResult } from './validation';
 
-declare const percentBrand: unique symbol;
-declare const efficiencyBrand: unique symbol;
-export type ChargePercent = number & { readonly [percentBrand]: true };
-export type ChargingEfficiency = number & { readonly [efficiencyBrand]: true };
+declare const chargePercentageBrand: unique symbol;
+declare const efficiencyPercentageBrand: unique symbol;
 
-export function createChargePercent(value: number, field: string): ValidationResult<ChargePercent> {
+export type ChargePercentage = number & { readonly [chargePercentageBrand]: true };
+export type EfficiencyPercentage = number & { readonly [efficiencyPercentageBrand]: true };
+
+function boundedPercentage<T extends number>(value: number, field: string, minimum: number, maximum: number): ValidationResult<T> {
   if (!Number.isFinite(value)) return invalid({ code: 'not-a-number', field, message: `${field} must be a finite number.`, received: value });
-  if (value < 0 || value > 100) return invalid({ code: 'out-of-range', field, message: `${field} must be between 0 and 100.`, received: value });
-  return valid(value as ChargePercent);
+  if (value < minimum || value > maximum) return invalid({ code: 'out-of-range', field, message: `${field} must be between ${minimum} and ${maximum}.`, received: value });
+  return valid(value as T);
 }
 
-export function createChargingEfficiency(value: number): ValidationResult<ChargingEfficiency> {
-  if (!Number.isFinite(value)) return invalid({ code: 'not-a-number', field: 'chargingEfficiency', message: 'Charging efficiency must be a finite number.', received: value });
-  if (value < 50 || value > 100) return invalid({ code: 'out-of-range', field: 'chargingEfficiency', message: 'Charging efficiency must be between 50 and 100.', received: value });
-  return valid(value as ChargingEfficiency);
-}
+export const createChargePercentage = (value: number, field: string): ValidationResult<ChargePercentage> => boundedPercentage<ChargePercentage>(value, field, 0, 100);
+export const createEfficiencyPercentage = (value: number): ValidationResult<EfficiencyPercentage> => boundedPercentage<EfficiencyPercentage>(value, 'chargingEfficiency', 50, 100);

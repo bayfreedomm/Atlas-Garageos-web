@@ -3,7 +3,7 @@ import directory from '../../src/components/ToolDirectory.astro?raw';
 import drawer from '../../src/components/NavigationDrawer.astro?raw';
 import layout from '../../src/components/SiteLayout.astro?raw';
 import toolPage from '../../src/components/ToolPage.astro?raw';
-import home from '../../src/pages/index.astro?raw';
+import home from '../../src/pages/en/index.astro?raw';
 import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
 import hub from '../../src/pages/en/tools/index.astro?raw';
 import { TOOL_CATEGORY_ORDER, routeForTool, toolById, toolRegistry } from '../../src/seo/tool-registry';
@@ -27,10 +27,10 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
-    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(15);
+    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(14);
     expect(hub).toContain('<ToolDirectory mode="all"');
     expect(home).toContain('<HomeLauncher');
-    expect(homeLauncher).toContain('data-tool-search');
+    expect(homeLauncher).toContain('data-tool-search-form');
     expect(homeLauncher).toContain('toolRegistry.filter');
     expect(directory).toContain('View all tools');
   });
@@ -45,9 +45,8 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('puts calculator inputs directly after a compact tool heading', () => {
-    expect(toolPage.indexOf('simple-tool__header')).toBeLessThan(toolPage.indexOf('simple-tool__work'));
-    expect(toolPage.indexOf('simple-tool__work')).toBeLessThan(toolPage.indexOf('tool-facts'));
-    expect(toolPage).toContain('href="/"');
+    expect(toolPage.indexOf('tool-intro')).toBeLessThan(toolPage.indexOf('tool-workspace'));
+    expect(toolPage.indexOf('tool-workspace')).toBeLessThan(toolPage.indexOf('tool-explanation'));
     expect(toolPage).toContain('Related tools');
   });
 

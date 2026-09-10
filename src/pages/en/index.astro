@@ -1,5 +1,12 @@
 ---
-import { canonicalForPath } from '../../seo/tool-registry';
-const destination = '/';
+import SiteLayout from '../../components/SiteLayout.astro';
+import HomeLauncher from '../../components/HomeLauncher.astro';
+import ToolIcon from '../../components/ToolIcon.astro';
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="robots" content="noindex,follow"/><meta http-equiv="refresh" content={`0; url=${destination}`}/><link rel="canonical" href={canonicalForPath(destination)}/><title>Atlas GarageOS</title></head><body><main><a href={destination}>Open Atlas GarageOS</a></main></body></html>
+<SiteLayout title="Atlas GarageOS" description="Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment." pathname="/en/" active="home">
+  <HomeLauncher />
+  <section class="launcher-products" aria-label="Atlas GarageOS product areas">
+    <a href="/en/fitment-studio/"><ToolIcon id="fitment-studio" category="Advanced"/><strong>Open Fitment Studio</strong><i aria-hidden="true">›</i></a>
+    <a href="/en/fitment-studio/#garage"><ToolIcon id="garage" category="Advanced"/><strong>Open My Garage</strong><i aria-hidden="true">›</i></a>
+  </section>
+</SiteLayout>

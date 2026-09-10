@@ -24,42 +24,42 @@ const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
 };
 const [title, copy] = labels[definition.id];
 ---
-<figure class:list={['tool-visual', `tool-visual--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, { 'tool-visual--compact': compact }]} data-live-tool={definition.id} aria-label={`${definition.title} visual`}>
+<figure class:list={['tool-visual', `tool-visual--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, { 'tool-visual--compact': compact }]} data-tool-visual data-tool-id={definition.id} aria-label={`${definition.title} visual`}>
   {!compact && <div class="tool-visual__top"><ToolIcon id={definition.id} category={definition.category}/><span><strong>{title}</strong><small>{copy}</small></span></div>}
   <svg class="tool-visual__scene" viewBox="0 0 360 180" role="img" aria-label={title}>
     {(definition.id === 'fuel-cost-calculator' || definition.id === 'road-trip-cost-calculator' || definition.id === 'mpg-l100km-converter') && <>
-      <path class="scene-road" data-live-path d="M18 139C91 142 102 86 168 96s82 57 174 13" />
-      <g data-live-motion><path class="scene-car" d="M122 101h69l20 19h21c8 0 14 6 14 14v5H94v-8c0-7 5-13 12-14l16-16Z" /><circle class="scene-wheel" cx="126" cy="140" r="13"/><circle class="scene-wheel" cx="211" cy="140" r="13"/></g>
+      <path class="scene-road" d="M18 139C91 142 102 86 168 96s82 57 174 13" />
+      <path class="scene-car" data-car-part d="M122 101h69l20 19h21c8 0 14 6 14 14v5H94v-8c0-7 5-13 12-14l16-16Z" />
+      <circle class="scene-wheel" data-car-part cx="126" cy="140" r="13"/><circle class="scene-wheel" data-car-part cx="211" cy="140" r="13"/>
       {definition.id === 'fuel-cost-calculator' && <><path class="scene-accent" d="M269 52h35v75h-35zM275 61h23v25h-23zM304 70h11l10 12v31c0 8 12 8 12 0V87l-10-10"/><path class="scene-dash" d="M251 92h18"/></>}
       {definition.id === 'road-trip-cost-calculator' && <><circle class="scene-accent-fill" cx="52" cy="119" r="7"/><circle class="scene-accent-fill" cx="316" cy="93" r="7"/><path class="scene-dash" d="M58 115C111 76 157 80 201 105s71 12 108-8"/></>}
-      {definition.id === 'mpg-l100km-converter' && <><path class="scene-accent" d="M270 55a38 38 0 0 1 64 28M302 91l20-26"/><text class="scene-text scene-text--large" data-live-value x="266" y="118">30</text><text class="scene-text" data-live-unit x="294" y="137">MPG</text></>}
-      {definition.id !== 'mpg-l100km-converter' && <text class="scene-text scene-text--large" data-live-value x="268" y="42">—</text>}
+      {definition.id === 'mpg-l100km-converter' && <><path class="scene-accent" d="M270 55a38 38 0 0 1 64 28M302 91l20-26"/><path class="scene-needle" data-gauge-needle d="M302 91l20-26"/><text class="scene-text scene-text--large" data-gauge-value x="266" y="118">30</text><text class="scene-text" x="294" y="137">MPG</text></>}
     </>}
     {(definition.id === 'psi-bar-converter' || definition.id === 'tire-size-calculator' || definition.id === 'tire-size-comparison') && <>
-      <circle class="scene-tire" cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r={definition.id === 'tire-size-comparison' ? '57' : '65'}/>
+      <circle class="scene-tread" cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r={definition.id === 'tire-size-comparison' ? '61' : '69'}/><circle class="scene-tire" data-tire-ring cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r={definition.id === 'tire-size-comparison' ? '57' : '65'}/>
       <circle class="scene-rim" cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r={definition.id === 'tire-size-comparison' ? '29' : '34'}/>
       <circle class="scene-hub" cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r="7"/>
       {definition.id === 'tire-size-comparison' && <><circle class="scene-tire scene-tire--accent" cx="235" cy="104" r="48"/><circle class="scene-rim" cx="235" cy="104" r="27"/><circle class="scene-hub" cx="235" cy="104" r="6"/></>}
-      {definition.id === 'psi-bar-converter' && <><path class="scene-accent" d="M236 68a44 44 0 0 1 51 44M261 112l18-27" data-live-needle/><text class="scene-text scene-text--large" data-live-value x="250" y="137">32</text><text class="scene-text" data-live-unit x="292" y="137">PSI</text></>}
+      {definition.id === 'psi-bar-converter' && <><path class="scene-accent" d="M236 68a44 44 0 0 1 51 44"/><path class="scene-needle" data-gauge-needle d="M261 112l18-27"/><text class="scene-text scene-text--large" data-gauge-value x="250" y="137">32</text><text class="scene-text" data-gauge-unit x="292" y="137">PSI</text><text class="scene-sidewall" x="151" y="45">225/45 R18</text></>}
       {definition.id === 'tire-size-calculator' && <><path class="scene-dimension" d="M92 28v140M82 39l10-11 10 11M82 157l10 11 10-11"/><text class="scene-text" x="32" y="103">DIAMETER</text><path class="scene-accent" d="M178 33v130"/></>}
     </>}
     {(definition.id === 'wheel-offset-calculator' || definition.id === 'fitment-map' || definition.id === 'measure-my-car' || definition.id === 'fitment-studio') && <>
       <path class="scene-body" d="M37 58h286l-21 79H58L37 58Z"/>
       <path class="scene-center" d="M180 35v120"/>
-      <rect class="scene-wheel-block" x="112" y="68" width="39" height="67" rx="8"/><rect class="scene-wheel-block scene-wheel-block--accent" data-live-motion x="202" y="68" width="49" height="67" rx="8"/>
+      <rect class="scene-wheel-block" x="112" y="68" width="39" height="67" rx="8"/><rect class="scene-wheel-block scene-wheel-block--accent" x="202" y="68" width="49" height="67" rx="8"/>
       <path class="scene-accent" d="M151 48h51M151 42l-9 6 9 6M202 42l9 6-9 6"/>
       <text class="scene-text" x="139" y="164">INNER</text><text class="scene-text" x="213" y="164">OUTER</text>
     </>}
     {definition.id === 'speedometer-error-calculator' && <>
       <path class="scene-gauge" d="M72 139a108 108 0 0 1 216 0"/><path class="scene-ticks" d="M84 127l17-4M105 82l15 11M148 51l6 18M201 48l-4 19M248 72l-13 14M280 112l-17 7"/>
-      <path class="scene-needle" data-live-needle d="M180 137l69-58"/><circle class="scene-accent-fill" cx="180" cy="137" r="10"/><text class="scene-text scene-text--large" data-live-value x="151" y="115">100</text>
+      <path class="scene-needle" data-gauge-needle d="M180 137l69-58"/><circle class="scene-accent-fill" cx="180" cy="137" r="10"/><text class="scene-text scene-text--large" data-gauge-value x="151" y="115">100</text>
     </>}
     {(definition.id === 'hp-kw-converter' || definition.id === 'nm-lb-ft-converter' || definition.id === 'power-to-weight-calculator' || definition.id === 'gear-ratio-calculator') && <>
       {definition.id !== 'gear-ratio-calculator' && <path class="scene-engine" d="M78 78h55l18-18h55l20 18h41v61H78V78Zm32-21v21m124-21v21M98 139v17m149-17v17"/>}
-      {definition.id === 'hp-kw-converter' && <path class="scene-bolt" data-live-motion d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/>}
-      {definition.id === 'nm-lb-ft-converter' && <><path class="scene-accent" data-live-needle d="M148 41a62 62 0 1 1-25 95M148 41h-31m31 0V12"/><circle class="scene-accent-fill" cx="180" cy="99" r="12"/></>}
-      {definition.id === 'power-to-weight-calculator' && <><g data-live-scale><path class="scene-scale" d="M53 153h254M180 36v117M119 65h122M85 65l-28 54h56L85 65Zm190 0-28 54h56l-28-54Z"/><path class="scene-bolt" d="m184 72-18 29h15l-6 25 23-36h-16l2-18Z"/></g></>}
-      {definition.id === 'gear-ratio-calculator' && <><g data-live-primary><circle class="scene-tire" cx="145" cy="103" r="43"/><circle class="scene-rim" cx="145" cy="103" r="21"/></g><g data-live-secondary><circle class="scene-accent" cx="224" cy="103" r="29"/><circle class="scene-hub" cx="224" cy="103" r="7"/></g><path class="scene-dash" d="M174 103h21M145 60V44M224 74V51"/><text class="scene-text" x="124" y="164">TIRE</text><text class="scene-text" x="204" y="164">GEAR</text></>}
+      {definition.id === 'hp-kw-converter' && <path class="scene-bolt" data-power-pulse d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/>}
+      {definition.id === 'nm-lb-ft-converter' && <><path class="scene-accent" data-torque-ring d="M148 41a62 62 0 1 1-25 95M148 41h-31m31 0V12"/><circle class="scene-accent-fill" cx="180" cy="99" r="12"/></>}
+      {definition.id === 'power-to-weight-calculator' && <><g data-power-scale><path class="scene-scale" d="M53 153h254M180 36v117M119 65h122M85 65l-28 54h56L85 65Zm190 0-28 54h56l-28-54Z"/><path class="scene-bolt" d="m184 72-18 29h15l-6 25 23-36h-16l2-18Z"/></g></>}
+      {definition.id === 'gear-ratio-calculator' && <><circle class="scene-tire" cx="145" cy="103" r="43"/><circle class="scene-rim" cx="145" cy="103" r="21"/><circle class="scene-accent" cx="224" cy="103" r="29"/><circle class="scene-hub" cx="224" cy="103" r="7"/><path class="scene-dash" d="M174 103h21M145 60V44M224 74V51"/><text class="scene-text" x="124" y="164">TIRE</text><text class="scene-text" x="204" y="164">GEAR</text></>}
     </>}
   </svg>
 </figure>

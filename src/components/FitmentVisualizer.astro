@@ -11,7 +11,6 @@ const { mode = 'full', title = 'Visual fitment comparison' } = Astro.props;
         <path class="measure-axis" d="M16 168H344M22 164v8M90 164v8M180 164v8M270 164v8M338 164v8" />
         <g class="tire-set tire-set--current"><circle data-current-tire cx="103" cy="91" r="62" /><circle data-current-rim cx="103" cy="91" r="35" /><path d="M103 20v142M32 91h142" /></g>
         <g class="tire-set tire-set--new"><circle data-new-tire cx="257" cy="91" r="62" /><circle data-new-rim cx="257" cy="91" r="35" /><path d="M257 20v142M186 91h142" /></g>
-        <g class="single-tire-width"><path class="dimension-line" d="M24 29v124m-5-119 5-7 5 7m-10 114 5 7 5-7"/><text x="17" y="96" text-anchor="middle" transform="rotate(-90 17 96)">DIAMETER</text><rect data-current-width x="229" y="36" width="56" height="110" rx="19"/><path d="M241 43v96m16-96v96m16-96v96"/><text data-current-width-label x="257" y="166" text-anchor="middle">225 MM WIDE</text></g>
         <text x="103" y="184" text-anchor="middle">CURRENT</text><text class="new-label" x="257" y="184" text-anchor="middle">NEW</text>
       </svg>
       <div class="visual-values"><span data-current-tire-label>Current</span><span data-new-tire-label>New</span></div>
