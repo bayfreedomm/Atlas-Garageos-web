@@ -1,7 +1,10 @@
 import { calculateEvChargingCostTool } from '../features/tools/ev-charging-tool';
 import { formatNumber } from './format-number';
 
-const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
+const numberValue = (form: HTMLFormElement, name: string): number => {
+  const raw = String(new FormData(form).get(name) ?? '').trim();
+  return raw === '' ? Number.NaN : Number(raw);
+};
 
 function paintBattery(form: HTMLFormElement, startPercent: number, endPercent: number): void {
   const fillStart = form.querySelector<SVGRectElement>('[data-fill-start]');
@@ -26,6 +29,7 @@ export function initializeEvChargingCalculators(): void {
         endPercent: numberValue(form, 'endPercent'),
         pricePerKwh: numberValue(form, 'pricePerKwh'),
         chargerPowerKw: numberValue(form, 'chargerPowerKw'),
+        chargingEfficiency: numberValue(form, 'chargingEfficiency'),
       };
       paintBattery(form, input.startPercent, input.endPercent);
       const result = calculateEvChargingCostTool(input);
@@ -39,10 +43,12 @@ export function initializeEvChargingCalculators(): void {
       errors.hidden = true;
       errors.replaceChildren();
       summary.classList.remove('is-pending');
-      summary.textContent = `Charging from ${formatNumber(input.startPercent, 0)}% to ${formatNumber(input.endPercent, 0)}% costs about ${formatNumber(result.value.cost, 2)}.`;
+      const currency = String(new FormData(form).get('currency') ?? 'USD');
+      summary.textContent = `Charging from ${formatNumber(input.startPercent, 0)}% to ${formatNumber(input.endPercent, 0)}% costs about ${currency} ${formatNumber(result.value.cost, 2)}.`;
       const rows: [string, string][] = [
-        ['Energy added', `${formatNumber(result.value.energyAddedKwh, 1)} kWh`],
-        ['Estimated cost', formatNumber(result.value.cost, 2)],
+        ['Battery energy', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`],
+        ['Grid energy', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`],
+        ['Estimated cost', `${currency} ${formatNumber(result.value.cost, 2)}`],
         ['Charging time', `${formatNumber(result.value.hours, 1)} h`],
       ];
       metrics.replaceChildren(

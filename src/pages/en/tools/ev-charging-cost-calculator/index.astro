@@ -3,14 +3,16 @@ import ToolPage from '../../../../components/ToolPage.astro';
 import { toolById } from '../../../../seo/tool-registry';
 const definition = toolById('ev-charging-cost-calculator');
 ---
-<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This is a plug-to-battery estimate. Charging losses, AC/DC conversion, and battery temperature can change the real number by 5–15%.">
+<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV." limitation="Charging speed and losses vary with temperature, battery state, and the vehicle’s charging curve.">
   <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
     <div class="utility-fields">
       <label>Battery capacity · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>
       <label>Electricity price · per kWh<input name="pricePerKwh" type="number" value="0.18" min="0" max="10" step="0.01" inputmode="decimal" /></label>
+      <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>TRY</option><option>CAD</option><option>AUD</option></select></label>
       <label>Charge from · %<input name="startPercent" type="number" value="20" min="0" max="100" step="1" inputmode="numeric" /></label>
       <label>Charge to · %<input name="endPercent" type="number" value="80" min="0" max="100" step="1" inputmode="numeric" /></label>
       <label>Charger power · kW<input name="chargerPowerKw" type="number" value="11" min="0.1" max="400" step="0.1" inputmode="decimal" /></label>
+      <label>Charging efficiency · %<input name="chargingEfficiency" type="number" value="90" min="50" max="100" step="1" inputmode="numeric" /></label>
     </div>
     <button type="submit">Calculate charging cost</button>
     <div class="inline-errors" data-errors role="alert" hidden></div>
@@ -26,6 +28,6 @@ const definition = toolById('ev-charging-cost-calculator');
     </div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
-  <div slot="explanation"><h2>Why the number is an estimate, not a promise</h2><p>Every charger loses some energy as heat between the wall and the battery — usually 5–15%, more on very cold days. This tool assumes no loss, so treat the result as a floor, not a ceiling.</p><p>Charging time also slows down sharply above roughly 80% on most DC fast chargers — the "charger power" figure here assumes a steady rate for simplicity.</p></div>
+  <div slot="explanation"><h2>Battery energy and grid energy differ</h2><p>Charging efficiency accounts for energy lost between the wall and the battery. A 90% setting means the charger draws more from the grid than the battery stores.</p><p>Real charging power can fall as the battery fills, especially near the top of its range.</p></div>
 </ToolPage>
 <script>import { initializeEvChargingCalculators } from '../../../../ui/ev-charging-calculator'; initializeEvChargingCalculators();</script>

@@ -3,7 +3,7 @@ import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, ro
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
 
 const intendedRoutes = [
-  '/en/',
+  '/',
   '/en/tools/',
   '/en/fitment-studio/',
   '/en/tools/tire-size-calculator/',
@@ -15,6 +15,7 @@ const intendedRoutes = [
   '/en/tools/measure-my-car/',
   '/en/tools/fuel-cost-calculator/',
   '/en/tools/road-trip-cost-calculator/',
+  '/en/tools/ev-charging-cost-calculator/',
   '/en/tools/mpg-l100km-converter/',
   '/en/tools/psi-bar-converter/',
   '/en/tools/hp-kw-converter/',
@@ -52,7 +53,7 @@ describe('SEO tool registry', () => {
     expect(xml.match(/<url>/g)).toHaveLength(intendedRoutes.length);
     expect(xml).not.toContain('#');
     expect(sitemapEntries().every((url) => !url.includes('?'))).toBe(true);
-    expect(xml).not.toContain('<loc>https://atlasgarageos.com/</loc>');
+    expect(xml).toContain('<loc>https://atlasgarageos.com/</loc>');
   });
 
   it('provides a validated seam for future high-value SEO pages', () => {

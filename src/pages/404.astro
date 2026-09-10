@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/atlas-v2.css';
 import Brand from '../components/Brand.astro';
 import ThemeBoot from '../components/ThemeBoot.astro';
 import ThemeControl from '../components/ThemeControl.astro';
@@ -14,14 +15,14 @@ import ThemeControl from '../components/ThemeControl.astro';
     <meta name="description" content="The requested Atlas GarageOS page could not be found." />
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#173f38" />
+    <meta name="theme-color" content="#151A20" />
     <title>Page Not Found — Atlas GarageOS</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
-      <div class="shell-controls"><ThemeControl /><span class="locale-chip">EN</span></div>
+      <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand /></a>
+      <div class="shell-controls"><ThemeControl /></div>
     </div></header>
     <main id="main-content" class="error-page">
       <section class="error-panel" aria-labelledby="error-heading">
@@ -29,8 +30,8 @@ import ThemeControl from '../components/ThemeControl.astro';
         <h1 id="error-heading">That page is not in the garage.</h1>
         <p class="hero-copy">The address may have changed, or the link may be incomplete. Your saved Garage data remains on this device.</p>
         <div class="error-actions">
-          <a class="button" href="/en/fitment-studio/">Open Fitment Studio</a>
-          <a class="button secondary" href="/en/tools/">Browse tools</a>
+          <a class="button" href="/">Return to Toolbox</a>
+          <a class="button secondary" href="/en/tools/">Browse by category</a>
         </div>
       </section>
     </main>

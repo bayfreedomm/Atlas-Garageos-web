@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import brand from '../../src/components/Brand.astro?raw';
-import home from '../../src/pages/en/index.astro?raw';
+import home from '../../src/pages/index.astro?raw';
 import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
 import toolsHub from '../../src/pages/en/tools/index.astro?raw';
 import siteLayout from '../../src/components/SiteLayout.astro?raw';
@@ -25,16 +25,17 @@ describe('Milestone 8 product experience', () => {
   it('uses the restrained Atlas wordmark and the four-part product shell', () => {
     expect(brand).not.toContain('brand-glyph');
     expect(brand).toContain('ATLAS');
-    expect(brand).toContain('GarageOS');
-    for (const label of ['Home', 'My Garage', 'Fitment Studio', 'Tools']) expect(`${siteLayout}${navigationDrawer}`).toContain(`>${label}</a>`);
+    expect(brand).toContain('Garage');
+    expect(brand).toContain('OS');
+    for (const label of ['Toolbox', 'My Garage', 'Fitment Studio']) expect(`${siteLayout}${navigationDrawer}`).toContain(label);
   });
 
   it('publishes a useful home and maps every implemented tool into the hub', () => {
-    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/en/', '/en/tools/']);
+    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/', '/en/tools/']);
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('What do you need to do?');
-    expect(homeLauncher).toContain('tool-launch-row');
-    expect(home).toContain('/en/fitment-studio/');
+    expect(homeLauncher).toContain('home-tool-row');
+    expect(homeLauncher).toContain('/en/fitment-studio/');
     expect(`${home}${homeLauncher}${toolDirectory}`).toContain('/en/tools/');
     expect(toolsHub).toContain('<ToolDirectory mode="all"');
     expect(toolDirectory).toContain("toolRegistry.filter(({ kind }) => kind === 'tool')");
@@ -43,8 +44,8 @@ describe('Milestone 8 product experience', () => {
 
   it('keeps key internal routes connected', () => {
     expect(siteLayout).toContain('/en/fitment-studio/#garage');
-    expect(studio).toContain('href="/en/"');
-    expect(studio).toContain('href="/en/tools/"');
+    expect(studio).toContain('href="/"');
+    expect(navigationDrawer).toContain('href="/en/tools/"');
   });
 
   it('maps calculated tire dimensions to a shared SVG scale', () => {

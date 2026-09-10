@@ -4,7 +4,9 @@ import { translate } from '../../../localization/catalog';
 import Brand from '../../../components/Brand.astro';
 import ThemeBoot from '../../../components/ThemeBoot.astro';
 import NavigationDrawer from '../../../components/NavigationDrawer.astro';
+import Footer from '../../../components/Footer.astro';
 import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
+import '../../../styles/fitment-legacy.css';
 import '../../../styles/global.css';
 import '../../../styles/atlas-v2.css';
 
@@ -25,7 +27,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#233630" />
+    <meta name="theme-color" content="#151A20" />
     <title>{seo.title} — Atlas GarageOS</title>
   </head>
   <body>
@@ -33,7 +35,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 
     <header class="app-header">
       <div class="app-header__inner">
-        <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand subtitle="Fitment Studio" /></a>
+        <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand subtitle="Fitment Studio" /></a>
         <NavigationDrawer />
       </div>
     </header>
@@ -147,6 +149,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 
       <section class="product-section subtle-panel" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">Related tools</p><h2 id="tools-heading">Continue with one focused calculation</h2><p>Use the same transparent geometry engines through a task-specific entry point.</p><div class="related-grid"><a class="related-card" href="/en/tools/tire-size-comparison/"><span>Tires & wheels</span><strong>Tire Size Comparison</strong><p>Compare diameter, sidewall, circumference, and speedometer changes.</p></a><a class="related-card" href="/en/tools/wheel-offset-calculator/"><span>Fitment</span><strong>Wheel Offset Calculator</strong><p>See inner-position and outer-poke changes before using measured clearance.</p></a><a class="related-card" href="#garage"><span>Vehicle memory</span><strong>My Garage</strong><p>Return to measurements and setups stored for your active vehicle.</p></a></div></section>
     </main>
+    <Footer />
 
 
     <script>

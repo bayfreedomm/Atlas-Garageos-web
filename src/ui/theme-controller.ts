@@ -11,7 +11,7 @@ export function initializeThemeControls(): void {
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.themePreference = preference;
     document.documentElement.style.colorScheme = resolved;
-    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => { meta.content = resolved === 'dark' ? '#14191e' : '#233630'; });
+    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => { meta.content = resolved === 'dark' ? '#151A20' : '#FBFBFA'; });
     controls.forEach((control) => { control.value = preference; });
   };
 

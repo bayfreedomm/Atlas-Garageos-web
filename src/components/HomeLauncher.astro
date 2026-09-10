@@ -3,68 +3,57 @@ import ToolIcon from './ToolIcon.astro';
 import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
-const homeIds: readonly ToolId[] = ['fuel-cost-calculator', 'tire-size-calculator', 'road-trip-cost-calculator', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
-const ordered = [...homeIds.map((id) => tools.find((tool) => tool.id === id)!), ...tools.filter((tool) => !homeIds.includes(tool.id))];
-const shortNames = new Map<ToolId, string>([
-  ['fuel-cost-calculator', 'Calculate fuel cost'],
-  ['tire-size-calculator', 'Calculate tire size'],
-  ['road-trip-cost-calculator', 'Plan a road trip'],
-  ['wheel-offset-calculator', 'Compare wheel offset'],
-  ['psi-bar-converter', 'Convert tire pressure'],
-  ['mpg-l100km-converter', 'Convert fuel economy'],
-  ['power-to-weight-calculator', 'Check power-to-weight'],
-  ['tire-size-comparison', 'Compare tire sizes'],
-  ['speedometer-error-calculator', 'Check speedometer error'],
-  ['gear-ratio-calculator', 'Compare gear ratios'],
-  ['fitment-map', 'Explore wheel fitment'],
-  ['measure-my-car', 'Record vehicle measurements'],
-  ['hp-kw-converter', 'Convert horsepower'],
-  ['nm-lb-ft-converter', 'Convert torque'],
-]);
-const jobCopy = new Map<ToolId, string>([
-  ['fuel-cost-calculator', 'Distance, consumption and local fuel price'],
-  ['tire-size-calculator', 'Decode the numbers printed on your tire'],
-  ['road-trip-cost-calculator', 'Fuel, extras and cost per traveller'],
-  ['wheel-offset-calculator', 'See inner clearance and outer movement'],
-  ['psi-bar-converter', 'Convert PSI, bar and kPa instantly'],
-  ['mpg-l100km-converter', 'Move between MPG and L/100km'],
-  ['power-to-weight-calculator', 'Put vehicle performance in context'],
+const order: readonly ToolId[] = [
+  'fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator',
+  'tire-size-comparison', 'wheel-offset-calculator', 'speedometer-error-calculator',
+  'psi-bar-converter', 'mpg-l100km-converter', 'ev-charging-cost-calculator',
+  'power-to-weight-calculator', 'hp-kw-converter', 'nm-lb-ft-converter',
+  'gear-ratio-calculator', 'fitment-map', 'measure-my-car',
+];
+const ordered = order.map((id) => tools.find((tool) => tool.id === id)).filter(Boolean);
+const labels = new Map<ToolId, string>([
+  ['fuel-cost-calculator', 'Calculate fuel cost'], ['road-trip-cost-calculator', 'Plan a road trip'],
+  ['tire-size-calculator', 'Calculate tire size'], ['tire-size-comparison', 'Compare tire sizes'],
+  ['wheel-offset-calculator', 'Compare wheel offset'], ['speedometer-error-calculator', 'Check speedometer error'],
+  ['psi-bar-converter', 'Convert tire pressure'], ['mpg-l100km-converter', 'Convert fuel economy'],
+  ['ev-charging-cost-calculator', 'Estimate EV charging'], ['power-to-weight-calculator', 'Check power-to-weight'],
+  ['hp-kw-converter', 'Convert horsepower'], ['nm-lb-ft-converter', 'Convert torque'],
+  ['gear-ratio-calculator', 'Compare gear ratios'], ['fitment-map', 'Explore fitment geometry'],
+  ['measure-my-car', 'Measure my car'],
 ]);
 ---
-<section class="home-launcher" data-toolbox data-mode="home" aria-labelledby="home-heading">
-  <div class="launcher-hero">
-    <img src="/atlas-hero-car.png" width="1680" height="945" alt="A dark premium sedan in warm sunrise light" fetchpriority="high" />
-    <div class="launcher-hero__shade"></div>
-    <header class="launcher-copy"><p class="launcher-kicker">ATLAS GARAGEOS</p><h1 id="home-heading">Your car.<br/>One clear answer.</h1><p>Fast tools for the decisions every driver makes.</p></header>
-    <form class="launcher-search" data-tool-search-form><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for="tool-search-home">Search tools</label><input id="tool-search-home" type="search" placeholder="What do you need to do?" autocomplete="off" data-tool-search /><button type="submit">Find tool</button></form>
-    <div class="quick-convert">
-      <span class="quick-convert__label">TRY IT — NO TAP NEEDED</span>
-      <div class="quick-convert__row">
-        <label class="quick-convert__field"><input type="text" inputmode="decimal" value="32" data-quick-psi /><span>psi</span></label>
-        <span class="quick-convert__eq">=</span>
-        <label class="quick-convert__field"><input type="text" inputmode="decimal" value="2.2" data-quick-bar /><span>bar</span></label>
-      </div>
-    </div>
+<section class="home-toolbox" data-toolbox data-mode="home" aria-labelledby="home-heading">
+  <header class="home-intro">
+    <p class="home-intro__eyebrow">AUTOMOTIVE TOOLS</p>
+    <h1 id="home-heading">What do you need to do?</h1>
+    <p>Choose a tool. Enter your numbers. Get a clear answer.</p>
+  </header>
+  <div class="home-search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+    <label class="sr-only" for="tool-search-home">Search automotive tools</label>
+    <input id="tool-search-home" type="search" placeholder="Search tools" autocomplete="off" data-tool-search />
+    <kbd aria-hidden="true">/</kbd>
   </div>
-
-  <div class="launcher-results" data-tool-rows>
-    <div class="launcher-results__heading"><div><span>START HERE</span><h2>Choose a job</h2></div><a href="/en/tools/">All 14 tools <i>›</i></a></div>
-    <div class="tool-launch-list" aria-label="Popular automotive tools">
-      {ordered.map((tool) =>
-        <a class:list={['tool-launch-row', { 'is-secondary': !homeIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={homeIds.includes(tool.id) ? 'true' : 'false'}>
-          <ToolIcon id={tool.id} category={tool.category}/><span><strong>{shortNames.get(tool.id) ?? tool.title}</strong>{jobCopy.get(tool.id) && <small>{jobCopy.get(tool.id)}</small>}</span><i aria-hidden="true">›</i>
-        </a>
-      )}
-    </div>
-    <a class="launcher-all" href="/en/tools/">Browse all tools <span aria-hidden="true">›</span></a>
-  </div>
-  <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
+  <nav class="home-tool-list" aria-label="Automotive tools" data-tool-rows>
+    {ordered.map((tool) => tool && (
+      <a class="home-tool-row" href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${labels.get(tool.id) ?? ''}`.toLowerCase()} data-popular="true">
+        <ToolIcon id={tool.id} category={tool.category}/><span><strong>{labels.get(tool.id) ?? tool.title}</strong><small>{tool.description}</small></span>
+        <svg class="row-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </a>
+    ))}
+  </nav>
+  <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a shorter search.</p>
+  <section class="home-advanced" aria-labelledby="advanced-heading">
+    <div><p class="section-kicker">MORE FROM ATLAS</p><h2 id="advanced-heading">Advanced fitment</h2></div>
+    <a href="/en/fitment-studio/"><span><strong>Fitment Studio</strong><small>Compare wheel and tire geometry</small></span><span aria-hidden="true">›</span></a>
+    <a href="/en/fitment-studio/#garage"><span><strong>My Garage</strong><small>Saved vehicles and measurements</small></span><span aria-hidden="true">›</span></a>
+  </section>
 </section>
-<script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();
-const psi = document.querySelector<HTMLInputElement>('[data-quick-psi]');
-const bar = document.querySelector<HTMLInputElement>('[data-quick-bar]');
-if (psi && bar) {
-  psi.addEventListener('input', () => { const v = parseFloat(psi.value); if (!Number.isNaN(v)) bar.value = (v * 0.0689476).toFixed(2); });
-  bar.addEventListener('input', () => { const v = parseFloat(bar.value); if (!Number.isNaN(v)) psi.value = (v / 0.0689476).toFixed(1); });
-}
+<script>
+  import { initializeToolboxes } from '../ui/toolbox-filter';
+  initializeToolboxes();
+  const search = document.querySelector<HTMLInputElement>('#tool-search-home');
+  document.addEventListener('keydown', (event) => {
+    if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') { event.preventDefault(); search?.focus(); }
+  });
 </script>

@@ -1,4 +1,7 @@
-import { invalid, valid, type ValidationIssue } from '../../domain/validation';
+import { calculateEvCharging } from '../../core/energy/ev-charging';
+import { createChargePercent, createChargingEfficiency } from '../../domain/ev-charging';
+import { createPositiveQuantity } from '../../domain/utility-calculators';
+import { invalid, valid } from '../../domain/validation';
 
 export interface EvChargingInput {
   readonly batteryCapacityKwh: number;
@@ -6,37 +9,19 @@ export interface EvChargingInput {
   readonly endPercent: number;
   readonly pricePerKwh: number;
   readonly chargerPowerKw: number;
+  readonly chargingEfficiency: number;
 }
-
-export interface EvChargingResult {
-  readonly energyAddedKwh: number;
-  readonly cost: number;
-  readonly hours: number;
-}
-
-function calculateEvChargingCost(input: EvChargingInput): EvChargingResult {
-  const percentAdded = Math.max(0, input.endPercent - input.startPercent);
-  const energyAddedKwh = input.batteryCapacityKwh * (percentAdded / 100);
-  const cost = energyAddedKwh * input.pricePerKwh;
-  const hours = input.chargerPowerKw > 0 ? energyAddedKwh / input.chargerPowerKw : 0;
-  return { energyAddedKwh, cost, hours };
-}
-
-const check = (value: number, field: string, min: number, max: number): ValidationIssue | null => {
-  if (Number.isNaN(value)) return { code: 'not-a-number', field, message: `${field} must be a number.` };
-  if (value < min || value > max) return { code: 'out-of-range', field, message: `${field} must be between ${min} and ${max}.`, received: value };
-  return null;
-};
 
 export function calculateEvChargingCostTool(input: EvChargingInput) {
-  const issues = [
-    check(input.batteryCapacityKwh, 'batteryCapacityKwh', 1, 250),
-    check(input.startPercent, 'startPercent', 0, 100),
-    check(input.endPercent, 'endPercent', 0, 100),
-    check(input.pricePerKwh, 'pricePerKwh', 0, 10),
-    check(input.chargerPowerKw, 'chargerPowerKw', 0.1, 400),
-  ].filter((issue): issue is ValidationIssue => issue !== null);
-  if (issues.length) return invalid(...issues);
-  if (input.endPercent <= input.startPercent) return invalid({ code: 'incompatible-values', field: 'endPercent', message: 'End charge must be higher than start charge.' });
-  return valid(calculateEvChargingCost(input));
+  const batteryCapacityKwh = createPositiveQuantity(input.batteryCapacityKwh, 'batteryCapacityKwh');
+  const startPercent = createChargePercent(input.startPercent, 'startPercent');
+  const endPercent = createChargePercent(input.endPercent, 'endPercent');
+  const pricePerKwh = createPositiveQuantity(input.pricePerKwh, 'pricePerKwh');
+  const chargerPowerKw = createPositiveQuantity(input.chargerPowerKw, 'chargerPowerKw');
+  const chargingEfficiency = createChargingEfficiency(input.chargingEfficiency);
+  const validated = { batteryCapacityKwh, startPercent, endPercent, pricePerKwh, chargerPowerKw, chargingEfficiency };
+  const issues = Object.values(validated).flatMap((result) => result.ok ? [] : result.issues);
+  if (issues.length || !batteryCapacityKwh.ok || !startPercent.ok || !endPercent.ok || !pricePerKwh.ok || !chargerPowerKw.ok || !chargingEfficiency.ok) return invalid(...issues);
+  if (endPercent.value <= startPercent.value) return invalid({ code: 'incompatible-values', field: 'endPercent', message: 'End charge must be higher than start charge.' });
+  return valid(calculateEvCharging({ batteryCapacityKwh: batteryCapacityKwh.value, startPercent: startPercent.value, endPercent: endPercent.value, pricePerKwh: pricePerKwh.value, chargerPowerKw: chargerPowerKw.value, chargingEfficiency: chargingEfficiency.value }));
 }

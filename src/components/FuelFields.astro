@@ -3,9 +3,11 @@ interface Props { distance?: number; economy?: number; price?: number; compact?:
 const { distance = 500, economy = 7.2, price = 1.8, compact = false } = Astro.props;
 ---
 <div class:list={['utility-fields', { 'utility-fields--compact': compact }]}>
-  <label>Units<select name="system"><option value="metric">Metric · km, L/100km</option><option value="imperial">US · miles, MPG</option></select></label>
   <label><span data-distance-label>Distance · km</span><input name="distance" type="number" value={distance} min="0" step="any" inputmode="decimal" /></label>
   <label><span data-economy-label>Fuel economy · L/100km</span><input name="economy" type="number" value={economy} min="0" step="any" inputmode="decimal" /></label>
   <label><span data-price-label>Fuel price · per litre</span><input name="price" type="number" value={price} min="0" step="any" inputmode="decimal" /></label>
-  <label>Currency label<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option></select></label>
 </div>
+<details class="fuel-settings"><summary>Units &amp; currency</summary><div class="utility-fields">
+  <label>Units<select name="system"><option value="metric">Metric · km, L/100km</option><option value="imperial">US · miles, MPG</option></select></label>
+  <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>TRY</option><option>CAD</option><option>AUD</option></select></label>
+</div></details>

@@ -14,8 +14,8 @@ describe('production launch configuration', () => {
     expect(config).not.toContain('localhost');
   });
 
-  it('publishes a single root locale redirect', () => {
-    expect(redirects.trim()).toBe('/ /en/ 302');
+  it('redirects the legacy locale homepage to the real root toolbox', () => {
+    expect(redirects.trim()).toBe('/en/ / 301');
   });
 
   it('sets defensive static-site security headers without unsafe eval', () => {
@@ -34,13 +34,13 @@ describe('production launch configuration', () => {
 
   it('keeps the 404 page non-indexable and provides recovery paths', () => {
     expect(notFoundPage).toContain('noindex,follow');
-    expect(notFoundPage).toContain('/en/fitment-studio/');
+    expect(notFoundPage).toContain('href="/"');
     expect(notFoundPage).toContain('/en/tools/');
   });
 
   it('ships the restrained Atlas monogram without external assets', () => {
     const manifest = JSON.parse(manifestSource) as { start_url: string; icons: Array<{ src: string }> };
-    expect(manifest.start_url).toBe('/en/');
+    expect(manifest.start_url).toBe('/');
     expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/atlas-mark.svg' })]));
     expect(atlasMark).toContain('aria-label="Atlas A monogram"');
     expect(atlasMark).toContain('M17 48 29 15h7l12 33');

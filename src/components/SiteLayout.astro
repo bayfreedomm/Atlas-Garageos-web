@@ -21,7 +21,7 @@ const canonical = canonicalForPath(pathname);
 const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
   ? [{ name: definition.title, href: pathname }]
-  : definition ? [{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
+  : definition ? [{ name: 'Home', href: '/' }, { name: 'Tools', href: '/en/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
 const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
@@ -37,7 +37,7 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#233630" />
+    <meta name="theme-color" content="#151A20" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
     <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
@@ -45,8 +45,8 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment Studio</a><a href="/en/fitment-studio/#garage" aria-current={active === 'garage' ? 'page' : undefined}>My Garage</a></nav>
+      <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand /></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/" aria-current={active === 'home' ? 'page' : undefined}>Toolbox</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>All tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment Studio</a><a href="/en/fitment-studio/#garage" aria-current={active === 'garage' ? 'page' : undefined}>My Garage</a></nav>
       <NavigationDrawer />
     </div></header>
     <main id="main-content"><slot /></main>

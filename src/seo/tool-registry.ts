@@ -8,7 +8,7 @@ export type ToolCategory = 'Tires & Wheels' | 'Fuel & Trips' | 'Converters' | 'P
 export const TOOL_CATEGORY_ORDER: readonly ToolCategory[] = Object.freeze(['Fuel & Trips', 'Tires & Wheels', 'Converters', 'Performance']);
 
 export const platformPageRegistry = Object.freeze([
-  { id: 'home', pathname: '/en/', title: 'Atlas GarageOS', description: 'Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment.' },
+  { id: 'home', pathname: '/', title: 'Atlas GarageOS', description: 'Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment.' },
   { id: 'tools-hub', pathname: '/en/tools/', title: 'Automotive Tools', description: 'Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment.' },
 ] as const);
 
