@@ -226,6 +226,38 @@ function setTireComparisonTechnicalVisual(
 }
 
 
+
+function setWheelOffsetPrimaryResult(
+  form: HTMLFormElement,
+  result: Extract<ReturnType<typeof calculateWheelOffsetTool>, { ok: true }>['value'],
+): void {
+  const panel = form.querySelector<HTMLElement>('[data-wheel-primary-result]');
+  if (!panel) return;
+
+  const outerNode = panel.querySelector<HTMLElement>('[data-wheel-primary-outer]');
+  const outerCopyNode = panel.querySelector<HTMLElement>('[data-wheel-primary-outer-copy]');
+  const innerNode = panel.querySelector<HTMLElement>('[data-wheel-primary-inner]');
+  const innerCopyNode = panel.querySelector<HTMLElement>('[data-wheel-primary-inner-copy]');
+
+  if (outerNode) outerNode.textContent = `${signed(result.outerPokeChangeMm, 2)} mm`;
+  if (outerCopyNode) {
+    outerCopyNode.textContent = result.outerPokeChangeMm === 0
+      ? 'The outer wheel edge stays in the same nominal position.'
+      : `The outer edge moves ${Math.abs(result.outerPokeChangeMm).toFixed(2)} mm ${result.outerPokeChangeMm > 0 ? 'farther toward the fender.' : 'inward.'}`;
+  }
+
+  if (innerNode) innerNode.textContent = `${signed(result.innerPositionChangeMm, 2)} mm`;
+  if (innerCopyNode) {
+    innerCopyNode.textContent = result.innerPositionChangeMm === 0
+      ? 'The inner wheel edge stays in the same nominal position.'
+      : `The inner edge moves ${Math.abs(result.innerPositionChangeMm).toFixed(2)} mm ${result.innerPositionChangeMm > 0 ? 'toward the suspension.' : 'away from the suspension.'}`;
+  }
+
+  panel.classList.remove('is-pending');
+  panel.dataset.outerDirection = result.outerPokeChangeMm < 0 ? 'inward' : result.outerPokeChangeMm > 0 ? 'outward' : 'zero';
+}
+
+
 function setWheelOffsetTechnicalVisual(
   form: HTMLFormElement,
   originalWidthInches: number,
@@ -343,11 +375,25 @@ export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach((form) => {
     const preview = (): void => {
       const result = calculateWheelOffsetTool({ originalWidthInches: numberValue(form, 'originalWidthInches'), originalOffsetMm: numberValue(form, 'originalOffsetMm'), newWidthInches: numberValue(form, 'newWidthInches'), newOffsetMm: numberValue(form, 'newOffsetMm') });
-      if (result.ok) { setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm); setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm); }
+      if (result.ok) {
+        const results = form.querySelector<HTMLDListElement>('[data-results]');
+        const errors = form.querySelector<HTMLElement>('[data-errors]');
+        if (errors) { errors.hidden = true; errors.replaceChildren(); }
+        setSummary(form, wheelOffsetSummary(result.value));
+        setWheelOffsetPrimaryResult(form, result.value);
+        setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
+        setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
+        if (results) renderMetrics(results, wheelOffsetMetrics(result.value));
+      }
     };
     bindCalculator(form, () => {
       const result = calculateWheelOffsetTool({ originalWidthInches: numberValue(form, 'originalWidthInches'), originalOffsetMm: numberValue(form, 'originalOffsetMm'), newWidthInches: numberValue(form, 'newWidthInches'), newOffsetMm: numberValue(form, 'newOffsetMm') });
-      if (result.ok) { setSummary(form, wheelOffsetSummary(result.value)); setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm); setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm); }
+      if (result.ok) {
+        setSummary(form, wheelOffsetSummary(result.value));
+        setWheelOffsetPrimaryResult(form, result.value);
+        setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
+        setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
+      }
       return result.ok ? { ok: true as const, metrics: wheelOffsetMetrics(result.value) } : result;
     });
     form.addEventListener('input', () => requestAnimationFrame(preview));
