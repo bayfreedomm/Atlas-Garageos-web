@@ -128,3 +128,13 @@ Next implementation pass:
 - Tire Size live technical anatomy is implemented.
 - Tire Comparison and Wheel Offset V3.1 dynamic technical visuals are preserved under the V4 shell.
 - Next visual expansion: Fuel Cost, Road Trip, EV Charging, Speedometer, Gear Ratio, Fitment Compare.
+
+## V4.1 checkpoint — mobile review corrections
+- [x] Day / Night / Auto theme contract.
+- [x] Header quick theme toggle.
+- [x] Compact mobile home hero.
+- [x] Input/result before explanatory art on standard tool pages.
+- [x] Smaller mobile tool/Fitment headings.
+- [x] Bottom navigation no longer leaves final content inaccessible beneath the fixed dock.
+- [x] Light/dark technical visual surface treatments.
+- [ ] Cloudflare clean Node 24 build for V4.1 archive.

@@ -36,3 +36,192 @@ main{padding-top:0!important}.breadcrumbs{margin-top:1rem}.breadcrumbs a{color:v
 
 @media(min-width:48rem){.home-v4-hero{grid-template-columns:minmax(0,.9fr) minmax(26rem,1.1fr);min-height:38rem}.home-v4-copy{padding:5rem 0 4rem;margin-left:max(2rem,calc((100vw - 74rem)/2))}.home-v4-car{align-self:end;margin:0 -3rem 0 -4rem;width:min(54rem,58vw)}.home-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.tool-results{grid-template-columns:repeat(2,minmax(0,1fr))!important}.single-tire-grid{grid-template-columns:minmax(0,1.35fr) minmax(15rem,.65fr)}}
 @media(min-width:60rem){.desktop-nav{display:flex!important}.menu-button{display:none!important}.tool-stage:not(.tool-stage--single){grid-template-columns:minmax(0,1.05fr) minmax(20rem,.65fr)!important}.tool-workspace{padding:1.3rem!important}.mobile-dock{display:none}.site-footer{padding-bottom:2rem!important}}
+
+/* V4.1 design contract — compact mobile flow, true day/night themes, input-first tools. */
+:root {
+  --day-canvas:#f7f8f5;
+  --day-surface:#ffffff;
+  --day-surface-2:#f1f4f6;
+  --day-ink:#111d2b;
+  --day-muted:#657386;
+  --night-canvas:#08131c;
+  --night-surface:#0f1d28;
+  --night-surface-2:#142633;
+  --night-ink:#f5f8fb;
+  --night-muted:#aebbc6;
+}
+:root[data-theme="light"] {
+  --color-canvas:var(--day-canvas);
+  --color-surface:var(--day-surface);
+  --color-surface-subtle:var(--day-surface-2);
+  --color-surface-strong:#e8eef2;
+  --color-ink:var(--day-ink);
+  --color-ink-muted:var(--day-muted);
+  --color-ink-soft:#8793a1;
+  --color-line:#d9e1e7;
+  --color-line-strong:#c5d0d9;
+}
+:root[data-theme="dark"] {
+  --color-canvas:var(--night-canvas);
+  --color-surface:var(--night-surface);
+  --color-surface-subtle:var(--night-surface-2);
+  --color-surface-strong:#19303f;
+  --color-ink:var(--night-ink);
+  --color-ink-muted:var(--night-muted);
+  --color-ink-soft:#8394a2;
+  --color-line:#29404f;
+  --color-line-strong:#3a5364;
+  --shadow-sm:0 10px 28px rgb(0 0 0 / 18%);
+  --shadow-lg:0 28px 70px rgb(0 0 0 / 28%);
+}
+
+body { background:var(--color-canvas)!important; color:var(--color-ink)!important; }
+.app-header__actions { display:flex; align-items:center; gap:.5rem; margin-left:auto; }
+.theme-quick-toggle { display:grid; place-items:center; width:2.75rem; height:2.75rem; padding:0; border:1px solid var(--color-line); border-radius:.85rem; background:var(--color-surface); color:var(--color-ink); box-shadow:none; cursor:pointer; }
+.theme-quick-toggle svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.theme-quick-toggle__moon { display:none; }
+:root[data-theme="dark"] .theme-quick-toggle__sun { display:none; }
+:root[data-theme="dark"] .theme-quick-toggle__moon { display:block; }
+
+/* Day mode is bright and restrained; night mode uses graphite/navy rather than pure black. */
+:root[data-theme="light"] .app-header { background:rgb(255 255 255 / 94%)!important; border-bottom-color:#dbe3e8!important; box-shadow:0 8px 26px rgb(20 45 70 / 6%)!important; backdrop-filter:blur(18px); }
+:root[data-theme="light"] .brand-wordmark__kicker { color:#0878f9!important; }
+:root[data-theme="light"] .brand-wordmark strong { color:#111d2b!important; }
+:root[data-theme="light"] .brand-wordmark__os, :root[data-theme="light"] .brand-wordmark__context { color:#68788a!important; }
+:root[data-theme="light"] .desktop-nav a { color:#526477!important; }
+:root[data-theme="light"] .desktop-nav a[aria-current="page"] { color:#0868ce!important; background:#eaf4ff!important; }
+:root[data-theme="light"] .menu-button { border-color:#ccd8e0!important; background:#fff!important; }
+:root[data-theme="light"] .menu-button span { background:#1c2a37!important; }
+:root[data-theme="dark"] .app-header { background:rgb(6 17 25 / 96%)!important; border-bottom-color:#1c3342!important; }
+:root[data-theme="dark"] .theme-quick-toggle { background:#0d202d; border-color:#29404f; color:#f3f7fa; }
+
+/* Compact home: show the job choices sooner on phones. */
+.home-v4-hero { min-height:27rem; }
+.home-v4-copy { padding:2.1rem 1rem 1.25rem; }
+.home-v4-copy h1 { max-width:9ch!important; font-size:clamp(2.7rem,12vw,5.5rem)!important; line-height:.91!important; }
+.home-lead { margin-top:.9rem; font-size:.94rem!important; line-height:1.48!important; }
+.home-v4-car { width:min(37rem,92vw); margin:-5.2rem -4rem -2rem auto; }
+.home-v4-car>span { right:2.5rem; bottom:1.5rem; font-size:.55rem; }
+.home-v4-surface { margin:0 auto; padding-top:1rem; }
+
+:root[data-theme="light"] .home-v4-hero { background:radial-gradient(circle at 78% 26%,#dbeeff 0,transparent 30%),linear-gradient(145deg,#fbfcf9 0%,#f1f6f8 62%,#e8f0f4 100%); color:#111d2b; }
+:root[data-theme="light"] .home-v4-hero:before { background-image:linear-gradient(rgb(24 54 78 / 5%) 1px,transparent 1px),linear-gradient(90deg,rgb(24 54 78 / 5%) 1px,transparent 1px); }
+:root[data-theme="light"] .home-v4-copy h1 { color:#111d2b!important; }
+:root[data-theme="light"] .home-kicker { color:#0878f9!important; }
+:root[data-theme="light"] .home-lead { color:#5f7080!important; }
+:root[data-theme="light"] .home-v4-car svg { filter:drop-shadow(0 25px 26px rgb(28 58 82 / 13%)); }
+:root[data-theme="light"] .car-v4-shadow { opacity:.13; }
+:root[data-theme="light"] .car-v4-line { stroke:#4f7086; }
+:root[data-theme="light"] .home-v4-car>span { color:#557184; }
+:root[data-theme="dark"] .home-v4-hero { background:radial-gradient(circle at 77% 24%,#103955 0,transparent 30%),linear-gradient(145deg,#06111a 0%,#0b1b28 58%,#071018 100%); color:#fff; }
+
+/* Cards and directory inherit the active theme instead of staying hard-coded white. */
+.home-category-grid a,.tool-launch-row,.toolbox,.tool-row,.related-card,.tool-workspace { background:var(--color-surface)!important; border-color:var(--color-line)!important; color:var(--color-ink)!important; }
+.toolbox-search,.result-summary.is-pending { background:var(--color-surface-subtle)!important; border-color:var(--color-line)!important; }
+:root[data-theme="dark"] .toolbox-search input { color:var(--color-ink)!important; }
+:root[data-theme="dark"] .category-filters button { background:transparent!important; color:var(--color-ink-muted)!important; border-color:var(--color-line)!important; }
+:root[data-theme="dark"] .category-filters button[aria-pressed="true"] { background:#12314a!important; color:#75baff!important; border-color:#2a6b9d!important; }
+:root[data-theme="dark"] .tool-row small,.home-category-grid small,.tool-launch-row small { color:var(--color-ink-muted)!important; }
+
+/* Input-first: the calculator always precedes explanatory art on mobile and desktop. */
+.tool-stage { align-items:start!important; }
+.tool-workspace { order:0!important; }
+.tool-visual-wrap { order:1!important; }
+.tool-visual-wrap { margin-top:0!important; padding-top:.2rem!important; border-top:0!important; }
+.tool-visual-label { margin:.25rem 0 .7rem!important; color:var(--color-accent)!important; }
+
+.tool-intro { padding:.85rem 0 .65rem!important; }
+.tool-intro h1 { font-size:clamp(1.9rem,7.6vw,3rem)!important; line-height:1.02!important; }
+.tool-intro .hero-copy { margin-top:.55rem!important; font-size:.92rem!important; line-height:1.5!important; }
+.tool-workspace { padding:.9rem!important; }
+
+.tool-machine input,.tool-machine select { background:var(--color-surface-subtle)!important; color:var(--color-ink)!important; border-color:var(--color-line)!important; }
+.tool-machine input::placeholder { color:var(--color-ink-soft)!important; }
+.tool-machine button.secondary { background:var(--color-surface)!important; color:var(--color-ink)!important; border-color:var(--color-line)!important; }
+:root[data-theme="dark"] .result-summary:not(.is-pending) { background:#0d2a40!important; border-color:#2a6490!important; color:#d7ecff!important; }
+:root[data-theme="dark"] .tool-results div { background:#102431!important; border-color:#28404f!important; }
+:root[data-theme="dark"] .tool-results div:first-child { background:#0d2a40!important; border-color:#2a6490!important; }
+:root[data-theme="dark"] .tool-results dt { color:#a5b5c2!important; }
+:root[data-theme="dark"] .tool-results dd { color:#f4f8fb!important; }
+:root[data-theme="dark"] .limitation-card { background:#2a2118!important; border-color:#76522f!important; color:#f4e6d5!important; }
+:root[data-theme="dark"] .insight-alert--mistake { background:#2c2517!important; border-color:#7d6631!important; color:#f4e8c8!important; }
+:root[data-theme="dark"] .insight-alert--warning { background:#321e1f!important; border-color:#804247!important; color:#f7d9dc!important; }
+
+/* Fitment: shorter intro and cleaner mobile brand. */
+.studio-hero { padding:.95rem 0 1.05rem!important; }
+.studio-hero h1 { max-width:11ch!important; margin-bottom:.55rem!important; font-size:clamp(2.35rem,9.6vw,3.7rem)!important; line-height:.95!important; }
+.studio-hero .hero-copy { font-size:.9rem!important; line-height:1.5!important; }
+.studio-primary-cta { margin-top:.8rem!important; }
+.studio-capabilities { margin-top:.75rem!important; }
+
+/* Technical scenes adapt to both themes while preserving meaning colors. */
+:root[data-theme="light"] .tire-tech-visual,
+:root[data-theme="light"] .offset-tech-visual,
+:root[data-theme="light"] .single-tire-visual { background:linear-gradient(145deg,#f8fbfd,#edf3f6); color:#162432; border-color:#cfdae2; }
+:root[data-theme="light"] .single-tire-card,
+:root[data-theme="light"] .tire-tech-card,
+:root[data-theme="light"] .offset-tech-card { background:#fff!important; border-color:#d8e2e9!important; }
+:root[data-theme="light"] .single-tire-card--facts>div { background:#f2f6f8; }
+:root[data-theme="light"] .single-tire-card--facts span,
+:root[data-theme="light"] .single-tire-card--facts small,
+:root[data-theme="light"] .single-tire-card--facts p { color:#687887; }
+:root[data-theme="light"] .single-ground { stroke:rgb(20 45 65 / 16%); }
+:root[data-theme="light"] .single-hub { fill:#f4f7f8; stroke:#556a78; }
+:root[data-theme="light"] .single-spokes { stroke:#536a78; }
+:root[data-theme="light"] .single-tread { stroke:#7a8d99; }
+
+/* Mobile dock gets real layout space; it must never cover forms or cards. */
+.mobile-dock { bottom:calc(.85rem + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--color-surface) 94%,transparent); border-color:var(--color-line); }
+.mobile-dock a { color:var(--color-ink-muted); }
+.mobile-dock a[aria-current="page"] { background:color-mix(in srgb,var(--color-brand) 10%,var(--color-surface)); color:var(--color-brand); }
+:root[data-theme="dark"] .mobile-dock { box-shadow:0 20px 48px rgb(0 0 0 / 38%); }
+
+@media(max-width:59.999rem) {
+  body { padding-bottom:calc(6rem + env(safe-area-inset-bottom)); }
+  .site-footer { padding-bottom:1.5rem!important; }
+  .brand-wordmark__context { display:none; }
+  .desktop-nav { display:none!important; }
+  .home-category-grid { margin-top:.15rem; }
+}
+
+@media(max-width:35rem) {
+  .home-v4-hero { min-height:25.5rem; }
+  .home-v4-copy { padding-top:1.65rem; }
+  .home-v4-copy h1 { font-size:clamp(2.45rem,11.5vw,3.8rem)!important; }
+  .home-v4-car { width:31rem; margin:-4.4rem -5rem -2rem auto; }
+  .studio-capabilities { grid-template-columns:1fr!important; }
+}
+
+@media(min-width:48rem) {
+  .home-v4-hero { min-height:33rem; }
+  .home-v4-copy { padding:4rem 0 3rem; }
+}
+
+@media(min-width:60rem) {
+  body { padding-bottom:0; }
+  .tool-stage:not(.tool-stage--single) { grid-template-columns:minmax(0,1.05fr) minmax(20rem,.65fr)!important; }
+  .tool-workspace { order:0!important; }
+  .tool-visual-wrap { order:1!important; position:sticky; top:5.5rem; }
+}
+
+@media(max-width:59.999rem) {
+  html { scroll-padding-bottom:7rem; }
+  .mobile-dock { right:1rem; left:1rem; min-height:3.6rem; padding:.28rem; border-radius:1.05rem; }
+  .mobile-dock a { border-radius:.78rem; font-size:.58rem; }
+  .mobile-dock svg { width:1.12rem; height:1.12rem; }
+}
+
+:root[data-theme="light"] .tire-tech-visual figcaption p,
+:root[data-theme="light"] .offset-tech-visual figcaption p,
+:root[data-theme="light"] .tire-tech-caption,
+:root[data-theme="light"] .offset-tech-note p { color:#667887!important; }
+:root[data-theme="light"] .tire-tech-card header span,
+:root[data-theme="light"] .offset-tech-card header span,
+:root[data-theme="light"] .offset-tech-values span { color:#748695!important; }
+:root[data-theme="light"] .tire-tech-card svg text,
+:root[data-theme="light"] .offset-tech-card svg text { fill:#536979!important; }
+:root[data-theme="light"] .offset-tech-values>div { background:#f3f6f8!important; border-color:#d8e2e9!important; }
+:root[data-theme="light"] .offset-tech-values strong { color:#172635!important; }
+:root[data-theme="light"] .offset-tech-values small { color:#6e7f8c!important; }
+:root[data-theme="light"] .offset-tech-note { background:#fff7ed!important; border-left-color:#ff8a22!important; }
+:root[data-theme="light"] .offset-tech-note strong { color:#412916!important; }

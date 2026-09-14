@@ -2,11 +2,11 @@
   (() => {
     try {
       const saved = localStorage.getItem('atlas-theme-v4');
-      const preference = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light';
+      const preference = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
       const resolved = preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : preference === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = resolved;
       document.documentElement.dataset.themePreference = preference;
       document.documentElement.style.colorScheme = resolved;
-    } catch { document.documentElement.dataset.theme = 'light'; }
+    } catch { const dark = matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = dark ? 'dark' : 'light'; document.documentElement.dataset.themePreference = 'system'; }
   })();
 </script>

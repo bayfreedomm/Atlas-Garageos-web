@@ -6,6 +6,7 @@ import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
 import MobileDock from './MobileDock.astro';
+import ThemeQuickToggle from './ThemeQuickToggle.astro';
 import '../styles/global.css';
 import '../styles/product-v3.css';
 import '../styles/product-v4.css';
@@ -48,7 +49,7 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#233630" />
+    <meta name="theme-color" content="#f7f8f5" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
     {applicationJsonLd && <script is:inline type="application/ld+json" set:html={applicationJsonLd}></script>}
@@ -58,8 +59,11 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
       <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
-      <NavigationDrawer />
+      <div class="app-header__actions">
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
+        <ThemeQuickToggle />
+        <NavigationDrawer />
+      </div>
     </div></header>
     <main id="main-content"><slot /></main>
     <Footer />
