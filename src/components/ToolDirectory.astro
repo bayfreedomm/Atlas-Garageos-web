@@ -24,7 +24,7 @@ const helper = new Map<ToolId, string>([
     {TOOL_CATEGORY_ORDER.map((category) => <button type="button" aria-pressed="false" data-tool-category={category}>{category}</button>)}
   </div>}
   {mode === 'all' && <div class="tool-list-heading"><h2 id="toolbox-heading">All automotive tools</h2><span data-tool-count>{tools.length} tools</span></div>}
-  {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">Quick tools</h2><a href="/en/tools/">All tools</a></div>}
+  {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">Quick tools</h2><a href="/tools/">All tools</a></div>}
   <div class="tool-rows" data-tool-rows>
     {displayedTools.map((tool) => <a class:list={['tool-row', { 'is-secondary': mode === 'home' && !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${helper.get(tool.id)} ${tool.id}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
       <ToolIcon id={tool.id} category={tool.category} />
@@ -32,6 +32,6 @@ const helper = new Map<ToolId, string>([
     </a>)}
   </div>
   <p class="toolbox-empty" data-tool-empty hidden>No matching tools. Try a broader search.</p>
-  {mode === 'home' && <a class="all-tools-link" href="/en/tools/">View all tools <span aria-hidden="true">›</span></a>}
+  {mode === 'home' && <a class="all-tools-link" href="/tools/">View all tools <span aria-hidden="true">›</span></a>}
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

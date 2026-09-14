@@ -8,9 +8,10 @@ export type ToolCategory = 'Tires & Wheels' | 'Fuel & Trips' | 'Converters' | 'P
 export const TOOL_CATEGORY_ORDER: readonly ToolCategory[] = Object.freeze(['Fuel & Trips', 'Tires & Wheels', 'Converters', 'Performance']);
 
 export const platformPageRegistry = Object.freeze([
-  { id: 'home', pathname: '/en/', title: 'Atlas GarageOS', description: 'Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment.' },
-  { id: 'tools-hub', pathname: '/en/tools/', title: 'Automotive Tools', description: 'Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment.' },
-  { id: 'methodology', pathname: '/en/methodology/', title: 'Accuracy & Methodology', description: 'How Atlas GarageOS calculators work, which formulas and assumptions they use, and where calculated results stop.' },
+  { id: 'home', pathname: '/', title: 'Atlas GarageOS', description: 'Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment.' },
+  { id: 'tools-hub', pathname: '/tools/', title: 'Automotive Tools', description: 'Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment.' },
+  { id: 'methodology', pathname: '/methodology/', title: 'Accuracy & Methodology', description: 'How Atlas GarageOS calculators work, which formulas and assumptions they use, and where calculated results stop.' },
+  { id: 'privacy-policy', pathname: '/privacy-policy/', title: 'Privacy Policy', description: 'How Atlas GarageOS handles calculator inputs and locally saved vehicle data.' },
 ] as const);
 
 export interface ToolDefinition {
@@ -46,7 +47,7 @@ export const toolRegistry: readonly ToolDefinition[] = Object.freeze([
 ]);
 
 export function routeForTool(tool: ToolDefinition): string {
-  return tool.kind === 'flagship' ? `/${tool.locale}/${tool.slug}/` : `/${tool.locale}/tools/${tool.slug}/`;
+  return tool.kind === 'flagship' ? `/${tool.slug}/` : `/tools/${tool.slug}/`;
 }
 
 export function canonicalForPath(pathname: string): string {

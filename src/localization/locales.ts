@@ -43,6 +43,7 @@ export function localeFor(code: AtlasLocale): LocaleDefinition { return localeDe
 export function localizedToolSlug(locale: AtlasLocale, id: ToolId): string { return localizedToolSlugs[locale][id]; }
 export function localizedToolPath(locale: AtlasLocale, id: ToolId, kind: 'flagship' | 'tool'): string {
   const slug = localizedToolSlug(locale, id);
-  return kind === 'flagship' ? `/${locale}/${slug}/` : `/${locale}/tools/${slug}/`;
+  const prefix = locale === 'en' ? '' : `/${locale}`;
+  return kind === 'flagship' ? `${prefix}/${slug}/` : `${prefix}/tools/${slug}/`;
 }
 export function publishedLocales(): readonly AtlasLocale[] { return LOCALE_CODES.filter((code) => localeDefinitions[code].published); }

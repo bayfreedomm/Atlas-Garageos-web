@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import brand from '../../src/components/Brand.astro?raw';
-import home from '../../src/pages/en/index.astro?raw';
+import home from '../../src/pages/index.astro?raw';
 import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
-import toolsHub from '../../src/pages/en/tools/index.astro?raw';
+import toolsHub from '../../src/pages/tools/index.astro?raw';
 import siteLayout from '../../src/components/SiteLayout.astro?raw';
 import navigationDrawer from '../../src/components/NavigationDrawer.astro?raw';
 import toolDirectory from '../../src/components/ToolDirectory.astro?raw';
-import studio from '../../src/pages/en/fitment-studio/index.astro?raw';
+import studio from '../../src/pages/fitment-studio/index.astro?raw';
 import { inchesToMillimeters } from '../../src/core/units/conversion';
 import { tireScaleMapping, wheelOffsetVisualMapping } from '../../src/ui/fitment-visualizer-model';
 import { parseThemePreference, resolveTheme, THEME_STORAGE_KEY } from '../../src/ui/theme-preference';
@@ -14,7 +14,7 @@ import { platformPageRegistry, routeForTool, toolRegistry } from '../../src/seo/
 
 describe('Milestone 8 product experience', () => {
   it('supports persisted light, dark, and system theme preferences', () => {
-    expect(THEME_STORAGE_KEY).toBe('atlas-theme');
+    expect(THEME_STORAGE_KEY).toBe('atlas-theme-v4');
     expect(parseThemePreference('dark')).toBe('dark');
     expect(parseThemePreference('unknown')).toBe('system');
     expect(resolveTheme('system', true)).toBe('dark');
@@ -32,21 +32,21 @@ describe('Milestone 8 product experience', () => {
   });
 
   it('publishes a useful home and maps every implemented tool into the hub', () => {
-    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/en/', '/en/tools/', '/en/methodology/']);
+    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/', '/tools/', '/methodology/', '/privacy-policy/']);
     expect(home).toContain('<HomeLauncher');
-    expect(homeLauncher).toContain('What do you need to calculate?');
+    expect(homeLauncher).toContain('What do you want to calculate?');
     expect(homeLauncher).toContain('tool-launch-row');
-    expect(`${home}${homeLauncher}`).toContain('/en/fitment-studio/');
-    expect(`${home}${homeLauncher}${toolDirectory}`).toContain('/en/tools/');
+    expect(`${home}${homeLauncher}`).toContain('/fitment-studio/');
+    expect(`${home}${homeLauncher}${toolDirectory}`).toContain('/tools/');
     expect(toolsHub).toContain('<ToolDirectory mode="all"');
     expect(toolDirectory).toContain("toolRegistry.filter(({ kind }) => kind === 'tool')");
-    for (const tool of toolRegistry.filter(({ kind }) => kind === 'tool')) expect(routeForTool(tool)).toMatch(/^\/en\/tools\/.+\/$/);
+    for (const tool of toolRegistry.filter(({ kind }) => kind === 'tool')) expect(routeForTool(tool)).toMatch(/^\/tools\/.+\/$/);
   });
 
   it('keeps key internal routes connected', () => {
-    expect(siteLayout).not.toContain('/en/fitment-studio/#garage');
+    expect(siteLayout).not.toContain('/fitment-studio/#garage');
     expect(studio).toContain('id="garage"');
-    expect(studio).toContain('href="/en/"');
+    expect(studio).toContain('href="/"');
     expect(studio).toContain('id="compare"');
   });
 

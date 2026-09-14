@@ -25,7 +25,7 @@ const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type'
 const applicationJsonLd = definition && definition.kind === 'tool' ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
   ? [{ name: definition.title, href: pathname }]
-  : definition ? [{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
+  : definition ? [{ name: 'Home', href: '/' }, { name: 'Tools', href: '/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
 const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
@@ -46,7 +46,7 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <meta name="twitter:description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={canonical} />
-    <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#f7f8f5" />
@@ -58,9 +58,9 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
+      <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
-        <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href="/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
         <ThemeQuickToggle />
         <NavigationDrawer />
       </div>

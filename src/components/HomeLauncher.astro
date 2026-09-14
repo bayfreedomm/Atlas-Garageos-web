@@ -61,8 +61,8 @@ const categories = [
       <p class="home-lead">Calculate tire fitment, wheel offset, fuel cost, road trips and EV charging with clear answers built for real-world ownership.</p>
 
       <div class="home-v7-actions" aria-label="Primary actions">
-        <a class="home-v7-cta home-v7-cta--primary" href="/en/tools/">Explore tools <span aria-hidden="true">→</span></a>
-        <a class="home-v7-cta home-v7-cta--secondary" href="/en/fitment-studio/">Compare fitment</a>
+        <a class="home-v7-cta home-v7-cta--primary" href="/tools/">Explore tools <span aria-hidden="true">→</span></a>
+        <a class="home-v7-cta home-v7-cta--secondary" href="/fitment-studio/">Compare fitment</a>
       </div>
 
       <div class="home-v7-capabilities" aria-label="GarageOS tool families">
@@ -86,14 +86,14 @@ const categories = [
     </section>
     <div class="home-category-grid" aria-label="Tool categories">
       {categories.map(([name, copy]) => (
-        <a href={`/en/tools/?category=${encodeURIComponent(name)}`}>
+        <a href={`/tools/?category=${encodeURIComponent(name)}`}>
           <span>{name}</span><small>{copy}</small><i aria-hidden="true">›</i>
         </a>
       ))}
     </div>
 
     <section class="home-popular" aria-labelledby="popular-heading">
-      <div class="home-section-heading"><div><p>POPULAR TOOLS</p><h2 id="popular-heading">Start with a job</h2></div><a href="/en/tools/">See all <span aria-hidden="true">→</span></a></div>
+      <div class="home-section-heading"><div><p>POPULAR TOOLS</p><h2 id="popular-heading">Start with a job</h2></div><a href="/tools/">See all <span aria-hidden="true">→</span></a></div>
       <div class="tool-launch-list" data-tool-rows>
         {ordered.map((tool) => (
           <a class:list={['tool-launch-row', { 'is-secondary': !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
@@ -104,7 +104,7 @@ const categories = [
       <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
     </section>
 
-    <a class="home-fitment-feature" href="/en/fitment-studio/"><span class="home-fitment-feature__badge">ADVANCED VISUAL TOOL</span><span class="home-fitment-feature__copy"><strong>Wheel &amp; Tire Fitment Compare</strong><small>See how a new setup changes diameter, inner position and outer stance before you buy.</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">ADVANCED VISUAL TOOL</span><span class="home-fitment-feature__copy"><strong>Wheel &amp; Tire Fitment Compare</strong><small>See how a new setup changes diameter, inner position and outer stance before you buy.</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

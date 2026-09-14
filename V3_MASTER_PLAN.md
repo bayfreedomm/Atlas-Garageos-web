@@ -36,7 +36,7 @@ Every major tool gets:
 
 ## Localization — first wave
 Planned public locales:
-- `/en/` English — live.
+- `/` English — live (V4.9 default-locale URL cleanup; former `/en/...` pages redirect 301 to matching root paths).
 - `/de/` German.
 - `/es/` Spanish.
 - `/pt-br/` Brazilian Portuguese.
@@ -50,6 +50,7 @@ Rules:
 - hreflang/x-default only for versions that actually exist.
 - Multilingual sitemap only includes QA-passed published locale pages.
 - No forced IP/browser-language redirect.
+- `/de/`, `/es/`, `/pt-br/`, and `/fr/` remain unpublished until each translation passes QA.
 - IT / JA / PL are later candidates; India is monitored through English first; China is a separate search/distribution ecosystem.
 
 ## Search / SEO — locked
@@ -158,4 +159,3 @@ Next implementation pass:
 - [x] Key light-mode orange labels, technical measurements, warning/mistake cards and hero readouts received explicit contrast treatment.
 - [x] Blue remains the primary navigation/action color in both themes.
 - [ ] Clean Node 24 + pnpm `astro check && astro build` for V4.5 archive.
-

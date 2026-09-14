@@ -1,0 +1,43 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import TireInputGroup from '../../../components/TireInputGroup.astro';
+import TireComparisonVisual from '../../../components/TireComparisonVisual.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('tire-size-comparison');
+---
+<ToolPage {definition} visual={false} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Compare wheel & tire geometry">
+  <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <div class="calculator-columns">
+      <TireInputGroup prefix="original-" title="Original tire" width={225} aspect={45} rim={18} />
+      <TireInputGroup prefix="new-" title="New tire" width={235} aspect={40} rim={19} />
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">Compare tire sizes</button>
+      <button type="button" class="secondary" data-share-result>Copy share link</button>
+    </div>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+
+    <section class="tire-primary-result is-pending" data-tire-primary-result aria-live="polite" aria-label="Primary tire comparison result">
+      <div class="tire-primary-result__answer">
+        <span>Diameter change</span>
+        <strong data-tire-primary-percent>—</strong>
+        <p data-tire-primary-copy>Compare the two sizes to see the main change.</p>
+      </div>
+      <div class="tire-primary-result__speed">
+        <span>At 100 km/h indicated</span>
+        <strong data-tire-speed-example>—</strong>
+        <small>Theoretical rolling-geometry example</small>
+      </div>
+    </section>
+
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your comparison summary will appear here.</p>
+
+    <TireComparisonVisual />
+
+    <div class="tire-detail-heading" aria-hidden="true"><span>Details</span><small>Nominal geometry</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation"><h2>What changes between the sizes</h2><p>Positive diameter and circumference differences mean the new tire is larger. Ride-height difference is half of the diameter change. The speedometer percentage shows the theoretical change at the same wheel rotation rate.</p><p>No percentage is treated as an automatic compatibility or safety limit.</p></div>
+</ToolPage>
+<script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeShareableToolState(); initializeToolCalculators();</script>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import tireVisual from '../../src/components/TireComparisonVisual.astro?raw';
 import offsetVisual from '../../src/components/WheelOffsetTechnicalVisual.astro?raw';
 import toolPage from '../../src/components/ToolPage.astro?raw';
-import methodology from '../../src/pages/en/methodology/index.astro?raw';
+import methodology from '../../src/pages/methodology/index.astro?raw';
 import { LOCALE_CODES, localeDefinitions, localizedToolPath } from '../../src/localization/locales';
 import { toolInsights } from '../../src/content/tool-insights';
 import { toolRegistry } from '../../src/seo/tool-registry';
@@ -12,6 +12,7 @@ describe('V3 visual and localization foundation', () => {
     expect(LOCALE_CODES).toEqual(['en', 'de', 'es', 'pt-br', 'fr']);
     expect(localeDefinitions.en.published).toBe(true);
     expect(localeDefinitions.de.published).toBe(false);
+    expect(localizedToolPath('en', 'wheel-offset-calculator', 'tool')).toBe('/tools/wheel-offset-calculator/');
     expect(localizedToolPath('de', 'wheel-offset-calculator', 'tool')).toBe('/de/tools/felgen-et-rechner/');
     expect(localizedToolPath('pt-br', 'fuel-cost-calculator', 'tool')).toBe('/pt-br/tools/calculadora-gasto-combustivel/');
   });

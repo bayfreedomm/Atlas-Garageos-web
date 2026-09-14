@@ -3,9 +3,9 @@ import directory from '../../src/components/ToolDirectory.astro?raw';
 import drawer from '../../src/components/NavigationDrawer.astro?raw';
 import layout from '../../src/components/SiteLayout.astro?raw';
 import toolPage from '../../src/components/ToolPage.astro?raw';
-import home from '../../src/pages/en/index.astro?raw';
+import home from '../../src/pages/index.astro?raw';
 import homeLauncher from '../../src/components/HomeLauncher.astro?raw';
-import hub from '../../src/pages/en/tools/index.astro?raw';
+import hub from '../../src/pages/tools/index.astro?raw';
 import { TOOL_CATEGORY_ORDER, routeForTool, toolById, toolRegistry } from '../../src/seo/tool-registry';
 import { toolMatchesFilter } from '../../src/ui/toolbox-filter';
 import { CURRENCY_STORAGE_KEY, parseCurrencyLabel, parseUnitSystem, UNIT_SYSTEM_STORAGE_KEY } from '../../src/ui/utility-preference';
@@ -52,7 +52,7 @@ describe('toolbox-first product surfaces', () => {
 
   it('exposes all utility URLs and preserves independent preferences', () => {
     const ids = ['fuel-cost-calculator', 'road-trip-cost-calculator', 'mpg-l100km-converter', 'psi-bar-converter', 'hp-kw-converter', 'nm-lb-ft-converter', 'power-to-weight-calculator'] as const;
-    for (const id of ids) expect(routeForTool(toolById(id))).toBe(`/en/tools/${id}/`);
+    for (const id of ids) expect(routeForTool(toolById(id))).toBe(`/tools/${id}/`);
     expect(UNIT_SYSTEM_STORAGE_KEY).toBe('atlas-unit-system');
     expect(CURRENCY_STORAGE_KEY).toBe('atlas-currency');
     expect(parseUnitSystem('imperial')).toBe('imperial');

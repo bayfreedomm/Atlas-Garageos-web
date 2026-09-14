@@ -1,0 +1,33 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('ev-charging-cost-calculator');
+---
+<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This estimate includes the efficiency you enter. Battery temperature, charge taper, and the vehicle's real charging curve can still change the result.">
+  <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
+    <div class="utility-fields">
+      <label>Battery capacity · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>
+      <label>Electricity price · per kWh<input name="pricePerKwh" type="number" value="0.18" min="0" max="10" step="0.01" inputmode="decimal" /></label>
+      <label>Currency<select name="currency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="CAD">CAD</option><option value="AUD">AUD</option></select></label>
+      <label>Charge from · %<input name="startPercent" type="number" value="20" min="0" max="100" step="1" inputmode="numeric" /></label>
+      <label>Charge to · %<input name="endPercent" type="number" value="80" min="0" max="100" step="1" inputmode="numeric" /></label>
+      <label>Charger power · kW<input name="chargerPowerKw" type="number" value="11" min="0.1" max="400" step="0.1" inputmode="decimal" /></label>
+      <label>Charging efficiency · %<input name="chargingEfficiency" type="number" value="90" min="50" max="100" step="1" inputmode="numeric" /></label>
+    </div>
+    <button type="submit">Calculate charging cost</button>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your charging estimate will appear here.</p>
+    <div class="tool-visual">
+      <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Battery charge level">
+        <rect x="14" y="20" width="122" height="50" rx="8" fill="none" stroke="var(--color-ink-soft)" stroke-width="2"/>
+        <rect x="136" y="36" width="8" height="18" rx="2" fill="var(--color-ink-soft)"/>
+        <rect data-fill-start x="18" y="24" width="0" height="42" fill="var(--color-ink-soft)" opacity=".45"/>
+        <rect data-fill-end x="18" y="24" width="0" height="42" fill="var(--color-accent)" opacity=".85"/>
+        <text data-battery-label x="80" y="82" text-anchor="middle" font-size="9" fill="var(--color-ink-muted)">20% → 80%</text>
+      </svg>
+    </div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation"><h2>Why the number is an estimate, not a promise</h2><p>Charging efficiency accounts for energy lost between the wall and battery. A 90% setting means 10% of grid energy does not reach the battery.</p><p>The time estimate assumes the entered charging power stays constant. Real charging can be slower because the vehicle, battery temperature, state of charge, and charging curve can limit power.</p></div>
+</ToolPage>
+<script>import { initializeEvChargingCalculators } from '../../../ui/ev-charging-calculator'; initializeEvChargingCalculators();</script>

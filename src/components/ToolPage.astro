@@ -7,12 +7,12 @@ import ToolVisual from './ToolVisual.astro';
 import ToolInsights from './ToolInsights.astro';
 
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string; studioHref?: string; visual?: boolean; }
-const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/en/fitment-studio/', visual = true } = Astro.props;
+const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/fitment-studio/', visual = true } = Astro.props;
 const related = relatedTools(definition);
 const hasLongTitle = definition.title.length > 24;
 ---
 <SiteLayout {definition} active="tools">
-  <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href="/en/tools/">← All tools</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
+  <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href="/tools/">← All tools</a><span class="sr-only" aria-current="page">{definition.title}</span></nav>
 
   <article class:list={['tool-machine', `tool-machine--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, `tool-machine--${definition.id}`]} data-tool-id={definition.id}>
     <header class:list={['tool-intro', { 'tool-intro--long': hasLongTitle }]}>

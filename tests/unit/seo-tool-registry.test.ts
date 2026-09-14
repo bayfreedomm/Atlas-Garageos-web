@@ -3,25 +3,26 @@ import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, ro
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
 
 const intendedRoutes = [
-  '/en/',
-  '/en/tools/',
-  '/en/methodology/',
-  '/en/fitment-studio/',
-  '/en/tools/tire-size-calculator/',
-  '/en/tools/tire-size-comparison/',
-  '/en/tools/wheel-offset-calculator/',
-  '/en/tools/speedometer-error-calculator/',
-  '/en/tools/gear-ratio-calculator/',
-  '/en/tools/fitment-map/',
-  '/en/tools/measure-my-car/',
-  '/en/tools/fuel-cost-calculator/',
-  '/en/tools/road-trip-cost-calculator/',
-  '/en/tools/ev-charging-cost-calculator/',
-  '/en/tools/mpg-l100km-converter/',
-  '/en/tools/psi-bar-converter/',
-  '/en/tools/hp-kw-converter/',
-  '/en/tools/nm-lb-ft-converter/',
-  '/en/tools/power-to-weight-calculator/',
+  '/',
+  '/tools/',
+  '/methodology/',
+  '/privacy-policy/',
+  '/fitment-studio/',
+  '/tools/tire-size-calculator/',
+  '/tools/tire-size-comparison/',
+  '/tools/wheel-offset-calculator/',
+  '/tools/speedometer-error-calculator/',
+  '/tools/gear-ratio-calculator/',
+  '/tools/fitment-map/',
+  '/tools/measure-my-car/',
+  '/tools/fuel-cost-calculator/',
+  '/tools/road-trip-cost-calculator/',
+  '/tools/ev-charging-cost-calculator/',
+  '/tools/mpg-l100km-converter/',
+  '/tools/psi-bar-converter/',
+  '/tools/hp-kw-converter/',
+  '/tools/nm-lb-ft-converter/',
+  '/tools/power-to-weight-calculator/',
 ];
 
 describe('SEO tool registry', () => {
@@ -37,8 +38,8 @@ describe('SEO tool registry', () => {
   });
 
   it('builds stable locale routes and canonical URLs without application state', () => {
-    expect(routeForTool(toolRegistry[1]!)).toBe('/en/tools/tire-size-calculator/');
-    expect(canonicalForPath('/en/fitment-studio/?unit=imperial#setup=abc')).toBe('https://atlasgarageos.com/en/fitment-studio/');
+    expect(routeForTool(toolRegistry[1]!)).toBe('/tools/tire-size-calculator/');
+    expect(canonicalForPath('/fitment-studio/?unit=imperial#setup=abc')).toBe('https://atlasgarageos.com/fitment-studio/');
   });
 
   it('keeps every related-tool edge valid and non-self-referential', () => {
@@ -54,11 +55,12 @@ describe('SEO tool registry', () => {
     expect(xml.match(/<url>/g)).toHaveLength(intendedRoutes.length);
     expect(xml).not.toContain('#');
     expect(sitemapEntries().every((url) => !url.includes('?'))).toBe(true);
-    expect(xml).not.toContain('<loc>https://atlasgarageos.com/</loc>');
+    expect(xml).toContain('<loc>https://atlasgarageos.com/</loc>');
+    expect(xml).not.toContain('https://atlasgarageos.com/en/');
   });
 
   it('provides a validated seam for future high-value SEO pages', () => {
-    expect(createSeoPageModel({ locale: 'en', pathname: '/en/tire-size/225-45-r18/', indexable: false, kind: 'tire-size' })).toMatchObject({ canonical: 'https://atlasgarageos.com/en/tire-size/225-45-r18/', indexable: false });
-    expect(() => createSeoPageModel({ locale: 'en', pathname: '/en/tire-size/225 45 r18/', indexable: false, kind: 'tire-size' })).toThrow('Invalid SEO pathname');
+    expect(createSeoPageModel({ locale: 'en', pathname: '/tire-size/225-45-r18/', indexable: false, kind: 'tire-size' })).toMatchObject({ canonical: 'https://atlasgarageos.com/tire-size/225-45-r18/', indexable: false });
+    expect(() => createSeoPageModel({ locale: 'en', pathname: '/tire-size/225 45 r18/', indexable: false, kind: 'tire-size' })).toThrow('Invalid SEO pathname');
   });
 });
