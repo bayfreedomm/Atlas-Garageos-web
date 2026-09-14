@@ -319,3 +319,82 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="dark"] .wheel-primary-result span,:root[data-theme="dark"] .wheel-primary-result small{color:#9fb1bf}
 :root[data-theme="dark"] .tool-machine--wheel-offset-calculator .tool-results div:first-child{background:#102431!important;border-color:#28404f!important}
 @media(min-width:42rem){.wheel-primary-result{grid-template-columns:minmax(0,1.35fr) minmax(15rem,.65fr);padding:1rem}.wheel-primary-result__answer,.wheel-primary-result__inner{padding:1rem}}
+
+/* V4.5 brand + visual-system correction.
+   Garage is the product name users should notice first. Atlas is provenance; OS is a quiet suffix.
+   Light mode has its own contrast-safe accent palette rather than reusing luminous night colors. */
+:root[data-theme="light"]{
+  --color-accent:#9a4300;
+  --color-accent-readable:#9a4300;
+  --color-accent-soft:#fff1e4;
+  --color-accent-line:#d78845;
+}
+:root[data-theme="dark"]{
+  --color-accent:#ff9b4f;
+  --color-accent-readable:#ffad6c;
+  --color-accent-soft:#2a2118;
+  --color-accent-line:#a96a39;
+}
+
+/* Garage-first wordmark. */
+.brand-lockup{display:inline-flex;align-items:center;min-width:0}
+.brand-wordmark{display:grid!important;grid-template-columns:auto!important;align-items:start!important;gap:.02rem!important;line-height:.86!important}
+.brand-wordmark__kicker{order:0;padding:0!important;border:0!important;color:#8aa6b8!important;font-family:var(--font-sans)!important;font-size:.47rem!important;font-weight:850!important;line-height:1!important;letter-spacing:.19em!important;text-transform:uppercase!important}
+.brand-wordmark__kicker::before{display:none!important}
+.brand-wordmark strong{order:1;color:#f7fafc!important;font-family:var(--font-display)!important;font-size:1.34rem!important;font-weight:820!important;line-height:.98!important;letter-spacing:-.035em!important;text-transform:none!important}
+.brand-wordmark__os{display:inline-block;margin-left:.08em!important;color:#7f98a9!important;font-family:var(--font-sans)!important;font-size:.48em!important;font-weight:760!important;letter-spacing:.04em!important;vertical-align:.42em!important}
+.brand-wordmark__context{display:inline!important;color:#718696!important;font-size:.86em!important;letter-spacing:.02em!important;text-transform:none!important}
+:root[data-theme="light"] .brand-wordmark__kicker{color:#527085!important}
+:root[data-theme="light"] .brand-wordmark strong{color:#101d29!important}
+:root[data-theme="light"] .brand-wordmark__os,:root[data-theme="light"] .brand-wordmark__context{color:#596f7d!important}
+@media(max-width:35rem){.brand-wordmark strong{font-size:1.23rem!important}.brand-wordmark__kicker{font-size:.43rem!important}.brand-wordmark__context{display:none!important}}
+
+/* Homepage hero is now an instrument panel, not a cartoon-car illustration. */
+.home-v5-hero{isolation:isolate}
+.home-v5-copy h1{max-width:10ch!important}
+.home-v5-console{position:relative;z-index:1;align-self:center;width:min(42rem,calc(100% - 2rem));margin:0 auto 1.2rem;border:1px solid rgb(119 177 216 / 28%);border-radius:1.05rem;background:linear-gradient(160deg,rgb(9 27 40 / 94%),rgb(5 17 26 / 97%));box-shadow:0 30px 70px rgb(0 0 0 / 28%);overflow:hidden}
+.home-v5-console__bar,.home-v5-console__footer{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.68rem .8rem;border-bottom:1px solid rgb(126 174 205 / 18%);color:#88a4b7;font-size:.52rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+.home-v5-console__bar span:first-child{color:#d8e8f2}
+.home-v5-console__body{display:grid;grid-template-columns:minmax(0,1fr) 8.7rem;gap:.7rem;padding:.7rem}
+.home-v5-wheel-stage{position:relative;min-width:0;border:1px solid rgb(122 172 204 / 14%);border-radius:.78rem;background:radial-gradient(circle at 52% 48%,rgb(16 111 177 / 13%),transparent 42%),#081723;overflow:hidden}
+.home-v5-wheel{display:block;width:100%;height:auto}
+.home-v5-grid{fill:none;stroke:rgb(134 180 207 / 7%);stroke-width:1}
+.home-v5-chassis{fill:none;stroke:#557991;stroke-width:2}
+.home-v5-fender{fill:none;stroke:#6e9ab6;stroke-width:2.5}
+.home-v5-tire{fill:#0b1116;stroke:#8ca2af;stroke-width:4}
+.home-v5-rim{fill:#121f28;stroke:#d3dfe5;stroke-width:2.5}
+.home-v5-hub{fill:#d9e4e9}
+.home-v5-spokes{fill:none;stroke:#9fb0bb;stroke-width:2.2}
+.home-v5-measure{fill:none;stroke:#75b9ff;stroke-width:1.35}
+.home-v5-measure--width{stroke:#7fa8c2}
+.home-v5-measure--offset{stroke:#ff9b5e}
+.home-v5-callout path{fill:none;stroke:#75b9ff;stroke-width:1.15}
+.home-v5-callout text{fill:#9ccaff;font:800 8px var(--font-mono);letter-spacing:.04em}
+.home-v5-callout--accent path{stroke:#ff9b5e}.home-v5-callout--accent text{fill:#ffae79}
+.home-v5-stage-label{position:absolute;left:.72rem;bottom:.65rem;display:grid;gap:.1rem;padding:.46rem .55rem;border:1px solid rgb(124 170 199 / 18%);border-radius:.55rem;background:rgb(5 17 26 / 82%);backdrop-filter:blur(8px)}
+.home-v5-stage-label strong{color:#f0f6f9;font:800 .72rem var(--font-mono)}.home-v5-stage-label span{color:#8da5b5;font-size:.51rem}
+.home-v5-readouts{display:grid;gap:.55rem;align-content:stretch}.home-v5-readouts>div{display:flex;min-height:0;flex-direction:column;justify-content:center;padding:.62rem;border:1px solid rgb(122 172 204 / 15%);border-radius:.7rem;background:#0a1b27}.home-v5-readouts span{color:#65aff1;font-size:.46rem;font-weight:850;letter-spacing:.1em}.home-v5-readouts strong{margin:.16rem 0;color:#f0f6f9;font:800 .96rem var(--font-display)}.home-v5-readouts small{color:#859dac;font-size:.5rem;line-height:1.35}
+.home-v5-console__footer{justify-content:center;border-top:1px solid rgb(126 174 205 / 14%);border-bottom:0;color:#7190a4}.home-v5-console__footer i{color:#2e8fe4;font-style:normal}.home-v5-console__footer span:nth-of-type(3){color:#dce9f0}
+
+:root[data-theme="light"] .home-v5-console{border-color:#c8d7e1;background:linear-gradient(160deg,#ffffff,#f3f7f9);box-shadow:0 24px 60px rgb(28 58 82 / 13%)}
+:root[data-theme="light"] .home-v5-console__bar,:root[data-theme="light"] .home-v5-console__footer{border-color:#dce5eb;color:#596d7a}:root[data-theme="light"] .home-v5-console__bar span:first-child{color:#193246}
+:root[data-theme="light"] .home-v5-wheel-stage{border-color:#d7e2e8;background:radial-gradient(circle at 52% 48%,rgb(8 120 249 / 8%),transparent 42%),#f8fafb}
+:root[data-theme="light"] .home-v5-grid{stroke:rgb(54 85 104 / 8%)}:root[data-theme="light"] .home-v5-chassis{stroke:#6a8495}:root[data-theme="light"] .home-v5-fender{stroke:#7796a8}:root[data-theme="light"] .home-v5-tire{fill:#f8fafb;stroke:#546a78}:root[data-theme="light"] .home-v5-rim{fill:#eef3f6;stroke:#718795}:root[data-theme="light"] .home-v5-hub{fill:#516774}:root[data-theme="light"] .home-v5-spokes{stroke:#6a7e8a}
+:root[data-theme="light"] .home-v5-measure{stroke:#086fdc}:root[data-theme="light"] .home-v5-measure--width{stroke:#596f7d}:root[data-theme="light"] .home-v5-measure--offset{stroke:#9a4300}:root[data-theme="light"] .home-v5-callout path{stroke:#086fdc}:root[data-theme="light"] .home-v5-callout text{fill:#075eb9}:root[data-theme="light"] .home-v5-callout--accent path{stroke:#9a4300}:root[data-theme="light"] .home-v5-callout--accent text{fill:#8c3f00}
+:root[data-theme="light"] .home-v5-stage-label{border-color:#d2dde4;background:rgb(255 255 255 / 90%)}:root[data-theme="light"] .home-v5-stage-label strong{color:#172635}:root[data-theme="light"] .home-v5-stage-label span{color:#5c707e}
+:root[data-theme="light"] .home-v5-readouts>div{border-color:#d7e2e8;background:#fff}:root[data-theme="light"] .home-v5-readouts span{color:#075fae}:root[data-theme="light"] .home-v5-readouts strong{color:#172635}:root[data-theme="light"] .home-v5-readouts small{color:#596d7a}:root[data-theme="light"] .home-v5-console__footer span:nth-of-type(3){color:#172635}
+
+/* Day-mode contrast audit: luminous orange/yellow is replaced by readable semantic orange. */
+:root[data-theme="light"] .tool-visual-label,
+:root[data-theme="light"] .launcher-kicker,
+:root[data-theme="light"] .launcher-feature__label small,
+:root[data-theme="light"] .quick-jobs__heading a,
+:root[data-theme="light"] .garage-memory small{color:var(--color-accent-readable)!important}
+:root[data-theme="light"] .single-measure--width path{stroke:#9a4300!important}:root[data-theme="light"] .single-measure--width text{fill:#8c3f00!important;stroke:#8c3f00!important}
+:root[data-theme="light"] .vehicle-label--new{fill:#8c3f00!important}:root[data-theme="light"] .vehicle-ride-callout path{stroke:#9a4300!important}:root[data-theme="light"] .vehicle-ride-callout text{fill:#8c3f00!important}
+:root[data-theme="light"] .offset-mini-wheel--new{fill:rgb(154 67 0 / 8%)!important;stroke:#9a4300!important}:root[data-theme="light"] .offset-mini-arrow{stroke:#9a4300!important}:root[data-theme="light"] .offset-mini-stance text{fill:#8c3f00!important}
+:root[data-theme="light"] .offset-tech-note{background:#fff4e9!important;border-left-color:#9a4300!important}:root[data-theme="light"] .offset-tech-note strong{color:#6d3100!important}
+:root[data-theme="light"] .insight-alert--mistake{background:#fff8eb!important;border-color:#d9aa58!important;color:#3c2b13!important}:root[data-theme="light"] .insight-alert--mistake span{color:#744600!important}:root[data-theme="light"] .insight-alert--mistake strong{color:#4e3308!important}:root[data-theme="light"] .insight-alert--mistake p{color:#5f4b2d!important}
+
+@media(max-width:47.99rem){.home-v5-console{width:calc(100% - 2rem);margin-top:-.2rem}.home-v5-console__body{grid-template-columns:1fr}.home-v5-readouts{grid-template-columns:repeat(3,minmax(0,1fr))}.home-v5-readouts>div{padding:.5rem}.home-v5-readouts small{display:none}.home-v5-console__bar span:last-child{display:none}}
+@media(min-width:48rem){.home-v5-hero{grid-template-columns:minmax(0,.92fr) minmax(28rem,1.08fr)}.home-v5-console{width:min(42rem,52vw);margin-right:max(1.5rem,calc((100vw - 74rem)/2));margin-left:-1.5rem}.home-v5-copy{align-self:center}.home-v5-readouts strong{font-size:1.05rem}}

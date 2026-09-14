@@ -149,3 +149,13 @@ Next implementation pass:
 - [x] Wheel Offset upgraded to a coherent wheel-well cutaway with suspension/fender/brake/hub context plus live outer-stance magnification.
 - [x] V4.2 TypeScript/Astro/CSS source validation passed.
 - [ ] Cloudflare clean Node 24 `astro check && astro build` for V4.2 archive.
+
+## V4.5 checkpoint — Garage-first brand + light-theme contrast + homepage visual reset
+- [x] `Garage` is now the dominant word in the visible wordmark; `Atlas` is secondary provenance and `OS` is a quiet suffix.
+- [x] Homepage hero copy now explains the platform scope at first glance: automotive calculators, fitment, fuel/trips and EV.
+- [x] Cartoon-like vehicle hero illustration replaced by an engineering-console visual with wheel/tire geometry and live tool readouts.
+- [x] Light theme no longer reuses luminous night orange/yellow for small text; a darker contrast-safe semantic orange is used instead.
+- [x] Key light-mode orange labels, technical measurements, warning/mistake cards and hero readouts received explicit contrast treatment.
+- [x] Blue remains the primary navigation/action color in both themes.
+- [ ] Clean Node 24 + pnpm `astro check && astro build` for V4.5 archive.
+
