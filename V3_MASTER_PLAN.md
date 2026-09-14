@@ -159,3 +159,10 @@ Next implementation pass:
 - [x] Key light-mode orange labels, technical measurements, warning/mistake cards and hero readouts received explicit contrast treatment.
 - [x] Blue remains the primary navigation/action color in both themes.
 - [ ] Clean Node 24 + pnpm `astro check && astro build` for V4.5 archive.
+
+## V4.10 checkpoint — Road Trip Cost Calculator
+- [x] Primary complete trip cost precedes interpretation, live route/cost diagram, and detailed figures.
+- [x] Existing metric/US fuel, one-way/round-trip, one-time extras, and whole-person split remain in the established domain model; core/domain calculation code unchanged.
+- [x] Road Trip inputs update the answer, interpretation, and proportional cost visual together; the route shows one or two legs without claiming a geographic scale.
+- [x] The Road Trip page places its method/details before quick facts and common mistake, followed by related tools. V4.9 root-English routes stay unchanged.
+- [x] 106 tests, Astro typecheck, and static production build passed for V4.10; deployed HTTP and mobile browser QA remain separate launch gates.

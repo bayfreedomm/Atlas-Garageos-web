@@ -1,12 +1,36 @@
 ---
 import ToolPage from '../../../components/ToolPage.astro';
 import FuelFields from '../../../components/FuelFields.astro';
-import UtilityResults from '../../../components/UtilityResults.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('road-trip-cost-calculator');
 ---
-<ToolPage {definition} eyebrow="Fuel & trips" intro="Estimate one-way or return fuel cost, add trip expenses, and split the total between travellers." limitation="Trip costs are estimates based on the numbers you enter. Actual consumption can vary with traffic, weather, load, speed, and driving style.">
-  <form slot="tool" class="calculator-form" data-utility-calculator="road-trip" novalidate><FuelFields distance={420} economy={6.5} /><fieldset class="trip-options"><legend>Trip</legend><div class="utility-fields"><label>Direction<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label></div><details><summary>Add tolls, extras, or travellers</summary><div class="utility-fields"><label>Extra trip cost<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label><label>People<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label></div></details></fieldset><button type="submit">Estimate road trip</button><UtilityResults pending="Your trip estimate will appear here." /></form>
-  <div slot="explanation"><h2>What is included</h2><p>Return trips double the entered one-way distance before fuel is calculated. Optional costs are then added, and the complete total is divided by the number of people.</p><p>Cost per distance includes the optional trip costs, giving one comparable journey figure.</p></div>
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate the complete journey cost from fuel and optional expenses, then see the share per traveller." limitation="Trip costs are estimates based on the numbers you enter. Actual consumption can vary with traffic, weather, load, speed, and driving style.">
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields distance={420} economy={6.5} />
+    <fieldset class="trip-options"><legend>Trip</legend>
+      <div class="utility-fields"><label>Direction<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label></div>
+      <details><summary>Add tolls, extras, or travellers</summary><div class="utility-fields">
+        <label>Extra trip cost<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>People<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Estimate road trip</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Estimated trip cost">
+      <div class="trip-primary__main"><span>Estimated total trip cost</span><strong data-trip-total>—</strong><p data-trip-context>Enter your journey details to see the complete cost.</p></div>
+      <div class="trip-primary__support"><div><span>Fuel used</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>Fuel cost appears here.</small></div><div><span>Journey</span><strong data-trip-direction>—</strong><small data-trip-distance>Distance appears here.</small></div><div data-trip-person-wrap hidden><span>Per person</span><strong data-trip-person>—</strong><small data-trip-people>Split of the total</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your trip estimate will appear here.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Trip distance and proportional cost breakdown">
+      <div class="trip-technical-visual__head"><span>JOURNEY → FUEL + EXTRAS → TOTAL</span><small>Route schematic; cost segments proportional</small></div>
+      <div class="trip-route" aria-hidden="true"><span>START</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>DESTINATION</span></div>
+      <div class="trip-visual-stats"><div><small>Driving distance</small><strong data-trip-visual-distance>—</strong></div><div><small>Fuel required</small><strong data-trip-visual-fuel>—</strong></div><div><small>Trip total</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Fuel and extras cost proportions" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Fuel <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Extras <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Full journey breakdown</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation"><h2>What this estimate means</h2><p>The distance field is one way. A round trip doubles it before fuel is calculated; the entered extras are added once to the complete journey. The total is then divided by the number of people, if sharing.</p><p>Metric mode uses km, L/100km and price per litre; US mode uses miles, US MPG and price per US gallon. Currency is a label, not an exchange-rate conversion. Cost per distance includes extras.</p></div>
 </ToolPage>
 <script>import { initializeUtilityCalculators } from '../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

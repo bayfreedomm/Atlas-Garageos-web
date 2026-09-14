@@ -15,7 +15,7 @@ function render(form: HTMLFormElement, result: { readonly ok: true; readonly sum
   if (!result.ok) {
     const list = document.createElement('ul');
     result.issues.forEach((issue) => { const item = document.createElement('li'); item.textContent = toolIssueText(issue); list.append(item); });
-    errors.replaceChildren(list); errors.hidden = false; summary.classList.add('is-pending'); metrics.replaceChildren(); return;
+    errors.replaceChildren(list); errors.hidden = false; summary.textContent = 'Check the highlighted inputs to update the estimate.'; summary.classList.add('is-pending'); metrics.replaceChildren(); return;
   }
   errors.hidden = true; errors.replaceChildren(); summary.textContent = result.summary; summary.classList.remove('is-pending');
   summary.classList.remove('is-refreshing'); requestAnimationFrame(() => summary.classList.add('is-refreshing'));
@@ -77,6 +77,73 @@ function resetFuelPrimary(form: HTMLFormElement): void {
     if (fuel) fuel.textContent = '—';
     if (copy) copy.textContent = 'Check the highlighted inputs to calculate this trip.';
     if (rate) rate.textContent = 'Cost per distance appears here.';
+  }
+}
+
+type RoadTripResult = Extract<ReturnType<typeof calculateRoadTripCostTool>, { readonly ok: true }>['value'];
+
+function syncRoadTripPrimary(form: HTMLFormElement, result: RoadTripResult, currency: string): void {
+  const panel = form.querySelector<HTMLElement>('[data-trip-primary]');
+  const visual = form.querySelector<HTMLElement>('[data-trip-visual]');
+  if (!panel || !visual) return;
+  const money = (amount: number): string => `${currency} ${formatNumber(amount, 2)}`;
+  const unit = result.system === 'metric' ? 'km' : 'mi';
+  const fuelUnit = result.system === 'metric' ? 'L' : 'US gal';
+  const distance = `${formatNumber(result.distance)} ${unit}`;
+  const fuel = `${formatNumber(result.fuelRequired)} ${fuelUnit}`;
+  const direction = result.roundTrip ? 'Round trip' : 'One way';
+  const set = (selector: string, content: string): void => {
+    const node = form.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = content;
+  };
+  set('[data-trip-total]', money(result.totalTripCost));
+  set('[data-trip-context]', `${money(result.fuelCost)} fuel + ${money(result.extraCost)} extras across ${distance}.`);
+  set('[data-trip-fuel]', fuel);
+  set('[data-trip-fuel-cost]', `${money(result.fuelCost)} for fuel`);
+  set('[data-trip-direction]', direction);
+  set('[data-trip-distance]', distance);
+  set('[data-trip-person]', money(result.costPerPerson));
+  set('[data-trip-people]', `Shared by ${result.people} people`);
+  const person = form.querySelector<HTMLElement>('[data-trip-person-wrap]');
+  if (person) person.hidden = result.people <= 1;
+  set('[data-trip-visual-distance]', distance);
+  set('[data-trip-visual-fuel]', fuel);
+  set('[data-trip-visual-total]', money(result.totalTripCost));
+  set('[data-trip-visual-fuel-cost]', money(result.fuelCost));
+  set('[data-trip-visual-extras]', money(result.extraCost));
+  set('[data-trip-end]', result.roundTrip ? 'RETURN TO START' : 'DESTINATION');
+  const returnLeg = visual.querySelector<HTMLElement>('[data-trip-return]');
+  if (returnLeg) returnLeg.hidden = !result.roundTrip;
+  const fuelBar = visual.querySelector<HTMLElement>('[data-trip-fuel-bar]');
+  const extraBar = visual.querySelector<HTMLElement>('[data-trip-extra-bar]');
+  if (fuelBar) fuelBar.style.width = `${result.fuelCost / result.totalTripCost * 100}%`;
+  if (extraBar) extraBar.style.width = `${result.extraCost / result.totalTripCost * 100}%`;
+  const track = visual.querySelector<HTMLElement>('[data-trip-cost-track]');
+  if (track) track.setAttribute('aria-label', `Fuel ${money(result.fuelCost)} and extras ${money(result.extraCost)} of ${money(result.totalTripCost)}`);
+  panel.classList.remove('is-pending');
+  visual.classList.remove('is-pending');
+}
+
+function resetRoadTripPrimary(form: HTMLFormElement): void {
+  form.querySelector('[data-trip-primary]')?.classList.add('is-pending');
+  form.querySelector('[data-trip-visual]')?.classList.add('is-pending');
+  for (const selector of ['[data-trip-total]', '[data-trip-fuel]', '[data-trip-direction]', '[data-trip-person]', '[data-trip-visual-distance]', '[data-trip-visual-fuel]', '[data-trip-visual-total]', '[data-trip-visual-fuel-cost]', '[data-trip-visual-extras]']) {
+    const node = form.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = '—';
+  }
+  const context = form.querySelector<HTMLElement>('[data-trip-context]');
+  if (context) context.textContent = 'Check the inputs to calculate this trip.';
+  for (const [selector, content] of [['[data-trip-fuel-cost]', 'Fuel cost appears here.'], ['[data-trip-distance]', 'Distance appears here.'], ['[data-trip-end]', 'DESTINATION']] as const) {
+    const node = form.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = content;
+  }
+  const returnLeg = form.querySelector<HTMLElement>('[data-trip-return]');
+  if (returnLeg) returnLeg.hidden = true;
+  const person = form.querySelector<HTMLElement>('[data-trip-person-wrap]');
+  if (person) person.hidden = true;
+  for (const selector of ['[data-trip-fuel-bar]', '[data-trip-extra-bar]']) {
+    const bar = form.querySelector<HTMLElement>(selector);
+    if (bar) bar.style.width = '0%';
   }
 }
 
@@ -142,10 +209,21 @@ export function initializeUtilityCalculators(): void {
     form.addEventListener('change', calculate);
     calculate();
   });
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="road-trip"]').forEach((form) => { initializeFuelPreferences(form); form.addEventListener('change', () => syncFuelLabels(form)); syncFuelLabels(form); bindSubmit(form, () => {
-    const base = fuelInput(form); const result = calculateRoadTripCostTool({ ...base, roundTrip: textValue(form, 'tripType') === 'round', extraCost: value(form, 'extraCost'), people: value(form, 'people') });
-    render(form, result.ok ? { ok: true, ...roadTripPresentation(result.value, textValue(form, 'currency') || 'USD') } : result);
-  }); });
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="road-trip"]').forEach((form) => {
+    initializeFuelPreferences(form);
+    const calculate = (): void => {
+      syncFuelLabels(form);
+      const base = fuelInput(form);
+      const result = calculateRoadTripCostTool({ ...base, roundTrip: textValue(form, 'tripType') === 'round', extraCost: value(form, 'extraCost'), people: value(form, 'people') });
+      const currency = textValue(form, 'currency') || 'USD';
+      render(form, result.ok ? { ok: true, ...roadTripPresentation(result.value, currency) } : result);
+      if (result.ok) syncRoadTripPrimary(form, result.value, currency); else resetRoadTripPrimary(form);
+    };
+    form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); });
+    form.addEventListener('input', calculate);
+    form.addEventListener('change', calculate);
+    calculate();
+  });
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="fuel-economy"]').forEach((form) => bindInstant(form, () => { const result = convertFuelEconomyTool(value(form, 'value'), textValue(form, 'unit') as FuelEconomyUnit); render(form, result.ok ? { ok: true, ...fuelEconomyPresentation(result.value) } : result); }));
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="pressure"]').forEach((form) => bindInstant(form, () => { const result = convertPressureTool(value(form, 'value'), textValue(form, 'unit') as PressureUnit); render(form, result.ok ? { ok: true, ...pressurePresentation(result.value) } : result); }));
   document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power"]').forEach((form) => bindInstant(form, () => { const result = convertPowerTool(value(form, 'value'), textValue(form, 'unit') as PowerUnit); render(form, result.ok ? { ok: true, ...powerPresentation(result.value) } : result); }));

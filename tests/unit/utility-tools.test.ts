@@ -45,6 +45,19 @@ describe('traffic-first utility calculations', () => {
     expect(roadTripPresentation(result.value, 'EUR').summary).toContain('Round trip: 840 km');
   });
 
+  it('adds extras once on a return journey and keeps the one-way comparison explicit', () => {
+    const base = { system: 'imperial' as const, distance: 100, economy: 25, price: 4, extraCost: 10, people: 2 };
+    const oneWay = calculateRoadTripCostTool({ ...base, roundTrip: false });
+    const returnTrip = calculateRoadTripCostTool({ ...base, roundTrip: true });
+    expect(oneWay.ok && returnTrip.ok).toBe(true);
+    if (!oneWay.ok || !returnTrip.ok) return;
+    expect(oneWay.value.totalTripCost).toBe(26);
+    expect(returnTrip.value.totalTripCost).toBe(42);
+    expect(returnTrip.value.fuelRequired).toBe(8);
+    expect(returnTrip.value.costPerPerson).toBe(21);
+    expect(roadTripPresentation(returnTrip.value, 'USD').summary).toContain('Round trip: 200 mi');
+  });
+
   it('keeps US and Imperial MPG distinct', () => {
     const us = convertFuelEconomyTool(30, 'us-mpg');
     const imperial = convertFuelEconomyTool(30, 'imperial-mpg');
