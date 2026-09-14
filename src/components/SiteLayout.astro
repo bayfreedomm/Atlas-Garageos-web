@@ -5,8 +5,10 @@ import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
+import MobileDock from './MobileDock.astro';
 import '../styles/global.css';
 import '../styles/product-v3.css';
+import '../styles/product-v4.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
 interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string; active?: 'home' | 'garage' | 'fitment' | 'tools'; breadcrumbs?: readonly Breadcrumb[]; }
@@ -61,5 +63,6 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     </div></header>
     <main id="main-content"><slot /></main>
     <Footer />
+    <MobileDock active={active === 'home' ? 'home' : active === 'fitment' ? 'fitment' : 'tools'} />
   </body>
 </html>

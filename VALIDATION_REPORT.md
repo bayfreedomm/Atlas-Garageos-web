@@ -1,30 +1,25 @@
-# Atlas GarageOS V3.1 Validation Report
+# Atlas GarageOS V4 Validation Report
 
 Validated on 2026-09-14 in the review environment.
 
-## Passed checks
-- Independent regression runner: **105 passed / 0 failed**.
-- Astro compiler parse: **41 Astro files / 0 parse failures**.
-- Runtime TypeScript source check (core/domain/features/localization/SEO/storage/UI/content): **passed**.
-- CSS parse: `global.css` and `product-v3.css`: **passed**.
+## Baseline inherited from V3.1
+- 105/105 regression scenarios passed before the V4 presentation layer work.
+- Core/domain/calculator mathematics were not rewritten in V4.
+- V3.1 Astro/TypeScript/CSS checks had passed before the V4 visual layer.
 
-## Included in V3.1
-- Dynamic Tire Size Comparison technical visual with true-scale side overlay, nominal front-width comparison, and an explicitly magnified difference lens.
-- Dynamic Wheel Offset technical cutaway with current/new wheel positions and live inner/outer movement.
-- Live valid-input visual previews for Tire Size, Tire Comparison, and Wheel Offset.
-- Quick Facts / Common Mistake / Important Warning content system across the current tool registry.
-- Accuracy & Methodology page.
-- WebApplication structured data and Open Graph/Twitter text metadata baseline.
-- Shareable state URLs for Tire Size Comparison and Wheel Offset with clean canonical URLs.
-- First-wave localization routing/slug registry for EN, DE, ES, PT-BR, FR; only English is published until complete localization QA.
-- Durable `V3_MASTER_PLAN.md` decision ledger.
+## V4-specific review
+- New files/references verified: `MobileDock.astro`, `TireSizeTechnicalVisual.astro`, `product-v4.css`.
+- SiteLayout imports the V4 layer after V3, so V4 is the final presentation layer.
+- Fitment Studio imports the same V4 layer and mobile dock.
+- Tire Size technical visual is wired to the existing validated tire calculator output and updates on valid input preview.
+- No new external image dependency was added for the home hero; it is inline SVG.
+- Existing calculation functions and validated conversion constants were left unchanged.
 
-## Environment limitation
-A full production Astro build was not run in this Linux review container because the originally uploaded dependency tree was installed on Windows and contains platform-specific native dependencies. The source package intentionally excludes `node_modules`, `dist`, `.astro`, and `.git`.
+## Final deployment gate
+Because this review environment does not have the clean Node 24 / pnpm 11 platform dependency tree used by Cloudflare, the final production build remains a deployment gate:
+1. clean `pnpm install`
+2. `pnpm test`
+3. `pnpm build`
+4. smoke-test `/en/`, `/en/tools/`, Tire Size, Tire Comparison, Wheel Offset and Fitment Compare at 360–430 px widths
 
-Launch gate on the real Git/Cloudflare build path remains:
-1. Use Node 24+ and pnpm 11.19.0.
-2. Run a clean `pnpm install`.
-3. Run `pnpm test`.
-4. Run `pnpm build`.
-5. Smoke-test routes, redirects, sitemap, canonical tags, share URLs, and representative 360–430 px mobile widths.
+Do not treat a successful upload alone as launch approval; inspect the deployed pages visually after Cloudflare's clean build.

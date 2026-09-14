@@ -121,3 +121,10 @@ Next implementation pass:
 - Exact pressure/contact-patch simulation without load/tire-construction data.
 - Browser extension until Atlas usage data indicates the best job to solve.
 - China localization/distribution in the first wave.
+
+## V4 visual implementation checkpoint — 2026-09-14
+- Approved dark automotive chrome + bright app-like calculator surface is now implemented in source.
+- Mobile bottom navigation is implemented.
+- Tire Size live technical anatomy is implemented.
+- Tire Comparison and Wheel Offset V3.1 dynamic technical visuals are preserved under the V4 shell.
+- Next visual expansion: Fuel Cost, Road Trip, EV Charging, Speedometer, Gear Ratio, Fitment Compare.

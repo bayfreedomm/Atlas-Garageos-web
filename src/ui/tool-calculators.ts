@@ -41,6 +41,35 @@ function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiame
   if (proposedLabel && proposed && proposedDiameterMm !== undefined) proposedLabel.textContent = `${proposed.widthMm}/${proposed.aspectRatio} R${proposed.rimDiameterInches} · ${proposedDiameterMm.toFixed(1)} mm`;
 }
 
+
+function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
+  const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
+  if (!visual) return;
+  const maxDiameter = 850;
+  const diameterScale = Math.min(1.08, Math.max(.72, result.overallDiameterMm / 680));
+  const widthScale = Math.min(1.18, Math.max(.78, input.widthMm / 225));
+  const wheel = visual.querySelector<SVGGElement>('[data-single-tire-wheel]');
+  wheel?.setAttribute('transform', `translate(210 145) scale(${widthScale.toFixed(3)} ${diameterScale.toFixed(3)})`);
+  const rimScale = Math.min(1.18, Math.max(.76, input.rimDiameterInches / 18));
+  const rim = visual.querySelector<SVGEllipseElement>('[data-single-tire-rim]');
+  if (rim) { rim.setAttribute('rx', (55 * rimScale / widthScale).toFixed(1)); rim.setAttribute('ry', (64 * rimScale / diameterScale).toFixed(1)); }
+  const widthHalf = 94 * widthScale;
+  visual.querySelector<SVGPathElement>('[data-single-width-line]')?.setAttribute('d', `M${(210-widthHalf).toFixed(1)} 22H${(210+widthHalf).toFixed(1)}`);
+  const diameterHalf = 110 * diameterScale;
+  visual.querySelector<SVGPathElement>('[data-single-diameter-line]')?.setAttribute('d', `M86 ${(145-diameterHalf).toFixed(1)}V${(145+diameterHalf).toFixed(1)}`);
+  const rimHalf = 64 * rimScale;
+  visual.querySelector<SVGPathElement>('[data-single-rim-line]')?.setAttribute('d', `M319 ${(145-rimHalf).toFixed(1)}V${(145+rimHalf).toFixed(1)}`);
+  const set = (selector: string, value: string): void => { const el = visual.querySelector<HTMLElement>(selector); if (el) el.textContent = value; };
+  set('[data-single-width-text]', `${input.widthMm} mm width`);
+  set('[data-single-diameter-text]', `${result.overallDiameterMm.toFixed(1)} mm`);
+  set('[data-single-rim-text]', `${input.rimDiameterInches} in rim`);
+  set('[data-single-size-label]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
+  set('[data-single-sidewall]', `${result.sidewallHeightMm.toFixed(1)} mm`);
+  set('[data-single-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
+  const profile = input.aspectRatio >= 55 ? 'taller' : input.aspectRatio <= 35 ? 'lower-profile' : 'balanced';
+  set('[data-single-meaning]', `${profile === 'taller' ? 'A taller sidewall is more visually pronounced.' : profile === 'lower-profile' ? 'A lower-profile sidewall puts more visual emphasis on the rim.' : 'This profile keeps a balanced sidewall-to-rim proportion.'} The drawing follows the entered proportions.`);
+}
+
 function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): void {
   const visual = form.querySelector<HTMLElement>('[data-fitment-visualizer]');
   if (!visual) return;
@@ -200,12 +229,12 @@ export function initializeToolCalculators(): void {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
       if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
-      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); renderMetrics(results, tireCalculatorMetrics(result.value));
+      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value));
     };
     const preview = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
-      if (result.ok) setTireVisual(form, input, result.value.overallDiameterMm);
+      if (result.ok) { setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); }
     };
     form.addEventListener('input', () => requestAnimationFrame(preview));
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate();

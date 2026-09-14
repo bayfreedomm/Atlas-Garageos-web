@@ -1,8 +1,8 @@
 <script is:inline>
   (() => {
     try {
-      const saved = localStorage.getItem('atlas-theme');
-      const preference = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+      const saved = localStorage.getItem('atlas-theme-v4');
+      const preference = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light';
       const resolved = preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : preference === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = resolved;
       document.documentElement.dataset.themePreference = preference;

@@ -6,8 +6,10 @@ import ThemeBoot from '../../../components/ThemeBoot.astro';
 import NavigationDrawer from '../../../components/NavigationDrawer.astro';
 import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
 import Footer from '../../../components/Footer.astro';
+import MobileDock from '../../../components/MobileDock.astro';
 import '../../../styles/global.css';
 import '../../../styles/product-v3.css';
+import '../../../styles/product-v4.css';
 
 const seo = toolById('fitment-studio');
 const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
@@ -150,6 +152,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
 
 
     <Footer />
+    <MobileDock active="fitment" />
     <script>
       import { initializeFitmentPage } from '../../../ui/fitment-page';
       void initializeFitmentPage();

@@ -1,7 +1,7 @@
 export type ThemePreference = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
 
-export const THEME_STORAGE_KEY = 'atlas-theme';
+export const THEME_STORAGE_KEY = 'atlas-theme-v4';
 
 export function parseThemePreference(value: unknown): ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system' ? value : 'system';

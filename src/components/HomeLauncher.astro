@@ -49,52 +49,56 @@ const categories = [
   ['Performance', 'Power-to-weight and gearing'],
 ] as const;
 ---
-<section class="home-launcher" data-toolbox data-mode="home" aria-labelledby="home-heading">
-  <header class="home-hero">
-    <p class="home-kicker">ATLAS GARAGEOS</p>
-    <h1 id="home-heading">Car questions.<br />Clear answers.</h1>
-    <p class="home-lead">Fast automotive calculators built for phones. Pick a job, enter your numbers, get the answer.</p>
+<section class="home-launcher home-launcher--v4" data-toolbox data-mode="home" aria-labelledby="home-heading">
+  <section class="home-v4-hero">
+    <div class="home-v4-copy">
+      <p class="home-kicker">SIMPLE TOOLS FOR REAL CAR ENTHUSIASTS</p>
+      <h1 id="home-heading">Calculate.<br />Compare.<br />Understand.</h1>
+      <p class="home-lead">Fast automotive calculators that turn numbers into something you can actually see.</p>
+      <form class="home-search" data-tool-search-form>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+        <label class="sr-only" for="tool-search-home">Search automotive tools</label>
+        <input id="tool-search-home" type="search" placeholder="Search tire size, fuel, offset..." autocomplete="off" data-tool-search />
+        <button type="submit">Find</button>
+      </form>
+    </div>
+    <div class="home-v4-car" aria-hidden="true">
+      <svg viewBox="0 0 760 360">
+        <defs><linearGradient id="carBodyV4" x1="0" x2="1"><stop offset="0" stop-color="#0c2234"/><stop offset=".55" stop-color="#123e62"/><stop offset="1" stop-color="#07131d"/></linearGradient><linearGradient id="carGlassV4" x1="0" x2="1"><stop offset="0" stop-color="#2c6687" stop-opacity=".82"/><stop offset="1" stop-color="#0b1a25" stop-opacity=".94"/></linearGradient></defs>
+        <path class="car-v4-shadow" d="M90 298c118-19 474-19 584 2-88 29-500 34-584-2Z"/>
+        <path class="car-v4-body" fill="url(#carBodyV4)" d="M88 242c20-31 54-51 105-61l96-20 83-78h126l91 84 74 20c42 11 65 35 72 72l-20 24H117L82 266Z"/>
+        <path class="car-v4-glass" fill="url(#carGlassV4)" d="m305 157 77-62h105l73 70-118-7Z"/>
+        <path class="car-v4-line" d="M108 239h563M289 162l-25 90m329-79-32 83M371 86l20 72"/>
+        <g class="car-v4-wheel"><circle cx="220" cy="267" r="58"/><circle cx="220" cy="267" r="34"/><circle cx="220" cy="267" r="9"/><path d="M220 235v64m-28-48 56 32m-56 0 56-32"/></g>
+        <g class="car-v4-wheel"><circle cx="581" cy="267" r="58"/><circle cx="581" cy="267" r="34"/><circle cx="581" cy="267" r="9"/><path d="M581 235v64m-28-48 56 32m-56 0 56-32"/></g>
+        <path class="car-v4-accent" d="M124 213h92m423 14h64"/>
+      </svg>
+      <span>LIVE CALCULATORS · VISUAL RESULTS</span>
+    </div>
+  </section>
 
-    <form class="home-search" data-tool-search-form>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
-      <label class="sr-only" for="tool-search-home">Search automotive tools</label>
-      <input id="tool-search-home" type="search" placeholder="What do you need to calculate?" autocomplete="off" data-tool-search />
-      <button type="submit">Find</button>
-    </form>
-
+  <section class="home-v4-surface">
     <div class="home-category-grid" aria-label="Tool categories">
       {categories.map(([name, copy]) => (
         <a href={`/en/tools/?category=${encodeURIComponent(name)}`}>
-          <span>{name}</span>
-          <small>{copy}</small>
-          <i aria-hidden="true">›</i>
+          <span>{name}</span><small>{copy}</small><i aria-hidden="true">›</i>
         </a>
       ))}
     </div>
-  </header>
 
-  <section class="home-popular" aria-labelledby="popular-heading">
-    <div class="home-section-heading">
-      <div><p>START HERE</p><h2 id="popular-heading">Popular tools</h2></div>
-      <a href="/en/tools/">All {tools.length} tools <span aria-hidden="true">›</span></a>
-    </div>
+    <section class="home-popular" aria-labelledby="popular-heading">
+      <div class="home-section-heading"><div><p>POPULAR TOOLS</p><h2 id="popular-heading">Start with a job</h2></div><a href="/en/tools/">See all <span aria-hidden="true">→</span></a></div>
+      <div class="tool-launch-list" data-tool-rows>
+        {ordered.map((tool) => (
+          <a class:list={['tool-launch-row', { 'is-secondary': !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
+            <ToolIcon id={tool.id} category={tool.category}/><span><strong>{shortNames.get(tool.id) ?? tool.title}</strong>{helper.get(tool.id) && <small>{helper.get(tool.id)}</small>}</span><i aria-hidden="true">›</i>
+          </a>
+        ))}
+      </div>
+      <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
+    </section>
 
-    <div class="tool-launch-list" data-tool-rows>
-      {ordered.map((tool) => (
-        <a class:list={['tool-launch-row', { 'is-secondary': !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
-          <ToolIcon id={tool.id} category={tool.category}/>
-          <span><strong>{shortNames.get(tool.id) ?? tool.title}</strong>{helper.get(tool.id) && <small>{helper.get(tool.id)}</small>}</span>
-          <i aria-hidden="true">›</i>
-        </a>
-      ))}
-    </div>
-    <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
+    <a class="home-fitment-feature" href="/en/fitment-studio/"><span class="home-fitment-feature__badge">ADVANCED VISUAL TOOL</span><span class="home-fitment-feature__copy"><strong>Wheel &amp; Tire Fitment Compare</strong><small>See how a new setup changes diameter, inner position and outer stance before you buy.</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
-
-  <a class="home-fitment-feature" href="/en/fitment-studio/">
-    <span class="home-fitment-feature__badge">ADVANCED</span>
-    <span class="home-fitment-feature__copy"><strong>Wheel &amp; Tire Fitment Compare</strong><small>Compare a current setup with a new one and see exactly how the geometry changes.</small></span>
-    <span class="home-fitment-feature__arrow" aria-hidden="true">›</span>
-  </a>
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>
