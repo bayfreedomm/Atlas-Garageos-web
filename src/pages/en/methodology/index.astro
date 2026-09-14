@@ -1,0 +1,20 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+---
+<SiteLayout title="Accuracy & Methodology" description="How Atlas GarageOS automotive calculators work, which formulas and assumptions they use, and where calculated results stop." pathname="/en/methodology/" active="tools" breadcrumbs={[{ name: 'Home', href: '/en/' }, { name: 'Accuracy & Methodology', href: '/en/methodology/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Accuracy &amp; Methodology</span></nav>
+  <header class="directory-identity methodology-hero"><p class="eyebrow">Transparency first</p><h1>Accuracy &amp; methodology</h1><p>Atlas separates exact unit conversion, nominal geometry, user-entered estimates, and real-world uncertainty instead of turning every result into a false verdict.</p></header>
+
+  <div class="methodology-grid">
+    <section><h2>What runs in your browser</h2><p>Calculator inputs are processed on the device. Core calculations are deterministic functions: the same valid inputs produce the same result without an Atlas account or application server.</p></section>
+    <section><h2>Tire geometry</h2><p>Metric tire dimensions use nominal sidewall geometry: sidewall height = section width × aspect ratio; overall diameter = rim diameter in millimetres + two sidewalls; circumference = π × diameter. Actual mounted tires vary by product, rim width, pressure, load, wear, and manufacturing tolerance.</p></section>
+    <section><h2>Wheel width &amp; offset</h2><p>Wheel-position tools compare the half-width change and offset change to calculate inner-edge movement and outer-poke movement. They describe static wheel geometry only — not brake shape, tire bulge, suspension travel, steering angle, alignment, or body clearance.</p></section>
+    <section><h2>Fuel &amp; trip estimates</h2><p>Fuel tools use the distance, efficiency, price, trip direction, passenger count, and extras you enter. They do not predict traffic, weather, driving style, fuel-price changes, or a specific vehicle's future consumption.</p></section>
+    <section><h2>Unit conversions</h2><p>Pressure, power, torque, distance, and fuel-economy conversions use explicit unit standards. MPG calculations keep US and Imperial gallons separate because they are different volumes.</p></section>
+    <section><h2>EV charging</h2><p>Energy and cost calculations include the efficiency value you enter. Charging time is an idealized constant-power estimate; real charging can be limited by the vehicle, charger, battery temperature, state of charge, and charging curve.</p></section>
+    <section><h2>Fitment status</h2><p>Atlas does not treat a non-negative static clearance as proof of vehicle compatibility. When no user target exists, geometry should remain neutral rather than becoming a green road-safety verdict.</p></section>
+    <section><h2>How to use Atlas</h2><p>Use the calculators to understand direction, magnitude, and relationships before making a decision. For anything safety-critical, legal, load-related, or vehicle-specific, verify against the vehicle manual, component manufacturer documentation, and a qualified professional.</p></section>
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="source-heading"><p class="eyebrow">Reference standards</p><h2 id="source-heading">Useful external references</h2><p>Atlas keeps its formulas explicit and uses primary or standards-oriented references where practical.</p><div class="methodology-source-links"><a href="https://www.nist.gov/pml/special-publication-811" rel="external noopener">NIST Guide to SI units and conversions <span>↗</span></a><a href="https://afdc.energy.gov/fuels/electricity-stations" rel="external noopener">U.S. DOE Alternative Fuels Data Center — EV charging <span>↗</span></a></div></section>
+</SiteLayout>

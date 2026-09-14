@@ -1,0 +1,72 @@
+<figure class="tire-tech-visual" data-tire-tech-visual aria-labelledby="tire-tech-title">
+  <figcaption>
+    <div><span class="visual-kicker">Live geometry</span><strong id="tire-tech-title">See the difference, not just the numbers</strong></div>
+    <p>Blue is the current tire. Orange is the new tire. Shapes stay proportional to the entered dimensions.</p>
+  </figcaption>
+
+  <div class="tire-tech-grid">
+    <section class="tire-tech-card tire-tech-card--overlay" aria-label="True-scale side-view tire comparison">
+      <header><strong>Side overlay</strong><span>TRUE SCALE</span></header>
+      <svg viewBox="0 0 360 250" role="img" aria-label="Current and new tire diameters drawn at the same scale">
+        <defs>
+          <radialGradient id="tireShadeCurrent" cx="35%" cy="28%" r="76%"><stop offset="0" stop-color="#52636f"/><stop offset=".5" stop-color="#27333b"/><stop offset="1" stop-color="#11181d"/></radialGradient>
+          <radialGradient id="tireShadeNew" cx="35%" cy="28%" r="76%"><stop offset="0" stop-color="#7a5843"/><stop offset=".5" stop-color="#402c22"/><stop offset="1" stop-color="#1b1512"/></radialGradient>
+        </defs>
+        <path class="tech-ground" d="M36 213H324" />
+        <g class="tech-side tech-side--current" data-current-side transform="translate(180 116)">
+          <circle data-current-side-tire r="76" fill="url(#tireShadeCurrent)"/>
+          <circle data-current-side-rim r="48" />
+          <circle class="tech-hub" r="8"/>
+          <path class="tech-spokes" d="M0-40V40M-40 0H40M-28-28 28 28M28-28-28 28" />
+        </g>
+        <g class="tech-side tech-side--new" data-new-side transform="translate(180 116)">
+          <circle data-new-side-tire r="72" fill="none"/>
+          <circle data-new-side-rim r="46" fill="none"/>
+        </g>
+        <g class="tech-measure tech-measure--current"><path data-current-diameter-line d="M76 40V192"/><path d="M68 40h16M68 192h16"/><text data-current-diameter-text x="51" y="119" text-anchor="middle">659.7</text></g>
+        <g class="tech-measure tech-measure--new"><path data-new-diameter-line d="M284 43V189"/><path d="M276 43h16M276 189h16"/><text data-new-diameter-text x="309" y="119" text-anchor="middle">670.6</text></g>
+        <g class="tech-legend-inline"><circle cx="122" cy="230" r="5" class="tech-dot-current"/><text x="133" y="234">CURRENT</text><circle cx="219" cy="230" r="5" class="tech-dot-new"/><text x="230" y="234">NEW</text></g>
+      </svg>
+      <p class="tire-tech-caption" data-side-meaning>The new tire is shown over the current tire at the same scale.</p>
+    </section>
+
+    <section class="tire-tech-card tire-tech-card--front" aria-label="True-scale front-view nominal tire width comparison">
+      <header><strong>Front width</strong><span>NOMINAL WIDTH</span></header>
+      <svg viewBox="0 0 360 250" role="img" aria-label="Current and new tire widths shown from the front">
+        <defs>
+          <linearGradient id="frontTireCurrent" x1="0" x2="1"><stop offset="0" stop-color="#12191e"/><stop offset=".5" stop-color="#45535d"/><stop offset="1" stop-color="#11171c"/></linearGradient>
+          <linearGradient id="frontTireNew" x1="0" x2="1"><stop offset="0" stop-color="#18120f"/><stop offset=".5" stop-color="#714b36"/><stop offset="1" stop-color="#18120f"/></linearGradient>
+          <pattern id="treadCurrent" width="14" height="18" patternUnits="userSpaceOnUse"><path d="M2 0l8 9-8 9M12 0 4 9l8 9" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/></pattern>
+          <pattern id="treadNew" width="14" height="18" patternUnits="userSpaceOnUse"><path d="M2 0l8 9-8 9M12 0 4 9l8 9" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/></pattern>
+        </defs>
+        <path class="tech-ground" d="M28 213H332" />
+        <g data-current-front transform="translate(105 44)">
+          <rect data-current-front-body x="-47" y="0" width="94" height="166" rx="38" fill="url(#frontTireCurrent)"/>
+          <rect data-current-front-tread x="-43" y="4" width="86" height="158" rx="34" fill="url(#treadCurrent)"/>
+          <path class="front-centerline" d="M0 10v146" />
+        </g>
+        <g data-new-front transform="translate(255 44)">
+          <rect data-new-front-body x="-49" y="0" width="98" height="166" rx="38" fill="url(#frontTireNew)"/>
+          <rect data-new-front-tread x="-45" y="4" width="90" height="158" rx="34" fill="url(#treadNew)"/>
+          <path class="front-centerline front-centerline--new" d="M0 10v146" />
+        </g>
+        <g class="tech-width-measure tech-width-measure--current"><path data-current-width-line d="M58 29H152"/><path d="M58 23v12M152 23v12"/><text data-current-width-text x="105" y="18" text-anchor="middle">225 mm</text></g>
+        <g class="tech-width-measure tech-width-measure--new"><path data-new-width-line d="M206 29H304"/><path d="M206 23v12M304 23v12"/><text data-new-width-text x="255" y="18" text-anchor="middle">235 mm</text></g>
+        <text class="tech-front-label tech-front-label--current" x="105" y="232" text-anchor="middle" data-current-size-label>225/45 R18</text>
+        <text class="tech-front-label tech-front-label--new" x="255" y="232" text-anchor="middle" data-new-size-label>235/40 R19</text>
+      </svg>
+      <p class="tire-tech-caption" data-width-meaning>Nominal section width is drawn proportionally so width changes are easy to see.</p>
+    </section>
+
+    <section class="tire-tech-card tire-tech-card--magnify" aria-label="Magnified tire dimension differences">
+      <header><strong>Difference lens</strong><span>SMALL CHANGES MAGNIFIED</span></header>
+      <div class="difference-lens">
+        <div class="difference-lens__row"><span>Overall diameter</span><strong data-diff-diameter>+10.9 mm</strong><div class="difference-track"><i data-diff-diameter-bar></i></div></div>
+        <div class="difference-lens__row"><span>Nominal width</span><strong data-diff-width>+10 mm</strong><div class="difference-track"><i data-diff-width-bar></i></div></div>
+        <div class="difference-lens__row"><span>Sidewall</span><strong data-diff-sidewall>-7.3 mm</strong><div class="difference-track"><i data-diff-sidewall-bar></i></div></div>
+        <div class="difference-lens__row"><span>Static ride height</span><strong data-diff-ride>+5.45 mm</strong><div class="difference-track"><i data-diff-ride-bar></i></div></div>
+      </div>
+      <p class="tire-tech-caption">Bars intentionally magnify the difference. The two drawings above keep the dimensions proportional.</p>
+    </section>
+  </div>
+</figure>

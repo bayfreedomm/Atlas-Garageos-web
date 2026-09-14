@@ -27,7 +27,7 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
-    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(14);
+    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(15);
     expect(hub).toContain('<ToolDirectory mode="all"');
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('data-tool-search-form');
@@ -39,8 +39,8 @@ describe('toolbox-first product surfaces', () => {
     expect(layout).not.toContain('bottom-nav');
     expect(drawer).toContain('aria-controls="navigation-drawer"');
     expect(drawer).toContain('data-menu-close');
-    expect(drawer).toContain('Fitment Studio');
-    expect(drawer).toContain('My Garage');
+    expect(drawer).toContain('Wheel &amp; Tire Compare');
+    expect(drawer).not.toContain('My Garage');
     expect(drawer).toContain('<ThemeControl');
   });
 

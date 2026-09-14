@@ -15,3 +15,6 @@
 ## Quality gates
 
 Before a checkpoint, run `pnpm test`, `pnpm typecheck`, and `pnpm build`. Add unit tests for every important formula and regression. Preserve unrelated working code and keep experiments outside the production core.
+
+## V3 decision ledger
+Before significant product, UI, SEO, localization, growth, or visual changes, read `V3_MASTER_PLAN.md`. Locked decisions must not be silently removed or reversed; update the ledger when an implementation pass changes status.

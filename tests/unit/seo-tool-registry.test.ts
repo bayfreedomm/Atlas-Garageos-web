@@ -5,6 +5,7 @@ import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
 const intendedRoutes = [
   '/en/',
   '/en/tools/',
+  '/en/methodology/',
   '/en/fitment-studio/',
   '/en/tools/tire-size-calculator/',
   '/en/tools/tire-size-comparison/',
@@ -15,6 +16,7 @@ const intendedRoutes = [
   '/en/tools/measure-my-car/',
   '/en/tools/fuel-cost-calculator/',
   '/en/tools/road-trip-cost-calculator/',
+  '/en/tools/ev-charging-cost-calculator/',
   '/en/tools/mpg-l100km-converter/',
   '/en/tools/psi-bar-converter/',
   '/en/tools/hp-kw-converter/',

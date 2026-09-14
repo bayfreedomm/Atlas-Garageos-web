@@ -1,0 +1,20 @@
+---
+import type { ToolId } from '../seo/tool-registry';
+import { insightForTool } from '../content/tool-insights';
+interface Props { id: ToolId; }
+const { id } = Astro.props;
+const insight = insightForTool(id);
+---
+<section class="tool-insights" aria-labelledby={`insights-${id}`}>
+  <div class="tool-insights__heading">
+    <p class="eyebrow">Quick understanding</p>
+    <h2 id={`insights-${id}`}>What matters here</h2>
+  </div>
+  <div class="quick-facts">
+    {insight.facts.map((fact) => <article class="quick-fact"><strong>{fact.title}</strong><p>{fact.body}</p></article>)}
+  </div>
+  <div class="insight-alerts">
+    {insight.commonMistake && <aside class="insight-alert insight-alert--mistake"><span aria-hidden="true">!</span><div><strong>Common mistake</strong><p>{insight.commonMistake}</p></div></aside>}
+    {insight.warning && <aside class="insight-alert insight-alert--warning"><span aria-hidden="true">!</span><div><strong>Important warning</strong><p>{insight.warning}</p></div></aside>}
+  </div>
+</section>

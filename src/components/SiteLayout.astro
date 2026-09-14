@@ -6,7 +6,7 @@ import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
 import '../styles/global.css';
-import '../styles/atlas-v2.css';
+import '../styles/product-v3.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
 interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string; active?: 'home' | 'garage' | 'fitment' | 'tools'; breadcrumbs?: readonly Breadcrumb[]; }
@@ -19,6 +19,7 @@ if (!title || !description || !pathname) throw new Error('SiteLayout requires de
 const active = props.active ?? (definition?.kind === 'flagship' ? 'fitment' : definition ? 'tools' : undefined);
 const canonical = canonicalForPath(pathname);
 const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
+const applicationJsonLd = definition && definition.kind === 'tool' ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
   ? [{ name: definition.title, href: pathname }]
   : definition ? [{ name: 'Home', href: '/en/' }, { name: 'Tools', href: '/en/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
@@ -32,6 +33,14 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="robots" content="index,follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Atlas GarageOS" />
+    <meta property="og:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
+    <meta name="twitter:description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={canonical} />
     <link rel="alternate" hreflang="x-default" href={canonicalForPath('/')} />
@@ -40,13 +49,14 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <meta name="theme-color" content="#233630" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
+    {applicationJsonLd && <script is:inline type="application/ld+json" set:html={applicationJsonLd}></script>}
     <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
       <a class="brand" href="/en/" aria-label="Atlas GarageOS home"><Brand /></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Fitment Studio</a><a href="/en/fitment-studio/#garage" aria-current={active === 'garage' ? 'page' : undefined}>My Garage</a></nav>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="/en/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/en/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
       <NavigationDrawer />
     </div></header>
     <main id="main-content"><slot /></main>

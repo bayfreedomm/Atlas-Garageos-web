@@ -1,0 +1,123 @@
+# Atlas GarageOS V3 — Master Product / SEO / Visual Plan
+
+This file is the decision ledger. Do not silently remove a locked decision. Update status after each major implementation pass.
+
+## North star
+- Primary growth objective: win valuable automotive calculator queries in Google organic search.
+- Secondary channels: shareable results, embeds/backlinks, communities/social, Bing/IndexNow, and later browser extensions when product usage data justifies one.
+- Product promise: enter a few values, get a clear answer immediately, then understand what the number means visually.
+- Mobile-first. Desktop expands the mobile system; it does not define it.
+
+## Locked product decisions
+- Preserve calculation/domain engines unless correctness testing finds a real defect.
+- Home is a fast automotive-tool launcher, not a dashboard.
+- My Garage is optional save-later memory, not a primary first-visit concept.
+- Wheel & Tire Fitment Compare is advanced. `What Fits` remains hidden/experimental until wheel/tire compatibility and real-clearance modeling are strong enough for the claim.
+- Do not use green states to imply safety when only non-overlap geometry is known.
+- Every important calculator follows: input → answer → visual meaning → quick facts → common mistake/warning → methodology → related tools.
+
+## Visual system — locked
+- Dynamic code/SVG first; avoid heavy decorative raster imagery inside calculator pages.
+- Technical-premium hybrid: light 3D/axonometric engineering illustration, measurement lines, callouts, cutaways, proportional shapes, restrained shading.
+- Current setup = blue/neutral; proposed setup = orange/amber. Warning colors are reserved for caution/risk.
+- `NUMBER → SHAPE → MEANING`: changing an input must change a meaningful part of the visual whenever the domain allows it.
+- Small real differences use two layers: true-scale drawing + explicitly labeled magnified difference. Never fake geometry just to make a difference visible.
+- Multiple views are allowed when each answers a different question (side diameter, front width, wheel cutaway, etc.).
+- Do not fake physics. Tire pressure/contact patch, wet/dry grip, tire deformation and similar illustrations must be labeled conceptual unless backed by sufficient data/modeling.
+- Page-specific facts only. Avoid generic repeated filler.
+
+## Content system — locked
+Every major tool gets:
+- 3 concise quick facts.
+- 1 Common Mistake where useful.
+- 1 Important Warning where safety/interpretation requires it.
+- Formula/assumption explanation and limitations.
+- Source/methodology transparency.
+
+## Localization — first wave
+Planned public locales:
+- `/en/` English — live.
+- `/de/` German.
+- `/es/` Spanish.
+- `/pt-br/` Brazilian Portuguese.
+- `/fr/` French.
+
+Rules:
+- Separate indexable URL per language.
+- Search-intent localized slugs, not literal machine-translated slugs.
+- Full translation of navigation, forms, results, validation, visuals, facts, warnings, methodology and structured data before publication.
+- Self-canonical per locale.
+- hreflang/x-default only for versions that actually exist.
+- Multilingual sitemap only includes QA-passed published locale pages.
+- No forced IP/browser-language redirect.
+- IT / JA / PL are later candidates; India is monitored through English first; China is a separate search/distribution ecosystem.
+
+## Search / SEO — locked
+- New tools are selected by search demand + weak/beat-able SERP + topic-cluster fit, not by raw tool count.
+- Build clusters: Tires & Wheels, Fuel & Trips, Performance, Converters, EV, later high-value ownership/used-car clusters if validated.
+- Page quality beats word count: useful calculator, visual explanation, formula, worked interpretation, limitations, sources, related tools.
+- Accuracy & Methodology is a permanent trust page.
+- Add structured data only when accurate; never fabricate ratings/reviews.
+- Shareable calculator state uses query parameters while canonical remains the clean tool URL.
+
+## Distribution — locked
+Near-term priority:
+1. Google organic.
+2. Shareable result URLs.
+3. Embed calculators / earned backlinks.
+4. Bing Webmaster + IndexNow.
+5. Communities/social using useful result links, not spam promotion.
+6. Browser extension later, selected from actual Atlas usage data.
+
+Do not build a random unrelated extension merely to place an Atlas link. Any extension must solve a real adjacent automotive browsing job on its own.
+
+## Launch gates
+Do not call the site launch-ready until all gates pass:
+- [ ] Correctness / reference-vector audit.
+- [ ] Mobile UX audit at representative 360–430 px widths.
+- [ ] Technical SEO audit.
+- [ ] Localization SEO audit for every published locale.
+- [ ] Core Web Vitals / performance audit on deployed build.
+- [ ] Build, routing, 404, redirects, canonical, sitemap smoke test.
+- [ ] Analytics configured and verified.
+- [ ] Google Search Console configured.
+- [ ] Bing Webmaster / IndexNow configured.
+- [ ] Open Graph/social preview validated.
+- [ ] Shareable result URL QA.
+- [ ] Accuracy/Methodology/source review.
+- [ ] Final regression suite.
+
+## Current implementation status
+Completed in the current V3.1 pass:
+- [x] Page-specific Quick Facts / Common Mistake / Important Warning registry for all current registered tools.
+- [x] ToolPage automatically renders the insight layer.
+- [x] Tire Size Comparison technical visual prototype: true-scale side overlay + nominal front width + magnified difference lens.
+- [x] Tire comparison visual updates live as valid input values change.
+- [x] Wheel Offset technical cutaway prototype with fixed hub mounting face, current/new proportional wheel position and live inner/outer movement.
+- [x] Wheel offset visual updates live as valid input values change.
+- [x] Tire Size and existing geometry visuals receive live valid-input preview updates.
+- [x] Accuracy & Methodology page added and linked.
+- [x] Basic WebApplication structured data for calculator pages.
+- [x] Basic Open Graph/Twitter text metadata.
+- [x] First-wave locale/slug routing registry created; unfinished locales remain unpublished.
+- [x] Tire Comparison and Wheel Offset shareable state URLs added.
+- [x] Methodology added to indexable sitemap registry.
+- [x] Regression suite updated: 105/105 current scenarios pass in independent runner.
+- [x] Astro source parser and TypeScript non-Astro source checks pass.
+
+Next implementation pass:
+- [ ] Finish localized content architecture and publish DE/ES/PT-BR/FR only after full translation QA.
+- [ ] Apply the new technical visual language to Tire Size Calculator and Fitment Compare.
+- [ ] Upgrade Fuel / Road Trip visuals from symbolic motion to meaningful distance/fuel/cost diagrams.
+- [ ] Replace PSI ring-scaling metaphor with a clearly conceptual pressure/contact-patch explanation.
+- [ ] Add shareable state to other high-value calculators.
+- [ ] Generate and validate lightweight social preview asset(s).
+- [ ] Analytics + Search Console + Bing/IndexNow deployment configuration.
+- [ ] SERP-driven next-tool selection and topic-cluster roadmap.
+
+## Parked / experimental
+- `What Fits` recommendation UI.
+- Wet/dry performance predictions from tire size alone.
+- Exact pressure/contact-patch simulation without load/tire-construction data.
+- Browser extension until Atlas usage data indicates the best job to solve.
+- China localization/distribution in the first wave.

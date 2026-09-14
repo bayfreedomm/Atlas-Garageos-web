@@ -1,0 +1,47 @@
+<figure class="offset-tech-visual" data-offset-tech-visual aria-labelledby="offset-tech-title">
+  <figcaption>
+    <div><span class="visual-kicker">Live wheel geometry</span><strong id="offset-tech-title">See where the wheel actually moves</strong></div>
+    <p>Hub mounting face stays fixed. Blue is the original wheel; orange is the new wheel.</p>
+  </figcaption>
+  <div class="offset-tech-grid">
+    <section class="offset-tech-card offset-tech-card--section" aria-label="Wheel cross-section relative to hub, suspension and fender">
+      <header><strong>Axle cross-section</strong><span>PROPORTIONAL POSITION</span></header>
+      <svg viewBox="0 0 420 255" role="img" aria-label="Original and new wheel position relative to hub mounting face">
+        <defs>
+          <linearGradient id="wheelCurrentFill" x1="0" x2="1"><stop offset="0" stop-color="#223746"/><stop offset=".5" stop-color="#42647a"/><stop offset="1" stop-color="#1e2d36"/></linearGradient>
+          <linearGradient id="wheelNewFill" x1="0" x2="1"><stop offset="0" stop-color="#3b2419"/><stop offset=".5" stop-color="#8b5434"/><stop offset="1" stop-color="#2e1d16"/></linearGradient>
+        </defs>
+        <path class="offset-body-line" d="M28 32v184M392 32v184"/>
+        <text class="offset-boundary-label" x="28" y="23">SUSPENSION SIDE</text>
+        <text class="offset-boundary-label" x="392" y="23" text-anchor="end">FENDER SIDE</text>
+        <path class="offset-hub-plane" d="M210 31v191"/>
+        <text class="offset-hub-label" x="210" y="242" text-anchor="middle">HUB MOUNTING FACE</text>
+        <g class="offset-wheel offset-wheel--current" data-current-offset-wheel>
+          <rect data-current-offset-body x="102" y="63" width="183" height="55" rx="15" fill="url(#wheelCurrentFill)"/>
+          <path data-current-centerline d="M194 52v77" />
+          <circle data-current-hub cx="210" cy="90.5" r="7"/>
+        </g>
+        <g class="offset-wheel offset-wheel--new" data-new-offset-wheel>
+          <rect data-new-offset-body x="99" y="139" width="194" height="55" rx="15" fill="url(#wheelNewFill)"/>
+          <path data-new-centerline d="M188 128v77" />
+          <circle data-new-hub cx="210" cy="166.5" r="7"/>
+        </g>
+        <text class="offset-row-label offset-row-label--current" x="38" y="96">CURRENT</text>
+        <text class="offset-row-label offset-row-label--new" x="38" y="172">NEW</text>
+        <g class="offset-arrow offset-arrow--inner"><path data-inner-arrow d="M102 218H99"/><path data-inner-head-left d="M102 214l-7 4 7 4"/><path data-inner-head-right d="M99 214l7 4-7 4"/><text data-inner-delta x="100.5" y="210" text-anchor="middle">1.4 mm</text></g>
+        <g class="offset-arrow offset-arrow--outer"><path data-outer-arrow d="M285 218H293"/><path data-outer-head-left d="M285 214l-7 4 7 4"/><path data-outer-head-right d="M293 214l7 4-7 4"/><text data-outer-delta x="289" y="210" text-anchor="middle">11.4 mm</text></g>
+      </svg>
+      <div class="offset-position-summary"><span data-inner-meaning>Inner edge moves farther inward.</span><span data-outer-meaning>Outer edge moves farther toward the fender.</span></div>
+    </section>
+    <section class="offset-tech-card offset-tech-card--numbers" aria-label="Wheel offset explanation">
+      <header><strong>What changed</strong><span>NUMBER → SHAPE → MEANING</span></header>
+      <div class="offset-tech-values">
+        <div><span>Original</span><strong data-original-wheel-spec>8J · ET40</strong></div>
+        <div><span>New</span><strong data-new-wheel-spec>8.5J · ET35</strong></div>
+        <div><span>Inner edge</span><strong data-inner-value>+1.35 mm</strong><small data-inner-copy>farther inward</small></div>
+        <div><span>Outer edge</span><strong data-outer-value>+11.35 mm</strong><small data-outer-copy>farther outward</small></div>
+      </div>
+      <aside class="offset-tech-note"><strong>Read the drawing like a cutaway</strong><p>The mounting face does not move. Width and ET move the wheel body around that fixed plane.</p></aside>
+    </section>
+  </div>
+</figure>

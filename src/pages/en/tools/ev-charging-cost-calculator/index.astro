@@ -28,6 +28,6 @@ const definition = toolById('ev-charging-cost-calculator');
     </div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
-  <div slot="explanation"><h2>Why the number is an estimate, not a promise</h2><p>Charging efficiency accounts for energy lost between the wall and battery. A 90% setting means 10% of grid energy does not reach the battery.</p><p>Charging power is treated as a steady average. Real DC charging usually slows as the battery fills, especially near a high state of charge.</p></div>
+  <div slot="explanation"><h2>Why the number is an estimate, not a promise</h2><p>Charging efficiency accounts for energy lost between the wall and battery. A 90% setting means 10% of grid energy does not reach the battery.</p><p>The time estimate assumes the entered charging power stays constant. Real charging can be slower because the vehicle, battery temperature, state of charge, and charging curve can limit power.</p></div>
 </ToolPage>
 <script>import { initializeEvChargingCalculators } from '../../../../ui/ev-charging-calculator'; initializeEvChargingCalculators();</script>

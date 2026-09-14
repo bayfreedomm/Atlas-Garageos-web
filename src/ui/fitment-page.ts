@@ -230,7 +230,7 @@ export async function initializeFitmentPage(): Promise<void> {
         const presentation = mapCellPresentation(cell, false);
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = `map-cell state-${cell.state}`;
+        button.className = `map-cell ${cell.reasons.includes('no-targets') ? 'state-neutral' : `state-${cell.state}`}`;
         button.textContent = presentation.symbol;
         button.setAttribute('aria-label', presentation.ariaLabel);
         button.setAttribute('aria-pressed', 'false');

@@ -10,6 +10,7 @@ export const TOOL_CATEGORY_ORDER: readonly ToolCategory[] = Object.freeze(['Fuel
 export const platformPageRegistry = Object.freeze([
   { id: 'home', pathname: '/en/', title: 'Atlas GarageOS', description: 'Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment.' },
   { id: 'tools-hub', pathname: '/en/tools/', title: 'Automotive Tools', description: 'Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment.' },
+  { id: 'methodology', pathname: '/en/methodology/', title: 'Accuracy & Methodology', description: 'How Atlas GarageOS calculators work, which formulas and assumptions they use, and where calculated results stop.' },
 ] as const);
 
 export interface ToolDefinition {
@@ -26,7 +27,7 @@ export interface ToolDefinition {
 }
 
 export const toolRegistry: readonly ToolDefinition[] = Object.freeze([
-  { id: 'fitment-studio', slug: 'fitment-studio', locale: 'en', title: 'Fitment Studio', description: 'Compare tire and wheel geometry, measure real clearances, and explore fitment combinations.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-comparison', 'wheel-offset-calculator', 'measure-my-car'], status: 'implemented', indexable: true, kind: 'flagship' },
+  { id: 'fitment-studio', slug: 'fitment-studio', locale: 'en', title: 'Wheel & Tire Fitment Compare', description: 'Compare current and proposed wheel and tire setups, visualize geometry changes, and optionally add measured clearances.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-comparison', 'wheel-offset-calculator', 'measure-my-car'], status: 'implemented', indexable: true, kind: 'flagship' },
   { id: 'tire-size-calculator', slug: 'tire-size-calculator', locale: 'en', title: 'Tire Size Calculator', description: 'Calculate tire sidewall, diameter, circumference, and revolutions from a metric tire size.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-comparison', 'speedometer-error-calculator', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },
   { id: 'tire-size-comparison', slug: 'tire-size-comparison', locale: 'en', title: 'Tire Size Comparison', description: 'Compare two tire sizes with transparent diameter, sidewall, circumference, and speedometer differences.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-calculator', 'speedometer-error-calculator', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },
   { id: 'wheel-offset-calculator', slug: 'wheel-offset-calculator', locale: 'en', title: 'Wheel Offset Calculator', description: 'Compare wheel width and offset to calculate inner-position and outer-poke changes.', category: 'Tires & Wheels', relatedToolIds: ['measure-my-car', 'fitment-map', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },

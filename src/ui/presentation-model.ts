@@ -93,8 +93,9 @@ export function resultCardModel(candidate: CombinedFitmentCandidate) {
 }
 
 export function mapCellPresentation(cell: FitmentMapCell, selected: boolean) {
-  const stateLabel = cell.state.toUpperCase();
-  const symbol = cell.state === 'green' ? '✓' : cell.state === 'yellow' ? '!' : '×';
+  const neutral = cell.reasons?.includes('no-targets') ?? false;
+  const stateLabel = neutral ? 'CHECKED' : cell.state.toUpperCase();
+  const symbol = neutral ? '•' : cell.state === 'green' ? '✓' : cell.state === 'yellow' ? '!' : '×';
   return Object.freeze({
     stateLabel,
     symbol,

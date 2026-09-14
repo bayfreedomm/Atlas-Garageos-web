@@ -49,7 +49,7 @@ export function initializeEvChargingCalculators(): void {
         ['Energy into battery', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`],
         ['Energy from grid', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`],
         ['Estimated cost', `${currency} ${formatNumber(result.value.cost, 2)}`],
-        ['Charging time', `${formatNumber(result.value.hours, 1)} h`],
+        ['Ideal time at constant power', `${formatNumber(result.value.hours, 1)} h`],
       ];
       metrics.replaceChildren(
         ...rows.map(([label, val]) => {
