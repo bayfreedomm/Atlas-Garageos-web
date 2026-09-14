@@ -225,3 +225,77 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="light"] .offset-tech-values small { color:#6e7f8c!important; }
 :root[data-theme="light"] .offset-tech-note { background:#fff7ed!important; border-left-color:#ff8a22!important; }
 :root[data-theme="light"] .offset-tech-note strong { color:#412916!important; }
+
+/* V4.2 polish — compact dock, clearer theme control, denser tool discovery and richer engineering visuals. */
+.theme-quick-toggle{position:relative;overflow:hidden}
+:root[data-theme="dark"] .theme-quick-toggle__moon{stroke:#ffc06a!important;filter:drop-shadow(0 0 5px rgb(255 192 106 / 22%))}
+:root[data-theme="light"] .theme-quick-toggle__sun{stroke:#0878f9!important}
+.tool-machine button:not(.secondary){color:#fff!important;text-shadow:0 1px 0 rgb(0 0 0 / 10%)}
+
+.mobile-dock{min-height:3.35rem!important;transition:transform 180ms ease,opacity 160ms ease;will-change:transform}
+.mobile-dock[data-hidden="true"]{transform:translateY(calc(100% + 2rem));opacity:0;pointer-events:none}
+.mobile-dock a{padding:.28rem .2rem!important}
+@media(max-width:59.999rem){body{padding-bottom:calc(5.3rem + env(safe-area-inset-bottom))}.mobile-dock{right:.85rem;left:.85rem;min-height:3.35rem!important}.mobile-dock svg{width:1.05rem;height:1.05rem}.mobile-dock a{font-size:.56rem}}
+
+/* Home and directory density: more jobs visible per phone screen. */
+@media(max-width:35rem){
+  .home-category-grid{gap:.55rem!important}
+  .home-category-grid a{min-height:5.1rem!important;padding:.8rem!important;border-radius:.9rem!important}
+  .home-category-grid a span{font-size:.88rem!important}.home-category-grid a small{font-size:.68rem!important;line-height:1.35!important}
+  .tool-launch-list{gap:.52rem!important}.tool-launch-row{min-height:4.35rem!important;padding:.68rem .75rem!important;border-radius:.9rem!important}
+  .tool-launch-row .tool-icon{width:2.65rem!important;height:2.65rem!important}.tool-launch-row strong{font-size:.88rem!important}.tool-launch-row small{font-size:.68rem!important}
+  .directory-identity{padding:1.05rem 0 .55rem!important}.directory-identity h1{font-size:clamp(2.05rem,9vw,3rem)!important}
+  .toolbox{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+  .toolbox-search{padding:.75rem!important;border-radius:.9rem!important}.category-filters{margin:.7rem 0 .9rem!important;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:.15rem}.category-filters button{flex:0 0 auto!important;padding:.62rem .82rem!important}
+  .tool-row{min-height:4.55rem!important;padding:.72rem .8rem!important;border-radius:.95rem!important}.tool-row .tool-icon{width:2.75rem!important;height:2.75rem!important}.tool-row__copy strong{font-size:.9rem!important}.tool-row__copy small{font-size:.68rem!important}
+}
+
+/* Tire comparison: technical-premium multi-view system. */
+.tech-contact-shadow{fill:#000;opacity:.2}
+.tech-sidewall-ring{fill:none;stroke:rgb(255 255 255 / 16%);stroke-width:1.3;stroke-dasharray:2 4}
+.tech-rim-inner{fill:#111a20;stroke:#687d89;stroke-width:1.3}
+.tire-tech-card--vehicle{background:radial-gradient(circle at 50% 48%,rgb(54 112 150 / 12%),transparent 55%),rgb(255 255 255 / 3%)!important}
+.vehicle-quarter{opacity:.85;stroke:#4c6b80;stroke-width:1.4}.vehicle-quarter--new{opacity:.78;stroke:#8d5b3f}
+.vehicle-fender{fill:none;stroke:#77a7c8;stroke-width:2}.vehicle-fender--new{stroke:#e5945e}
+.vehicle-tire{fill:#10171c;stroke-width:2.5}.vehicle-tire--current{stroke:#4d9cff}.vehicle-tire--new{stroke:#f18a4d}
+.vehicle-rim{fill:#25313a;stroke:#9aacb7;stroke-width:2}.vehicle-rim--new{stroke:#d8a17e}
+.vehicle-spokes{fill:none;stroke:#aebbc3;stroke-width:1.8}.vehicle-spokes--new{stroke:#d7b29b}
+.vehicle-label--current{fill:#74b4ff!important}.vehicle-label--new{fill:#ff9b5e!important}
+.vehicle-ride-callout path{fill:none;stroke:#ffb06f;stroke-width:1.3}.vehicle-ride-callout text{fill:#ffb06f!important;font-size:7px!important}
+.surface-context{display:grid;gap:.5rem;margin-top:.6rem}.surface-context>div{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;padding:.72rem;border:1px solid rgb(255 255 255 / 9%);border-radius:.75rem;background:rgb(255 255 255 / 3%)}.surface-context__icon{display:grid;place-items:center;width:2rem;height:2rem;border-radius:.6rem;background:rgb(77 156 255 / 12%);color:#79b7ff;font-size:1rem}.surface-context p{margin:0;color:#a9b8c1;font-size:.64rem;line-height:1.45}.surface-context strong{display:block;margin-bottom:.12rem;color:#eef5f8;font-size:.68rem}
+@media(min-width:34rem){.tire-tech-card--vehicle{grid-column:1 / -1}.surface-context{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:60rem){.tire-tech-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.tire-tech-card--vehicle,.tire-tech-card--magnify{grid-column:auto!important}}
+
+/* Wheel-offset cutaway now reads like a real wheel-well section. */
+.offset-fender-shell{fill:rgb(78 112 134 / 12%);stroke:#57768a;stroke-width:2}
+.offset-strut{fill:#687985;stroke:#b5c1c7;stroke-width:1.2}.offset-strut-link{fill:none;stroke:#7d8c95;stroke-width:5;stroke-linecap:round}
+.offset-brake-disc{stroke:#d9e1e4;stroke-width:1.2;opacity:.72}.offset-brake-hat{fill:#28333a;stroke:#aab8bf;stroke-width:1.2}.offset-caliper{fill:#d47b42;stroke:#f0a06f;stroke-width:1}
+.offset-mini-stance{margin:.55rem 0 .15rem!important}.offset-mini-body{fill:rgb(86 119 139 / 14%);stroke:#526e80;stroke-width:1.4}.offset-mini-center{fill:none;stroke:#6c8290;stroke-width:1;stroke-dasharray:4 4}.offset-mini-wheel{fill:rgb(77 156 255 / 16%);stroke:#4d9cff;stroke-width:1.8}.offset-mini-wheel--new{fill:rgb(241 138 77 / 16%);stroke:#f18a4d}.offset-mini-arrow{fill:none;stroke:#f18a4d;stroke-width:1.5}.offset-mini-stance text{fill:#ff9d63!important;font-size:7px!important}
+
+:root[data-theme="light"] .surface-context>div{background:#fff!important;border-color:#d8e2e9!important}.surface-context p{color:var(--color-ink-muted)}:root[data-theme="light"] .surface-context strong{color:#172635}:root[data-theme="light"] .tire-tech-card--vehicle{background:radial-gradient(circle at 50% 48%,rgb(63 145 201 / 9%),transparent 55%),#fff!important}:root[data-theme="light"] .tech-sidewall-ring{stroke:rgb(31 62 83 / 16%)}:root[data-theme="light"] .tech-rim-inner{fill:#eef3f5;stroke:#7d909b}:root[data-theme="light"] .offset-fender-shell{fill:#eef4f7;stroke:#7792a3}:root[data-theme="light"] .offset-mini-body{fill:#eef4f7;stroke:#7b94a4}
+.offset-wheel--new rect{fill:rgb(241 138 77 / 8%)!important;stroke-dasharray:6 4}.offset-fixed-hub{fill:#111a20;stroke:#e5edf1;stroke-width:1.7}.offset-overlay-legend text{font-size:7px!important}.offset-brake-disc{stroke:#d9e1e4;stroke-width:1.2;opacity:.82}.offset-brake-hat{fill:#29363e;stroke:#9fb0b8;stroke-width:1.1}
+:root[data-theme="light"] .offset-fixed-hub{fill:#f5f8fa;stroke:#566b79}
+/* V4 owns brand semantics in both themes; legacy V3 theme tokens must not recolor navigation/CTAs. */
+:root[data-theme="light"],:root[data-theme="dark"]{--color-brand:#0878f9;--color-brand-hover:#086bdc;--color-accent:#ff8a22}
+
+
+/* V4.3 Tire Comparison answer hierarchy: one decision-grade answer before the engineering detail. */
+.tire-primary-result{display:grid;gap:.7rem;margin:.8rem 0 0;padding:.82rem;border:1px solid #b9d8f6;border-radius:1rem;background:linear-gradient(145deg,#edf7ff,#f8fbfe);box-shadow:0 10px 28px rgb(20 83 137 / 8%)}
+.tire-primary-result__answer,.tire-primary-result__speed{min-width:0;padding:.82rem;border-radius:.82rem;background:#fff}
+.tire-primary-result span,.tire-primary-result small{display:block;color:#687b8c;font-size:.64rem;font-weight:750;letter-spacing:.055em;text-transform:uppercase}
+.tire-primary-result__answer strong{display:block;margin:.12rem 0 .2rem;color:#0878f9;font:800 clamp(2rem,11vw,3rem)/1 var(--font-display)}
+.tire-primary-result__answer p{margin:0;color:#22384b;font-size:.82rem;line-height:1.45}
+.tire-primary-result__speed{display:flex;flex-direction:column;justify-content:center;border:1px solid #e0e8ef}
+.tire-primary-result__speed strong{display:block;margin:.22rem 0;color:#172536;font:800 clamp(1.2rem,6vw,1.65rem)/1.1 var(--font-display)}
+.tire-primary-result__speed small{color:#80909e;font-size:.58rem;letter-spacing:.03em;text-transform:none}
+.tire-primary-result.is-pending strong{color:#8b9aa7}
+.tire-primary-result[data-direction="negative"] .tire-primary-result__answer strong,.tire-primary-result[data-direction="positive"] .tire-primary-result__answer strong{color:#0878f9}
+.tire-detail-heading{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:1rem 0 .45rem;padding:0 .1rem}.tire-detail-heading span{color:var(--color-ink);font-weight:800}.tire-detail-heading small{color:var(--color-ink-muted);font-size:.67rem;text-transform:uppercase;letter-spacing:.06em}
+.tool-machine--tire-size-comparison .result-summary:not(.is-pending){margin-top:.55rem!important;padding:.8rem .9rem!important;font-family:var(--font-sans)!important;font-size:.82rem!important;font-weight:650!important;line-height:1.45!important}
+.tool-machine--tire-size-comparison .tool-results div:first-child{background:#f7f9fb!important;border-color:#dfe6ed!important}
+:root[data-theme="dark"] .tire-primary-result{border-color:#2a6490;background:linear-gradient(145deg,#0d2a40,#102431);box-shadow:none}
+:root[data-theme="dark"] .tire-primary-result__answer,:root[data-theme="dark"] .tire-primary-result__speed{background:#0c1d29;border-color:#28404f}
+:root[data-theme="dark"] .tire-primary-result__answer p,:root[data-theme="dark"] .tire-primary-result__speed strong{color:#eef6fb}
+:root[data-theme="dark"] .tire-primary-result span,:root[data-theme="dark"] .tire-primary-result small{color:#9fb1bf}
+:root[data-theme="dark"] .tool-machine--tire-size-comparison .tool-results div:first-child{background:#102431!important;border-color:#28404f!important}
+@media(min-width:42rem){.tire-primary-result{grid-template-columns:minmax(0,1.35fr) minmax(15rem,.65fr);padding:1rem}.tire-primary-result__answer,.tire-primary-result__speed{padding:1rem}}

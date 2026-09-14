@@ -138,3 +138,14 @@ Next implementation pass:
 - [x] Bottom navigation no longer leaves final content inaccessible beneath the fixed dock.
 - [x] Light/dark technical visual surface treatments.
 - [ ] Cloudflare clean Node 24 build for V4.1 archive.
+
+## V4.2 checkpoint — visual meaning + mobile polish
+- [x] Theme toggle icon contrast corrected.
+- [x] V4 explicitly owns blue brand tokens in Day and Night modes; legacy V3 amber no longer recolors primary navigation state.
+- [x] Primary calculator CTA text contrast locked to white.
+- [x] Mobile dock reduced and scroll/focus auto-hide added to reduce content obstruction.
+- [x] Small-phone home/tool-directory density improved and redundant directory outer-card treatment removed.
+- [x] Tire Size Comparison upgraded with true-scale side view, nominal-width front view, on-vehicle static geometry, magnified-difference lens and wet/dry context non-claims.
+- [x] Wheel Offset upgraded to a coherent wheel-well cutaway with suspension/fender/brake/hub context plus live outer-stance magnification.
+- [x] V4.2 TypeScript/Astro/CSS source validation passed.
+- [ ] Cloudflare clean Node 24 `astro check && astro build` for V4.2 archive.

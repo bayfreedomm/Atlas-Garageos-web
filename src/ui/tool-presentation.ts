@@ -41,12 +41,12 @@ type ValidValue<T extends (...args: never[]) => unknown> = ReturnType<T> extends
 
 export function tireComparisonMetrics(result: ValidValue<typeof compareTireSizesTool>): readonly PresentedMetric[] {
   return Object.freeze([
-    { label: 'Diameter difference', value: `${formatNumber(result.diameterDifferenceMm)} mm` },
-    { label: 'Diameter difference', value: `${formatNumber(result.diameterDifferencePercent)} %` },
-    { label: 'Sidewall difference', value: `${formatNumber(result.sidewallDifferenceMm)} mm` },
-    { label: 'Circumference difference', value: `${formatNumber(result.circumferenceDifferenceMm)} mm` },
-    { label: 'Ride-height difference', value: `${formatNumber(result.rideHeightDifferenceMm)} mm` },
-    { label: 'Speedometer difference', value: `${formatNumber(result.speedometerDifferencePercent)} %` },
+    { label: 'Overall diameter change', value: `${formatNumber(result.diameterDifferenceMm)} mm` },
+    { label: 'Diameter change', value: `${formatNumber(result.diameterDifferencePercent)} %` },
+    { label: 'Sidewall change', value: `${formatNumber(result.sidewallDifferenceMm)} mm` },
+    { label: 'Circumference change', value: `${formatNumber(result.circumferenceDifferenceMm)} mm` },
+    { label: 'Static ride-height change', value: `${formatNumber(result.rideHeightDifferenceMm)} mm` },
+    { label: 'Theoretical speed change', value: `${formatNumber(result.speedometerDifferencePercent)} %` },
   ]);
 }
 

@@ -90,6 +90,34 @@ function setLineX(path: SVGPathElement | null, left: number, right: number, y: n
   path?.setAttribute('d', `M${left.toFixed(1)} ${y}H${right.toFixed(1)}`);
 }
 
+
+function setTireComparisonPrimaryResult(
+  form: HTMLFormElement,
+  result: Extract<ReturnType<typeof compareTireSizesTool>, { ok: true }>['value'],
+): void {
+  const panel = form.querySelector<HTMLElement>('[data-tire-primary-result]');
+  if (!panel) return;
+
+  const percent = result.diameterDifferencePercent;
+  const actualAt100Kmh = 100 * (result.proposed.overallDiameterMm / result.current.overallDiameterMm);
+  const direction = result.diameterDifferenceMm > 0 ? 'taller' : result.diameterDifferenceMm < 0 ? 'shorter' : 'the same diameter as';
+
+  const percentNode = panel.querySelector<HTMLElement>('[data-tire-primary-percent]');
+  const copyNode = panel.querySelector<HTMLElement>('[data-tire-primary-copy]');
+  const speedNode = panel.querySelector<HTMLElement>('[data-tire-speed-example]');
+
+  if (percentNode) percentNode.textContent = `${signed(percent, 2)}%`;
+  if (copyNode) {
+    copyNode.textContent = result.diameterDifferenceMm === 0
+      ? 'The new tire has the same nominal overall diameter.'
+      : `The new tire is ${Math.abs(result.diameterDifferenceMm).toFixed(1)} mm ${direction} overall.`;
+  }
+  if (speedNode) speedNode.textContent = `${actualAt100Kmh.toFixed(1)} km/h actual`;
+
+  panel.classList.remove('is-pending');
+  panel.dataset.direction = percent < 0 ? 'negative' : percent > 0 ? 'positive' : 'zero';
+}
+
 function setTireComparisonTechnicalVisual(
   form: HTMLFormElement,
   original: TireToolInput,
@@ -164,6 +192,37 @@ function setTireComparisonTechnicalVisual(
   if (sideMeaning) sideMeaning.textContent = `New diameter is ${Math.abs(result.diameterDifferenceMm).toFixed(1)} mm ${result.diameterDifferenceMm >= 0 ? 'taller' : 'shorter'}; static ride height changes by about ${Math.abs(result.rideHeightDifferenceMm).toFixed(1)} mm.`;
   const widthMeaning = visual.querySelector<HTMLElement>('[data-width-meaning]');
   if (widthMeaning) widthMeaning.textContent = widthDifference === 0 ? 'Both tires have the same nominal section width.' : `The new tire is ${Math.abs(widthDifference)} mm ${widthDifference > 0 ? 'wider' : 'narrower'} by nominal section width.`;
+
+  // Vehicle view: both tires sit on the same road line. A larger radius lifts the hub/body.
+  const vehicleMaxRadius = 54;
+  const currentVehicleRadius = result.current.overallDiameterMm / maxDiameter * vehicleMaxRadius;
+  const proposedVehicleRadius = result.proposed.overallDiameterMm / maxDiameter * vehicleMaxRadius;
+  const vehicleGroundY = 213;
+  const currentVehicleCenterY = vehicleGroundY - currentVehicleRadius;
+  const proposedVehicleCenterY = vehicleGroundY - proposedVehicleRadius;
+  visual.querySelector<SVGGElement>('[data-current-vehicle-group]')?.setAttribute('transform', `translate(94 ${currentVehicleCenterY.toFixed(2)})`);
+  visual.querySelector<SVGGElement>('[data-new-vehicle-group]')?.setAttribute('transform', `translate(266 ${proposedVehicleCenterY.toFixed(2)})`);
+  visual.querySelector<SVGCircleElement>('[data-current-vehicle-tire]')?.setAttribute('r', currentVehicleRadius.toFixed(2));
+  visual.querySelector<SVGCircleElement>('[data-new-vehicle-tire]')?.setAttribute('r', proposedVehicleRadius.toFixed(2));
+  visual.querySelector<SVGCircleElement>('[data-current-vehicle-rim]')?.setAttribute('r', (original.rimDiameterInches * 25.4 / maxDiameter * vehicleMaxRadius).toFixed(2));
+  visual.querySelector<SVGCircleElement>('[data-new-vehicle-rim]')?.setAttribute('r', (proposed.rimDiameterInches * 25.4 / maxDiameter * vehicleMaxRadius).toFixed(2));
+  const rideArrow = visual.querySelector<SVGPathElement>('[data-vehicle-ride-arrow]');
+  const currentReferenceY = currentVehicleCenterY - 70;
+  const proposedReferenceY = proposedVehicleCenterY - 70;
+  if (rideArrow) {
+    const upper = Math.min(currentReferenceY, proposedReferenceY);
+    const lower = Math.max(currentReferenceY, proposedReferenceY);
+    rideArrow.setAttribute('d', `M173 ${upper.toFixed(1)}H183M178 ${upper.toFixed(1)}V${lower.toFixed(1)}M173 ${lower.toFixed(1)}H183`);
+  }
+  const rideText = visual.querySelector<SVGTextElement>('[data-vehicle-ride-text]');
+  if (rideText) {
+    rideText.setAttribute('y', (Math.min(currentReferenceY, proposedReferenceY) - 8).toFixed(1));
+    rideText.textContent = `${signed(result.rideHeightDifferenceMm)} mm`;
+  }
+  const vehicleMeaning = visual.querySelector<HTMLElement>('[data-vehicle-meaning]');
+  if (vehicleMeaning) vehicleMeaning.textContent = result.rideHeightDifferenceMm === 0
+    ? 'Both sizes produce the same nominal static ride height.'
+    : `Nominal static ride height is about ${Math.abs(result.rideHeightDifferenceMm).toFixed(1)} mm ${result.rideHeightDifferenceMm > 0 ? 'higher' : 'lower'} with the new tire.`;
 }
 
 
@@ -187,16 +246,16 @@ function setWheelOffsetTechnicalVisual(
   };
   const current = position(originalWidthInches, originalOffsetMm);
   const next = position(newWidthInches, newOffsetMm);
-  const setWheel = (prefix: 'current' | 'new', model: ReturnType<typeof position>, y: number): void => {
+  const setWheel = (prefix: 'current' | 'new', model: ReturnType<typeof position>): void => {
     const body = visual.querySelector<SVGRectElement>(`[data-${prefix}-offset-body]`);
     if (body) { body.setAttribute('x', model.left.toFixed(1)); body.setAttribute('width', model.widthPx.toFixed(1)); }
-    visual.querySelector<SVGPathElement>(`[data-${prefix}-centerline]`)?.setAttribute('d', `M${model.centerX.toFixed(1)} ${y - 11}v77`);
+    visual.querySelector<SVGPathElement>(`[data-${prefix}-centerline]`)?.setAttribute('d', `M${model.centerX.toFixed(1)} 76v98`);
   };
-  setWheel('current', current, 63);
-  setWheel('new', next, 139);
+  setWheel('current', current);
+  setWheel('new', next);
 
   const setArrow = (kind: 'inner' | 'outer', from: number, to: number, value: number): void => {
-    const y = 218;
+    const y = 210;
     const a = Math.min(from, to); const b = Math.max(from, to);
     visual.querySelector<SVGPathElement>(`[data-${kind}-arrow]`)?.setAttribute('d', `M${a.toFixed(1)} ${y}H${b.toFixed(1)}`);
     const leftHead = visual.querySelector<SVGPathElement>(`[data-${kind}-head-left]`);
@@ -218,6 +277,26 @@ function setWheelOffsetTechnicalVisual(
   setText('[data-outer-copy]', outerPokeChangeMm >= 0 ? 'farther outward' : 'less outward');
   setText('[data-inner-meaning]', innerPositionChangeMm === 0 ? 'Inner edge stays in the same position.' : `Inner edge moves ${Math.abs(innerPositionChangeMm).toFixed(2)} mm ${innerPositionChangeMm > 0 ? 'toward the suspension' : 'away from the suspension'}.`);
   setText('[data-outer-meaning]', outerPokeChangeMm === 0 ? 'Outer edge stays in the same position.' : `Outer edge moves ${Math.abs(outerPokeChangeMm).toFixed(2)} mm ${outerPokeChangeMm > 0 ? 'toward the fender' : 'inward'}.`);
+
+  // Mini stance view magnifies only the outer-edge movement; the cutaway above stays proportional.
+  const currentMini = visual.querySelector<SVGRectElement>('[data-current-mini-wheel]');
+  const newMini = visual.querySelector<SVGRectElement>('[data-new-mini-wheel]');
+  const baseX = 202;
+  const currentMiniWidth = 30;
+  const widthRatio = Math.max(.72, Math.min(1.35, newWidthInches / Math.max(.1, originalWidthInches)));
+  const newMiniWidth = currentMiniWidth * widthRatio;
+  const movementPx = Math.max(-28, Math.min(28, outerPokeChangeMm * .9));
+  if (currentMini) { currentMini.setAttribute('x', String(baseX)); currentMini.setAttribute('width', String(currentMiniWidth)); }
+  if (newMini) { newMini.setAttribute('x', (baseX + movementPx).toFixed(1)); newMini.setAttribute('width', newMiniWidth.toFixed(1)); }
+  const currentOuterX = baseX + currentMiniWidth;
+  const newOuterX = baseX + movementPx + newMiniWidth;
+  const miniArrow = visual.querySelector<SVGPathElement>('[data-mini-outer-arrow]');
+  if (miniArrow) miniArrow.setAttribute('d', `M${currentOuterX.toFixed(1)} 110H${newOuterX.toFixed(1)}`);
+  const miniText = visual.querySelector<SVGTextElement>('[data-mini-outer-text]');
+  if (miniText) {
+    miniText.setAttribute('x', ((currentOuterX + newOuterX) / 2).toFixed(1));
+    miniText.textContent = `${signed(outerPokeChangeMm)} mm`;
+  }
 }
 
 export function initializeToolCalculators(): void {
@@ -242,12 +321,21 @@ export function initializeToolCalculators(): void {
     const preview = (): void => {
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
       const result = compareTireSizesTool(original, proposed);
-      if (result.ok) setTireComparisonTechnicalVisual(form, original, proposed, result.value);
+      if (result.ok) {
+        const results = form.querySelector<HTMLDListElement>('[data-results]');
+        const errors = form.querySelector<HTMLElement>('[data-errors]');
+        if (errors) { errors.hidden = true; errors.replaceChildren(); }
+        setSummary(form, tireComparisonSummary(result.value));
+        setTireComparisonPrimaryResult(form, result.value);
+        setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm);
+        setTireComparisonTechnicalVisual(form, original, proposed, result.value);
+        if (results) renderMetrics(results, tireComparisonMetrics(result.value));
+      }
     };
     bindCalculator(form, () => {
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
       const result = compareTireSizesTool(original, proposed);
-      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
+      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
       return result.ok ? { ok: true as const, metrics: tireComparisonMetrics(result.value) } : result;
     });
     form.addEventListener('input', () => requestAnimationFrame(preview));
