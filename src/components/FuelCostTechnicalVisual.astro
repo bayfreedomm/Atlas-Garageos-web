@@ -1,0 +1,40 @@
+<figure class="fuel-technical-visual" data-fuel-technical-visual aria-label="Fuel cost visual summary">
+  <div class="fuel-technical-visual__head">
+    <span>TRIP → FUEL → COST</span>
+    <small>Input changes update the whole picture</small>
+  </div>
+  <svg viewBox="0 0 720 260" role="img" aria-label="Trip distance, fuel required, and estimated cost">
+    <defs>
+      <linearGradient id="fuel-road" x1="0" x2="1">
+        <stop offset="0" stop-color="currentColor" stop-opacity=".12"/>
+        <stop offset="1" stop-color="currentColor" stop-opacity=".55"/>
+      </linearGradient>
+    </defs>
+    <path class="fuel-v-road" d="M46 181C151 183 196 121 286 137s122 63 219 24 124-80 169-65"/>
+    <path class="fuel-v-road fuel-v-road--dash" d="M46 181C151 183 196 121 286 137s122 63 219 24 124-80 169-65"/>
+
+    <g class="fuel-v-car" data-fuel-car>
+      <path d="M142 143h104l30 27h31c12 0 22 9 22 21v9H103v-14c0-11 8-20 19-21l20-22Z"/>
+      <circle cx="153" cy="201" r="20"/><circle cx="280" cy="201" r="20"/>
+    </g>
+
+    <g class="fuel-v-pump">
+      <path d="M501 76h67v133h-67zM513 91h43v43h-43zM568 105h16l18 20v61c0 16 25 16 25 0v-47l-20-20"/>
+      <path class="fuel-v-fill" data-fuel-fill d="M513 134h43v0h-43z"/>
+    </g>
+
+    <g class="fuel-v-callout fuel-v-callout--distance">
+      <text x="44" y="42">DISTANCE</text>
+      <text class="fuel-v-value" data-fuel-visual-distance x="44" y="69">500 km</text>
+    </g>
+    <g class="fuel-v-callout fuel-v-callout--fuel">
+      <text x="410" y="42">FUEL REQUIRED</text>
+      <text class="fuel-v-value" data-fuel-visual-fuel x="410" y="69">36 L</text>
+    </g>
+    <g class="fuel-v-callout fuel-v-callout--cost">
+      <text x="570" y="42">EST. COST</text>
+      <text class="fuel-v-value" data-fuel-visual-cost x="570" y="69">USD 64.80</text>
+    </g>
+  </svg>
+  <figcaption><span data-fuel-visual-caption>500 km at 7.2 L/100km</span><strong data-fuel-visual-rate>USD 0.13 / km</strong></figcaption>
+</figure>

@@ -398,3 +398,132 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 
 @media(max-width:47.99rem){.home-v5-console{width:calc(100% - 2rem);margin-top:-.2rem}.home-v5-console__body{grid-template-columns:1fr}.home-v5-readouts{grid-template-columns:repeat(3,minmax(0,1fr))}.home-v5-readouts>div{padding:.5rem}.home-v5-readouts small{display:none}.home-v5-console__bar span:last-child{display:none}}
 @media(min-width:48rem){.home-v5-hero{grid-template-columns:minmax(0,.92fr) minmax(28rem,1.08fr)}.home-v5-console{width:min(42rem,52vw);margin-right:max(1.5rem,calc((100vw - 74rem)/2));margin-left:-1.5rem}.home-v5-copy{align-self:center}.home-v5-readouts strong{font-size:1.05rem}}
+
+/* V4.6 — Fuel Cost primary answer + technical trip/fuel/cost visual */
+.tool-machine--fuel-cost-calculator .result-summary:not(.is-pending){margin-top:.55rem!important;padding:.8rem .9rem!important;font-family:var(--font-sans)!important;font-size:.82rem!important;font-weight:650!important;line-height:1.45!important}
+.tool-machine--fuel-cost-calculator .tool-results div:first-child{background:#f7f9fb!important;border-color:#dfe6ed!important}
+.fuel-primary-result{display:grid;gap:.7rem;margin:.8rem 0 0;padding:.82rem;border:1px solid #b9d8f6;border-radius:1rem;background:linear-gradient(145deg,#edf7ff,#f8fbfe);box-shadow:0 10px 28px rgb(20 83 137 / 8%)}
+.fuel-primary-result__cost,.fuel-primary-result__fuel{min-width:0;padding:.82rem;border-radius:.82rem;background:#fff}
+.fuel-primary-result span,.fuel-primary-result small{display:block;color:#687b8c;font-size:.64rem;font-weight:750;letter-spacing:.055em;text-transform:uppercase}
+.fuel-primary-result__cost strong{display:block;margin:.12rem 0 .2rem;color:#0878f9;font:800 clamp(2rem,11vw,3rem)/1 var(--font-display)}
+.fuel-primary-result__cost p{margin:0;color:#22384b;font-size:.82rem;line-height:1.45}
+.fuel-primary-result__fuel{display:flex;flex-direction:column;justify-content:center;border:1px solid #e0e8ef}
+.fuel-primary-result__fuel strong{display:block;margin:.22rem 0;color:#172536;font:800 clamp(1.2rem,6vw,1.65rem)/1.1 var(--font-display)}
+.fuel-primary-result__fuel small{color:#6f8190;font-size:.65rem;line-height:1.4;letter-spacing:0;text-transform:none}
+.fuel-primary-result.is-pending strong{color:#8b9aa7}
+.fuel-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.9rem 0 .4rem;padding-top:.75rem;border-top:1px solid var(--color-line)}
+.fuel-detail-heading span{color:var(--color-ink);font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase}.fuel-detail-heading small{color:var(--color-ink-muted);font-size:.68rem}
+.fuel-technical-visual{margin:.9rem 0 0;padding:.85rem;border:1px solid #d8e4ee;border-radius:1rem;background:linear-gradient(180deg,#fbfdff,#f3f8fc);overflow:hidden}
+.fuel-technical-visual__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.2rem}.fuel-technical-visual__head span{color:#173754;font-size:.66rem;font-weight:850;letter-spacing:.095em}.fuel-technical-visual__head small{max-width:12rem;color:#6f8190;font-size:.63rem;text-align:right}
+.fuel-technical-visual svg{display:block;width:100%;height:auto;color:#0878f9}.fuel-v-road{fill:none;stroke:#9db1c1;stroke-width:18;stroke-linecap:round;opacity:.2}.fuel-v-road--dash{stroke:#64839a;stroke-width:2;stroke-dasharray:9 11;opacity:.72}.fuel-v-car path{fill:#20394c;stroke:#0b2130;stroke-width:2}.fuel-v-car circle{fill:#0c1d29;stroke:#9fb4c4;stroke-width:3}.fuel-v-pump{fill:none;stroke:#26465d;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.fuel-v-fill{fill:#0878f9;stroke:none;opacity:.85}.fuel-v-callout text{fill:#6f8190;font:800 12px var(--font-sans);letter-spacing:1.2px}.fuel-v-callout .fuel-v-value{fill:#172536;font:850 22px var(--font-display);letter-spacing:0}.fuel-technical-visual figcaption{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem .1rem .05rem;border-top:1px solid #dbe5ed;color:#526b7e;font-size:.68rem}.fuel-technical-visual figcaption strong{color:#173754;font-weight:800}
+:root[data-theme="dark"] .fuel-primary-result{border-color:#2a6490;background:linear-gradient(145deg,#0d2a40,#102431);box-shadow:none}:root[data-theme="dark"] .fuel-primary-result__cost,:root[data-theme="dark"] .fuel-primary-result__fuel{background:#0c1d29;border-color:#28404f}:root[data-theme="dark"] .fuel-primary-result__cost p,:root[data-theme="dark"] .fuel-primary-result__fuel strong{color:#eef6fb}:root[data-theme="dark"] .fuel-primary-result span,:root[data-theme="dark"] .fuel-primary-result small{color:#9fb1bf}:root[data-theme="dark"] .tool-machine--fuel-cost-calculator .tool-results div:first-child{background:#102431!important;border-color:#28404f!important}
+:root[data-theme="dark"] .fuel-technical-visual{border-color:#28404f;background:linear-gradient(180deg,#0d202d,#0a1822)}:root[data-theme="dark"] .fuel-technical-visual__head span,:root[data-theme="dark"] .fuel-technical-visual figcaption strong{color:#d7ecff}:root[data-theme="dark"] .fuel-technical-visual__head small,:root[data-theme="dark"] .fuel-technical-visual figcaption{color:#9fb1bf}:root[data-theme="dark"] .fuel-v-road{stroke:#33546a}:root[data-theme="dark"] .fuel-v-road--dash{stroke:#6f92aa}:root[data-theme="dark"] .fuel-v-car path{fill:#15354a;stroke:#7fb9e3}:root[data-theme="dark"] .fuel-v-car circle{fill:#071722;stroke:#7695aa}:root[data-theme="dark"] .fuel-v-pump{stroke:#a8c8df}:root[data-theme="dark"] .fuel-v-callout text{fill:#91a7b8}:root[data-theme="dark"] .fuel-v-callout .fuel-v-value{fill:#f4f8fb}:root[data-theme="dark"] .fuel-technical-visual figcaption{border-color:#28404f}
+@media(min-width:42rem){.fuel-primary-result{grid-template-columns:minmax(0,1.35fr) minmax(15rem,.65fr);padding:1rem}.fuel-primary-result__cost,.fuel-primary-result__fuel{padding:1rem}.fuel-technical-visual{padding:1rem}}
+
+/* V4.7 — Homepage Concept B: real car, real context.
+   The photographic hero remains dark in both themes; light mode applies to the product surface below it.
+   This avoids low-contrast hero text and removes the dashboard/diagram-first homepage feel. */
+.home-v7-hero{
+  position:relative!important;
+  display:block!important;
+  min-height:clamp(34rem,72vh,46rem)!important;
+  background:#071018!important;
+  color:#fff!important;
+  isolation:isolate;
+}
+.home-v7-hero::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgb(3 10 16 / 92%) 0%,rgb(3 10 16 / 82%) 34%,rgb(3 10 16 / 34%) 62%,rgb(3 10 16 / 12%) 100%),
+    linear-gradient(0deg,rgb(3 10 16 / 74%) 0%,transparent 42%);
+  pointer-events:none;
+}
+.home-v7-hero::after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  right:0;
+  bottom:0;
+  left:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#267eb8,transparent);
+  opacity:.7;
+}
+.home-v7-media{position:absolute;z-index:0;inset:0;overflow:hidden;background:#071018}
+.home-v7-media img{width:100%;height:100%;object-fit:cover;object-position:center center;filter:saturate(.82) contrast(1.04) brightness(.88);transform:scale(1.01)}
+.home-v7-copy{position:relative!important;z-index:2!important;display:flex;min-height:clamp(34rem,72vh,46rem);flex-direction:column;justify-content:center;width:min(100% - 2rem,74rem)!important;margin:0 auto!important;padding:4.5rem 0 3.25rem!important}
+.home-v7-copy .home-kicker{margin:0 0 1rem!important;color:#78bdff!important;font-size:.68rem!important;font-weight:850!important;letter-spacing:.16em!important}
+.home-v7-copy h1{max-width:8.5ch!important;margin-bottom:1rem!important;color:#fff!important;font-size:clamp(3.2rem,8.3vw,6.7rem)!important;line-height:.88!important;letter-spacing:-.067em!important;text-shadow:0 10px 36px rgb(0 0 0 / 34%)}
+.home-v7-copy .home-lead{max-width:35rem!important;margin:.25rem 0 0!important;color:#d5e0e7!important;font-size:clamp(.98rem,1.5vw,1.12rem)!important;line-height:1.58!important;text-shadow:0 4px 20px rgb(0 0 0 / 35%)}
+.home-v7-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.55rem}
+.home-v7-cta{display:inline-flex;min-height:3.15rem;align-items:center;justify-content:center;gap:.55rem;padding:.72rem 1.12rem;border:1px solid transparent;border-radius:.82rem;font-size:.82rem;font-weight:850;text-decoration:none;transition:transform 160ms ease,border-color 160ms ease,background 160ms ease}
+.home-v7-cta:hover{transform:translateY(-1px)}
+.home-v7-cta--primary{background:#0c83ff;color:#fff;box-shadow:0 12px 28px rgb(0 99 214 / 28%)}
+.home-v7-cta--primary:hover{background:#168cff}
+.home-v7-cta--secondary{border-color:rgb(255 255 255 / 28%);background:rgb(4 15 23 / 44%);color:#eaf3f8;backdrop-filter:blur(8px)}
+.home-v7-cta--secondary:hover{border-color:rgb(128 194 245 / 62%);background:rgb(6 25 38 / 62%)}
+.home-v7-capabilities{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:min(39rem,100%);margin-top:2.2rem;border-top:1px solid rgb(255 255 255 / 17%);border-bottom:1px solid rgb(255 255 255 / 12%);background:rgb(3 12 18 / 28%);backdrop-filter:blur(7px)}
+.home-v7-capabilities>div{display:flex;min-height:4.25rem;align-items:center;gap:.5rem;padding:.65rem .75rem;border-right:1px solid rgb(255 255 255 / 12%)}
+.home-v7-capabilities>div:last-child{border-right:0}
+.home-v7-capabilities span{display:grid;width:1.45rem;height:1.45rem;place-items:center;color:#69b8ff;font-size:.86rem}
+.home-v7-capabilities strong{color:#dce7ed;font-size:.64rem;font-weight:760;line-height:1.3}
+
+/* The light theme never turns the photo hero white. Its text stays purpose-built for the image. */
+:root[data-theme="light"] .home-v7-hero,
+:root[data-theme="dark"] .home-v7-hero{background:#071018!important;color:#fff!important}
+:root[data-theme="light"] .home-v7-copy h1,
+:root[data-theme="dark"] .home-v7-copy h1{color:#fff!important}
+:root[data-theme="light"] .home-v7-copy .home-kicker,
+:root[data-theme="dark"] .home-v7-copy .home-kicker{color:#78bdff!important}
+:root[data-theme="light"] .home-v7-copy .home-lead,
+:root[data-theme="dark"] .home-v7-copy .home-lead{color:#d5e0e7!important}
+
+.home-v7-search-panel{display:grid;gap:.8rem;margin:.15rem 0 1rem;padding:1rem;border:1px solid var(--color-line);border-radius:1.05rem;background:var(--color-surface);box-shadow:var(--shadow-sm)}
+.home-v7-search-panel p{margin:0 0 .2rem;color:#0878f9;font-size:.6rem;font-weight:900;letter-spacing:.13em}
+.home-v7-search-panel h2{margin:0;color:var(--color-ink);font-size:clamp(1.2rem,4vw,1.6rem);letter-spacing:-.035em}
+.home-v7-search-panel .home-search{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.45rem;max-width:none!important;margin:0!important;padding:.38rem .38rem .38rem .78rem;border:1px solid var(--color-line)!important;border-radius:.85rem;background:var(--color-surface-subtle)!important;box-shadow:none!important}
+.home-v7-search-panel .home-search svg{width:1.05rem;height:1.05rem;fill:none;stroke:var(--color-ink-muted);stroke-width:1.8}
+.home-v7-search-panel .home-search input{min-width:0;height:2.5rem;padding:0;border:0;outline:0;background:transparent!important;color:var(--color-ink)!important;font-size:.82rem}
+.home-v7-search-panel .home-search input::placeholder{color:var(--color-ink-soft)!important}
+.home-v7-search-panel .home-search button{min-height:2.55rem;padding:0 .9rem;border:0;border-radius:.68rem;background:#0878f9!important;color:#fff!important;font-size:.74rem;font-weight:850}
+
+/* Light-theme contrast pass: all semantic amber/orange text is intentionally dark on light surfaces. */
+:root[data-theme="light"]{
+  --color-accent:#934000;
+  --color-accent-readable:#7e3700;
+  --color-yellow:#684900;
+  --color-yellow-bg:#fff3c7;
+}
+:root[data-theme="light"] .status-yellow,
+:root[data-theme="light"] .map-cell.state-yellow{color:#684900!important;background:#fff3c7!important}
+:root[data-theme="light"] .tool-visual-label,
+:root[data-theme="light"] .launcher-kicker,
+:root[data-theme="light"] .launcher-feature__label small,
+:root[data-theme="light"] .quick-jobs__heading a,
+:root[data-theme="light"] .garage-memory small,
+:root[data-theme="light"] .navigation-drawer nav p,
+:root[data-theme="light"] .drawer-settings>p{color:#7e3700!important}
+:root[data-theme="light"] .quick-start__header>span,
+:root[data-theme="light"] .launcher-search button{background:#934000!important;color:#fff!important}
+:root[data-theme="light"] .category-glyph{color:#fff!important}
+
+@media(max-width:47.99rem){
+  .home-v7-hero{min-height:38rem!important}
+  .home-v7-media img{object-position:61% center;filter:saturate(.78) contrast(1.03) brightness(.75)}
+  .home-v7-hero::before{background:linear-gradient(180deg,rgb(3 10 16 / 84%) 0%,rgb(3 10 16 / 69%) 43%,rgb(3 10 16 / 84%) 100%),linear-gradient(90deg,rgb(3 10 16 / 76%) 0%,transparent 90%)}
+  .home-v7-copy{min-height:38rem;padding:3rem 0 2rem!important;justify-content:flex-end}
+  .home-v7-copy h1{max-width:8.8ch!important;font-size:clamp(3rem,15vw,4.45rem)!important}
+  .home-v7-copy .home-lead{max-width:30rem!important;font-size:.93rem!important}
+  .home-v7-actions{margin-top:1.2rem}
+  .home-v7-cta{flex:1 1 9.5rem;min-height:3rem}
+  .home-v7-capabilities{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.35rem}
+  .home-v7-capabilities>div:nth-child(2){border-right:0}.home-v7-capabilities>div:nth-child(-n+2){border-bottom:1px solid rgb(255 255 255 / 12%)}
+  .home-v7-search-panel{padding:.85rem}
+}
+@media(min-width:48rem){
+  .home-v7-media img{object-position:center center}
+  .home-v7-search-panel{grid-template-columns:minmax(14rem,.65fr) minmax(24rem,1.35fr);align-items:center;padding:1rem 1.1rem}
+}

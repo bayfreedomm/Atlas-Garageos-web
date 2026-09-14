@@ -50,52 +50,40 @@ const categories = [
 ] as const;
 ---
 <section class="home-launcher home-launcher--v4" data-toolbox data-mode="home" aria-labelledby="home-heading">
-  <section class="home-v4-hero home-v5-hero">
-    <div class="home-v4-copy home-v5-copy">
-      <p class="home-kicker">AUTOMOTIVE CALCULATORS · FITMENT · TRIP · EV</p>
-      <h1 id="home-heading">Your garage.<br />Every calculation.</h1>
-      <p class="home-lead">Practical car tools for tire fitment, wheel setup, fuel, road trips, EV charging and everyday ownership decisions.</p>
-      <form class="home-search" data-tool-search-form>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
-        <label class="sr-only" for="tool-search-home">Search automotive tools</label>
-        <input id="tool-search-home" type="search" placeholder="Search tire size, fuel, offset..." autocomplete="off" data-tool-search />
-        <button type="submit">Find</button>
-      </form>
+  <section class="home-v4-hero home-v7-hero">
+    <div class="home-v7-media" aria-hidden="true">
+      <img src="/atlas-hero-car.png" alt="" loading="eager" decoding="async" />
     </div>
 
-    <div class="home-v5-console" aria-hidden="true">
-      <div class="home-v5-console__bar"><span>GARAGE TOOL SYSTEM</span><span>LIVE · VISUAL · PRACTICAL</span></div>
-      <div class="home-v5-console__body">
-        <div class="home-v5-wheel-stage">
-          <svg class="home-v5-wheel" viewBox="0 0 420 300">
-            <g class="home-v5-grid"><path d="M32 45H388M32 85H388M32 125H388M32 165H388M32 205H388M32 245H388"/><path d="M70 24V274M120 24V274M170 24V274M220 24V274M270 24V274M320 24V274M370 24V274"/></g>
-            <path class="home-v5-chassis" d="M42 82h96l28-22h105l42 22h65"/>
-            <path class="home-v5-fender" d="M112 192c8-68 48-112 106-112 61 0 101 44 108 112"/>
-            <circle class="home-v5-tire" cx="219" cy="190" r="79"/>
-            <circle class="home-v5-rim" cx="219" cy="190" r="48"/>
-            <circle class="home-v5-hub" cx="219" cy="190" r="8"/>
-            <path class="home-v5-spokes" d="M219 146v88m-38-66 76 44m-76 0 76-44"/>
-            <path class="home-v5-measure home-v5-measure--diameter" d="M324 111h24m-12 0v158m-12 0h24"/>
-            <path class="home-v5-measure home-v5-measure--width" d="M139 278v-18m160 18v-18m-160 9h160"/>
-            <path class="home-v5-measure home-v5-measure--offset" d="M219 62v48m0-24h59"/>
-            <g class="home-v5-callout"><path d="M296 118l40-32h50"/><text x="340" y="79">653 mm DIA</text></g>
-            <g class="home-v5-callout"><path d="M136 242l-52 18H42"/><text x="42" y="279">245 mm WIDTH</text></g>
-            <g class="home-v5-callout home-v5-callout--accent"><path d="M278 86l52-34h56"/><text x="333" y="45">ET +35 mm</text></g>
-          </svg>
-          <div class="home-v5-stage-label"><strong>245/40 R18</strong><span>Wheel &amp; tire geometry</span></div>
-        </div>
+    <div class="home-v4-copy home-v7-copy">
+      <p class="home-kicker">GARAGE TOOLS FOR REAL DRIVERS</p>
+      <h1 id="home-heading">Smarter tools for every drive.</h1>
+      <p class="home-lead">Calculate tire fitment, wheel offset, fuel cost, road trips and EV charging with clear answers built for real-world ownership.</p>
 
-        <div class="home-v5-readouts">
-          <div><span>FUEL &amp; TRIP</span><strong>486 km</strong><small>cost, fuel and split</small></div>
-          <div><span>EV CHARGING</span><strong>42 min</strong><small>time and charging cost</small></div>
-          <div><span>FITMENT</span><strong>+11.4 mm</strong><small>outer wheel movement</small></div>
-        </div>
+      <div class="home-v7-actions" aria-label="Primary actions">
+        <a class="home-v7-cta home-v7-cta--primary" href="/en/tools/">Explore tools <span aria-hidden="true">→</span></a>
+        <a class="home-v7-cta home-v7-cta--secondary" href="/en/fitment-studio/">Compare fitment</a>
       </div>
-      <div class="home-v5-console__footer"><span>NUMBERS</span><i>→</i><span>SHAPE</span><i>→</i><span>MEANING</span></div>
+
+      <div class="home-v7-capabilities" aria-label="GarageOS tool families">
+        <div><span aria-hidden="true">◉</span><strong>Tires &amp; wheels</strong></div>
+        <div><span aria-hidden="true">▰</span><strong>Fuel &amp; trips</strong></div>
+        <div><span aria-hidden="true">⚡</span><strong>EV tools</strong></div>
+        <div><span aria-hidden="true">⌁</span><strong>Performance</strong></div>
+      </div>
     </div>
   </section>
 
   <section class="home-v4-surface">
+    <section class="home-v7-search-panel" aria-label="Find a calculator">
+      <div><p>FIND A TOOL</p><h2>What do you want to calculate?</h2></div>
+      <form class="home-search" data-tool-search-form>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+        <label class="sr-only" for="tool-search-home">Search automotive tools</label>
+        <input id="tool-search-home" type="search" placeholder="Tire size, fuel cost, wheel offset..." autocomplete="off" data-tool-search />
+        <button type="submit">Find</button>
+      </form>
+    </section>
     <div class="home-category-grid" aria-label="Tool categories">
       {categories.map(([name, copy]) => (
         <a href={`/en/tools/?category=${encodeURIComponent(name)}`}>

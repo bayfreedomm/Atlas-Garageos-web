@@ -1,12 +1,24 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import FuelFields from '../../../../components/FuelFields.astro';
-import UtilityResults from '../../../../components/UtilityResults.astro';
+import FuelCostTechnicalVisual from '../../../../components/FuelCostTechnicalVisual.astro';
 import { toolById } from '../../../../seo/tool-registry';
 const definition = toolById('fuel-cost-calculator');
 ---
-<ToolPage {definition} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
-  <form slot="tool" class="calculator-form" data-utility-calculator="fuel-cost" novalidate><FuelFields /><button type="submit">Calculate fuel cost</button><UtilityResults pending="Your fuel estimate will appear here." /></form>
+<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
+  <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
+    <FuelFields />
+    <button type="submit">Calculate fuel cost</button>
+    <div class="fuel-primary-result is-pending" data-fuel-primary-result aria-live="polite" aria-label="Primary fuel cost result">
+      <div class="fuel-primary-result__cost"><span>Estimated fuel cost</span><strong data-fuel-primary-cost>—</strong><p data-fuel-primary-copy>Enter your trip details to see the estimated fuel cost.</p></div>
+      <div class="fuel-primary-result__fuel"><span>Fuel required</span><strong data-fuel-primary-fuel>—</strong><small data-fuel-primary-rate>Cost per distance appears here.</small></div>
+    </div>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your fuel estimate will appear here.</p>
+    <FuelCostTechnicalVisual />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Fuel and cost breakdown</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
   <div slot="explanation"><h2>One calculation, two unit systems</h2><p>Metric mode uses kilometres, litres per 100 kilometres, and price per litre. US mode uses miles, US MPG, and price per US gallon.</p><p>The currency is a label only. Atlas does not fetch exchange rates or change the price you enter.</p></div>
 </ToolPage>
 <script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>
