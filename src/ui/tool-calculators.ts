@@ -45,7 +45,6 @@ function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiame
 function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
   const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
   if (!visual) return;
-  const maxDiameter = 850;
   const diameterScale = Math.min(1.08, Math.max(.72, result.overallDiameterMm / 680));
   const widthScale = Math.min(1.18, Math.max(.78, input.widthMm / 225));
   const wheel = visual.querySelector<SVGGElement>('[data-single-tire-wheel]');
