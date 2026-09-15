@@ -5,7 +5,6 @@ import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
-import MobileDock from './MobileDock.astro';
 import ThemeQuickToggle from './ThemeQuickToggle.astro';
 import '../styles/global.css';
 import '../styles/product-v3.css';
@@ -67,6 +66,5 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     </div></header>
     <main id="main-content"><slot /></main>
     <Footer />
-    {active !== 'home' && <MobileDock active={active === 'fitment' ? 'fitment' : 'tools'} />}
   </body>
 </html>

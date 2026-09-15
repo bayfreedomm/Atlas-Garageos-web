@@ -32,7 +32,7 @@ main{padding-top:0!important}.breadcrumbs{margin-top:1rem}.breadcrumbs a{color:v
 .directory-identity{padding:1.5rem 0 .8rem!important}.directory-identity h1{font-size:clamp(2.4rem,9vw,4rem)!important}.toolbox{padding:1rem!important;border:1px solid var(--color-line);border-radius:1.15rem;background:#fff;box-shadow:var(--shadow-sm)}.toolbox-search{background:#f5f8fb!important;border-color:#dce5ed!important}.category-filters button[aria-pressed="true"]{background:#eaf4ff!important;border-color:#87bef5!important;color:#0868c6!important}.tool-row{background:#fff!important;border-color:#e0e7ee!important}.fitment-directory-row{background:linear-gradient(135deg,#081722,#0d2d44)!important;border-color:#174968!important;color:#fff!important}
 
 /* Mobile dock */
-.mobile-dock{position:fixed;z-index:999;right:.75rem;bottom:calc(.65rem + env(safe-area-inset-bottom));left:.75rem;display:grid;grid-template-columns:repeat(3,1fr);min-height:4.1rem;padding:.35rem;border:1px solid #d9e1e8;border-radius:1.2rem;background:rgb(255 255 255 / 94%);box-shadow:0 18px 45px rgb(14 36 56 / 18%);backdrop-filter:blur(18px)}.mobile-dock a{display:grid;place-items:center;gap:.1rem;border-radius:.9rem;color:#566779;font-size:.62rem;font-weight:750;text-decoration:none}.mobile-dock svg{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:1.8}.mobile-dock a[aria-current="page"]{background:#edf6ff;color:#0878f9}.site-footer{padding-bottom:6rem!important}
+.site-footer{padding-bottom:2rem!important}
 
 @media(min-width:48rem){.home-v4-hero{grid-template-columns:minmax(0,.9fr) minmax(26rem,1.1fr);min-height:38rem}.home-v4-copy{padding:5rem 0 4rem;margin-left:max(2rem,calc((100vw - 74rem)/2))}.home-v4-car{align-self:end;margin:0 -3rem 0 -4rem;width:min(54rem,58vw)}.home-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.tool-results{grid-template-columns:repeat(2,minmax(0,1fr))!important}.single-tire-grid{grid-template-columns:minmax(0,1.35fr) minmax(15rem,.65fr)}}
 @media(min-width:60rem){.desktop-nav{display:flex!important}.menu-button{display:none!important}.tool-stage:not(.tool-stage--single){grid-template-columns:minmax(0,1.05fr) minmax(20rem,.65fr)!important}.tool-workspace{padding:1.3rem!important}.mobile-dock{display:none}.site-footer{padding-bottom:2rem!important}}
@@ -177,7 +177,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="dark"] .mobile-dock { box-shadow:0 20px 48px rgb(0 0 0 / 38%); }
 
 @media(max-width:59.999rem) {
-  body { padding-bottom:calc(6rem + env(safe-area-inset-bottom)); }
+  body { padding-bottom:0; }
   .site-footer { padding-bottom:1.5rem!important; }
   .brand-wordmark__context { display:none; }
   .desktop-nav { display:none!important; }
@@ -205,7 +205,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 }
 
 @media(max-width:59.999rem) {
-  html { scroll-padding-bottom:7rem; }
+  html { scroll-padding-bottom:1rem; }
   .mobile-dock { right:1rem; left:1rem; min-height:3.6rem; padding:.28rem; border-radius:1.05rem; }
   .mobile-dock a { border-radius:.78rem; font-size:.58rem; }
   .mobile-dock svg { width:1.12rem; height:1.12rem; }
@@ -235,7 +235,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .mobile-dock{min-height:3.35rem!important;transition:transform 180ms ease,opacity 160ms ease;will-change:transform}
 .mobile-dock[data-hidden="true"]{transform:translateY(calc(100% + 2rem));opacity:0;pointer-events:none}
 .mobile-dock a{padding:.28rem .2rem!important}
-@media(max-width:59.999rem){body{padding-bottom:calc(5.3rem + env(safe-area-inset-bottom))}.mobile-dock{right:.85rem;left:.85rem;min-height:3.35rem!important}.mobile-dock svg{width:1.05rem;height:1.05rem}.mobile-dock a{font-size:.56rem}}
+@media(max-width:59.999rem){body{padding-bottom:0}}
 
 /* Home and directory density: more jobs visible per phone screen. */
 @media(max-width:35rem){
@@ -696,7 +696,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
     justify-content:center!important;
     text-align:center!important;
   }
-  body:not(.page-home) .site-footer{padding-bottom:calc(6.5rem + env(safe-area-inset-bottom))!important;}
+  body:not(.page-home) .site-footer{padding-bottom:2rem!important;}
 
   /* Tool directories stay one clean column on phones. */
   .tool-launch-list,
