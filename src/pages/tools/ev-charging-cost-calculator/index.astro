@@ -3,7 +3,7 @@ import ToolPage from '../../../components/ToolPage.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('ev-charging-cost-calculator');
 ---
-<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This estimate includes the efficiency you enter. Battery temperature, charge taper, and the vehicle's real charging curve can still change the result.">
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This estimate includes the efficiency you enter. Battery temperature, charge taper, and the vehicle's real charging curve can still change the result.">
   <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
     <div class="utility-fields">
       <label>Battery capacity · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>
@@ -15,9 +15,10 @@ const definition = toolById('ev-charging-cost-calculator');
       <label>Charging efficiency · %<input name="chargingEfficiency" type="number" value="90" min="50" max="100" step="1" inputmode="numeric" /></label>
     </div>
     <button type="submit">Calculate charging cost</button>
-    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="standard-answer ev-answer is-pending" data-ev-answer aria-live="polite"><div class="standard-answer__main"><span>Estimated charging cost</span><strong data-ev-cost>—</strong><p data-ev-context>Your charging estimate will appear here.</p></div><div class="standard-answer__secondary"><span>Ideal charging time</span><strong data-ev-time>—</strong><small data-ev-grid>Grid energy appears here.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Your charging estimate will appear here.</p>
-    <div class="tool-visual">
+    <figure class="ev-technical-visual is-pending" data-ev-visual>
+      <figcaption><span>BATTERY → GRID ENERGY → COST + TIME</span><small>Charge window is proportional; time assumes constant power</small></figcaption>
       <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Battery charge level">
         <rect x="14" y="20" width="122" height="50" rx="8" fill="none" stroke="var(--color-ink-soft)" stroke-width="2"/>
         <rect x="136" y="36" width="8" height="18" rx="2" fill="var(--color-ink-soft)"/>
@@ -25,8 +26,11 @@ const definition = toolById('ev-charging-cost-calculator');
         <rect data-fill-end x="18" y="24" width="0" height="42" fill="var(--color-accent)" opacity=".85"/>
         <text data-battery-label x="80" y="82" text-anchor="middle" font-size="9" fill="var(--color-ink-muted)">20% → 80%</text>
       </svg>
-    </div>
+      <div class="ev-visual-stats"><div><small>Into battery</small><strong data-ev-battery-energy>—</strong></div><div><small>From grid</small><strong data-ev-grid-energy>—</strong></div><div><small>Efficiency loss</small><strong data-ev-loss>—</strong></div></div>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Energy, cost, and ideal time</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
   </form>
   <div slot="explanation"><h2>Why the number is an estimate, not a promise</h2><p>Charging efficiency accounts for energy lost between the wall and battery. A 90% setting means 10% of grid energy does not reach the battery.</p><p>The time estimate assumes the entered charging power stays constant. Real charging can be slower because the vehicle, battery temperature, state of charge, and charging curve can limit power.</p></div>
 </ToolPage>

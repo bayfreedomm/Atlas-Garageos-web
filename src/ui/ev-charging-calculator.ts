@@ -37,7 +37,10 @@ export function initializeEvChargingCalculators(): void {
       if (!result.ok) {
         errors.textContent = result.issues.map((issue: { message: string }) => issue.message).join(' ');
         errors.hidden = false;
+        summary.textContent = 'Check the highlighted inputs to update the estimate.';
         summary.classList.add('is-pending');
+        form.querySelector('[data-ev-answer]')?.classList.add('is-pending');
+        form.querySelector('[data-ev-visual]')?.classList.add('is-pending');
         metrics.replaceChildren();
         return;
       }
@@ -45,6 +48,17 @@ export function initializeEvChargingCalculators(): void {
       errors.replaceChildren();
       summary.classList.remove('is-pending');
       summary.textContent = `Charging from ${formatNumber(input.startPercent, 0)}% to ${formatNumber(input.endPercent, 0)}% costs about ${currency} ${formatNumber(result.value.cost, 2)}.`;
+      const text = (selector: string, value: string): void => { const node = form.querySelector<HTMLElement>(selector); if (node) node.textContent = value; };
+      const loss = result.value.gridEnergyKwh - result.value.batteryEnergyKwh;
+      text('[data-ev-cost]', `${currency} ${formatNumber(result.value.cost, 2)}`);
+      text('[data-ev-context]', `${formatNumber(input.startPercent, 0)}% to ${formatNumber(input.endPercent, 0)}% at ${formatNumber(input.chargingEfficiency, 0)}% entered efficiency.`);
+      text('[data-ev-time]', `${formatNumber(result.value.hours, 1)} h`);
+      text('[data-ev-grid]', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh drawn from the grid.`);
+      text('[data-ev-battery-energy]', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`);
+      text('[data-ev-grid-energy]', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`);
+      text('[data-ev-loss]', `${formatNumber(loss, 1)} kWh`);
+      form.querySelector('[data-ev-answer]')?.classList.remove('is-pending');
+      form.querySelector('[data-ev-visual]')?.classList.remove('is-pending');
       const rows: [string, string][] = [
         ['Energy into battery', `${formatNumber(result.value.batteryEnergyKwh, 1)} kWh`],
         ['Energy from grid', `${formatNumber(result.value.gridEnergyKwh, 1)} kWh`],
@@ -65,6 +79,7 @@ export function initializeEvChargingCalculators(): void {
     };
 
     form.addEventListener('input', calculate);
+    form.addEventListener('change', calculate);
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); });
     calculate();
   });

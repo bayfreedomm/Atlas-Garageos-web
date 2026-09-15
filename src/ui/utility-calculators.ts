@@ -147,7 +147,33 @@ function resetRoadTripPrimary(form: HTMLFormElement): void {
   }
 }
 
-function bindSubmit(form: HTMLFormElement, calculate: () => void): void { form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate(); }
+interface StandardAnswerContent { primary: string; secondaryLabel: string; secondary: string; secondaryNote: string; leftLabel: string; left: string; rightLabel: string; right: string; }
+
+function syncStandardAnswer(form: HTMLFormElement, content: StandardAnswerContent): void {
+  const answer = form.querySelector<HTMLElement>('[data-standard-answer]');
+  const visual = form.querySelector<HTMLElement>('[data-standard-visual]');
+  if (!answer || !visual) return;
+  const values: readonly [string, string][] = [
+    ['[data-standard-primary]', content.primary], ['[data-standard-secondary-label]', content.secondaryLabel],
+    ['[data-standard-secondary]', content.secondary], ['[data-standard-secondary-note]', content.secondaryNote],
+    ['[data-standard-visual-left-label]', content.leftLabel], ['[data-standard-visual-left]', content.left],
+    ['[data-standard-visual-right-label]', content.rightLabel], ['[data-standard-visual-right]', content.right],
+  ];
+  values.forEach(([selector, value]) => { const node = form.querySelector<HTMLElement>(selector); if (node) node.textContent = value; });
+  const summary = form.querySelector<HTMLElement>('[data-result-summary]');
+  const context = form.querySelector<HTMLElement>('[data-standard-context]');
+  if (summary && context) context.textContent = summary.textContent;
+  answer.classList.remove('is-pending'); visual.classList.remove('is-pending');
+}
+
+function resetStandardAnswer(form: HTMLFormElement): void {
+  form.querySelector('[data-standard-answer]')?.classList.add('is-pending');
+  form.querySelector('[data-standard-visual]')?.classList.add('is-pending');
+  form.querySelectorAll<HTMLElement>('[data-standard-primary], [data-standard-secondary], [data-standard-visual-left], [data-standard-visual-right]').forEach((node) => { node.textContent = '—'; });
+  const context = form.querySelector<HTMLElement>('[data-standard-context]');
+  if (context) context.textContent = 'Check the input to update the conversion.';
+}
+
 function bindInstant(form: HTMLFormElement, calculate: () => void): void { form.addEventListener('input', calculate); form.addEventListener('change', calculate); calculate(); }
 
 function fuelInput(form: HTMLFormElement) { return { system: (textValue(form, 'system') === 'imperial' ? 'imperial' : 'metric') as UnitSystem, distance: value(form, 'distance'), economy: value(form, 'economy'), price: value(form, 'price') }; }
@@ -224,9 +250,40 @@ export function initializeUtilityCalculators(): void {
     form.addEventListener('change', calculate);
     calculate();
   });
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="fuel-economy"]').forEach((form) => bindInstant(form, () => { const result = convertFuelEconomyTool(value(form, 'value'), textValue(form, 'unit') as FuelEconomyUnit); render(form, result.ok ? { ok: true, ...fuelEconomyPresentation(result.value) } : result); }));
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="pressure"]').forEach((form) => bindInstant(form, () => { const result = convertPressureTool(value(form, 'value'), textValue(form, 'unit') as PressureUnit); render(form, result.ok ? { ok: true, ...pressurePresentation(result.value) } : result); }));
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power"]').forEach((form) => bindInstant(form, () => { const result = convertPowerTool(value(form, 'value'), textValue(form, 'unit') as PowerUnit); render(form, result.ok ? { ok: true, ...powerPresentation(result.value) } : result); }));
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="torque"]').forEach((form) => bindInstant(form, () => { const result = convertTorqueTool(value(form, 'value'), textValue(form, 'unit') as TorqueUnit); render(form, result.ok ? { ok: true, ...torquePresentation(result.value) } : result); }));
-  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power-weight"]').forEach((form) => bindSubmit(form, () => { const power = value(form, 'power'); const weight = value(form, 'weight'); const powerUnit = textValue(form, 'powerUnit') as PowerUnit; const weightUnit = textValue(form, 'weightUnit') as WeightUnit; const result = calculatePowerToWeightTool({ power, powerUnit, weight, weightUnit }); render(form, result.ok ? { ok: true, ...powerToWeightPresentation(result.value, power, powerUnit, weight, weightUnit) } : result); }));
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="fuel-economy"]').forEach((form) => bindInstant(form, () => {
+    const entered = value(form, 'value'); const unit = textValue(form, 'unit') as FuelEconomyUnit; const result = convertFuelEconomyTool(entered, unit);
+    render(form, result.ok ? { ok: true, ...fuelEconomyPresentation(result.value) } : result);
+    if (!result.ok) return resetStandardAnswer(form);
+    const from = unit === 'l100km' ? `${formatNumber(entered)} L/100km` : `${formatNumber(entered)} ${unit === 'us-mpg' ? 'US MPG' : 'Imp MPG'}`;
+    const primary = unit === 'l100km' ? `${formatNumber(result.value.usMpg)} US MPG` : `${formatNumber(result.value.litersPer100Km)} L/100km`;
+    const secondary = unit === 'imperial-mpg' ? `${formatNumber(result.value.usMpg)} US MPG` : `${formatNumber(result.value.imperialMpg)} Imp MPG`;
+    syncStandardAnswer(form, { primary, secondaryLabel: 'Other gallon standard', secondary, secondaryNote: 'US and Imperial gallons are not interchangeable.', leftLabel: 'Entered economy', left: from, rightLabel: 'Converted economy', right: primary });
+  }));
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="pressure"]').forEach((form) => bindInstant(form, () => {
+    const entered = value(form, 'value'); const unit = textValue(form, 'unit') as PressureUnit; const result = convertPressureTool(entered, unit);
+    render(form, result.ok ? { ok: true, ...pressurePresentation(result.value) } : result);
+    if (!result.ok) return resetStandardAnswer(form);
+    const primary = unit === 'psi' ? `${formatNumber(result.value.bar, 3)} bar` : `${formatNumber(result.value.psi)} PSI`;
+    syncStandardAnswer(form, { primary, secondaryLabel: 'Kilopascals', secondary: `${formatNumber(result.value.kpa)} kPa`, secondaryNote: 'Conversion only—use the vehicle specification.', leftLabel: 'Entered pressure', left: `${formatNumber(entered)} ${unit}`, rightLabel: 'Converted pressure', right: primary });
+  }));
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power"]').forEach((form) => bindInstant(form, () => {
+    const entered = value(form, 'value'); const unit = textValue(form, 'unit') as PowerUnit; const result = convertPowerTool(entered, unit);
+    render(form, result.ok ? { ok: true, ...powerPresentation(result.value) } : result);
+    if (!result.ok) return resetStandardAnswer(form);
+    const primary = unit === 'hp' ? `${formatNumber(result.value.kilowatts)} kW` : `${formatNumber(result.value.mechanicalHorsepower)} hp`;
+    syncStandardAnswer(form, { primary, secondaryLabel: 'Underlying power', secondary: `${formatNumber(result.value.watts)} W`, secondaryNote: 'Uses mechanical horsepower, not metric PS.', leftLabel: 'Entered power', left: `${formatNumber(entered)} ${unit}`, rightLabel: 'Converted power', right: primary });
+  }));
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="torque"]').forEach((form) => bindInstant(form, () => {
+    const entered = value(form, 'value'); const unit = textValue(form, 'unit') as TorqueUnit; const result = convertTorqueTool(entered, unit);
+    render(form, result.ok ? { ok: true, ...torquePresentation(result.value) } : result);
+    if (!result.ok) return resetStandardAnswer(form);
+    const primary = unit === 'nm' ? `${formatNumber(result.value.poundFeet)} lb-ft` : `${formatNumber(result.value.newtonMeters)} Nm`;
+    syncStandardAnswer(form, { primary, secondaryLabel: 'Relationship', secondary: 'Same torque', secondaryNote: 'Only the unit expression changes.', leftLabel: 'Entered torque', left: `${formatNumber(entered)} ${unit}`, rightLabel: 'Converted torque', right: primary });
+  }));
+  document.querySelectorAll<HTMLFormElement>('[data-utility-calculator="power-weight"]').forEach((form) => bindInstant(form, () => {
+    const power = value(form, 'power'); const weight = value(form, 'weight'); const powerUnit = textValue(form, 'powerUnit') as PowerUnit; const weightUnit = textValue(form, 'weightUnit') as WeightUnit; const result = calculatePowerToWeightTool({ power, powerUnit, weight, weightUnit });
+    render(form, result.ok ? { ok: true, ...powerToWeightPresentation(result.value, power, powerUnit, weight, weightUnit) } : result);
+    if (!result.ok) return resetStandardAnswer(form);
+    syncStandardAnswer(form, { primary: `${formatNumber(result.value.mechanicalHorsepowerPerTonne)} hp/t`, secondaryLabel: 'Metric equivalent', secondary: `${formatNumber(result.value.kilowattsPerTonne)} kW/t`, secondaryNote: 'Ratio only; traction, gearing, and drag are separate.', leftLabel: 'Entered vehicle', left: `${formatNumber(power)} ${powerUnit} · ${formatNumber(weight)} ${weightUnit}`, rightLabel: 'Normalized ratio', right: `${formatNumber(result.value.wattsPerKilogram)} W/kg` });
+  }));
 }

@@ -442,6 +442,63 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="dark"] .trip-technical-visual{border-color:#28404f;background:linear-gradient(180deg,#0d202d,#0a1822)}:root[data-theme="dark"] .trip-technical-visual__head span,:root[data-theme="dark"] .trip-visual-stats strong,:root[data-theme="dark"] .trip-technical-visual figcaption strong{color:#d7ecff}:root[data-theme="dark"] .trip-technical-visual__head small,:root[data-theme="dark"] .trip-route,:root[data-theme="dark"] .trip-visual-stats small,:root[data-theme="dark"] .trip-technical-visual figcaption{color:#aabfcc}:root[data-theme="dark"] .tool-machine--road-trip-cost-calculator .tool-results div:first-child{background:#102431!important;border-color:#28404f!important}
 @media(min-width:42rem){.trip-primary{grid-template-columns:minmax(0,1.15fr) minmax(16rem,.85fr);padding:1rem}.trip-primary__support{grid-template-columns:1fr}.trip-technical-visual{padding:1rem}}
 
+/* V4.11 carry-forward — Fitment escape routes and resilient related cards. */
+.studio-breadcrumbs{width:min(100% - 2rem,78rem);margin:.85rem auto .25rem}.studio-breadcrumbs span{color:var(--color-ink-muted);font-size:.72rem}.related-card{min-width:0}.related-card>span{min-width:0}.related-card span strong,.related-card span small{overflow-wrap:anywhere;word-break:normal}.related-card i{flex:none}
+
+/* V5.0 RC1 — semantic contrast contract. Small light-theme text tokens exceed 4.5:1 on white. */
+:root[data-theme="light"]{
+  --semantic-accent-text:#8a3f00;
+  --semantic-warning-text:#744600;
+  --semantic-warning-bg:#fff7e6;
+  --semantic-warning-border:#c78a2c;
+  --semantic-danger-text:#8f2d25;
+  --semantic-danger-bg:#fff0ee;
+  --semantic-danger-border:#cc7770;
+  --semantic-helper-text:#526477;
+  --semantic-info-text:#0868c6;
+  --color-accent:var(--semantic-accent-text);
+  --color-ink-soft:#59697a;
+  --color-yellow:var(--semantic-warning-text);
+  --color-yellow-bg:var(--semantic-warning-bg);
+}
+:root[data-theme="dark"]{
+  --semantic-accent-text:#ffad6c;
+  --semantic-warning-text:#f2d08a;
+  --semantic-warning-bg:#2c2517;
+  --semantic-warning-border:#7d6631;
+  --semantic-danger-text:#f0b8bd;
+  --semantic-danger-bg:#321e1f;
+  --semantic-danger-border:#804247;
+  --semantic-helper-text:#b5c0cb;
+  --semantic-info-text:#75baff;
+}
+:root[data-theme="light"] .eyebrow,:root[data-theme="light"] .tool-visual-label,:root[data-theme="light"] .navigation-drawer nav>p,:root[data-theme="light"] .drawer-settings>p{color:var(--semantic-accent-text)!important}
+:root[data-theme="light"] .limitation-card,:root[data-theme="light"] .insight-alert--mistake{background:var(--semantic-warning-bg)!important;border-color:var(--semantic-warning-border)!important;color:var(--color-ink)!important}
+:root[data-theme="light"] .limitation-card strong,:root[data-theme="light"] .insight-alert--mistake strong,:root[data-theme="light"] .insight-alert--mistake>span{color:var(--semantic-warning-text)!important}
+:root[data-theme="light"] .limitation-card p,:root[data-theme="light"] .insight-alert--mistake p{color:#4f4637!important}
+:root[data-theme="light"] .insight-alert--warning{background:var(--semantic-danger-bg)!important;border-color:var(--semantic-danger-border)!important;color:var(--color-ink)!important}
+:root[data-theme="light"] .insight-alert--warning strong,:root[data-theme="light"] .insight-alert--warning>span{color:var(--semantic-danger-text)!important}:root[data-theme="light"] .insight-alert--warning p{color:#553d3b!important}
+:root[data-theme="light"] .tool-results dt,:root[data-theme="light"] .related-card small,:root[data-theme="light"] .quick-fact p,:root[data-theme="light"] .tool-explanation p,:root[data-theme="light"] .fuel-detail-heading small{color:var(--semantic-helper-text)!important}
+.tool-machine .calculator-form>button:not(.secondary){border-color:#075fb8!important;background:linear-gradient(180deg,#0a67d8,#075fb8)!important;color:#fff!important;text-shadow:none!important}
+:root[data-theme="light"] .tool-machine .calculator-form>button:not(.secondary),:root[data-theme="dark"] .tool-machine .calculator-form>button:not(.secondary){color:#fff!important}
+
+/* Shared result hierarchy for utility calculators. */
+.standard-answer{display:grid;gap:.7rem;margin:.85rem 0 0;padding:.82rem;border:1px solid #b9d8f6;border-radius:1rem;background:linear-gradient(145deg,#edf7ff,#f8fbfe)}
+.standard-answer__main,.standard-answer__secondary{min-width:0;padding:.82rem;border:1px solid #e0e8ef;border-radius:.82rem;background:#fff}.standard-answer span,.standard-answer small{display:block;color:var(--semantic-helper-text,#586d80);font-size:.68rem;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
+.standard-answer__main>strong{display:block;margin:.15rem 0 .25rem;color:#0878f9;font:800 clamp(2rem,10vw,3rem)/1 var(--font-display);overflow-wrap:anywhere}.standard-answer__main p{margin:0;color:#22384b;font-size:.82rem;line-height:1.45}.standard-answer__secondary{display:flex;flex-direction:column;justify-content:center}.standard-answer__secondary strong{display:block;margin:.22rem 0;color:#172536;font:800 clamp(1.15rem,5vw,1.55rem)/1.1 var(--font-display);overflow-wrap:anywhere}.standard-answer__secondary small{line-height:1.4;letter-spacing:0;text-transform:none}.standard-answer.is-pending strong{color:#8192a2}
+.standard-visual,.gear-technical-visual,.ev-technical-visual{margin:.9rem 0 0;padding:.85rem;border:1px solid #d8e4ee;border-radius:1rem;background:linear-gradient(180deg,#fbfdff,#f3f8fc);overflow:hidden}.standard-visual>figcaption,.gear-technical-visual>figcaption,.ev-technical-visual>figcaption{display:flex;justify-content:space-between;gap:1rem;color:#173754;font-size:.66rem;font-weight:850;letter-spacing:.075em}.standard-visual>figcaption small,.gear-technical-visual>figcaption small,.ev-technical-visual>figcaption small{max-width:14rem;color:var(--semantic-helper-text,#61788b);font-size:.63rem;font-weight:500;letter-spacing:0;text-align:right}
+.standard-visual__equation{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:.65rem;margin-top:.85rem}.standard-visual__equation>div{min-width:0;padding:.8rem;border:1px solid #dbe5ed;border-radius:.75rem;background:#fff}.standard-visual__equation small{display:block;color:var(--semantic-helper-text,#61788b);font-size:.63rem}.standard-visual__equation strong{display:block;margin-top:.25rem;color:#173754;font:800 clamp(.95rem,4vw,1.35rem)/1.15 var(--font-display);overflow-wrap:anywhere}.standard-visual__equation i{color:#0878f9;font-size:1.4rem;font-style:normal}.standard-visual.is-pending{opacity:.72}
+.gear-wheel-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:.7rem;min-height:9rem;margin:.9rem 0}.gear-wheel-pair>div{display:grid;place-items:center;gap:.4rem}.gear-wheel-pair i{display:block;width:var(--gear-wheel-size,6rem);height:var(--gear-wheel-size,6rem);border:.65rem solid #20394c;border-radius:50%;box-shadow:inset 0 0 0 2px #7890a1;transition:width 180ms ease,height 180ms ease}.gear-wheel-pair>div:last-child i{border-color:#8a3f00}.gear-wheel-pair b{align-self:center;color:#0878f9}.gear-wheel-pair small{color:var(--semantic-helper-text,#61788b)}.gear-wheel-pair strong{color:#173754}.gear-technical-visual>p{margin:.4rem 0 0;color:#314b61;font-size:.78rem;line-height:1.45}
+.ev-technical-visual .tool-visual__scene{display:block;width:min(100%,30rem);margin:.45rem auto}.ev-visual-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}.ev-visual-stats>div{min-width:0;padding:.65rem;border:1px solid #dbe5ed;border-radius:.65rem;background:#fff}.ev-visual-stats small{display:block;color:var(--semantic-helper-text,#61788b);font-size:.62rem}.ev-visual-stats strong{display:block;margin-top:.2rem;color:#173754;font:800 clamp(.8rem,3vw,1.1rem)/1.15 var(--font-display);overflow-wrap:anywhere}
+:root[data-theme="dark"] .standard-answer{border-color:#2a6490;background:linear-gradient(145deg,#0d2a40,#102431)}:root[data-theme="dark"] .standard-answer__main,:root[data-theme="dark"] .standard-answer__secondary,:root[data-theme="dark"] .standard-visual__equation>div,:root[data-theme="dark"] .ev-visual-stats>div{background:#0c1d29;border-color:#28404f}:root[data-theme="dark"] .standard-answer__main p,:root[data-theme="dark"] .standard-answer__secondary strong{color:#eef6fb}
+:root[data-theme="dark"] .standard-visual,:root[data-theme="dark"] .gear-technical-visual,:root[data-theme="dark"] .ev-technical-visual{border-color:#28404f;background:linear-gradient(180deg,#0d202d,#0a1822)}:root[data-theme="dark"] .standard-visual>figcaption,:root[data-theme="dark"] .gear-technical-visual>figcaption,:root[data-theme="dark"] .ev-technical-visual>figcaption,:root[data-theme="dark"] .standard-visual__equation strong,:root[data-theme="dark"] .gear-wheel-pair strong,:root[data-theme="dark"] .ev-visual-stats strong{color:#d7ecff}:root[data-theme="dark"] .gear-technical-visual>p{color:#b5c0cb}:root[data-theme="dark"] .gear-wheel-pair i{border-color:#75baff}:root[data-theme="dark"] .gear-wheel-pair>div:last-child i{border-color:#ffad6c}
+
+/* Responsive release guardrails. */
+.tool-machine,.tool-workspace,.calculator-form,.utility-fields,.instant-input,.related-grid,.setup-columns,.spec-row,.rpm-matrix{min-width:0}.calculator-form{grid-template-columns:minmax(0,1fr)!important}.tool-machine input,.tool-machine select,.tool-machine button{max-width:100%}.rpm-matrix{width:100%;max-width:100%}.rpm-matrix__scroll,.map-scroll{width:100%;max-width:100%;overflow:auto}.related-grid{overflow:visible}
+@media(min-width:42rem){.standard-answer{grid-template-columns:minmax(0,1.3fr) minmax(14rem,.7fr);padding:1rem}.standard-visual,.gear-technical-visual,.ev-technical-visual{padding:1rem}}
+@media(max-width:47.999rem){.tool-machine .utility-fields,.tool-machine .gear-ratio-inputs{grid-template-columns:minmax(0,1fr)!important}.utility-fields>label,.instant-input>label{min-width:0;width:100%}.utility-fields input,.utility-fields select,.instant-input input,.instant-input select{width:100%;min-width:0}}
+@media(max-width:26rem){.tool-workspace{padding:.75rem!important}.utility-fields,.instant-input,.ev-visual-stats{grid-template-columns:1fr!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.5rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.5rem!important;height:2.5rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
+
 /* V4.7 — Homepage Concept B: real car, real context.
    The photographic hero remains dark in both themes; light mode applies to the product surface below it.
    This avoids low-contrast hero text and removes the dashboard/diagram-first homepage feel. */
@@ -548,21 +605,4 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 @media(min-width:48rem){
   .home-v7-media img{object-position:center center}
   .home-v7-search-panel{grid-template-columns:minmax(14rem,.65fr) minmax(24rem,1.35fr);align-items:center;padding:1rem 1.1rem}
-}
-
-/* V4.11 — Fitment Studio navigation and related-card integrity */
-.studio-breadcrumbs { margin:0 0 .55rem; padding:0; }
-.studio-breadcrumbs a { color:var(--color-brand); font-size:.82rem; font-weight:800; text-decoration:none; }
-.studio-breadcrumbs a:hover { text-decoration:underline; }
-.related-fitment-tools .fitment-related-card { grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:.8rem; }
-.related-fitment-tools .fitment-related-copy { min-width:0; }
-.related-fitment-tools .fitment-related-copy small,
-.related-fitment-tools .fitment-related-copy strong,
-.related-fitment-tools .fitment-related-copy p { display:block; }
-.related-fitment-tools .fitment-related-copy small { margin:0 0 .22rem; color:var(--color-ink-soft); font-size:.68rem; font-weight:850; letter-spacing:.04em; text-transform:uppercase; }
-.related-fitment-tools .fitment-related-copy strong { color:var(--color-ink); line-height:1.18; }
-.related-fitment-tools .fitment-related-copy p { margin:.28rem 0 0; color:var(--color-ink-muted); font-size:.78rem; line-height:1.35; }
-.related-fitment-tools .fitment-related-card i { color:var(--color-ink-soft); font-size:1.55rem; font-style:normal; }
-@media(min-width:48rem){
-  .related-fitment-tools .fitment-related-card { min-height:8.5rem; align-items:start; padding:1rem; }
 }

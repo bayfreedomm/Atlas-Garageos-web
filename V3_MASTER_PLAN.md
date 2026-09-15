@@ -166,3 +166,11 @@ Next implementation pass:
 - [x] Road Trip inputs update the answer, interpretation, and proportional cost visual together; the route shows one or two legs without claiming a geographic scale.
 - [x] The Road Trip page places its method/details before quick facts and common mistake, followed by related tools. V4.9 root-English routes stay unchanged.
 - [x] 106 tests, Astro typecheck, and static production build passed for V4.10; deployed HTTP and mobile browser QA remain separate launch gates.
+
+## V5.0 RC1 checkpoint — scope locked
+- [x] Global semantic light-theme contrast tokens and an audited 4.5:1 minimum for targeted small text roles.
+- [x] MPG/L100km, Gear Ratio, EV Charging, PSI, power, torque, and power-to-weight aligned to the shared V4 result hierarchy without core/domain changes.
+- [x] Desktop header, mobile drawer, bottom dock, Fitment escape routes, footer, and related-tool navigation audited.
+- [x] Browser QA at 390px, tablet, and desktop completed with no document-level horizontal overflow in the sampled release-critical pages.
+- [x] Root-English routes, 20 legacy `/en/...` 301 rules, canonical, hreflang, sitemap, manifest, and internal links verified.
+- [x] 106 tests passed; typecheck and production build clean. RC1 requires only deployed HTTP checks and the planned physical-device acceptance pass.
