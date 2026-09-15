@@ -606,3 +606,112 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
   .home-v7-media img{object-position:center center}
   .home-v7-search-panel{grid-template-columns:minmax(14rem,.65fr) minmax(24rem,1.35fr);align-items:center;padding:1rem 1.1rem}
 }
+
+
+/* V5.0 RC2 mobile navigation + touch theme-control stabilization. */
+.theme-quick-toggle:hover,
+.theme-quick-toggle:active {
+  border-color: var(--color-line-strong);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+@media (hover:hover) and (pointer:fine) {
+  .theme-quick-toggle:hover { background: var(--color-surface-subtle); }
+}
+:root[data-theme="dark"] .theme-quick-toggle:hover,
+:root[data-theme="dark"] .theme-quick-toggle:active {
+  border-color:#365268;
+  background:#0d202d;
+  color:#f3f7fa;
+}
+
+@media(max-width:59.999rem){
+  .mobile-dock{
+    right:auto!important;
+    left:50%!important;
+    width:min(calc(100% - 1.5rem),36rem);
+    transform:translateX(-50%);
+  }
+  .mobile-dock[data-hidden="true"]{
+    transform:translate(-50%,calc(100% + 2rem));
+  }
+  .mobile-dock a{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    line-height:1.05;
+  }
+}
+
+
+/* V5.0 FINAL — frozen mobile stabilization. No scroll-driven dock behavior. */
+.theme-quick-toggle{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+@media (hover:none), (pointer:coarse){
+  .theme-quick-toggle:hover,
+  .theme-quick-toggle:active,
+  .theme-quick-toggle:focus:not(:focus-visible){
+    border-color:var(--color-line)!important;
+    background:var(--color-surface)!important;
+    color:var(--color-ink)!important;
+    box-shadow:none!important;
+    transform:none!important;
+  }
+  :root[data-theme="dark"] .theme-quick-toggle:hover,
+  :root[data-theme="dark"] .theme-quick-toggle:active,
+  :root[data-theme="dark"] .theme-quick-toggle:focus:not(:focus-visible){
+    border-color:#29404f!important;
+    background:#0d202d!important;
+    color:#f3f7fa!important;
+  }
+}
+
+@media(max-width:59.999rem){
+  /* Home intentionally has no fixed bottom dock; the header menu is the navigation. */
+  .page-home main{padding-bottom:1.5rem!important;}
+  .page-home .site-footer{padding-bottom:2rem!important;}
+
+  /* Inner-page dock: fixed, centered by equal left/right insets, three equal targets. */
+  .mobile-dock{
+    left:1rem!important;
+    right:1rem!important;
+    bottom:calc(.75rem + env(safe-area-inset-bottom))!important;
+    width:auto!important;
+    min-height:4.15rem!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    transform:none!important;
+  }
+  .mobile-dock[data-hidden="true"]{transform:none!important;}
+  .mobile-dock a{
+    min-width:0!important;
+    width:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  body:not(.page-home) .site-footer{padding-bottom:calc(6.5rem + env(safe-area-inset-bottom))!important;}
+
+  /* Tool directories stay one clean column on phones. */
+  .tool-launch-list,
+  .toolbox .tool-rows{grid-template-columns:minmax(0,1fr)!important;}
+  .tool-launch-row,
+  .toolbox .tool-row,
+  .toolbox .tool-row + .tool-row{
+    grid-template-columns:2.75rem minmax(0,1fr) auto!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .tool-launch-row>span,
+  .tool-row__copy{min-width:0!important;}
+  .tool-launch-row strong,
+  .tool-launch-row small,
+  .tool-row__copy strong,
+  .tool-row__copy small{overflow-wrap:anywhere;}
+}

@@ -55,7 +55,7 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     {applicationJsonLd && <script is:inline type="application/ld+json" set:html={applicationJsonLd}></script>}
     <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
   </head>
-  <body>
+  <body class={active === 'home' ? 'page-home' : undefined}>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="app-header"><div class="app-header__inner">
       <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand /></a>
@@ -67,6 +67,6 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     </div></header>
     <main id="main-content"><slot /></main>
     <Footer />
-    <MobileDock active={active === 'home' ? 'home' : active === 'fitment' ? 'fitment' : 'tools'} />
+    {active !== 'home' && <MobileDock active={active === 'fitment' ? 'fitment' : 'tools'} />}
   </body>
 </html>

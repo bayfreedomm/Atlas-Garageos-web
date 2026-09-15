@@ -30,11 +30,13 @@ export function initializeThemeControls(): void {
     localStorage.setItem(THEME_STORAGE_KEY, preference);
     apply();
   }));
+  const touchLikePointer = window.matchMedia('(hover: none), (pointer: coarse)');
   quickToggles.forEach((button) => button.addEventListener('click', () => {
     const resolved = resolveTheme(preference, media.matches);
     preference = resolved === 'dark' ? 'light' : 'dark';
     localStorage.setItem(THEME_STORAGE_KEY, preference);
     apply();
+    if (touchLikePointer.matches) window.requestAnimationFrame(() => button.blur());
   }));
   media.addEventListener('change', () => { if (preference === 'system') apply(); });
   apply();
