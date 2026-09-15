@@ -38,12 +38,21 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
     <header class="app-header">
       <div class="app-header__inner">
         <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand subtitle="Wheel & Tire Compare" /></a>
-        <div class="app-header__actions"><ThemeQuickToggle /><NavigationDrawer /></div>
+        <div class="app-header__actions">
+          <nav class="desktop-nav" aria-label="Primary navigation">
+            <a href="/">Home</a>
+            <a href="/tools/">Tools</a>
+            <a href="/fitment-studio/" aria-current="page">Wheel &amp; Tire Compare</a>
+          </nav>
+          <ThemeQuickToggle />
+          <NavigationDrawer />
+        </div>
       </div>
     </header>
 
     <main id="main-content">
       <section class="studio-hero" id="fitment" aria-labelledby="studio-heading">
+        <nav class="tool-breadcrumbs studio-breadcrumbs" aria-label="Back to tools"><a href="/tools/">← All tools</a></nav>
         <p class="eyebrow">Wheel &amp; tire fitment compare</p>
         <h1 id="studio-heading">See what changes before you change wheels.</h1>
         <p class="hero-copy">Enter your current setup and the setup you are considering. Atlas shows tire-size change, wheel position, and static geometry without pretending that geometry alone proves road fitment.</p>
@@ -148,7 +157,22 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <div class="garage-shell"><article id="vehicle-summary" class="vehicle-card"></article><div><label for="active-vehicle">Current vehicle<select id="active-vehicle"><option value="">No saved vehicle</option></select></label><label for="vehicle-nickname">New vehicle nickname<input id="vehicle-nickname" name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label><p id="garage-status" role="status" aria-live="polite"></p><div id="saved-setups"></div></div></div>
       </section>
 
-      <section class="product-section subtle-panel related-fitment-tools" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">Related tools</p><h2 id="tools-heading">Continue with one focused calculation</h2><p>Use the same transparent geometry engines through a task-specific entry point.</p><div class="related-grid"><a class="related-card" href="/tools/tire-size-comparison/"><span>Tires & wheels</span><strong>Tire Size Comparison</strong><p>Compare diameter, sidewall, circumference, and speedometer changes.</p></a><a class="related-card" href="/tools/wheel-offset-calculator/"><span>Fitment</span><strong>Wheel Offset Calculator</strong><p>See inner-position and outer-poke changes before using measured clearance.</p></a><a class="related-card" href="#garage"><span>Optional storage</span><strong>Save this setup</strong><p>Keep this vehicle and setup in this browser for later.</p></a></div></section>
+      <section class="product-section subtle-panel related-fitment-tools" id="tools" aria-labelledby="tools-heading">
+        <p class="eyebrow">Related tools</p>
+        <h2 id="tools-heading">Continue with one focused calculation</h2>
+        <p>Use the same transparent geometry engines through a task-specific entry point.</p>
+        <div class="related-grid">
+          <a class="related-card fitment-related-card" href="/tools/tire-size-comparison/">
+            <div class="fitment-related-copy"><small>Tires &amp; wheels</small><strong>Tire Size Comparison</strong><p>Compare diameter, sidewall, circumference, and speedometer changes.</p></div><i aria-hidden="true">›</i>
+          </a>
+          <a class="related-card fitment-related-card" href="/tools/wheel-offset-calculator/">
+            <div class="fitment-related-copy"><small>Fitment</small><strong>Wheel Offset Calculator</strong><p>See inner-position and outer-poke changes before using measured clearance.</p></div><i aria-hidden="true">›</i>
+          </a>
+          <a class="related-card fitment-related-card" href="#garage">
+            <div class="fitment-related-copy"><small>Optional storage</small><strong>Save this setup</strong><p>Keep this vehicle and setup in this browser for later.</p></div><i aria-hidden="true">›</i>
+          </a>
+        </div>
+      </section>
     </main>
 
 

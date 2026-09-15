@@ -549,3 +549,20 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
   .home-v7-media img{object-position:center center}
   .home-v7-search-panel{grid-template-columns:minmax(14rem,.65fr) minmax(24rem,1.35fr);align-items:center;padding:1rem 1.1rem}
 }
+
+/* V4.11 — Fitment Studio navigation and related-card integrity */
+.studio-breadcrumbs { margin:0 0 .55rem; padding:0; }
+.studio-breadcrumbs a { color:var(--color-brand); font-size:.82rem; font-weight:800; text-decoration:none; }
+.studio-breadcrumbs a:hover { text-decoration:underline; }
+.related-fitment-tools .fitment-related-card { grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:.8rem; }
+.related-fitment-tools .fitment-related-copy { min-width:0; }
+.related-fitment-tools .fitment-related-copy small,
+.related-fitment-tools .fitment-related-copy strong,
+.related-fitment-tools .fitment-related-copy p { display:block; }
+.related-fitment-tools .fitment-related-copy small { margin:0 0 .22rem; color:var(--color-ink-soft); font-size:.68rem; font-weight:850; letter-spacing:.04em; text-transform:uppercase; }
+.related-fitment-tools .fitment-related-copy strong { color:var(--color-ink); line-height:1.18; }
+.related-fitment-tools .fitment-related-copy p { margin:.28rem 0 0; color:var(--color-ink-muted); font-size:.78rem; line-height:1.35; }
+.related-fitment-tools .fitment-related-card i { color:var(--color-ink-soft); font-size:1.55rem; font-style:normal; }
+@media(min-width:48rem){
+  .related-fitment-tools .fitment-related-card { min-height:8.5rem; align-items:start; padding:1rem; }
+}
