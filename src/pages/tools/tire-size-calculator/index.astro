@@ -1,15 +1,132 @@
 ---
-import ToolPage from '../../../components/ToolPage.astro';
-import TireSizeTechnicalVisual from '../../../components/TireSizeTechnicalVisual.astro';
-import TireCodeExplainer from '../../../components/TireCodeExplainer.astro';
-import { toolById } from '../../../seo/tool-registry';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import ToolIcon from '../../../components/ToolIcon.astro';
+import { insightForTool } from '../../../content/tool-insights';
+import { relatedTools, routeForTool, toolById } from '../../../seo/tool-registry';
+import '../../../styles/reference-tool.css';
+
 const definition = toolById('tire-size-calculator');
+const insight = insightForTool(definition.id);
+const related = relatedTools(definition);
 ---
-<ToolPage {definition} visual={false} eyebrow="Tires & wheels" intro="Enter the three numbers printed on a metric tire sidewall to calculate its physical dimensions and rolling distance." limitation="These are nominal geometric calculations. Real dimensions vary by tire model, rim width, pressure, load, and manufacturer tolerances." studioCta="Open Wheel & Tire Compare">
-  <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
-    <fieldset><legend>Tire size</legend><div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
-    <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p><TireSizeTechnicalVisual /><dl class="tool-results" data-results aria-live="polite"></dl>
-  </form>
-  <div slot="explanation"><TireCodeExplainer /><h2>How the geometry is calculated</h2><p>Sidewall height is width multiplied by the profile percentage. Two sidewalls plus the rim diameter, converted from inches to millimetres, gives overall diameter.</p><p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p><h2>Why the size on the sidewall actually matters</h2><p>A tire's overall diameter sets how far your car travels per wheel rotation. Fit a noticeably taller or shorter tire and your speedometer starts reading the wrong number — check the real difference with the <a href="/tools/speedometer-error-calculator/">Speedometer Error Calculator</a>. The same diameter change also shifts your effective gearing, which the <a href="/tools/gear-ratio-calculator/">Gear Ratio Calculator</a> shows directly.</p></div>
-</ToolPage>
-<script>import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeToolCalculators();</script>
+<SiteLayout {definition} active="tools">
+  <div class="reference-tool">
+    <nav class="reference-tool__crumb" aria-label="Breadcrumb">
+      <a href="/tools/">All tools</a><span aria-hidden="true">/</span><span>Tires &amp; wheels</span>
+    </nav>
+
+    <header class="reference-tool__intro">
+      <div class="reference-tool__title-icon"><ToolIcon id={definition.id} category={definition.category} /></div>
+      <div>
+        <p class="reference-tool__eyebrow">Tires &amp; wheels</p>
+        <h1>Tire Size Calculator</h1>
+        <p>Enter the three numbers on your tire. Get its real-world dimensions instantly.</p>
+      </div>
+    </header>
+
+    <form class="reference-calculator" data-calculator="tire-size" novalidate>
+      <section class="reference-calculator__input" aria-labelledby="tire-size-input-heading">
+        <div class="reference-section-heading">
+          <div><span>01</span><h2 id="tire-size-input-heading">Enter your tire size</h2></div>
+          <p>Example: 225 / 45 R18</p>
+        </div>
+
+        <fieldset class="reference-size-input">
+          <legend class="sr-only">Metric tire size</legend>
+          <label><span>Width</span><input name="widthMm" type="number" value="225" min="1" inputmode="numeric" aria-describedby="width-unit" /><small id="width-unit">mm</small></label>
+          <b aria-hidden="true">/</b>
+          <label><span>Profile</span><input name="aspectRatio" type="number" value="45" min="1" inputmode="numeric" /><small>%</small></label>
+          <b aria-hidden="true">R</b>
+          <label><span>Rim</span><input name="rimDiameterInches" type="number" value="18" min="1" step="0.5" inputmode="decimal" /><small>inch</small></label>
+        </fieldset>
+
+        <button type="submit">Calculate dimensions <span aria-hidden="true">→</span></button>
+        <div class="inline-errors reference-errors" data-errors role="alert" hidden></div>
+      </section>
+
+      <section class="reference-answer" data-reference-answer aria-labelledby="tire-result-heading">
+        <div class="reference-section-heading reference-section-heading--answer">
+          <div><span>02</span><h2 id="tire-result-heading">Your answer</h2></div>
+          <p data-reference-size>225 / 45 R18</p>
+        </div>
+
+        <div class="reference-answer__lead" aria-live="polite">
+          <p>Overall diameter</p>
+          <strong><span data-reference-diameter>659.7</span> <small>mm</small></strong>
+          <span data-reference-meaning>A balanced 18-inch setup with a 101.3 mm sidewall.</span>
+        </div>
+
+        <figure class="reference-visual" data-reference-visual>
+          <svg viewBox="0 0 360 230" role="img" aria-labelledby="reference-visual-title reference-visual-desc">
+            <title id="reference-visual-title">Live tire dimension drawing</title>
+            <desc id="reference-visual-desc">A proportional side view shows overall diameter and rim diameter. A section view shows nominal tire width.</desc>
+            <defs>
+              <radialGradient id="reference-tire-fill" cx="38%" cy="30%" r="72%"><stop offset="0" stop-color="#536170"/><stop offset=".58" stop-color="#202a33"/><stop offset="1" stop-color="#0b1015"/></radialGradient>
+              <linearGradient id="reference-rim-fill" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e9eef2"/><stop offset=".52" stop-color="#81909c"/><stop offset="1" stop-color="#2d3943"/></linearGradient>
+            </defs>
+            <path class="reference-visual__ground" d="M24 205H336" />
+            <g data-reference-wheel transform="translate(112 112)">
+              <circle data-reference-tire r="78" fill="url(#reference-tire-fill)" />
+              <circle data-reference-rim r="54" fill="url(#reference-rim-fill)" />
+              <circle r="13" class="reference-visual__hub" />
+              <path class="reference-visual__spokes" d="M0-47V47M-41-24 41 24M-41 24 41-24M-47 0H47" />
+            </g>
+            <g class="reference-visual__dimension">
+              <path data-reference-diameter-line d="M20 34V190M15 34h10M15 190h10" />
+              <text x="11" y="112" text-anchor="middle" transform="rotate(-90 11 112)" data-reference-diameter-label>659.7 mm diameter</text>
+            </g>
+            <g class="reference-visual__section">
+              <text x="262" y="56" text-anchor="middle">SECTION WIDTH</text>
+              <rect data-reference-width-body x="208" y="76" width="108" height="72" rx="28" />
+              <path d="M208 164H316M208 158v12M316 158v12" />
+              <text x="262" y="184" text-anchor="middle" data-reference-width-label>225 mm</text>
+            </g>
+            <text class="reference-visual__note" x="262" y="211" text-anchor="middle">Nominal geometry · proportional view</text>
+          </svg>
+          <figcaption><strong>Number → shape → meaning</strong><span>The drawing updates only when the values form a valid tire size.</span></figcaption>
+        </figure>
+
+        <p class="result-summary is-pending sr-only" data-result-summary aria-live="polite">Your result will appear here.</p>
+        <dl class="tool-results reference-metrics" data-results aria-live="polite"></dl>
+      </section>
+    </form>
+
+    <section class="reference-reading" aria-labelledby="read-code-heading">
+      <div class="reference-section-heading"><div><span>03</span><h2 id="read-code-heading">Read the code</h2></div></div>
+      <div class="reference-reading__row"><strong>225</strong><div><b>Width</b><span>Nominal section width in millimetres.</span></div></div>
+      <div class="reference-reading__row"><strong>45</strong><div><b>Profile</b><span>Sidewall height as a percentage of width — not millimetres.</span></div></div>
+      <div class="reference-reading__row"><strong>R18</strong><div><b>Rim</b><span>Wheel diameter in inches.</span></div></div>
+    </section>
+
+    <section class="reference-understanding" aria-labelledby="understanding-heading">
+      <div class="reference-section-heading"><div><span>04</span><h2 id="understanding-heading">What matters</h2></div></div>
+      <div class="reference-facts">
+        {insight.facts.map((fact) => <article><strong>{fact.title}</strong><p>{fact.body}</p></article>)}
+      </div>
+      {insight.commonMistake && <aside class="reference-mistake"><span aria-hidden="true">!</span><div><strong>Common mistake</strong><p>{insight.commonMistake}</p></div></aside>}
+    </section>
+
+    <details class="reference-method">
+      <summary><span>Method &amp; limitations</span><i aria-hidden="true">+</i></summary>
+      <div>
+        <h2>How the geometry is calculated</h2>
+        <p>Sidewall height is width multiplied by the profile percentage. Overall diameter is two sidewalls plus the rim diameter converted from inches to millimetres.</p>
+        <p><code>diameter = 2 × (width × profile ÷ 100) + (rim × 25.4)</code></p>
+        <p>Results describe nominal geometry. Actual dimensions vary by tire model, rim width, pressure, load, wear, and manufacturer tolerance.</p>
+        <a href="/methodology/">Read Accuracy &amp; Methodology →</a>
+      </div>
+    </details>
+
+    <section class="reference-next" aria-labelledby="next-heading">
+      <div class="reference-section-heading"><div><span>Next</span><h2 id="next-heading">Keep going</h2></div></div>
+      <div>
+        {related.map((tool) => <a href={routeForTool(tool)}><span><ToolIcon id={tool.id} category={tool.category} /></span><div><strong>{tool.title}</strong><small>{tool.description}</small></div><i aria-hidden="true">→</i></a>)}
+      </div>
+    </section>
+  </div>
+</SiteLayout>
+
+<script>
+  import { initializeToolCalculators } from '../../../ui/tool-calculators';
+  initializeToolCalculators();
+</script>
