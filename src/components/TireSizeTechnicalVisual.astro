@@ -1,30 +1,36 @@
-<figure class="single-tire-visual" data-single-tire-visual aria-labelledby="single-tire-title">
-  <figcaption><span class="visual-kicker">Live tire anatomy</span><strong id="single-tire-title">See the tire behind the code</strong><p>The drawing updates with width, profile and rim size.</p></figcaption>
-  <div class="single-tire-grid">
-    <section class="single-tire-card single-tire-card--hero">
-      <svg viewBox="0 0 420 300" role="img" aria-label="Technical tire illustration with live dimensions">
-        <defs>
-          <radialGradient id="singleTireBody" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#64717a"/><stop offset=".52" stop-color="#232c33"/><stop offset="1" stop-color="#0c1115"/></radialGradient>
-          <radialGradient id="singleRim" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f2f5f7"/><stop offset=".55" stop-color="#9caab4"/><stop offset="1" stop-color="#394650"/></radialGradient>
-        </defs>
-        <path class="single-ground" d="M45 248H375"/>
-        <g data-single-tire-wheel transform="translate(210 145)">
-          <ellipse data-single-tire-body cx="0" cy="0" rx="94" ry="110" fill="url(#singleTireBody)"/>
-          <ellipse data-single-tire-rim cx="0" cy="0" rx="55" ry="64" fill="url(#singleRim)"/>
-          <ellipse cx="0" cy="0" rx="16" ry="18" class="single-hub"/>
-          <path class="single-spokes" d="M0-54V54M-46-27 46 27M-46 27 46-27M-52 0H52"/>
-          <path class="single-tread" d="M-60-90l18 16-16 18 18 16-17 18m117-88-18 16 16 18-18 16 17 18"/>
-        </g>
-        <g class="single-measure single-measure--width"><path data-single-width-line d="M116 22H304"/><path d="M116 16v12M304 16v12"/><text data-single-width-text x="210" y="13" text-anchor="middle">225 mm width</text></g>
-        <g class="single-measure single-measure--diameter"><path data-single-diameter-line d="M86 35V255"/><path d="M78 35h16M78 255h16"/><text data-single-diameter-text x="54" y="148" text-anchor="middle">659.7 mm</text></g>
-        <g class="single-measure single-measure--rim"><path data-single-rim-line d="M319 81V209"/><path d="M311 81h16M311 209h16"/><text data-single-rim-text x="350" y="148" text-anchor="middle">18 in rim</text></g>
-      </svg>
-      <div class="single-tire-badge" data-single-size-label>225 / 45 R18</div>
-    </section>
-    <section class="single-tire-card single-tire-card--facts">
-      <div><span>Sidewall</span><strong data-single-sidewall>101.3 mm</strong><small>Width × profile %</small></div>
-      <div><span>Overall diameter</span><strong data-single-diameter>659.7 mm</strong><small>Rim + two sidewalls</small></div>
-      <div><span>What changes visually</span><p data-single-meaning>Higher profile makes the sidewall taller; larger rim makes the wheel opening larger.</p></div>
-    </section>
-  </div>
+<figure class="tire-drawing" data-single-tire-visual aria-labelledby="single-tire-title">
+  <figcaption><span>Live geometry</span><strong id="single-tire-title">235 / 40 R18</strong></figcaption>
+  <svg viewBox="0 0 420 280" role="img" aria-label="Technical tire illustration with live width, rim and diameter measurements">
+    <defs>
+      <radialGradient id="singleTireBody" cx="38%" cy="30%" r="72%"><stop offset="0" stop-color="#52616b"/><stop offset=".55" stop-color="#1d2a33"/><stop offset="1" stop-color="#090f13"/></radialGradient>
+      <radialGradient id="singleRim" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#eff4f6"/><stop offset=".58" stop-color="#9aa8b0"/><stop offset="1" stop-color="#3b4850"/></radialGradient>
+    </defs>
+    <path class="ground" d="M60 252H360"/>
+    <g data-single-tire-wheel transform="translate(210 145)">
+      <ellipse data-single-tire-body cx="0" cy="0" rx="94" ry="110" fill="url(#singleTireBody)"/>
+      <ellipse data-single-tire-rim cx="0" cy="0" rx="55" ry="64" fill="url(#singleRim)"/>
+      <ellipse cx="0" cy="0" rx="14" ry="16" class="hub"/>
+      <path class="spokes" d="M0-54V54M-46-27 46 27M-46 27 46-27M-52 0H52"/>
+      <path class="tread" d="M-60-90l18 16-16 18 18 16-17 18m117-88-18 16 16 18-18 16 17 18"/>
+    </g>
+    <g class="measure measure-width"><path data-single-width-line d="M116 22H304"/><path d="M116 16v12M304 16v12"/><text data-single-width-text x="210" y="12" text-anchor="middle">235 mm width</text></g>
+    <g class="measure measure-diameter"><path data-single-diameter-line d="M86 35V255"/><path d="M78 35h16M78 255h16"/><text data-single-diameter-text x="52" y="148" text-anchor="middle">645.2 mm</text></g>
+    <g class="measure measure-rim"><path data-single-rim-line d="M319 81V209"/><path d="M311 81h16M311 209h16"/><text data-single-rim-text x="352" y="148" text-anchor="middle">18 in rim</text></g>
+  </svg>
+  <div class="visual-legend" aria-hidden="true"><span><i></i>Overall diameter</span><span><i></i>Rim</span></div>
+  <span data-single-size-label hidden>235 / 40 R18</span><span data-single-sidewall hidden>94.0 mm</span><span data-single-diameter hidden>645.2 mm</span><span data-single-meaning hidden>A lower-profile sidewall puts more visual emphasis on the rim.</span>
 </figure>
+
+<style>
+  .tire-drawing{margin:0;padding:.4rem 0 0;border:0;border-radius:0;background:transparent;color:#f5f7f8;overflow:hidden}
+  figcaption{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin:0 0 .25rem}
+  figcaption span{color:#ff6b2c;font-size:.65rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+  figcaption strong{font-size:.86rem;letter-spacing:-.02em}
+  svg{display:block;width:100%;height:auto;max-height:18rem}
+  .ground{fill:none;stroke:#243643;stroke-width:1}.hub{fill:#08141d;stroke:#d6dfe3;stroke-width:2}
+  .spokes,.tread{fill:none;stroke:#c4d1d9;stroke-width:2.2}.tread{stroke:#607480;stroke-width:1.4}
+  .measure path{fill:none;stroke-width:1.4}.measure text{font:750 9px var(--font-mono)}
+  .measure-width path,.measure-width text{stroke:#ff6b2c;fill:#ff8a59}.measure-diameter path,.measure-diameter text{stroke:#43a6ef;fill:#74bef5}.measure-rim path,.measure-rim text{stroke:#d9e2e7;fill:#d9e2e7}
+  .visual-legend{display:flex;justify-content:center;gap:1.1rem;color:#82949f;font-size:.65rem}.visual-legend span{display:flex;align-items:center;gap:.35rem}.visual-legend i{width:.5rem;height:2px;background:#43a6ef}.visual-legend span+span i{background:#d9e2e7}
+  :global(:root[data-theme="light"]) .tire-drawing{color:#17232c}:global(:root[data-theme="light"]) .ground{stroke:#d5dcd9}
+</style>

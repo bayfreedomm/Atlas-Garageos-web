@@ -1,132 +1,130 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
-import ToolIcon from '../../../components/ToolIcon.astro';
-import { insightForTool } from '../../../content/tool-insights';
+import TireSizeTechnicalVisual from '../../../components/TireSizeTechnicalVisual.astro';
+import TireCodeExplainer from '../../../components/TireCodeExplainer.astro';
 import { relatedTools, routeForTool, toolById } from '../../../seo/tool-registry';
-import '../../../styles/reference-tool.css';
 
 const definition = toolById('tire-size-calculator');
-const insight = insightForTool(definition.id);
 const related = relatedTools(definition);
 ---
-<SiteLayout {definition} active="tools">
-  <div class="reference-tool">
-    <nav class="reference-tool__crumb" aria-label="Breadcrumb">
-      <a href="/tools/">All tools</a><span aria-hidden="true">/</span><span>Tires &amp; wheels</span>
-    </nav>
 
-    <header class="reference-tool__intro">
-      <div class="reference-tool__title-icon"><ToolIcon id={definition.id} category={definition.category} /></div>
-      <div>
-        <p class="reference-tool__eyebrow">Tires &amp; wheels</p>
-        <h1>Tire Size Calculator</h1>
-        <p>Enter the three numbers on your tire. Get its real-world dimensions instantly.</p>
-      </div>
+<SiteLayout {definition} active="tools">
+  <article class="tire-size-page">
+    <header class="tire-size-hero">
+      <p class="tire-size-kicker">Tires &amp; wheels</p>
+      <h1>Tire Size Calculator</h1>
+      <p>Enter the three numbers on your tire to see its real-world dimensions.</p>
     </header>
 
-    <form class="reference-calculator" data-calculator="tire-size" novalidate>
-      <section class="reference-calculator__input" aria-labelledby="tire-size-input-heading">
-        <div class="reference-section-heading">
-          <div><span>01</span><h2 id="tire-size-input-heading">Enter your tire size</h2></div>
-          <p>Example: 225 / 45 R18</p>
+    <form class="tire-size-calculator" data-calculator="tire-size" novalidate>
+      <fieldset>
+        <legend class="sr-only">Tire size</legend>
+        <div class="tire-size-inputs">
+          <label><span>Width</span><span class="input-shell"><input name="widthMm" type="number" value="235" inputmode="numeric" /><small>mm</small></span></label>
+          <span class="tire-code-separator" aria-hidden="true">/</span>
+          <label><span>Aspect ratio</span><span class="input-shell"><input name="aspectRatio" type="number" value="40" inputmode="numeric" /><small>%</small></span></label>
+          <span class="tire-code-separator" aria-hidden="true">R</span>
+          <label><span>Rim</span><span class="input-shell"><input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /><small>in</small></span></label>
         </div>
+      </fieldset>
 
-        <fieldset class="reference-size-input">
-          <legend class="sr-only">Metric tire size</legend>
-          <label><span>Width</span><input name="widthMm" type="number" value="225" min="1" inputmode="numeric" aria-describedby="width-unit" /><small id="width-unit">mm</small></label>
-          <b aria-hidden="true">/</b>
-          <label><span>Profile</span><input name="aspectRatio" type="number" value="45" min="1" inputmode="numeric" /><small>%</small></label>
-          <b aria-hidden="true">R</b>
-          <label><span>Rim</span><input name="rimDiameterInches" type="number" value="18" min="1" step="0.5" inputmode="decimal" /><small>inch</small></label>
-        </fieldset>
+      <button type="submit">Calculate</button>
+      <div class="inline-errors" data-errors role="alert" hidden></div>
 
-        <button type="submit">Calculate dimensions <span aria-hidden="true">→</span></button>
-        <div class="inline-errors reference-errors" data-errors role="alert" hidden></div>
+      <section class="primary-answer" aria-live="polite" aria-labelledby="diameter-label">
+        <p id="diameter-label">Overall diameter</p>
+        <strong data-primary-diameter>645.2 mm</strong>
+        <small data-result-summary>For tire size 235/40 R18</small>
       </section>
 
-      <section class="reference-answer" data-reference-answer aria-labelledby="tire-result-heading">
-        <div class="reference-section-heading reference-section-heading--answer">
-          <div><span>02</span><h2 id="tire-result-heading">Your answer</h2></div>
-          <p data-reference-size>225 / 45 R18</p>
-        </div>
+      <TireSizeTechnicalVisual />
 
-        <div class="reference-answer__lead" aria-live="polite">
-          <p>Overall diameter</p>
-          <strong><span data-reference-diameter>659.7</span> <small>mm</small></strong>
-          <span data-reference-meaning>A balanced 18-inch setup with a 101.3 mm sidewall.</span>
-        </div>
+      <dl class="secondary-metrics" data-results aria-live="polite">
+        <div><dt>Sidewall height</dt><dd data-sidewall-height>94.0 mm</dd></div>
+        <div><dt>Circumference</dt><dd data-circumference>2,026.7 mm</dd></div>
+        <div><dt>Revs per km</dt><dd data-revs-km>493.4</dd></div>
+      </dl>
 
-        <figure class="reference-visual" data-reference-visual>
-          <svg viewBox="0 0 360 230" role="img" aria-labelledby="reference-visual-title reference-visual-desc">
-            <title id="reference-visual-title">Live tire dimension drawing</title>
-            <desc id="reference-visual-desc">A proportional side view shows overall diameter and rim diameter. A section view shows nominal tire width.</desc>
-            <defs>
-              <radialGradient id="reference-tire-fill" cx="38%" cy="30%" r="72%"><stop offset="0" stop-color="#536170"/><stop offset=".58" stop-color="#202a33"/><stop offset="1" stop-color="#0b1015"/></radialGradient>
-              <linearGradient id="reference-rim-fill" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e9eef2"/><stop offset=".52" stop-color="#81909c"/><stop offset="1" stop-color="#2d3943"/></linearGradient>
-            </defs>
-            <path class="reference-visual__ground" d="M24 205H336" />
-            <g data-reference-wheel transform="translate(112 112)">
-              <circle data-reference-tire r="78" fill="url(#reference-tire-fill)" />
-              <circle data-reference-rim r="54" fill="url(#reference-rim-fill)" />
-              <circle r="13" class="reference-visual__hub" />
-              <path class="reference-visual__spokes" d="M0-47V47M-41-24 41 24M-41 24 41-24M-47 0H47" />
-            </g>
-            <g class="reference-visual__dimension">
-              <path data-reference-diameter-line d="M20 34V190M15 34h10M15 190h10" />
-              <text x="11" y="112" text-anchor="middle" transform="rotate(-90 11 112)" data-reference-diameter-label>659.7 mm diameter</text>
-            </g>
-            <g class="reference-visual__section">
-              <text x="262" y="56" text-anchor="middle">SECTION WIDTH</text>
-              <rect data-reference-width-body x="208" y="76" width="108" height="72" rx="28" />
-              <path d="M208 164H316M208 158v12M316 158v12" />
-              <text x="262" y="184" text-anchor="middle" data-reference-width-label>225 mm</text>
-            </g>
-            <text class="reference-visual__note" x="262" y="211" text-anchor="middle">Nominal geometry · proportional view</text>
-          </svg>
-          <figcaption><strong>Number → shape → meaning</strong><span>The drawing updates only when the values form a valid tire size.</span></figcaption>
-        </figure>
-
-        <p class="result-summary is-pending sr-only" data-result-summary aria-live="polite">Your result will appear here.</p>
-        <dl class="tool-results reference-metrics" data-results aria-live="polite"></dl>
+      <section class="result-meaning" aria-labelledby="meaning-title">
+        <p class="section-label">What this means</p>
+        <h2 id="meaning-title">A compact sidewall on an 18-inch wheel.</h2>
+        <p data-primary-meaning>This balanced size has a 94.0 mm sidewall. Overall diameter controls rolling distance and can affect gearing and speedometer readings when compared with another size.</p>
       </section>
     </form>
 
-    <section class="reference-reading" aria-labelledby="read-code-heading">
-      <div class="reference-section-heading"><div><span>03</span><h2 id="read-code-heading">Read the code</h2></div></div>
-      <div class="reference-reading__row"><strong>225</strong><div><b>Width</b><span>Nominal section width in millimetres.</span></div></div>
-      <div class="reference-reading__row"><strong>45</strong><div><b>Profile</b><span>Sidewall height as a percentage of width — not millimetres.</span></div></div>
-      <div class="reference-reading__row"><strong>R18</strong><div><b>Rim</b><span>Wheel diameter in inches.</span></div></div>
-    </section>
-
-    <section class="reference-understanding" aria-labelledby="understanding-heading">
-      <div class="reference-section-heading"><div><span>04</span><h2 id="understanding-heading">What matters</h2></div></div>
-      <div class="reference-facts">
-        {insight.facts.map((fact) => <article><strong>{fact.title}</strong><p>{fact.body}</p></article>)}
-      </div>
-      {insight.commonMistake && <aside class="reference-mistake"><span aria-hidden="true">!</span><div><strong>Common mistake</strong><p>{insight.commonMistake}</p></div></aside>}
-    </section>
-
-    <details class="reference-method">
-      <summary><span>Method &amp; limitations</span><i aria-hidden="true">+</i></summary>
-      <div>
-        <h2>How the geometry is calculated</h2>
-        <p>Sidewall height is width multiplied by the profile percentage. Overall diameter is two sidewalls plus the rim diameter converted from inches to millimetres.</p>
-        <p><code>diameter = 2 × (width × profile ÷ 100) + (rim × 25.4)</code></p>
-        <p>Results describe nominal geometry. Actual dimensions vary by tire model, rim width, pressure, load, wear, and manufacturer tolerance.</p>
-        <a href="/methodology/">Read Accuracy &amp; Methodology →</a>
-      </div>
-    </details>
-
-    <section class="reference-next" aria-labelledby="next-heading">
-      <div class="reference-section-heading"><div><span>Next</span><h2 id="next-heading">Keep going</h2></div></div>
-      <div>
-        {related.map((tool) => <a href={routeForTool(tool)}><span><ToolIcon id={tool.id} category={tool.category} /></span><div><strong>{tool.title}</strong><small>{tool.description}</small></div><i aria-hidden="true">→</i></a>)}
+    <section class="tire-size-method" aria-labelledby="method-title">
+      <p class="section-label">How it works</p>
+      <div class="method-grid">
+        <div>
+          <h2 id="method-title">Read the code, then calculate the shape.</h2>
+          <p>Sidewall height is width multiplied by the aspect ratio. Overall diameter is the rim diameter in millimetres plus two sidewalls.</p>
+          <p>These are nominal geometric dimensions. Actual tires vary by model, rim width, pressure, load, and manufacturer tolerances.</p>
+        </div>
+        <TireCodeExplainer />
       </div>
     </section>
-  </div>
+
+    <section class="tire-size-related" aria-labelledby="related-title">
+      <p class="section-label">Keep going</p>
+      <h2 id="related-title">Related tools</h2>
+      <div class="related-links">
+        {related.map((tool) => <a href={routeForTool(tool)}><span>{tool.title}</span><i aria-hidden="true">→</i></a>)}
+      </div>
+    </section>
+  </article>
 </SiteLayout>
 
-<script>
-  import { initializeToolCalculators } from '../../../ui/tool-calculators';
-  initializeToolCalculators();
-</script>
+<script>import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeToolCalculators();</script>
+
+<style>
+  .tire-size-page{--accent:#ff6b2c;--ink:#f5f7f8;--muted:#92a2ad;--line:#243643;--panel:#0d1b24;width:min(100%,64rem);margin:0 auto;color:var(--ink)}
+  .tire-size-hero{padding:2rem 0 1.15rem;border-bottom:1px solid var(--line)}
+  .tire-size-kicker,.section-label{margin:0 0 .55rem;color:var(--accent);font-size:.68rem;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+  .tire-size-hero h1{margin:0;color:var(--ink);font-size:clamp(1.75rem,7.2vw,2.65rem);font-weight:780;letter-spacing:-.045em;line-height:1.05}
+  .tire-size-hero>p:last-child{max-width:38rem;margin:.65rem 0 0;color:var(--muted);font-size:.9rem;line-height:1.5}
+  .tire-size-calculator{display:grid;gap:1.4rem;padding:1.35rem 0 0}
+  .tire-size-calculator fieldset{min-width:0;margin:0;padding:0;border:0;background:transparent!important}
+  .tire-size-inputs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,.8fr);align-items:end;gap:.38rem}
+  .tire-size-inputs label{display:grid;min-width:0;gap:.42rem;color:var(--muted);font-size:.68rem;font-weight:700}
+  .input-shell{display:flex;height:3.35rem;min-width:0;align-items:center;border:1px solid var(--line);border-radius:.72rem;background:var(--panel);transition:border-color 150ms ease,box-shadow 150ms ease}
+  .input-shell:focus-within{border-color:#4aa5ef;box-shadow:0 0 0 3px rgb(74 165 239 / 14%)}
+  .input-shell input{width:100%;min-width:0;height:100%;padding:0 .3rem 0 .75rem;border:0!important;background:transparent!important;color:var(--ink)!important;font:750 1rem/1 var(--font-sans);box-shadow:none!important;appearance:textfield}
+  .input-shell input::-webkit-inner-spin-button{appearance:none}
+  .input-shell small{padding-right:.58rem;color:#6f8390;font-size:.62rem;font-weight:800;text-transform:uppercase}
+  .tire-code-separator{padding-bottom:1rem;color:#708490;font-weight:850}
+  .tire-size-calculator>button{min-height:3.45rem;border:0;border-radius:.72rem;background:var(--accent);color:#151b1f;font-size:.95rem;font-weight:850;box-shadow:0 10px 24px rgb(255 107 44 / 16%)}
+  .tire-size-calculator>button:hover{background:#ff7d46}
+  .inline-errors{padding:.75rem 0;color:#ffb39a;font-size:.82rem}
+  .primary-answer{padding:.45rem 0 1.45rem;border-bottom:1px solid var(--line);text-align:center}
+  .primary-answer p{margin:0 0 .45rem;color:var(--muted);font-size:.72rem;font-weight:780;letter-spacing:.11em;text-transform:uppercase}
+  .primary-answer strong{display:block;color:var(--ink);font-size:clamp(3rem,16vw,5rem);font-weight:760;letter-spacing:-.07em;line-height:.94}
+  .primary-answer small{display:block;margin-top:.6rem;color:var(--muted);font-size:.76rem}
+  .secondary-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0;border-block:1px solid var(--line)}
+  .secondary-metrics>div{min-width:0;padding:1rem .35rem}
+  .secondary-metrics>div+div{border-left:1px solid var(--line)}
+  .secondary-metrics dt{color:var(--muted);font-size:.6rem;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
+  .secondary-metrics dd{margin:.35rem 0 0;color:var(--ink);font-size:.88rem;font-weight:790;letter-spacing:-.02em}
+  .result-meaning{padding:.4rem 0 .25rem}
+  .result-meaning h2,.tire-size-method h2,.tire-size-related h2{margin:0;color:var(--ink);font-size:1.25rem;letter-spacing:-.025em;line-height:1.25}
+  .result-meaning>p:last-child,.tire-size-method p{margin:.55rem 0 0;color:var(--muted);font-size:.84rem;line-height:1.6}
+  .tire-size-method,.tire-size-related{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--line)}
+  .method-grid{display:grid;gap:1.25rem}
+  .tire-size-related{padding-bottom:1rem}
+  .related-links{display:grid;margin-top:.75rem;border-top:1px solid var(--line)}
+  .related-links a{display:flex;min-height:3.5rem;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--line);color:var(--ink);font-size:.86rem;font-weight:720;text-decoration:none}
+  .related-links i{color:var(--accent);font-size:1.15rem;font-style:normal}
+  :global(.tire-size-page .tire-code){margin-top:.8rem}
+  @media(max-width:22.5rem){.tire-size-inputs{gap:.25rem}.input-shell{height:3.15rem}.input-shell input{padding-left:.55rem;font-size:.9rem}.input-shell small{display:none}.secondary-metrics dd{font-size:.8rem}}
+  @media(min-width:48rem){.tire-size-page{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(22rem,.95fr);column-gap:4rem}.tire-size-hero{grid-column:1/-1;padding-top:3rem}.tire-size-calculator{grid-column:1}.tire-size-method,.tire-size-related{grid-column:2;align-self:start;margin-top:1.35rem}.tire-size-related{margin-top:-1px}.method-grid{display:block}}
+</style>
+
+<style is:global>
+  body:has(.tire-size-page){background:#08141d;color:#f5f7f8}
+  body:has(.tire-size-page) main{width:min(100% - 2rem,68rem);padding-bottom:4rem}
+  body:has(.tire-size-page) .site-footer{background:#08141d;border-color:#243643}
+  body:has(.tire-size-page) .site-footer p,body:has(.tire-size-page) .site-footer a{color:#92a2ad}
+  body:has(.tire-size-page) .mobile-dock{display:none!important}
+  :root[data-theme="light"] body:has(.tire-size-page){background:#f7f7f4}
+  :root[data-theme="light"] .tire-size-page{--ink:#17232c;--muted:#64737c;--line:#d5dcd9;--panel:#fff}
+  :root[data-theme="light"] body:has(.tire-size-page) .site-footer{background:#f7f7f4;border-color:#d5dcd9}
+</style>

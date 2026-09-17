@@ -1,5 +1,5 @@
 import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, type TireToolInput } from '../features/tools/calculator-tools';
-import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
+import { speedometerMetrics, speedometerSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
@@ -23,38 +23,6 @@ function renderIssues(container: HTMLElement, issues: readonly Parameters<typeof
 function setSummary(form: HTMLFormElement, summary: string): void {
   const element = form.querySelector<HTMLElement>('[data-result-summary]');
   if (element) { element.textContent = summary; element.classList.remove('is-pending'); }
-}
-
-function setReferenceTireResult(
-  form: HTMLFormElement,
-  input: TireToolInput,
-  result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value'],
-): void {
-  const reference = form.querySelector<HTMLElement>('[data-reference-answer]');
-  if (!reference) return;
-  const setText = (selector: string, value: string): void => {
-    const node = reference.querySelector<HTMLElement>(selector);
-    if (node) node.textContent = value;
-  };
-  const oneDecimal = (value: number): string => value.toFixed(1);
-  setText('[data-reference-size]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
-  setText('[data-reference-diameter]', oneDecimal(result.overallDiameterMm));
-  setText('[data-reference-meaning]', `A ${input.rimDiameterInches}-inch setup with a ${oneDecimal(result.sidewallHeightMm)} mm sidewall.`);
-  setText('[data-reference-diameter-label]', `${oneDecimal(result.overallDiameterMm)} mm diameter`);
-  setText('[data-reference-width-label]', `${input.widthMm} mm`);
-
-  const visual = reference.querySelector<SVGElement>('[data-reference-visual]');
-  if (!visual) return;
-  const tireRadius = 78;
-  const rimRadius = Math.max(24, Math.min(68, input.rimDiameterInches * 25.4 / result.overallDiameterMm * tireRadius));
-  visual.querySelector<SVGCircleElement>('[data-reference-tire]')?.setAttribute('r', tireRadius.toFixed(2));
-  visual.querySelector<SVGCircleElement>('[data-reference-rim]')?.setAttribute('r', rimRadius.toFixed(2));
-  const widthBody = visual.querySelector<SVGRectElement>('[data-reference-width-body]');
-  const widthPx = Math.max(76, Math.min(120, input.widthMm / 225 * 108));
-  if (widthBody) {
-    widthBody.setAttribute('x', (262 - widthPx / 2).toFixed(2));
-    widthBody.setAttribute('width', widthPx.toFixed(2));
-  }
 }
 
 function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiameterMm: number, proposed?: TireToolInput, proposedDiameterMm?: number): void {
@@ -367,16 +335,26 @@ export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach((form) => {
     const results = form.querySelector<HTMLDListElement>('[data-results]')!;
     const errors = form.querySelector<HTMLElement>('[data-errors]')!;
+    const present = (input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void => {
+      const set = (selector: string, value: string): void => { const node = form.querySelector<HTMLElement>(selector); if (node) node.textContent = value; };
+      const profile = input.aspectRatio <= 35 ? 'low-profile' : input.aspectRatio >= 55 ? 'tall-sidewall' : 'balanced';
+      set('[data-primary-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
+      set('[data-result-summary]', `For tire size ${input.widthMm}/${input.aspectRatio} R${input.rimDiameterInches}`);
+      set('[data-sidewall-height]', `${result.sidewallHeightMm.toFixed(1)} mm`);
+      set('[data-circumference]', `${result.circumferenceMm.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mm`);
+      set('[data-revs-km]', result.revolutionsPerKilometer.toFixed(1));
+      set('[data-primary-meaning]', `This ${profile} size has a ${result.sidewallHeightMm.toFixed(1)} mm sidewall. Overall diameter controls rolling distance and can affect gearing and speedometer readings when compared with another size.`);
+    };
     const calculate = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
       if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
-      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); setReferenceTireResult(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value));
+      errors.hidden = true; errors.replaceChildren(); present(input, result.value); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value);
     };
     const preview = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
-      if (result.ok) { setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); setReferenceTireResult(form, input, result.value); }
+      if (result.ok) { present(input, result.value); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); }
     };
     form.addEventListener('input', () => requestAnimationFrame(preview));
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate();

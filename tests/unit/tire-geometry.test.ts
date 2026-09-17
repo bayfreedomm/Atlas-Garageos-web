@@ -7,6 +7,13 @@ if (!tireResult.ok) throw new Error('Reference tire must be valid');
 const tire = tireResult.value;
 
 describe('tire geometry', () => {
+  it('preserves the 235/40 R18 redesign reference vector', () => {
+    const reference = createTireSize({ widthMm: 235, aspectRatio: 40, rimDiameterInches: 18 });
+    if (!reference.ok) throw new Error('235/40 R18 reference tire must be valid');
+    expect(calculateSidewallHeightMm(reference.value)).toBe(94);
+    expect(calculateOverallDiameterMm(reference.value)).toBeCloseTo(645.2, 10);
+  });
+
   it('calculates sidewall and overall diameter from the standard formula', () => {
     expect(calculateSidewallHeightMm(tire)).toBe(101.25);
     expect(calculateOverallDiameterMm(tire)).toBe(659.7);

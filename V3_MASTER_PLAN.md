@@ -175,9 +175,8 @@ Next implementation pass:
 - [x] Root-English routes, 20 legacy `/en/...` 301 rules, canonical, hreflang, sitemap, manifest, and internal links verified.
 - [x] 106 tests passed; typecheck and production build clean. RC1 requires only deployed HTTP checks and the planned physical-device acceptance pass.
 
-## Mobile reference redesign checkpoint — 2026-09-17
-- [x] Tire Size Calculator rebuilt as the first independent mobile-first reference screen; legacy ToolPage layout and card hierarchy are not reused on this route.
-- [x] Existing `ui -> features/tools -> domain + core` calculation and validation path preserved unchanged.
-- [x] New screen follows input → primary answer → proportional technical visual → supporting measurements → meaning/method → related action.
-- [x] Compact type and spacing target 360/390/430 px first; desktop expands the same information order into two columns.
-- [x] Live technical drawing reflects valid diameter, rim ratio, and nominal section width without adding a fitment or safety verdict.
+## V5.1 checkpoint — Tire Size mobile-first redesign
+- [x] Tire Size Calculator removed from the legacy `ToolPage` shell and rebuilt as a dedicated mobile-first flow.
+- [x] Input → primary number → live technical shape → compact metrics → meaning → related tools order implemented.
+- [x] Tire calculation, validation, domain, SEO registry, and route layers remain unchanged.
+- [x] Desktop expands the same single-purpose mobile composition; no dashboard layout was introduced.
