@@ -1,5 +1,5 @@
 import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, type TireToolInput } from '../features/tools/calculator-tools';
-import { speedometerMetrics, speedometerSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
+import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
@@ -335,26 +335,16 @@ export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach((form) => {
     const results = form.querySelector<HTMLDListElement>('[data-results]')!;
     const errors = form.querySelector<HTMLElement>('[data-errors]')!;
-    const present = (input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void => {
-      const set = (selector: string, value: string): void => { const node = form.querySelector<HTMLElement>(selector); if (node) node.textContent = value; };
-      const profile = input.aspectRatio <= 35 ? 'low-profile' : input.aspectRatio >= 55 ? 'tall-sidewall' : 'balanced';
-      set('[data-primary-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
-      set('[data-result-summary]', `For tire size ${input.widthMm}/${input.aspectRatio} R${input.rimDiameterInches}`);
-      set('[data-sidewall-height]', `${result.sidewallHeightMm.toFixed(1)} mm`);
-      set('[data-circumference]', `${result.circumferenceMm.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mm`);
-      set('[data-revs-km]', result.revolutionsPerKilometer.toFixed(1));
-      set('[data-primary-meaning]', `This ${profile} size has a ${result.sidewallHeightMm.toFixed(1)} mm sidewall. Overall diameter controls rolling distance and can affect gearing and speedometer readings when compared with another size.`);
-    };
     const calculate = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
       if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
-      errors.hidden = true; errors.replaceChildren(); present(input, result.value); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value);
+      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value));
     };
     const preview = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
-      if (result.ok) { present(input, result.value); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); }
+      if (result.ok) { setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); }
     };
     form.addEventListener('input', () => requestAnimationFrame(preview));
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate();

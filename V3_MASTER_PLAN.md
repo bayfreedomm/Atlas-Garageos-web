@@ -123,6 +123,12 @@ Next implementation pass:
 - Browser extension until Atlas usage data indicates the best job to solve.
 - China localization/distribution in the first wave.
 
+## Tire Size Calculator blank-canvas checkpoint — 2026-09-17
+- [x] Tire Size Calculator now uses an independent mobile-first page shell instead of `ToolPage` and the shared legacy header/navigation presentation.
+- [x] The calculator follows input → primary answer → live technical visual → compact metrics → meaning → SEO content → related tools.
+- [x] Existing tire calculation, validation, domain, route registry, canonical and structured-data behavior remain the source of truth.
+- [x] Scope is limited to Tire Size Calculator; Tire Comparison, Wheel Offset, Fitment Studio and the global shell remain unchanged.
+
 ## V4 visual implementation checkpoint — 2026-09-14
 - Approved dark automotive chrome + bright app-like calculator surface is now implemented in source.
 - Mobile bottom navigation is implemented.
@@ -174,9 +180,3 @@ Next implementation pass:
 - [x] Browser QA at 390px, tablet, and desktop completed with no document-level horizontal overflow in the sampled release-critical pages.
 - [x] Root-English routes, 20 legacy `/en/...` 301 rules, canonical, hreflang, sitemap, manifest, and internal links verified.
 - [x] 106 tests passed; typecheck and production build clean. RC1 requires only deployed HTTP checks and the planned physical-device acceptance pass.
-
-## V5.1 checkpoint — Tire Size mobile-first redesign
-- [x] Tire Size Calculator removed from the legacy `ToolPage` shell and rebuilt as a dedicated mobile-first flow.
-- [x] Input → primary number → live technical shape → compact metrics → meaning → related tools order implemented.
-- [x] Tire calculation, validation, domain, SEO registry, and route layers remain unchanged.
-- [x] Desktop expands the same single-purpose mobile composition; no dashboard layout was introduced.

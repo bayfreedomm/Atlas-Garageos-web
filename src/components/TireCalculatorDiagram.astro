@@ -1,0 +1,23 @@
+<figure class="tire-diagram" data-tire-diagram aria-labelledby="tire-diagram-title">
+  <figcaption id="tire-diagram-title">Live tire measurements</figcaption>
+  <svg viewBox="0 0 360 250" role="img" aria-label="Side view of a tire with width, overall diameter, sidewall and rim measurements">
+    <defs>
+      <radialGradient id="newTireRubber" cx="38%" cy="30%" r="72%"><stop offset="0" stop-color="#47505a" /><stop offset=".58" stop-color="#20252b" /><stop offset="1" stop-color="#0d1014" /></radialGradient>
+      <radialGradient id="newTireRim" cx="40%" cy="32%" r="70%"><stop offset="0" stop-color="#f8fafb" /><stop offset=".54" stop-color="#b4bdc4" /><stop offset="1" stop-color="#646e76" /></radialGradient>
+      <marker id="arrowStart" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M8 0 0 4l8 4Z" /></marker>
+    </defs>
+    <path class="diagram-ground" d="M72 222h220" />
+    <g data-tire-wheel transform="translate(192 128)">
+      <circle data-tire-body r="89" fill="url(#newTireRubber)" />
+      <circle data-tire-rim r="52" fill="url(#newTireRim)" />
+      <circle class="diagram-hub" r="13" />
+      <path class="diagram-spokes" d="M0-46V46M-40-23l80 46M-40 23l80-46M-46 0h92" />
+      <path class="diagram-tread" d="M-57-67l16 11-11 16m109-27L41-56l11 16M-82-22l19 6-4 19m149-25-19 6 4 19" />
+    </g>
+    <g class="diagram-measure diagram-measure--diameter"><path data-diameter-line d="M54 39v178" marker-start="url(#arrowStart)" marker-end="url(#arrowStart)" /><text data-diameter-text x="44" y="128" transform="rotate(-90 44 128)" text-anchor="middle">645.2 mm diameter</text></g>
+    <g class="diagram-measure diagram-measure--width"><path data-width-line d="M112 24h160" marker-start="url(#arrowStart)" marker-end="url(#arrowStart)" /><text data-width-text x="192" y="15" text-anchor="middle">235 mm width</text></g>
+    <g class="diagram-measure diagram-measure--sidewall"><path data-sidewall-line d="M192 39v37" marker-start="url(#arrowStart)" marker-end="url(#arrowStart)" /><path class="diagram-callout" d="M199 57h87" /><text data-sidewall-text x="292" y="61">94.0 mm</text><text class="diagram-label" x="292" y="74">sidewall</text></g>
+    <g class="diagram-measure diagram-measure--rim"><path data-rim-line d="M192 76v104" marker-start="url(#arrowStart)" marker-end="url(#arrowStart)" /><text data-rim-text x="199" y="131">18 in rim</text></g>
+  </svg>
+  <p class="tire-diagram__code" data-size-code>235 / 40 R18</p>
+</figure>
