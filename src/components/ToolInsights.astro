@@ -2,7 +2,7 @@
 import type { ToolId } from '../seo/tool-registry';
 import { insightForTool } from '../content/tool-insights';
 import { uiStrings, localizedTool, type ContentLocale } from '../localization/site-catalog';
-interface Props { id: ToolId; locale?: ContentLocale; }
+interface Props { id: ToolId; locale?: ContentLocale | undefined; }
 const { id, locale } = Astro.props;
 const insight = locale ? localizedTool(id, locale) : insightForTool(id);
 const t = locale ? uiStrings[locale] : undefined;

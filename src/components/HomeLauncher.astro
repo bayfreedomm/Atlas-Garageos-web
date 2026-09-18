@@ -4,7 +4,7 @@ import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 
-interface Props { locale?: ContentLocale; }
+interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const prefix = locale ? `/${locale}` : '';
 const home = locale ? platformCatalog[locale].home : undefined;

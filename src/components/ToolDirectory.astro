@@ -3,7 +3,7 @@ import ToolIcon from './ToolIcon.astro';
 import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
-interface Props { mode?: 'home' | 'all'; locale?: ContentLocale; }
+interface Props { mode?: 'home' | 'all'; locale?: ContentLocale | undefined; }
 const { mode = 'all', locale } = Astro.props;
 const categoryLabels = locale ? new Map(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name] as const)) : undefined;
 const allLabel = locale === 'de' ? 'Alle' : locale === 'es' ? 'Todo' : 'All';

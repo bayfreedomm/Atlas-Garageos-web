@@ -1,6 +1,6 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
-interface Props { primaryLabel: string; pending: string; visualTitle: string; visualNote: string; locale?: ContentLocale; }
+interface Props { primaryLabel: string; pending: string; visualTitle: string; visualNote: string; locale?: ContentLocale | undefined; }
 const { primaryLabel, pending, visualTitle, visualNote, locale } = Astro.props;
 const L = {
   en: { supporting: 'Supporting result', updates: 'Updates with your input.', input: 'Input', result: 'Result', details: 'Details', calculated: 'Calculated values' },

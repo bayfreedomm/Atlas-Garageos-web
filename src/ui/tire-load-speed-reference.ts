@@ -29,9 +29,9 @@ export function initializeTireLoadSpeedReference(): void {
       const kg = LOAD_INDEX_KG[loadIndex];
       const kmh = SPEED_RATING_KMH[speedRating];
       const issues: string[] = [];
-      if (!kg) issues.push('Choose a load index from the list.');
-      if (!kmh) issues.push('Choose a speed rating letter from the list.');
-      if (issues.length) {
+      if (kg === undefined) issues.push('Choose a load index from the list.');
+      if (kmh === undefined) issues.push('Choose a speed rating letter from the list.');
+      if (issues.length || kg === undefined || kmh === undefined) {
         setErrors(form, issues);
         setSummary(form, 'Choose a load index and speed rating to look up their ratings.', true);
         renderMetrics(form, []);

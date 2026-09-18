@@ -1,6 +1,6 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
-interface Props { prefix: string; title: string; width: number; aspect: number; rim: number; locale?: ContentLocale; }
+interface Props { prefix: string; title: string; width: number; aspect: number; rim: number; locale?: ContentLocale | undefined; }
 const { prefix, title, width, aspect, rim, locale } = Astro.props;
 const L = { en: { width: 'Width', profile: 'Profile', rim: 'Rim' }, de: { width: 'Breite', profile: 'Profil', rim: 'Felge' }, es: { width: 'Ancho', profile: 'Perfil', rim: 'Llanta' } }[locale ?? 'en'];
 ---

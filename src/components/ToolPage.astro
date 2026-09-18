@@ -9,7 +9,7 @@ import ToolVisual from './ToolVisual.astro';
 import ToolInsights from './ToolInsights.astro';
 
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
-interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale; titleOverride?: string; descriptionOverride?: string; alternates?: readonly HreflangAlternate[]; }
+interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string | undefined; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale | undefined; titleOverride?: string | undefined; descriptionOverride?: string | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
 const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/fitment-studio/', visual = true, explanationBeforeInsights = false, locale, titleOverride, descriptionOverride, alternates } = Astro.props;
 const related = relatedTools(definition);
 const displayTitle = titleOverride ?? definition.title;

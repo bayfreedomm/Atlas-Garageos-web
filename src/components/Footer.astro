@@ -1,6 +1,6 @@
 ---
 import { uiStrings, type ContentLocale } from '../localization/site-catalog';
-interface Props { locale?: ContentLocale; }
+interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const t = locale ? uiStrings[locale] : undefined;
 const prefix = locale ? `/${locale}` : '';

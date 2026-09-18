@@ -1,6 +1,6 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
-interface Props { distance?: number; economy?: number; price?: number; compact?: boolean; locale?: ContentLocale; }
+interface Props { distance?: number; economy?: number; price?: number; compact?: boolean; locale?: ContentLocale | undefined; }
 const { distance = 500, economy = 7.2, price = 1.8, compact = false, locale } = Astro.props;
 const L = {
   en: { units: 'Units', metric: 'Metric · km, L/100km', imperial: 'US · miles, MPG', distance: 'Distance · km', economy: 'Fuel economy · L/100km', price: 'Fuel price · per litre', currency: 'Currency label' },

@@ -38,7 +38,7 @@ export function initializeTireDateCodeDecoder(): void {
       const manufactureDate = dateFromWeek(week, year);
       const now = new Date();
       const ageYears = (now.getTime() - manufactureDate.getTime()) / (365.25 * 86400000);
-      const monthLabel = MONTH_NAMES[manufactureDate.getUTCMonth()];
+      const monthLabel = MONTH_NAMES[manufactureDate.getUTCMonth()] ?? '';
       let guidance = 'Within a commonly cited service-life window; still confirm your tire manufacturer\'s specific guidance.';
       if (ageYears >= 10) guidance = 'Beyond the 10-year mark many manufacturers cite as a maximum, regardless of tread depth.';
       else if (ageYears >= 6) guidance = 'Past 6 years old, many manufacturers recommend a qualified inspection at least once a year.';

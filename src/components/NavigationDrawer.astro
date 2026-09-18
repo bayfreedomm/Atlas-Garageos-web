@@ -2,7 +2,7 @@
 import ThemeControl from './ThemeControl.astro';
 import { uiStrings, type ContentLocale } from '../localization/site-catalog';
 interface LocaleLink { readonly code: 'en' | 'de' | 'es'; readonly label: string; readonly href: string; }
-interface Props { locale?: ContentLocale; localeLinks?: readonly LocaleLink[]; }
+interface Props { locale?: ContentLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
 const { locale, localeLinks } = Astro.props;
 const t = locale ? uiStrings[locale] : undefined;
 const prefix = locale ? `/${locale}` : '';
