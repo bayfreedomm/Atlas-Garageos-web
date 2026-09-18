@@ -2,11 +2,32 @@
 interface LocaleLink { readonly code: string; readonly label: string; readonly href: string; }
 interface Props { links: readonly LocaleLink[]; current: string; }
 const { links, current } = Astro.props;
+const currentLink = links.find((link) => link.code === current);
 ---
 {links.length > 1 && (
-  <nav class="lang-quick-toggle" aria-label="Switch language">
-    {links.map((link) => (
-      <a href={link.href} class:list={['lang-quick-toggle__option', { 'is-active': link.code === current }]} aria-current={link.code === current ? 'page' : undefined}>{link.label}</a>
-    ))}
-  </nav>
+  <details class="lang-dropdown">
+    <summary class="lang-dropdown__trigger" aria-label="Switch language">
+      <span>{currentLink?.label ?? current.toUpperCase()}</span>
+      <svg class="lang-dropdown__chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </summary>
+    <nav class="lang-dropdown__menu" aria-label="Switch language">
+      {links.map((link) => (
+        <a href={link.href} class:list={['lang-dropdown__option', { 'is-active': link.code === current }]} aria-current={link.code === current ? 'page' : undefined}>{link.label}</a>
+      ))}
+    </nav>
+  </details>
 )}
+<script>
+  // Native <details> gives us a zero-dependency, keyboard-accessible dropdown. This just closes
+  // it when a click lands outside it, or on Escape, so it behaves like a normal dropdown menu
+  // instead of staying open until the person clicks the trigger again.
+  document.addEventListener('click', (event) => {
+    document.querySelectorAll<HTMLDetailsElement>('details.lang-dropdown[open]').forEach((el) => {
+      if (!el.contains(event.target as Node)) el.open = false;
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll<HTMLDetailsElement>('details.lang-dropdown[open]').forEach((el) => { el.open = false; });
+  });
+</script>

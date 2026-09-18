@@ -22,8 +22,8 @@ describe('Milestone 8 product experience', () => {
     expect(resolveTheme('light', true)).toBe('light');
   });
 
-  it('uses the restrained Atlas wordmark and a simple three-part product shell', () => {
-    expect(brand).not.toContain('brand-glyph');
+  it('uses the Atlas wordmark with its glyph mark and a simple three-part product shell', () => {
+    expect(brand).toContain('brand-glyph');
     expect(brand).toContain('Atlas');
     expect(brand).toContain('Garage');
     expect(brand).toContain('brand-wordmark__os');
