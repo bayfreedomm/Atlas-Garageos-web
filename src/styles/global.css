@@ -317,10 +317,15 @@ dd { margin: var(--space-2) 0 0; font-family: var(--font-mono); font-size: var(-
 .studio-cta p:last-child { margin-bottom: 0; }
 .studio-cta .button { justify-self: start; }
 .related-tools { margin-top: var(--space-10); }
-.related-grid { display: grid; gap: var(--space-3); }
-.related-card { display: grid; gap: var(--space-2); padding: var(--space-5); border: var(--border); border-radius: var(--radius-md); background: var(--color-surface); text-decoration: none; }
-.related-card > span { color: var(--color-ink-soft); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; }
-.related-card p { margin: 0; font-size: var(--text-sm); }
+/* display:grid is the only property here that still matters — product-v4.css's later .related-grid
+   rule (see product-v4.css) never redeclares display, so this can't be deleted outright the way the
+   fully-dead .related-card rules below were; only gap was superseded, and gap is gone. */
+.related-grid { display: grid; }
+/* The three rules below are fully dead: product-v4.css's .related-card block resets every property
+   era 1's markup needed (a bare <span> category label + <p> title — the current markup nests a
+   <strong>/<small> pair inside one <span> instead, and product-v4.css's .related-card>span/strong/small
+   rules own their typography completely with !important), and .related-card p matches no element in
+   the current markup at all. Kept removed rather than "fixed in place" to stop a third CSS era forming. */
 .entry-workspace { display: grid; gap: var(--space-6); align-items: end; }
 .entry-workspace .button { justify-self: start; }
 .entry-steps { display: grid; gap: var(--space-3); margin: var(--space-5) 0 0; padding: 0; list-style: none; }
