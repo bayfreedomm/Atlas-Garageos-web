@@ -1,6 +1,7 @@
 ---
 import type { ToolDefinition } from '../seo/tool-registry';
 import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registry';
+import { uiStrings, type ContentLocale } from '../localization/site-catalog';
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
@@ -11,7 +12,8 @@ import '../styles/product-v3.css';
 import '../styles/product-v4.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
-interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string; active?: 'home' | 'garage' | 'fitment' | 'tools'; breadcrumbs?: readonly Breadcrumb[]; }
+interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
+interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string; active?: 'home' | 'garage' | 'fitment' | 'tools'; breadcrumbs?: readonly Breadcrumb[]; locale?: ContentLocale; alternates?: readonly HreflangAlternate[]; }
 const props = Astro.props;
 const definition = props.definition;
 const title = props.title ?? definition?.title;
@@ -20,6 +22,10 @@ const pathname = props.pathname ?? (definition ? routeForTool(definition) : unde
 if (!title || !description || !pathname) throw new Error('SiteLayout requires definition or explicit page metadata.');
 const active = props.active ?? (definition?.kind === 'flagship' ? 'fitment' : definition ? 'tools' : undefined);
 const canonical = canonicalForPath(pathname);
+const locale = props.locale;
+const t = locale ? uiStrings[locale] : undefined;
+const htmlLang = locale ?? definition?.locale ?? 'en';
+const alternates = props.alternates ?? [{ hreflang: 'en', href: canonical }, { hreflang: 'x-default', href: canonical }];
 const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
 const applicationJsonLd = definition && definition.kind === 'tool' ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
@@ -28,7 +34,7 @@ const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
 const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
-<html lang={definition?.locale ?? 'en'}>
+<html lang={htmlLang}>
   <head>
     <ThemeBoot />
     <meta charset="UTF-8" />
@@ -44,8 +50,7 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <meta name="twitter:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
     <meta name="twitter:description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="en" href={canonical} />
-    <link rel="alternate" hreflang="x-default" href={canonical} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#f7f8f5" />
@@ -55,16 +60,16 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
   </head>
   <body class={active === 'home' ? 'page-home' : undefined}>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content">{t?.skipToContent ?? 'Skip to main content'}</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand /></a>
+      <a class="brand" href={locale ? `/${locale}/` : '/'} aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
-        <nav class="desktop-nav" aria-label="Primary navigation"><a href="/" aria-current={active === 'home' ? 'page' : undefined}>Home</a><a href="/tools/" aria-current={active === 'tools' ? 'page' : undefined}>Tools</a><a href="/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>Wheel &amp; Tire Compare</a></nav>
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href={locale ? `/${locale}/` : '/'} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={locale ? `/${locale}/tools/` : '/tools/'} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href="/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a></nav>
         <ThemeQuickToggle />
-        <NavigationDrawer />
+        <NavigationDrawer locale={locale} />
       </div>
     </div></header>
     <main id="main-content"><slot /></main>
-    <Footer />
+    <Footer locale={locale} />
   </body>
 </html>

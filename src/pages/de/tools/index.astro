@@ -1,0 +1,18 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import ToolDirectory from '../../../components/ToolDirectory.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog.de.toolsHub;
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/tools/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/' },
+];
+---
+<SiteLayout title={c.title} description={c.description} pathname="/de/tools/" active="tools" locale="de" alternates={alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: 'Werkzeuge', href: '/de/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><span aria-current="page">Werkzeuge</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.lead}</p></header>
+  <ToolDirectory mode="all" locale="de" />
+  <a class="fitment-directory-row" href="/fitment-studio/"><strong>{c.fitmentRowTitle}</strong><span>{c.fitmentRowCopy}</span><i aria-hidden="true">›</i></a>
+</SiteLayout>

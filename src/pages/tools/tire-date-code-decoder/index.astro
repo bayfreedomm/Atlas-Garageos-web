@@ -1,0 +1,22 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('tire-date-code-decoder');
+---
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Tires & wheels" intro="Decode the DOT week-and-year code on a tire sidewall to find its manufacture date and age." limitation="Age guidance reflects commonly cited manufacturer and industry practice, not a specific vehicle or tire manufacturer recommendation.">
+  <form slot="tool" class="calculator-form" data-calculator="tire-date-code" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Last 4 digits of the DOT code<input name="code" type="text" value="2219" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 2219" /></label>
+    </div>
+    <UtilityResultStandard primaryLabel="Manufacture date" pending="Enter the 4-digit week/year code." visualTitle="WWYY → week + year" visualNote="Last group in the DOT serial number" />
+  </form>
+  <div slot="explanation">
+    <h2>Where to find the code</h2>
+    <p>Look for "DOT" followed by a string of letters and numbers on the tire sidewall — sometimes only on one side of the tire. The final group, either 3 or 4 digits, is the date code. A 4-digit code like 2219 means week 22 of 2019: the first two digits are the week of the year, the last two are the year.</p>
+    <p>Tires made before 2000 used a 3-digit code instead, which this decoder does not cover — a tire with only a 3-digit date code is old enough that age is very unlikely to be in question.</p>
+    <h2>Why tire age matters even with good tread</h2>
+    <p>Rubber compounds harden and can develop cracking over time, independent of how much tread remains. Many manufacturers publish guidance suggesting inspection after around 6 years and replacement consideration around 10 years from the manufacture date, but always check your specific tire manufacturer's stated guidance.</p>
+  </div>
+</ToolPage>
+<script>import { initializeTireDateCodeDecoder } from '../../../ui/tire-date-code-decoder'; initializeTireDateCodeDecoder();</script>

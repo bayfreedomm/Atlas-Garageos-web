@@ -1,0 +1,16 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('psi-bar-converter');
+const c = localizedTool('psi-bar-converter', 'de');
+---
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/psi-bar-converter/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/psi-bar-umrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/convertidor-psi-bar/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/psi-bar-converter/' }]}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="pressure" novalidate>
+    <div class="instant-input"><label>Druck<input name="value" type="number" value="32" min="0" step="any" inputmode="decimal" /></label><label>Einheit<select name="unit"><option value="psi">PSI</option><option value="bar">Bar</option><option value="kpa">kPa</option></select></label></div>
+    <UtilityResultStandard locale="de" primaryLabel="Umgerechneter Druck" pending="Geben Sie einen Druckwert ein." visualTitle="Ein Druck, drei Einheiten" visualNote="Direkte Einheitenbeziehung; keine Druckempfehlung" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

@@ -1,0 +1,21 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog.de.methodology;
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/methodology/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/methodology/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/methodology/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/methodology/' },
+];
+---
+<SiteLayout title={c.title} description={c.description} pathname="/de/methodology/" active="tools" locale="de" alternates={alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: c.h1, href: '/de/methodology/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>
+  <header class="directory-identity methodology-hero"><p class="eyebrow">{c.eyebrow}</p><h1>{c.h1}</h1><p>{c.lead}</p></header>
+
+  <div class="methodology-grid">
+    {c.sections.map((s) => <section><h2>{s.heading}</h2><p>{s.body}</p></section>)}
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="source-heading"><p class="eyebrow">{c.sourcesEyebrow}</p><h2 id="source-heading">{c.sourcesHeading}</h2><p>{c.sourcesLead}</p><div class="methodology-source-links"><a href="https://www.nist.gov/pml/special-publication-811" rel="external noopener">NIST Guide to SI units and conversions <span>↗</span></a><a href="https://afdc.energy.gov/fuels/electricity-stations" rel="external noopener">U.S. DOE Alternative Fuels Data Center — EV charging <span>↗</span></a></div></section>
+</SiteLayout>

@@ -1,0 +1,24 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('quarter-mile-calculator');
+---
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Performance" intro="Estimate quarter-mile elapsed time and trap speed from vehicle weight and power." limitation="This is a power-to-weight physics estimate, not a performance guarantee. Traction, driver skill, gearing, altitude, and track conditions all change the real result.">
+  <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
+    <div class="utility-fields">
+      <label>Vehicle weight<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>
+      <label>Weight unit<select name="weightUnit"><option value="lb" selected>lb</option><option value="kg">kg</option></select></label>
+      <label>Power<input name="power" type="number" value="300" min="0" step="any" inputmode="decimal" /></label>
+      <label>Power unit<select name="powerUnit"><option value="hp" selected>Mechanical hp</option><option value="kw">kW</option></select></label>
+    </div>
+    <UtilityResultStandard primaryLabel="Estimated quarter mile ET" pending="Enter vehicle weight and power." visualTitle="Weight ÷ power → elapsed time" visualNote="Classic power-to-weight drag estimate" />
+  </form>
+  <div slot="explanation">
+    <h2>Where the formula comes from</h2>
+    <p>Elapsed time and trap speed are estimated from the widely used power-to-weight relationship: ET (seconds) = 5.825 × (weight in lb ÷ hp)^(1/3), and trap speed (mph) = 234 × (hp ÷ weight in lb)^(1/3). It only needs weight and power, which is also why it is only an estimate — it assumes ideal traction and a clean launch.</p>
+    <h2>Why there's no proper 0-60 calculation</h2>
+    <p>Unlike the quarter mile, there is no widely accepted formula that estimates 0-60 mph time from weight and power alone — real 0-60 times depend heavily on gearing, launch RPM, and how a car's power is delivered at low speed, not just the peak power-to-weight ratio. The 0-60 figure shown in the results is a very rough rule-of-thumb fraction of the estimated quarter-mile time, included for reference only.</p>
+  </div>
+</ToolPage>
+<script>import { initializeQuarterMileCalculator } from '../../../ui/quarter-mile-calculator'; initializeQuarterMileCalculator();</script>

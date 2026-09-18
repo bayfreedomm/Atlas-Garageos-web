@@ -1,6 +1,13 @@
 ---
 import ToolIcon from './ToolIcon.astro';
 import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
+import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
+import { localizedToolPath } from '../localization/locales';
+
+interface Props { locale?: ContentLocale; }
+const { locale } = Astro.props;
+const prefix = locale ? `/${locale}` : '';
+const home = locale ? platformCatalog[locale].home : undefined;
 
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
 const popularIds: readonly ToolId[] = [
@@ -42,12 +49,14 @@ const helper = new Map<ToolId, string>([
   ['mpg-l100km-converter', 'US MPG, Imperial MPG and L/100km'],
   ['power-to-weight-calculator', 'Power relative to vehicle weight'],
 ]);
-const categories = [
-  ['Fuel & Trips', 'Fuel cost, road trips and EV charging'],
-  ['Tires & Wheels', 'Tire sizes, wheel offset and geometry'],
-  ['Converters', 'Pressure, economy, power and torque'],
-  ['Performance', 'Power-to-weight and gearing'],
-] as const;
+const categories = home
+  ? home.categories.map((c) => [c.name, c.copy] as const)
+  : ([
+      ['Fuel & Trips', 'Fuel cost, road trips and EV charging'],
+      ['Tires & Wheels', 'Tire sizes, wheel offset and geometry'],
+      ['Converters', 'Pressure, economy, power and torque'],
+      ['Performance', 'Power-to-weight and gearing'],
+    ] as const);
 ---
 <section class="home-launcher home-launcher--v4" data-toolbox data-mode="home" aria-labelledby="home-heading">
   <section class="home-v4-hero home-v7-hero">
@@ -56,55 +65,54 @@ const categories = [
     </div>
 
     <div class="home-v4-copy home-v7-copy">
-      <p class="home-kicker">GARAGE TOOLS FOR REAL DRIVERS</p>
-      <h1 id="home-heading">Smarter tools for every drive.</h1>
-      <p class="home-lead">Calculate tire fitment, wheel offset, fuel cost, road trips and EV charging with clear answers built for real-world ownership.</p>
+      <p class="home-kicker">{home?.kicker ?? 'GARAGE TOOLS FOR REAL DRIVERS'}</p>
+      <h1 id="home-heading">{home?.h1 ?? 'Smarter tools for every drive.'}</h1>
+      <p class="home-lead">{home?.lead ?? 'Calculate tire fitment, wheel offset, fuel cost, road trips and EV charging with clear answers built for real-world ownership.'}</p>
 
       <div class="home-v7-actions" aria-label="Primary actions">
-        <a class="home-v7-cta home-v7-cta--primary" href="/tools/">Explore tools <span aria-hidden="true">→</span></a>
-        <a class="home-v7-cta home-v7-cta--secondary" href="/fitment-studio/">Compare fitment</a>
+        <a class="home-v7-cta home-v7-cta--primary" href={`${prefix}/tools/`}>{home?.ctaExplore ?? 'Explore tools'} <span aria-hidden="true">→</span></a>
+        <a class="home-v7-cta home-v7-cta--secondary" href="/fitment-studio/">{home?.ctaCompare ?? 'Compare fitment'}</a>
       </div>
 
       <div class="home-v7-capabilities" aria-label="GarageOS tool families">
-        <div><span aria-hidden="true">◉</span><strong>Tires &amp; wheels</strong></div>
-        <div><span aria-hidden="true">▰</span><strong>Fuel &amp; trips</strong></div>
-        <div><span aria-hidden="true">⚡</span><strong>EV tools</strong></div>
-        <div><span aria-hidden="true">⌁</span><strong>Performance</strong></div>
+        <div><span aria-hidden="true">◉</span><strong>{home?.capTires ?? 'Tires & wheels'}</strong></div>
+        <div><span aria-hidden="true">▰</span><strong>{home?.capFuel ?? 'Fuel & trips'}</strong></div>
+        <div><span aria-hidden="true">⚡</span><strong>{home?.capEv ?? 'EV tools'}</strong></div>
+        <div><span aria-hidden="true">⌁</span><strong>{home?.capPerformance ?? 'Performance'}</strong></div>
       </div>
     </div>
   </section>
 
   <section class="home-v4-surface">
     <section class="home-v7-search-panel" aria-label="Find a calculator">
-      <div><p>FIND A TOOL</p><h2>What do you want to calculate?</h2></div>
+      <div><p>{home?.findToolLabel ?? 'FIND A TOOL'}</p><h2>{home?.findToolQuestion ?? 'What do you want to calculate?'}</h2></div>
       <form class="home-search" data-tool-search-form>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
         <label class="sr-only" for="tool-search-home">Search automotive tools</label>
-        <input id="tool-search-home" type="search" placeholder="Tire size, fuel cost, wheel offset..." autocomplete="off" data-tool-search />
-        <button type="submit">Find</button>
+        <input id="tool-search-home" type="search" placeholder={home?.searchPlaceholder ?? 'Tire size, fuel cost, wheel offset...'} autocomplete="off" data-tool-search />
+        <button type="submit">{home?.searchButton ?? 'Find'}</button>
       </form>
     </section>
     <div class="home-category-grid" aria-label="Tool categories">
       {categories.map(([name, copy]) => (
-        <a href={`/tools/?category=${encodeURIComponent(name)}`}>
+        <a href={`${prefix}/tools/?category=${encodeURIComponent(name)}`}>
           <span>{name}</span><small>{copy}</small><i aria-hidden="true">›</i>
         </a>
       ))}
     </div>
 
     <section class="home-popular" aria-labelledby="popular-heading">
-      <div class="home-section-heading"><div><p>POPULAR TOOLS</p><h2 id="popular-heading">Start with a job</h2></div><a href="/tools/">See all <span aria-hidden="true">→</span></a></div>
+      <div class="home-section-heading"><div><p>{home?.popularLabel ?? 'POPULAR TOOLS'}</p><h2 id="popular-heading">{home?.popularHeading ?? 'Start with a job'}</h2></div><a href={`${prefix}/tools/`}>{home?.seeAll ?? 'See all'} <span aria-hidden="true">→</span></a></div>
       <div class="tool-launch-list" data-tool-rows>
-        {ordered.map((tool) => (
-          <a class:list={['tool-launch-row', { 'is-secondary': !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
-            <ToolIcon id={tool.id} category={tool.category}/><span><strong>{shortNames.get(tool.id) ?? tool.title}</strong>{helper.get(tool.id) && <small>{helper.get(tool.id)}</small>}</span><i aria-hidden="true">›</i>
-          </a>
-        ))}
+        {ordered.map((tool) => { const label = locale ? localizedTool(tool.id, locale) : undefined; const href = locale ? localizedToolPath(locale, tool.id, 'tool') : routeForTool(tool); const displayTitle = label?.title ?? shortNames.get(tool.id) ?? tool.title; const displayHelper = label?.intro ?? helper.get(tool.id); return (
+        <a class:list={['tool-launch-row', { 'is-secondary': !popularIds.includes(tool.id) }]} href={href} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${label?.title ?? tool.title} ${label?.description ?? tool.description} ${tool.id} ${shortNames.get(tool.id) ?? ''}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
+          <ToolIcon id={tool.id} category={tool.category}/><span><strong>{displayTitle}</strong>{displayHelper && <small>{displayHelper}</small>}</span><i aria-hidden="true">›</i>
+        </a>); })}
       </div>
       <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
     </section>
 
-    <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">ADVANCED VISUAL TOOL</span><span class="home-fitment-feature__copy"><strong>Wheel &amp; Tire Fitment Compare</strong><small>See how a new setup changes diameter, inner position and outer stance before you buy.</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

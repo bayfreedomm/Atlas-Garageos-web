@@ -1,0 +1,25 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('towing-capacity-calculator');
+---
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate maximum trailer weight and tongue weight from your GCWR, curb weight, and load." limitation="This is a simplified GCWR-based estimate. It does not check axle ratings, hitch class, brake requirements, or manufacturer-specific towing limits.">
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Unit<select name="unit"><option value="lb" selected>Pounds (lb)</option><option value="kg">Kilograms (kg)</option></select></label>
+      <label>GCWR<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Tow vehicle curb weight<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Passengers + cargo in vehicle<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard primaryLabel="Maximum trailer weight" pending="Enter your GCWR, curb weight, and load." visualTitle="GCWR − loaded vehicle = trailer capacity" visualNote="Simplified estimate, not a manufacturer rating" />
+  </form>
+  <div slot="explanation">
+    <h2>Where these numbers come from</h2>
+    <p>GCWR (Gross Combined Weight Rating) is set by the manufacturer and covers the fully loaded tow vehicle plus a trailer together. Curb weight is the vehicle empty, so this calculator adds your passengers and cargo to curb weight, then subtracts that total from GCWR to estimate what trailer weight remains.</p>
+    <p>Tongue weight — the downward force the trailer puts on the hitch — is conventionally 10 to 15% of trailer weight for a standard bumper-pull hitch. Too little tongue weight can cause trailer sway; too much can overload the rear axle or hitch.</p>
+    <h2>What this does not check</h2>
+    <p>Real towing capacity also depends on the tow vehicle's specific engine, axle ratio, brake system, and cooling package — two trims of the same model can have different ratings. Always confirm the manufacturer's published towing capacity and GVWR for your exact configuration before hitching up a trailer.</p>
+  </div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

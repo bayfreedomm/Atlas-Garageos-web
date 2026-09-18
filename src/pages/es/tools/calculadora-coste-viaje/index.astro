@@ -1,0 +1,38 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('road-trip-cost-calculator');
+const c = localizedTool('road-trip-cost-calculator', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]}>
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields locale="es" distance={420} economy={6.5} />
+    <fieldset class="trip-options"><legend>Trayecto</legend>
+      <div class="utility-fields"><label class="field-wide">Dirección<select name="tripType"><option value="one">Solo ida</option><option value="round">Ida y vuelta</option></select></label></div>
+      <details><summary>Añadir peajes, extras o acompañantes</summary><div class="utility-fields">
+        <label>Coste adicional del viaje<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>Personas<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Estimar coste del viaje</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Coste estimado del viaje">
+      <div class="trip-primary__main"><span>Coste total estimado del viaje</span><strong data-trip-total>—</strong><p data-trip-context>Introduzca los datos de su viaje para ver el coste completo.</p></div>
+      <div class="trip-primary__support"><div><span>Combustible consumido</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>El coste del combustible aparecerá aquí.</small></div><div><span>Trayecto</span><strong data-trip-direction>—</strong><small data-trip-distance>La distancia aparecerá aquí.</small></div><div data-trip-person-wrap hidden><span>Por persona</span><strong data-trip-person>—</strong><small data-trip-people>Reparto del total</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Su estimación de viaje aparecerá aquí.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Distancia del viaje y desglose proporcional de costes">
+      <div class="trip-technical-visual__head"><span>TRAYECTO → COMBUSTIBLE + EXTRAS → TOTAL</span><small>Esquema de ruta; los tramos de coste son proporcionales</small></div>
+      <div class="trip-route" aria-hidden="true"><span>INICIO</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>DESTINO</span></div>
+      <div class="trip-visual-stats"><div><small>Distancia recorrida</small><strong data-trip-visual-distance>—</strong></div><div><small>Combustible necesario</small><strong data-trip-visual-fuel>—</strong></div><div><small>Total</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Reparto del coste de combustible y extras" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Combustible <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Extras <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Detalles</span><small>Desglose completo del viaje</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

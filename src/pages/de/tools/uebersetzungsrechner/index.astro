@@ -1,0 +1,21 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('gear-ratio-calculator');
+const c = localizedTool('gear-ratio-calculator', 'de');
+const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
+---
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/gear-ratio-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/uebersetzungsrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-relacion-transmision/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/gear-ratio-calculator/' }]}>
+  <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
+    <div class="utility-fields gear-ratio-inputs"><label>Aktueller Reifendurchmesser · Zoll<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Neuer Reifendurchmesser · Zoll<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Aktuelle Achsübersetzung<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Fahrgeschwindigkeit · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
+    <button type="submit">Übersetzung vergleichen</button>
+    <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Effektive Achsübersetzung</span><strong data-gear-effective>—</strong><p data-gear-context>Ihr Übersetzungsvergleich erscheint hier.</p></div><div class="standard-answer__secondary"><span>Passende Übersetzung zum Originalgefühl</span><strong data-gear-matching>—</strong><small data-gear-rpm>Direktantrieb-Drehzahl erscheint hier.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre effektive Übersetzung erscheint hier.</p>
+    <figure class="gear-technical-visual is-pending" data-gear-visual aria-label="Beziehung zwischen Reifendurchmesser und effektiver Übersetzung"><figcaption><span>REIFENDURCHMESSER → EFFEKTIVE ÜBERSETZUNG</span><small>Schematische Kreise verwenden das eingegebene Durchmesserverhältnis</small></figcaption><div class="gear-wheel-pair" aria-hidden="true"><div><i data-gear-current-wheel></i><small>Aktuell <strong data-gear-current-diameter>—</strong></small></div><b>→</b><div><i data-gear-new-wheel></i><small>Neu <strong data-gear-new-diameter>—</strong></small></div></div><p data-gear-visual-meaning>Geben Sie beide Reifendurchmesser ein, um den Übersetzungseffekt zu vergleichen.</p></figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Übersetzung und Direktantrieb-Berechnung</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">25–44 ZOLL REIFEN</p><h2 id="rpm-matrix-heading">Drehzahlkarte bei <span data-matrix-speed>65</span> mph</h2><p>Direktantrieb (1,00:1). Farbe zeigt relative Drehzahl nur innerhalb dieser Tabelle.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Reifen</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>Niedrigere relative Drehzahl</span><i aria-hidden="true"></i><span>Höhere relative Drehzahl</span></p></section>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeGearRatioCalculators } from '../../../../ui/gear-ratio-calculator'; initializeGearRatioCalculators();</script>

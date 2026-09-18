@@ -1,0 +1,17 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireSizeTechnicalVisual from '../../../../components/TireSizeTechnicalVisual.astro';
+import TireCodeExplainer from '../../../../components/TireCodeExplainer.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-size-calculator');
+const c = localizedTool('tire-size-calculator', 'de');
+---
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifengroesse-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-tamano-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-calculator/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
+    <fieldset><legend>Reifengröße</legend><div class="tire-input-row"><label>Breite<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profil<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Felge<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
+    <button type="submit">Reifenmaße berechnen</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Ihr Ergebnis erscheint hier.</p><TireSizeTechnicalVisual /><dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation"><TireCodeExplainer />{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>

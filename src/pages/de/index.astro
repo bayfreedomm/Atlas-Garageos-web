@@ -1,0 +1,15 @@
+---
+import SiteLayout from '../../components/SiteLayout.astro';
+import HomeLauncher from '../../components/HomeLauncher.astro';
+import { platformCatalog } from '../../localization/site-catalog';
+const c = platformCatalog.de.home;
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/' },
+];
+---
+<SiteLayout title={c.title} description={c.description} pathname="/de/" active="home" locale="de" alternates={alternates}>
+  <HomeLauncher locale="de" />
+</SiteLayout>

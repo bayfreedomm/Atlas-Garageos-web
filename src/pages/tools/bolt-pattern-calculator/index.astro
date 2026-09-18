@@ -1,0 +1,24 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('bolt-pattern-calculator');
+---
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Tires & wheels" intro="Calculate wheel bolt circle diameter (PCD) from the measured distance between two adjacent lug holes." limitation="This converts a measurement into a bolt circle diameter. It does not verify hub bore, lug thread, or vehicle fitment." studioCta="Confirm fitment in Wheel & Tire Compare">
+  <form slot="tool" class="calculator-form" data-calculator="bolt-pattern" novalidate>
+    <div class="utility-fields">
+      <label>Lug count<select name="lugCount"><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option><option value="8">8</option><option value="10">10</option></select></label>
+      <label>Hole-to-hole spacing<input name="spacing" type="number" value="67.1" min="0" step="any" inputmode="decimal" /></label>
+      <label>Spacing unit<select name="spacingUnit"><option value="mm" selected>mm</option><option value="in">in</option></select></label>
+    </div>
+    <UtilityResultStandard primaryLabel="Bolt circle diameter (PCD)" pending="Enter lug count and hole-to-hole spacing." visualTitle="Adjacent holes → bolt circle" visualNote="Trigonometric relationship, not a straight measurement" />
+  </form>
+  <div slot="explanation">
+    <h2>Why you can't just measure straight across</h2>
+    <p>On an even lug count, the bolt circle diameter equals the distance between two holes directly opposite each other. On an odd lug count — 5 lugs being the common case — no two holes sit directly across from one another, so the diameter has to be calculated from the angle between adjacent holes instead.</p>
+    <p>The formula used here is the standard bolt-circle relationship: PCD = spacing ÷ sin(180° ÷ lug count), measuring the straight-line distance between the centers of two adjacent bolt holes.</p>
+    <h2>Common bolt patterns for reference</h2>
+    <p>4x100, 4x114.3, 5x100, 5x108, 5x112, 5x114.3, 5x120, 6x139.7, and 8x165.1 are among the most common patterns across mainstream passenger cars, SUVs, and light trucks — but always confirm the exact pattern for your specific vehicle rather than assuming from vehicle class.</p>
+  </div>
+</ToolPage>
+<script>import { initializeBoltPatternCalculator } from '../../../ui/bolt-pattern-calculator'; initializeBoltPatternCalculator();</script>

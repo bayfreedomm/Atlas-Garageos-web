@@ -222,6 +222,15 @@ dd { margin: var(--space-2) 0 0; font-family: var(--font-mono); font-size: var(-
 .measure-panel { min-height: 18rem; }
 .measure-panel > label { max-width: 30rem; }
 .measure-media-slot { display: grid; min-height: 8rem; margin-bottom: var(--space-5); place-items: center; border: 1px dashed var(--color-line-strong); border-radius: var(--radius-md); background: var(--color-surface-subtle); color: var(--color-ink-soft); font-size: var(--text-sm); text-align: center; }
+.measure-illustration { margin: 0 0 var(--space-5); padding: var(--space-3); border: 1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
+.measure-illustration svg { display: block; width: 100%; height: auto; }
+.measure-illustration__fixed { fill: none; stroke: var(--color-ink-soft); stroke-width: 3; stroke-dasharray: 5 5; stroke-linecap: round; }
+.measure-illustration__tire { fill: none; stroke: var(--color-ink-muted); stroke-width: 2.5; }
+.measure-illustration__rim { fill: none; stroke: var(--color-ink-soft); stroke-width: 2; }
+.measure-illustration__hub { fill: var(--color-ink-soft); }
+.measure-illustration__arrow { fill: none; stroke: var(--color-brand); stroke-width: 2; }
+.measure-illustration__label { fill: var(--color-brand); font: 700 .68rem var(--font-sans); }
+.measure-illustration__tag { fill: var(--color-ink-soft); font: 700 .58rem var(--font-sans); letter-spacing: .07em; text-transform: uppercase; }
 .step-actions { position: sticky; z-index: var(--z-sticky); bottom: calc(4.7rem + env(safe-area-inset-bottom)); margin: var(--space-6) calc(var(--space-5) * -1) calc(var(--space-5) * -1); padding: var(--space-3) var(--space-5); border-top: var(--border); background: rgb(255 255 255 / 94%); backdrop-filter: blur(12px); }
 .step-actions button { flex: 1; }
 
@@ -672,6 +681,11 @@ main { padding-top: 1rem; padding-bottom: calc(2.5rem + env(safe-area-inset-bott
 .drawer-settings .theme-control select { width: 8rem; background-color: var(--color-surface-subtle); }
 .language-setting { display: flex; min-height: 3.25rem; align-items: center; justify-content: space-between; padding: .4rem .5rem; font-size: .9rem; }
 .language-setting strong { color: var(--color-ink-muted); font-size: .85rem; }
+.language-setting--switcher { align-items: center; }
+.language-options { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: flex-end; }
+.language-option { padding: .3rem .6rem; border: 1px solid var(--color-line); border-radius: .6rem; color: var(--color-ink-muted); font-size: .78rem; font-weight: 650; text-decoration: none; }
+.language-option:hover { background: var(--color-surface-subtle); }
+.language-option.is-active { border-color: var(--color-brand); background: var(--color-brand); color: var(--color-on-brand, #fff); }
 
 .toolbox-identity, .directory-identity { padding: .45rem 0 1rem; }
 .toolbox-identity h1, .directory-identity h1 { max-width: none; margin: 0; font-size: 1.35rem; font-weight: 760; letter-spacing: -.035em; line-height: 1.2; }

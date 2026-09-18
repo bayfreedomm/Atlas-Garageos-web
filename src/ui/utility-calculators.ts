@@ -178,15 +178,23 @@ function bindInstant(form: HTMLFormElement, calculate: () => void): void { form.
 
 function fuelInput(form: HTMLFormElement) { return { system: (textValue(form, 'system') === 'imperial' ? 'imperial' : 'metric') as UnitSystem, distance: value(form, 'distance'), economy: value(form, 'economy'), price: value(form, 'price') }; }
 
+const FUEL_LABEL_TEXT: Readonly<Record<string, { distance: string; oneWay: string; economy: string; price: string; gallon: string; litre: string }>> = {
+  en: { distance: 'Distance', oneWay: 'One-way distance', economy: 'Fuel economy', price: 'Fuel price', gallon: 'US gallon', litre: 'litre' },
+  de: { distance: 'Distanz', oneWay: 'Distanz (einfach)', economy: 'Kraftstoffverbrauch', price: 'Kraftstoffpreis', gallon: 'US-Gallone', litre: 'Liter' },
+  es: { distance: 'Distancia', oneWay: 'Distancia de ida', economy: 'Consumo', price: 'Precio del combustible', gallon: 'galón estadounidense', litre: 'litro' },
+};
+
 function syncFuelLabels(form: HTMLFormElement): void {
   const us = textValue(form, 'system') === 'imperial';
   const trip = form.dataset.utilityCalculator === 'road-trip';
   const distance = form.querySelector<HTMLElement>('[data-distance-label]');
   const economy = form.querySelector<HTMLElement>('[data-economy-label]');
   const price = form.querySelector<HTMLElement>('[data-price-label]');
-  if (distance) distance.textContent = `${trip ? 'One-way distance' : 'Distance'} · ${us ? 'miles' : 'km'}`;
-  if (economy) economy.textContent = `Fuel economy · ${us ? 'US MPG' : 'L/100km'}`;
-  if (price) price.textContent = `Fuel price · per ${us ? 'US gallon' : 'litre'}`;
+  const lang = document.documentElement.lang || 'en';
+  const t = FUEL_LABEL_TEXT[lang] ?? FUEL_LABEL_TEXT.en!;
+  if (distance) distance.textContent = `${trip ? t.oneWay : t.distance} · ${us ? 'miles' : 'km'}`;
+  if (economy) economy.textContent = `${t.economy} · ${us ? 'US MPG' : 'L/100km'}`;
+  if (price) price.textContent = `${t.price} · ${lang === 'en' ? 'per' : lang === 'de' ? 'pro' : 'por'} ${us ? t.gallon : t.litre}`;
 }
 
 function initializeFuelPreferences(form: HTMLFormElement): void {

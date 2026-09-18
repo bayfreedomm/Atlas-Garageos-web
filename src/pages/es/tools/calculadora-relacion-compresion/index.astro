@@ -1,0 +1,21 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('compression-ratio-calculator');
+const c = localizedTool('compression-ratio-calculator', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/compression-ratio-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/verdichtungsverhaeltnis-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-relacion-compresion/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/compression-ratio-calculator/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="compression-ratio" novalidate>
+    <div class="utility-fields">
+      <label>Diámetro · mm<input name="bore" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Carrera · mm<input name="stroke" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Volumen de cámara · cc<input name="chamber" type="number" value="48" min="0" step="any" inputmode="decimal" /></label>
+      <label>Volumen adicional · cc<input name="otherVolume" type="number" value="4" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="es" primaryLabel="Relación de compresión estática" pending="Introduzca el diámetro, la carrera y el volumen de la cámara." visualTitle="Volumen desplazado + volumen de holgura ÷ volumen de holgura" visualNote="Relación geométrica estática, no compresión dinámica" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeCompressionRatioCalculator } from '../../../../ui/compression-ratio-calculator'; initializeCompressionRatioCalculator();</script>

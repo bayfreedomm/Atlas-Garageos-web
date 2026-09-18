@@ -142,6 +142,60 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     ],
     commonMistake: 'Comparing one vehicle using curb weight and another using dry weight or a manufacturer figure based on a different standard.',
   },
+  'bolt-pattern-calculator': {
+    facts: [
+      { title: 'Bolt pattern is written lugs×PCD', body: 'A "5x114.3" pattern means 5 lug holes arranged on a 114.3 mm bolt circle diameter.' },
+      { title: 'Measure hole-to-hole, not edge-to-edge', body: 'The distance between two adjacent bolt centers is what the geometry formula needs, not the outer rim edge.' },
+      { title: 'Odd lug counts need the diagonal method', body: 'On 5-lug wheels the bolt circle is not a straight measurement across, which is why this calculator uses the trigonometric relationship instead.' },
+    ],
+    commonMistake: 'Measuring the distance between two lug holes that are directly across from each other on a 5-lug wheel, which is not the bolt circle diameter.',
+    warning: 'A calculated PCD is a starting reference only. Always confirm bolt pattern, hub bore, and lug thread against the wheel and vehicle specification before buying.',
+  },
+  'tire-load-speed-rating': {
+    facts: [
+      { title: 'Load index is a code, not a weight', body: 'The number on the sidewall maps to a fixed load-capacity table — it is not the weight in kilograms or pounds itself.' },
+      { title: 'Speed rating is a sustained-speed rating', body: 'The letter describes the maximum speed the tire is rated to sustain, not a speed limit recommendation.' },
+      { title: 'Both figures are per tire', body: 'Load index capacity applies to a single tire, not the combined capacity of an axle or the vehicle.' },
+    ],
+    commonMistake: 'Fitting a tire with a lower load index or speed rating than the vehicle placard specifies to save cost.',
+    warning: 'Always match or exceed the load index and speed rating listed on your vehicle\'s tire placard, not just the size.',
+  },
+  'tire-date-code-decoder': {
+    facts: [
+      { title: 'The code is the last four digits of the DOT number', body: 'The first two digits are the week of manufacture, the last two are the year — for example 2219 means week 22 of 2019.' },
+      { title: 'Three-digit codes predate 2000', body: 'Tires made before 2000 used a three-digit code and are effectively always past any reasonable service life today.' },
+      { title: 'Age matters even with good tread', body: 'Rubber compounds harden and crack with age regardless of remaining tread depth or how the tire looks.' },
+    ],
+    commonMistake: 'Judging tire age only by tread depth or visual condition instead of checking the molded date code.',
+    warning: 'Age guidance here reflects common manufacturer and industry practice, not a specific vehicle recommendation. Check your tire manufacturer\'s stated service life.',
+  },
+  'towing-capacity-calculator': {
+    facts: [
+      { title: 'GCWR already includes the tow vehicle', body: 'Gross Combined Weight Rating covers the loaded tow vehicle plus the trailer together, so the vehicle\'s own weight has to be subtracted first.' },
+      { title: 'Passengers and cargo count against the total', body: 'Everything riding in or on the tow vehicle reduces the trailer weight that remains available.' },
+      { title: 'Tongue weight is a fraction of trailer weight', body: 'Most conventional trailers want roughly 10 to 15 percent of trailer weight on the tongue or hitch.' },
+    ],
+    commonMistake: 'Comparing a trailer\'s weight only to the vehicle\'s advertised maximum towing capacity while ignoring passengers, cargo, and hitch equipment already loaded in the tow vehicle.',
+    warning: 'This is a simplified GCWR-based estimate. Always confirm the manufacturer\'s towing capacity, GVWR, axle ratings, and hitch class for your exact vehicle configuration.',
+  },
+  'quarter-mile-calculator': {
+    facts: [
+      { title: 'The formula uses weight and power only', body: 'Elapsed time and trap speed are estimated from the power-to-weight ratio, the same two numbers that drive real acceleration.' },
+      { title: 'Real results vary with the driver and the track', body: 'Traction, launch technique, gearing, altitude, and temperature all shift the real number away from the estimate.' },
+      { title: '0-60 is not a reliable weight-and-power calculation', body: 'Unlike the quarter mile, there is no widely accepted formula that estimates 0-60 time from weight and power alone, so it is shown only as a rough rule of thumb.' },
+    ],
+    commonMistake: 'Treating the estimated elapsed time as a guaranteed result rather than a power-to-weight-based approximation.',
+    warning: 'This is a physics-based estimate, not a performance guarantee. Actual times depend on traction, driver skill, gearing, weather, and track conditions.',
+  },
+  'compression-ratio-calculator': {
+    facts: [
+      { title: 'Swept volume comes from bore and stroke', body: 'Cylinder swept volume is calculated from bore and stroke alone; it does not depend on chamber shape.' },
+      { title: 'Clearance volume is everything the piston does not fill at top dead center', body: 'Combustion chamber, head gasket, deck clearance, and piston dish or dome volume all add to or subtract from clearance volume.' },
+      { title: 'Static ratio is not dynamic compression', body: 'Camshaft timing changes effective cylinder filling, so static compression ratio and dynamic compression ratio are different numbers.' },
+    ],
+    commonMistake: 'Ignoring head gasket thickness and deck clearance volume, which can shift the calculated ratio by a full point or more.',
+    warning: 'This is a geometric calculation from the volumes you enter. Fuel octane requirements and safe compression ratios depend on the specific engine, tuning, and fuel.',
+  },
 });
 
 export function insightForTool(id: ToolId): ToolInsightContent {

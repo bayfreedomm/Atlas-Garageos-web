@@ -1,0 +1,21 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('towing-capacity-calculator');
+const c = localizedTool('towing-capacity-calculator', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/anhaengelast-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-capacidad-remolque/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Unidad<select name="unit"><option value="lb" selected>Libras (lb)</option><option value="kg">Kilogramos (kg)</option></select></label>
+      <label>Peso bruto combinado nominal (GCWR)<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Peso en vacío del vehículo remolcador<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Pasajeros + carga en el vehículo<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="es" primaryLabel="Peso máximo de remolque" pending="Introduzca el GCWR, el peso en vacío y la carga." visualTitle="GCWR − vehículo cargado = capacidad de remolque" visualNote="Estimación simplificada, no una cifra del fabricante" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

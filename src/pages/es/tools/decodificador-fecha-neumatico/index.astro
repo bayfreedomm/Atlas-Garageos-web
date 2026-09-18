@@ -1,0 +1,18 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-date-code-decoder');
+const c = localizedTool('tire-date-code-decoder', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifen-dot-code-decoder/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/decodificador-fecha-neumatico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-date-code" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Últimos 4 dígitos del código DOT<input name="code" type="text" value="2219" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="p. ej. 2219" /></label>
+    </div>
+    <UtilityResultStandard locale="es" primaryLabel="Fecha de fabricación" pending="Introduzca el código de 4 dígitos de semana/año." visualTitle="SSAA → semana + año" visualNote="Último grupo del número de serie DOT" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTireDateCodeDecoder } from '../../../../ui/tire-date-code-decoder'; initializeTireDateCodeDecoder();</script>

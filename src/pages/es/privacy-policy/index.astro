@@ -1,0 +1,18 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog.es.privacy;
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/privacy-policy/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/privacy-policy/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/privacy-policy/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/privacy-policy/' },
+];
+---
+<SiteLayout title={c.title} description={c.description} pathname="/es/privacy-policy/" active="tools" locale="es" alternates={alternates} breadcrumbs={[{ name: 'Inicio', href: '/es/' }, { name: c.h1, href: '/es/privacy-policy/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.updated}</p></header>
+  <div class="tool-explanation privacy-copy">
+    {c.sections.map((s) => <><h2>{s.heading}</h2><p>{s.body}</p></>)}
+  </div>
+</SiteLayout>

@@ -1,0 +1,21 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('quarter-mile-calculator');
+const c = localizedTool('quarter-mile-calculator', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/quarter-mile-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/viertelmeile-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-cuarto-milla/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/quarter-mile-calculator/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
+    <div class="utility-fields">
+      <label>Peso del vehículo<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>
+      <label>Unidad de peso<select name="weightUnit"><option value="lb" selected>lb</option><option value="kg">kg</option></select></label>
+      <label>Potencia<input name="power" type="number" value="300" min="0" step="any" inputmode="decimal" /></label>
+      <label>Unidad de potencia<select name="powerUnit"><option value="hp" selected>CV mecánicos</option><option value="kw">kW</option></select></label>
+    </div>
+    <UtilityResultStandard locale="es" primaryLabel="Tiempo final estimado en el cuarto de milla" pending="Introduzca el peso del vehículo y la potencia." visualTitle="Peso ÷ potencia → tiempo final" visualNote="Estimación clásica de peso-potencia en carreras de aceleración" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeQuarterMileCalculator } from '../../../../ui/quarter-mile-calculator'; initializeQuarterMileCalculator();</script>

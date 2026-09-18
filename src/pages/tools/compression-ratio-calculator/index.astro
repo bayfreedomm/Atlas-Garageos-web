@@ -1,0 +1,25 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('compression-ratio-calculator');
+---
+<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Performance" intro="Calculate engine compression ratio from bore, stroke, chamber volume, and other clearance volume." limitation="This is a geometric calculation from the volumes you enter, not a fuel or tuning recommendation. Safe compression for your engine depends on fuel octane, ignition timing, and other tuning factors.">
+  <form slot="tool" class="calculator-form" data-calculator="compression-ratio" novalidate>
+    <div class="utility-fields">
+      <label>Bore · mm<input name="bore" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Stroke · mm<input name="stroke" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Combustion chamber volume · cc<input name="chamber" type="number" value="48" min="0" step="any" inputmode="decimal" /></label>
+      <label>Additional volume · cc<input name="otherVolume" type="number" value="4" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard primaryLabel="Static compression ratio" pending="Enter bore, stroke, and chamber volume." visualTitle="Swept + clearance ÷ clearance" visualNote="Static geometric ratio, not dynamic compression" />
+  </form>
+  <div slot="explanation">
+    <h2>What each number means</h2>
+    <p>Swept volume is the space one cylinder displaces from bottom dead center to top dead center, calculated from bore and stroke alone. Clearance volume is everything left at top dead center: the combustion chamber volume, plus head gasket volume, deck clearance volume, and piston dish (positive) or dome (negative) volume — entered together here as one "additional volume" figure.</p>
+    <p>Compression ratio = (swept volume + clearance volume) ÷ clearance volume. If you only know chamber volume, leave additional volume at 0; for a more precise result, add your head gasket's compressed volume and any deck clearance, and subtract piston dome volume or add piston dish volume.</p>
+    <h2>Static vs dynamic compression</h2>
+    <p>This is the static compression ratio — a fixed geometric number. Camshaft timing, especially intake valve closing point, changes how much of that swept volume the cylinder actually fills before compression begins, which is what dynamic compression ratio describes. Two engines with the same static ratio can behave very differently depending on cam timing.</p>
+  </div>
+</ToolPage>
+<script>import { initializeCompressionRatioCalculator } from '../../../ui/compression-ratio-calculator'; initializeCompressionRatioCalculator();</script>

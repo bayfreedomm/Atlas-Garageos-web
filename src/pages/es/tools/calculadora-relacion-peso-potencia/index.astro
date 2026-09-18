@@ -1,0 +1,17 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('power-to-weight-calculator');
+const c = localizedTool('power-to-weight-calculator', 'es');
+---
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/power-to-weight-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/leistungsgewicht-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-relacion-peso-potencia/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/power-to-weight-calculator/' }]}>
+  <form slot="tool" class="calculator-form" data-utility-calculator="power-weight" novalidate>
+    <div class="utility-fields"><label>Potencia<input name="power" type="number" value="180" min="0" step="any" inputmode="decimal" /></label><label>Unidad de potencia<select name="powerUnit"><option value="hp">CV mecánicos</option><option value="kw">kW</option></select></label><label>Peso del vehículo<input name="weight" type="number" value="1350" min="0" step="any" inputmode="decimal" /></label><label>Unidad de peso<select name="weightUnit"><option value="kg">kg</option><option value="lb">lb</option></select></label></div>
+    <button type="submit">Calcular relación peso-potencia</button>
+    <UtilityResultStandard locale="es" primaryLabel="Relación peso-potencia" pending="Introduzca la potencia y el peso del vehículo." visualTitle="POTENCIA ÷ MASA = RELACIÓN" visualNote="Normalización física, no una puntuación de rendimiento" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

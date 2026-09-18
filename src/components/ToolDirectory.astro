@@ -1,8 +1,20 @@
 ---
 import ToolIcon from './ToolIcon.astro';
 import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry, type ToolId } from '../seo/tool-registry';
-interface Props { mode?: 'home' | 'all'; }
-const { mode = 'all' } = Astro.props;
+import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
+import { localizedToolPath } from '../localization/locales';
+interface Props { mode?: 'home' | 'all'; locale?: ContentLocale; }
+const { mode = 'all', locale } = Astro.props;
+const categoryLabels = locale ? new Map(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name] as const)) : undefined;
+const allLabel = locale === 'de' ? 'Alle' : locale === 'es' ? 'Todo' : 'All';
+const searchPlaceholder = locale ? platformCatalog[locale].home.searchPlaceholder : 'Search automotive tools...';
+const allToolsHeading = locale === 'de' ? 'Alle Kfz-Werkzeuge' : locale === 'es' ? 'Todas las herramientas' : 'All automotive tools';
+const quickToolsHeading = locale === 'de' ? 'Schnellwerkzeuge' : locale === 'es' ? 'Herramientas rápidas' : 'Quick tools';
+const allToolsLink = locale === 'de' ? 'Alle Werkzeuge' : locale === 'es' ? 'Todas' : 'All tools';
+const emptyLabel = locale === 'de' ? 'Keine passenden Werkzeuge. Versuchen Sie eine allgemeinere Suche.' : locale === 'es' ? 'No hay herramientas coincidentes. Pruebe una búsqueda más amplia.' : 'No matching tools. Try a broader search.';
+const viewAllLabel = locale === 'de' ? 'Alle Werkzeuge ansehen' : locale === 'es' ? 'Ver todas las herramientas' : 'View all tools';
+const toolsWord = locale === 'de' ? 'Werkzeuge' : locale === 'es' ? 'herramientas' : 'tools';
+const hubPrefix = locale ? `/${locale}` : '';
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
 const popularIds: readonly ToolId[] = ['fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
 const displayedTools = mode === 'home'
@@ -18,20 +30,21 @@ const helper = new Map<ToolId, string>([
 ]);
 ---
 <section class:list={['toolbox', { 'toolbox--home': mode === 'home' }]} data-toolbox data-mode={mode} aria-labelledby="toolbox-heading">
-  <div class="toolbox-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for={`tool-search-${mode}`}>Search automotive tools</label><input id={`tool-search-${mode}`} type="search" placeholder="Search automotive tools..." autocomplete="off" data-tool-search /></div>
+  <div class="toolbox-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for={`tool-search-${mode}`}>Search automotive tools</label><input id={`tool-search-${mode}`} type="search" placeholder={searchPlaceholder} autocomplete="off" data-tool-search /></div>
   {mode === 'all' && <div class="category-filters" role="group" aria-label="Filter tools by category">
-    <button type="button" aria-pressed="true" data-tool-category="All">All</button>
-    {TOOL_CATEGORY_ORDER.map((category) => <button type="button" aria-pressed="false" data-tool-category={category}>{category}</button>)}
+    <button type="button" aria-pressed="true" data-tool-category="All">{allLabel}</button>
+    {TOOL_CATEGORY_ORDER.map((category) => <button type="button" aria-pressed="false" data-tool-category={category}>{categoryLabels?.get(category) ?? category}</button>)}
   </div>}
-  {mode === 'all' && <div class="tool-list-heading"><h2 id="toolbox-heading">All automotive tools</h2><span data-tool-count>{tools.length} tools</span></div>}
-  {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">Quick tools</h2><a href="/tools/">All tools</a></div>}
+  {mode === 'all' && <div class="tool-list-heading"><h2 id="toolbox-heading">{allToolsHeading}</h2><span data-tool-count>{tools.length} {toolsWord}</span></div>}
+  {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">{quickToolsHeading}</h2><a href={`${hubPrefix}/tools/`}>{allToolsLink}</a></div>}
   <div class="tool-rows" data-tool-rows>
-    {displayedTools.map((tool) => <a class:list={['tool-row', { 'is-secondary': mode === 'home' && !popularIds.includes(tool.id) }]} href={routeForTool(tool)} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${tool.title} ${tool.description} ${helper.get(tool.id)} ${tool.id}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
+    {displayedTools.map((tool) => { const label = locale ? localizedTool(tool.id, locale) : undefined; const href = locale ? localizedToolPath(locale, tool.id, 'tool') : routeForTool(tool); const displayTitle = label?.title ?? tool.title; const displayHelper = label?.intro ?? helper.get(tool.id); return (
+    <a class:list={['tool-row', { 'is-secondary': mode === 'home' && !popularIds.includes(tool.id) }]} href={href} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${displayTitle} ${label?.description ?? tool.description} ${helper.get(tool.id)} ${tool.id}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
       <ToolIcon id={tool.id} category={tool.category} />
-      <span class="tool-row__copy"><strong>{tool.title}</strong>{helper.get(tool.id) && <small>{helper.get(tool.id)}</small>}</span><span class="tool-row__arrow" aria-hidden="true">›</span>
-    </a>)}
+      <span class="tool-row__copy"><strong>{displayTitle}</strong>{displayHelper && <small>{displayHelper}</small>}</span><span class="tool-row__arrow" aria-hidden="true">›</span>
+    </a>); })}
   </div>
-  <p class="toolbox-empty" data-tool-empty hidden>No matching tools. Try a broader search.</p>
-  {mode === 'home' && <a class="all-tools-link" href="/tools/">View all tools <span aria-hidden="true">›</span></a>}
+  <p class="toolbox-empty" data-tool-empty hidden>{emptyLabel}</p>
+  {mode === 'home' && <a class="all-tools-link" href={`${hubPrefix}/tools/`}>{viewAllLabel} <span aria-hidden="true">›</span></a>}
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

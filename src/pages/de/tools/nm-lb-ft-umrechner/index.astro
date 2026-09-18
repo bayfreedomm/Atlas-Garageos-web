@@ -1,0 +1,16 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('nm-lb-ft-converter');
+const c = localizedTool('nm-lb-ft-converter', 'de');
+---
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/nm-lb-ft-converter/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/nm-lb-ft-umrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/convertidor-nm-lb-ft/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/nm-lb-ft-converter/' }]}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="torque" novalidate>
+    <div class="instant-input"><label>Drehmoment<input name="value" type="number" value="300" min="0" step="any" inputmode="decimal" /></label><label>Einheit<select name="unit"><option value="nm">Nm</option><option value="lb-ft">lb-ft</option></select></label></div>
+    <UtilityResultStandard locale="de" primaryLabel="Umgerechnetes Drehmoment" pending="Geben Sie einen Drehmomentwert ein." visualTitle="Ein Drehmoment, zwei Einheiten" visualNote="Exakte Einheitenumrechnung, keine Motorschätzung" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

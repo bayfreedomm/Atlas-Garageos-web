@@ -1,0 +1,40 @@
+---
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireInputGroup from '../../../../components/TireInputGroup.astro';
+import TireComparisonVisual from '../../../../components/TireComparisonVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-size-comparison');
+const c = localizedTool('tire-size-comparison', 'de');
+---
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifenrechner-vergleich/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/comparador-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }]}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <div class="calculator-columns">
+      <TireInputGroup locale="de" prefix="original-" title="Ursprünglicher Reifen" width={225} aspect={45} rim={18} />
+      <TireInputGroup locale="de" prefix="new-" title="Neuer Reifen" width={235} aspect={40} rim={19} />
+    </div>
+    <div class="form-actions">
+      <button type="submit">Reifengrößen vergleichen</button>
+      <button type="button" class="secondary" data-share-result>Link zum Teilen kopieren</button>
+    </div>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="tire-primary-result is-pending" data-tire-primary-result aria-live="polite" aria-label="Primäres Reifenvergleichsergebnis">
+      <div class="tire-primary-result__answer">
+        <span>Durchmesseränderung</span>
+        <strong data-tire-primary-percent>—</strong>
+        <p data-tire-primary-copy>Vergleichen Sie die beiden Größen, um die Hauptänderung zu sehen.</p>
+      </div>
+      <div class="tire-primary-result__speed">
+        <span>Bei angezeigten 100 km/h</span>
+        <strong data-tire-speed-example>—</strong>
+        <small>Theoretisches Abrollgeometrie-Beispiel</small>
+      </div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre Vergleichszusammenfassung erscheint hier.</p>
+    <TireComparisonVisual />
+    <div class="tire-detail-heading" aria-hidden="true"><span>Details</span><small>Nominale Geometrie</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeShareableToolState(); initializeToolCalculators();</script>
