@@ -1,3 +1,11 @@
+import { getPageLocale } from './page-locale';
+
+const TOOL_COUNT_WORDS = {
+  en: { one: 'tool', other: 'tools' },
+  de: { one: 'Tool', other: 'Tools' },
+  es: { one: 'herramienta', other: 'herramientas' },
+} as const;
+
 export interface ToolFilterCandidate { readonly category: string; readonly searchText: string; readonly popular: boolean; }
 export function toolMatchesFilter(candidate: ToolFilterCandidate, query: string, category: string, homeDefault: boolean): boolean {
   const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -7,6 +15,7 @@ export function toolMatchesFilter(candidate: ToolFilterCandidate, query: string,
 }
 
 export function initializeToolboxes(): void {
+  const countWords = TOOL_COUNT_WORDS[getPageLocale()];
   document.querySelectorAll<HTMLElement>('[data-toolbox]').forEach((toolbox) => {
     if (toolbox.dataset.ready === 'true') return;
     toolbox.dataset.ready = 'true';
@@ -27,7 +36,7 @@ export function initializeToolboxes(): void {
         if (show) visible++;
       });
       if (empty) empty.hidden = visible !== 0;
-      if (count) count.textContent = `${visible} ${visible === 1 ? 'tool' : 'tools'}`;
+      if (count) count.textContent = `${visible} ${visible === 1 ? countWords.one : countWords.other}`;
     };
     buttons.forEach((button) => button.addEventListener('click', () => {
       category = button.dataset.toolCategory ?? 'All';

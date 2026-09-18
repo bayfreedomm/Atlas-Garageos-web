@@ -1,6 +1,14 @@
 import { parseThemePreference, resolveTheme, THEME_STORAGE_KEY } from './theme-preference';
+import { getPageLocale } from './page-locale';
+
+const THEME_TOGGLE_LABELS = {
+  en: { night: 'Switch to night mode', day: 'Switch to day mode' },
+  de: { night: 'In den Nachtmodus wechseln', day: 'In den Tagmodus wechseln' },
+  es: { night: 'Cambiar a modo noche', day: 'Cambiar a modo día' },
+} as const;
 
 export function initializeThemeControls(): void {
+  const labels = THEME_TOGGLE_LABELS[getPageLocale()];
   const media = window.matchMedia('(prefers-color-scheme: dark)');
   const controls = [...document.querySelectorAll<HTMLSelectElement>('[data-theme-control]')];
   const quickToggles = [...document.querySelectorAll<HTMLButtonElement>('[data-theme-quick-toggle]')];
@@ -16,7 +24,7 @@ export function initializeThemeControls(): void {
     controls.forEach((control) => { control.value = preference; });
     quickToggles.forEach((button) => {
       const next = resolved === 'dark' ? 'light' : 'dark';
-      const label = next === 'dark' ? 'Switch to night mode' : 'Switch to day mode';
+      const label = next === 'dark' ? labels.night : labels.day;
       button.dataset.resolvedTheme = resolved;
       button.setAttribute('aria-label', label);
       button.title = label;

@@ -8,7 +8,7 @@ export type EfficiencyPercentage = number & { readonly [efficiencyPercentageBran
 
 function boundedPercentage<T extends number>(value: number, field: string, minimum: number, maximum: number): ValidationResult<T> {
   if (!Number.isFinite(value)) return invalid({ code: 'not-a-number', field, message: `${field} must be a finite number.`, received: value });
-  if (value < minimum || value > maximum) return invalid({ code: 'out-of-range', field, message: `${field} must be between ${minimum} and ${maximum}.`, received: value });
+  if (value < minimum || value > maximum) return invalid({ code: 'out-of-range', field, message: `${field} must be between ${minimum} and ${maximum}.`, received: value, minimum, maximum });
   return valid(value as T);
 }
 

@@ -1,5 +1,6 @@
 import { calculateActualSpeed } from '../../core/fitment/compare';
 import { calculateCircumferenceMm, calculateOverallDiameterMm, calculateRevolutionsPerKilometer, calculateRevolutionsPerMile, calculateSidewallHeightMm } from '../../core/tire/geometry';
+import { searchTireCandidates } from '../../core/tire/search';
 import { compareWheelPosition } from '../../core/wheel/position';
 import { createTireSize, createWheelSpec, type TireSize } from '../../domain/vehicle';
 import { invalid, valid, type ValidationIssue, type ValidationResult } from '../../domain/validation';
@@ -34,6 +35,79 @@ export function compareTireSizesTool(originalInput: TireToolInput, newInput: Tir
   const diameterDifferenceMm = next.overallDiameterMm - current.overallDiameterMm;
   const diameterDifferencePercent = diameterDifferenceMm / current.overallDiameterMm * 100;
   return valid(Object.freeze({ current, proposed: next, diameterDifferenceMm, diameterDifferencePercent, sidewallDifferenceMm: next.sidewallHeightMm - current.sidewallHeightMm, circumferenceDifferenceMm: next.circumferenceMm - current.circumferenceMm, rideHeightDifferenceMm: diameterDifferenceMm / 2, speedometerDifferencePercent: diameterDifferencePercent }));
+}
+
+export interface NearEquivalentSize {
+  readonly tire: TireSize;
+  readonly overallDiameterMm: number;
+  readonly diameterDifferencePercent: number;
+}
+
+// Rim sizes to try relative to the calculated tire's own rim (skips 0 — that would
+// just restate the input). Kept close to the original so every suggestion stays a
+// realistic plus/minus-sizing candidate rather than a wildly different tire.
+const NEAR_SIZE_RIM_DELTAS = [-1, 1, 2] as const;
+const NEAR_SIZE_MIN_RIM_INCHES = 13;
+const NEAR_SIZE_MAX_RIM_INCHES = 24;
+const NEAR_SIZE_WIDTH_SPAN_MM = 30;
+const NEAR_SIZE_WIDTH_STEP_MM = 10;
+const NEAR_SIZE_ASPECT_SPAN = 15;
+const NEAR_SIZE_ASPECT_STEP = 5;
+const NEAR_SIZE_MAX_DIAMETER_DIFFERENCE_PERCENT = 3;
+
+/**
+ * Calculated (not catalog-confirmed) tire sizes at nearby rim diameters that keep
+ * overall diameter within a small tolerance of the input tire — the same
+ * "plus sizing" search that powers Fitment Studio's What Fits search, reused here
+ * to surface a couple of realistic alternates directly under a single tire-size
+ * calculation. These are mathematically valid combinations, not a guarantee that a
+ * manufacturer actually produces that exact size.
+ */
+export function nearEquivalentSizesTool(input: TireToolInput): ValidationResult<readonly NearEquivalentSize[]> {
+  const baseline = validatedTire(input, 'tire');
+  if (!baseline.ok) return baseline;
+  const tire = baseline.value;
+  const widthRangeMm = { min: Math.max(80, tire.widthMm - NEAR_SIZE_WIDTH_SPAN_MM), max: Math.min(500, tire.widthMm + NEAR_SIZE_WIDTH_SPAN_MM), step: NEAR_SIZE_WIDTH_STEP_MM };
+  const aspectRatioRange = { min: Math.max(20, tire.aspectRatio - NEAR_SIZE_ASPECT_SPAN), max: Math.min(100, tire.aspectRatio + NEAR_SIZE_ASPECT_SPAN), step: NEAR_SIZE_ASPECT_STEP };
+  const results: NearEquivalentSize[] = [];
+  for (const delta of NEAR_SIZE_RIM_DELTAS) {
+    const targetRimDiameterInches = tire.rimDiameterInches + delta;
+    if (targetRimDiameterInches < NEAR_SIZE_MIN_RIM_INCHES || targetRimDiameterInches > NEAR_SIZE_MAX_RIM_INCHES) continue;
+    const search = searchTireCandidates({
+      baselineTire: tire,
+      targetRimDiameterInches,
+      widthRangeMm,
+      aspectRatioRange,
+      maximumAbsoluteDiameterDifferencePercent: NEAR_SIZE_MAX_DIAMETER_DIFFERENCE_PERCENT,
+      maxResults: 1,
+    });
+    if (search.ok && search.value.candidates.length > 0) {
+      const best = search.value.candidates[0]!;
+      results.push(Object.freeze({ tire: best.tire, overallDiameterMm: best.overallDiameterMm, diameterDifferencePercent: best.diameterDifferencePercent }));
+    }
+  }
+  results.sort((a, b) => a.tire.rimDiameterInches - b.tire.rimDiameterInches);
+  return valid(Object.freeze(results));
+}
+
+export interface SpeedometerTableRow { readonly indicatedSpeed: number; readonly actualSpeed: number; }
+
+// Representative indicated-speed checkpoints per unit — city/suburban/highway spread —
+// so the table reads as a realistic driving range rather than an arbitrary grid.
+const SPEED_TABLE_STEPS_KMH = [30, 50, 70, 90, 110, 130] as const;
+const SPEED_TABLE_STEPS_MPH = [20, 30, 40, 50, 65, 80] as const;
+
+/**
+ * The same tire-diameter speedometer offset applied across a spread of indicated
+ * speeds, instead of just the one the user typed — so a driver can see the actual
+ * gap at city, suburban, and highway speeds in one glance.
+ */
+export function speedometerTableTool(original: TireToolInput, proposed: TireToolInput, unit: 'km/h' | 'mph'): ValidationResult<readonly SpeedometerTableRow[]> {
+  const comparison = compareTireSizesTool(original, proposed);
+  if (!comparison.ok) return comparison;
+  const factor = 1 + comparison.value.speedometerDifferencePercent / 100;
+  const steps = unit === 'mph' ? SPEED_TABLE_STEPS_MPH : SPEED_TABLE_STEPS_KMH;
+  return valid(Object.freeze(steps.map((indicatedSpeed) => Object.freeze({ indicatedSpeed, actualSpeed: Number((indicatedSpeed * factor).toFixed(1)) }))));
 }
 
 export function calculateWheelOffsetTool(input: WheelOffsetToolInput) {

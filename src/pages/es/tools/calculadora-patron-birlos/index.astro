@@ -17,4 +17,4 @@ const c = localizedTool('bolt-pattern-calculator', 'es');
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>
-<script>import { initializeBoltPatternCalculator } from '../../../../ui/bolt-pattern-calculator'; initializeBoltPatternCalculator();</script>
+<script>import { initializeBoltPatternCalculator } from '../../../../ui/bolt-pattern-calculator'; import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; initializeBoltPatternCalculator(); initializeShareableToolState();</script>

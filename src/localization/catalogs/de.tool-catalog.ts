@@ -470,4 +470,25 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     commonMistake: 'Die Dicke der Zylinderkopfdichtung und das Quetschkantenspiel zu ignorieren, was das berechnete Verhältnis um einen vollen Punkt oder mehr verschieben kann.',
     warning: 'Dies ist eine geometrische Berechnung aus den von Ihnen eingegebenen Volumina. Kraftstoff-Oktananforderungen und sichere Verdichtungsverhältnisse hängen vom konkreten Motor, der Abstimmung und dem Kraftstoff ab.',
   },
+  'vehicle-fitment-finder': {
+    title: 'Fahrzeug finden',
+    description: 'Werksseitige Reifengröße, Lochkreis und Anzugsdrehmoment nach Marke und Modell nachschlagen, mit Quellenangabe und Verlässlichkeitseinstufung.',
+    category: 'Reifen & Felgen',
+    eyebrow: 'Reifen & Felgen',
+    intro: 'Wählen Sie Marke und Modell, um werksseitige Reifengröße, Lochkreis und Anzugsdrehmoment als Referenz zu sehen — und direkt in den passenden Rechner zu springen.',
+    limitation: 'Dies ist eine kuratierte Referenzsammlung, keine Live-Herstellerdatenbank. Ausstattungslinien und Modelljahre variieren, prüfen Sie daher immer das Handbuch oder den Aufkleber an der Fahrertür Ihres Fahrzeugs, bevor Sie Teile kaufen.',
+    studioCta: 'Passung in Felgen- & Reifenvergleich bestätigen',
+    explanation: [
+      { heading: 'Woher diese Daten stammen', paragraphs: [
+        'Jeder Eintrag wurde manuell aus öffentlichen Referenzquellen recherchiert und, wo möglich, gegen mindestens zwei Quellen geprüft. Jedes Fahrzeug zeigt eine Verlässlichkeitseinstufung und seine Quellen, damit Sie selbst beurteilen können, wie belastbar die Zahl ist.',
+        'Einige Drehmomentwerte konnten nicht zweifelsfrei bestätigt werden oder unterschieden sich zwischen Quellen — diese sind entsprechend gekennzeichnet, statt geraten zu werden.',
+      ] },
+    ],
+    facts: [
+      { title: 'Referenz, keine Herstellerfreigabe', body: 'Diese Werte ersetzen nicht das Fahrzeughandbuch — bei Abweichungen gilt immer die Herstellerangabe für Ihre genaue Ausstattung.' },
+      { title: 'Verlässlichkeit wird offen angezeigt', body: 'Jeder Eintrag zeigt „Hoch", „Mittel" oder „Gering" — je nachdem, wie gut die Quellen übereinstimmten.' },
+    ],
+    commonMistake: 'Eine Werksangabe für die gesamte Modellreihe zu übernehmen, obwohl einzelne Ausstattungslinien abweichende Rad- oder Reifenpakete haben.',
+    warning: 'Diese Liste wächst mit der Zeit und deckt noch nicht jedes Fahrzeug ab. Prüfen Sie die Angaben immer gegen Ihr eigenes Handbuch, bevor Sie Räder anziehen oder Teile bestellen.',
+  },
 });

@@ -29,6 +29,7 @@ const intendedRoutes = [
   '/tools/towing-capacity-calculator/',
   '/tools/quarter-mile-calculator/',
   '/tools/compression-ratio-calculator/',
+  '/tools/find-my-vehicle/',
 ];
 
 describe('SEO tool registry', () => {

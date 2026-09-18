@@ -196,6 +196,15 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     commonMistake: 'Ignoring head gasket thickness and deck clearance volume, which can shift the calculated ratio by a full point or more.',
     warning: 'This is a geometric calculation from the volumes you enter. Fuel octane requirements and safe compression ratios depend on the specific engine, tuning, and fuel.',
   },
+  'vehicle-fitment-finder': {
+    facts: [
+      { title: 'Reference data, not a manufacturer feed', body: 'These values do not replace your vehicle’s manual — when in doubt, the manufacturer spec for your exact trim always wins.' },
+      { title: 'Confidence is shown honestly', body: 'Each entry is marked High, Medium, or Low depending on how well independent sources agreed — a couple of torque specs could not be confirmed at all and are left blank rather than guessed.' },
+      { title: 'Trims vary more than model names suggest', body: 'The same model can ship with different wheel or tire packages by trim or model year, so this is a starting reference, not a universal spec for the nameplate.' },
+    ],
+    commonMistake: 'Assuming one factory spec applies across an entire model line when individual trims carry different wheel or tire packages.',
+    warning: 'This list grows over time and does not yet cover every vehicle. Always confirm against your own vehicle’s manual or door-jamb sticker before torquing wheels or ordering parts.',
+  },
 });
 
 export function insightForTool(id: ToolId): ToolInsightContent {

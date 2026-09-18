@@ -450,4 +450,25 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     commonMistake: 'Ignorar el grosor de la junta de culata y el volumen de holgura de plano, lo que puede desplazar la relación calculada en un punto completo o más.',
     warning: 'Este es un cálculo geométrico a partir de los volúmenes que usted introduce. Los requisitos de octanaje del combustible y las relaciones de compresión seguras dependen del motor concreto, la puesta a punto y el combustible.',
   },
+  'vehicle-fitment-finder': {
+    title: 'Encontrar mi Vehículo',
+    description: 'Consulte la medida de neumático, el patrón de birlos y el par de apriete de fábrica por marca y modelo, con fuentes y nivel de confianza.',
+    category: 'Neumáticos y Llantas',
+    eyebrow: 'Neumáticos y llantas',
+    intro: 'Elija una marca y un modelo para ver la medida de neumático, el patrón de birlos y el par de apriete de referencia — y pase directamente a la calculadora correspondiente.',
+    limitation: 'Este es un conjunto de referencia curado, no un feed en vivo del fabricante. Los acabados y años de modelo varían, así que confirme siempre con el manual de su vehículo o la etiqueta del pilar de la puerta antes de comprar piezas.',
+    studioCta: 'Confirmar el ajuste en el Comparador de Llantas y Neumáticos',
+    explanation: [
+      { heading: 'De dónde vienen estos datos', paragraphs: [
+        'Cada entrada se ha investigado manualmente a partir de referencias públicas y, cuando ha sido posible, se ha verificado con al menos dos fuentes. Cada vehículo muestra un nivel de confianza y sus fuentes para que pueda juzgar cuán sólido es el dato.',
+        'Algunos valores de par de apriete no se pudieron confirmar con certeza o difirieron entre fuentes — estos casos están señalados como tales en lugar de inventar una cifra.',
+      ] },
+    ],
+    facts: [
+      { title: 'Referencia, no una homologación del fabricante', body: 'Estos valores no sustituyen al manual del vehículo — ante cualquier discrepancia, prevalece siempre la especificación del fabricante para su acabado exacto.' },
+      { title: 'La confianza se muestra de forma transparente', body: 'Cada entrada indica "Alta", "Media" o "Baja" según lo bien que coincidieron las fuentes consultadas.' },
+    ],
+    commonMistake: 'Asumir una única especificación de fábrica para toda una gama, cuando distintos acabados pueden llevar paquetes de llantas o neumáticos diferentes.',
+    warning: 'Esta lista crece con el tiempo y todavía no cubre todos los vehículos. Confirme siempre los datos con el manual de su propio vehículo antes de apretar ruedas o pedir piezas.',
+  },
 });

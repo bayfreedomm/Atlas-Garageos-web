@@ -14,6 +14,11 @@ export interface ValidationIssue {
   readonly field: string;
   readonly message: string;
   readonly received?: unknown;
+  /** Present on `out-of-range` issues so presentation code can build a localized
+   * message instead of showing the English `message` fallback. `maximum` omitted
+   * means "must be at least `minimum`" (or "greater than zero" when minimum is 0). */
+  readonly minimum?: number;
+  readonly maximum?: number;
 }
 
 export type ValidationResult<T> =

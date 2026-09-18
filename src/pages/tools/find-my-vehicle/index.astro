@@ -1,0 +1,38 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import { toolById } from '../../../seo/tool-registry';
+import { vehicleMakes } from '../../../data/vehicle-fitment';
+import { indexedVehicleMakes } from '../../../data/vehicle-model-index';
+const definition = toolById('vehicle-fitment-finder');
+const makeCount = vehicleMakes().length;
+const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()]).size;
+---
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrzeug-finden/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/encontrar-mi-vehiculo/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }]} visual={false} eyebrow="Tires & wheels" intro="Pick a make and model to see reference OEM tire size, bolt pattern, and wheel torque — then jump straight into the matching calculator." limitation="This is a curated reference set, not a live manufacturer feed. Trims and model years vary, so confirm against your own vehicle's manual or door-jamb sticker before buying parts." studioCta="Confirm fitment in Wheel & Tire Compare">
+  <form slot="tool" class="calculator-form" data-calculator="vehicle-finder" novalidate>
+    <fieldset><legend>Vehicle</legend>
+      <div class="utility-fields">
+        <label>Make<select name="make" data-vehicle-make></select></label>
+        <label>Model<select name="model" data-vehicle-model disabled></select></label>
+      </div>
+    </fieldset>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Pick a make and model to see reference fitment data.</p>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="vehicle-meta" data-vehicle-meta hidden>
+      <span class="vehicle-confidence" data-vehicle-confidence></span>
+      <p class="vehicle-sources" data-vehicle-sources></p>
+      <p class="vehicle-notes" data-vehicle-notes hidden></p>
+    </div>
+    <div class="vehicle-actions" data-vehicle-actions hidden>
+      <a class="studio-cta studio-cta--row" data-vehicle-tire-link data-base-href="/tools/tire-size-calculator/"><span><small>Prefilled from this vehicle</small><strong>Open in Tire Size Calculator</strong></span><i aria-hidden="true">›</i></a>
+      <a class="studio-cta studio-cta--row" data-vehicle-bolt-link data-base-href="/tools/bolt-pattern-calculator/"><span><small>Prefilled from this vehicle</small><strong>Open in Bolt Pattern Calculator</strong></span><i aria-hidden="true">›</i></a>
+    </div>
+  </form>
+  <div slot="explanation">
+    <h2>Where this data comes from</h2>
+    <p>Each entry is hand-researched from public fitment references (aggregator sites and, where available, manufacturer service manuals) and cross-checked across at least two sources where possible. Every vehicle shows a confidence level and its sources so you can judge how solid the number is before you rely on it — some torque specs, in particular, varied between sources or couldn't be confirmed at all, and are marked accordingly rather than guessed.</p>
+    <h2>Currently covers {makeCount} makes with verified fitment data</h2>
+    <p>This is a starting set of commonly seen vehicles, not a complete manufacturer database — it will grow over time. If your exact vehicle isn't listed yet, the door-jamb sticker (driver's door frame) or your owner's manual has the manufacturer's own spec, which you can enter directly into the <a href="/tools/tire-size-calculator/">Tire Size Calculator</a> or <a href="/tools/bolt-pattern-calculator/">Bolt Pattern Calculator</a>.</p>
+    <p>The make and model picker itself searches a wider list — {searchableMakeCount} makes in total — so you can find and select your vehicle even when we don't have a verified tire/bolt-pattern reference for it yet. In that case we tell you plainly rather than guess a number.</p>
+  </div>
+</ToolPage>
+<script>import { initializeVehicleFitmentFinder } from '../../../ui/vehicle-fitment-finder'; initializeVehicleFitmentFinder();</script>

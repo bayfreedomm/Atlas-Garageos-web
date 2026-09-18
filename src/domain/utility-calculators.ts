@@ -14,7 +14,7 @@ export type TorqueUnit = 'nm' | 'lb-ft';
 export type WeightUnit = 'kg' | 'lb';
 
 const numberIssue = (field: string, value: unknown): ValidationIssue => ({ code: 'not-a-number', field, message: `${field} must be a finite number.`, received: value });
-const rangeIssue = (field: string, value: number, minimum: number): ValidationIssue => ({ code: 'out-of-range', field, message: `${field} must be ${minimum === 0 ? 'zero or greater' : 'greater than zero'}.`, received: value });
+const rangeIssue = (field: string, value: number, minimum: number): ValidationIssue => ({ code: 'out-of-range', field, message: `${field} must be ${minimum === 0 ? 'zero or greater' : 'greater than zero'}.`, received: value, minimum });
 
 export function createPositiveQuantity(value: number, field: string): ValidationResult<PositiveQuantity> {
   if (!Number.isFinite(value)) return invalid(numberIssue(field, value));

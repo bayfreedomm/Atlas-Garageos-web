@@ -1,9 +1,49 @@
-import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, type TireToolInput } from '../features/tools/calculator-tools';
+import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, nearEquivalentSizesTool, speedometerTableTool, type NearEquivalentSize, type SpeedometerTableRow, type TireToolInput } from '../features/tools/calculator-tools';
 import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
+import { getPageLocale } from './page-locale';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
 const tireValue = (form: HTMLFormElement, prefix: string): TireToolInput => ({ widthMm: numberValue(form, `${prefix}widthMm`), aspectRatio: numberValue(form, `${prefix}aspectRatio`), rimDiameterInches: numberValue(form, `${prefix}rimDiameterInches`) });
+
+// Direction-phrase fragments shared across the wheel-offset visuals. Kept in one
+// place so the same German/Spanish wording is used everywhere the same concept
+// (an edge moving farther in/out, toward the fender, toward the suspension) appears.
+const WHEEL_DIRECTION_TEXT = {
+  en: {
+    fartherInward: 'farther inward',
+    lessInward: 'less inward',
+    moreInnerClearance: 'more inner clearance',
+    fartherOutward: 'farther outward',
+    lessOutward: 'less outward',
+    towardFender: 'farther toward the fender',
+    inward: 'inward',
+    towardSuspension: 'toward the suspension',
+    awayFromSuspension: 'away from the suspension',
+  },
+  de: {
+    fartherInward: 'weiter nach innen',
+    lessInward: 'weniger weit nach innen',
+    moreInnerClearance: 'mehr Freiraum nach innen',
+    fartherOutward: 'weiter nach außen',
+    lessOutward: 'weniger weit nach außen',
+    towardFender: 'weiter Richtung Kotflügel',
+    inward: 'nach innen',
+    towardSuspension: 'Richtung Fahrwerk',
+    awayFromSuspension: 'vom Fahrwerk weg',
+  },
+  es: {
+    fartherInward: 'más hacia adentro',
+    lessInward: 'menos hacia adentro',
+    moreInnerClearance: 'más holgura interior',
+    fartherOutward: 'más hacia afuera',
+    lessOutward: 'menos hacia afuera',
+    towardFender: 'más hacia el guardabarros',
+    inward: 'hacia adentro',
+    towardSuspension: 'hacia la suspensión',
+    awayFromSuspension: 'alejándose de la suspensión',
+  },
+} as const;
 
 function renderMetrics(container: HTMLDListElement, metrics: readonly PresentedMetric[]): void {
   container.replaceChildren(...metrics.map((metric) => {
@@ -42,9 +82,125 @@ function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiame
 }
 
 
+const NEAR_SIZES_TEXT = {
+  en: {
+    heading: 'Near-equivalent sizes',
+    note: 'Calculated matches within about 3% of this diameter at nearby rim sizes — not confirmed against a real tire catalog.',
+    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}% diameter`,
+  },
+  de: {
+    heading: 'Ähnliche Ersatzgrößen',
+    note: 'Berechnete Übereinstimmungen innerhalb von etwa 3 % dieses Durchmessers bei benachbarten Felgengrößen — nicht mit einem echten Reifenkatalog abgeglichen.',
+    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1).replace('.', ',')}% Durchmesser`,
+  },
+  es: {
+    heading: 'Tamaños equivalentes cercanos',
+    note: 'Coincidencias calculadas dentro de aproximadamente un 3% de este diámetro en llantas de tamaño cercano — no confirmadas en un catálogo real de neumáticos.',
+    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1).replace('.', ',')}% de diámetro`,
+  },
+} as const;
+
+function renderNearEquivalentSizes(form: HTMLFormElement, input: TireToolInput): void {
+  const container = form.querySelector<HTMLElement>('[data-near-sizes]');
+  if (!container) return;
+  const result = nearEquivalentSizesTool(input);
+  if (!result.ok || result.value.length === 0) { container.hidden = true; return; }
+  const t = NEAR_SIZES_TEXT[getPageLocale()];
+  const heading = container.querySelector<HTMLElement>('[data-near-sizes-heading]');
+  const note = container.querySelector<HTMLElement>('[data-near-sizes-note]');
+  const list = container.querySelector<HTMLUListElement>('[data-near-sizes-list]');
+  if (heading) heading.textContent = t.heading;
+  if (note) note.textContent = t.note;
+  if (list) {
+    list.replaceChildren(...result.value.map((candidate: NearEquivalentSize) => {
+      const item = document.createElement('li');
+      const size = document.createElement('span'); size.className = 'near-sizes__size';
+      size.textContent = `${candidate.tire.widthMm}/${candidate.tire.aspectRatio}R${candidate.tire.rimDiameterInches}`;
+      const diff = document.createElement('span'); diff.className = 'near-sizes__diff';
+      diff.textContent = t.diff(candidate.diameterDifferencePercent);
+      item.append(size, diff);
+      return item;
+    }));
+  }
+  container.hidden = false;
+}
+
+const SPEED_TABLE_TEXT = {
+  en: {
+    heading: 'At other speeds',
+    indicated: 'Indicated',
+    actual: 'Actual',
+  },
+  de: {
+    heading: 'Bei anderen Geschwindigkeiten',
+    indicated: 'Angezeigt',
+    actual: 'Tatsächlich',
+  },
+  es: {
+    heading: 'A otras velocidades',
+    indicated: 'Indicada',
+    actual: 'Real',
+  },
+} as const;
+
+function renderSpeedTable(form: HTMLFormElement, original: TireToolInput, proposed: TireToolInput, unit: 'km/h' | 'mph'): void {
+  const container = form.querySelector<HTMLElement>('[data-speed-table]');
+  if (!container) return;
+  const result = speedometerTableTool(original, proposed, unit);
+  if (!result.ok || result.value.length === 0) { container.hidden = true; return; }
+  const t = SPEED_TABLE_TEXT[getPageLocale()];
+  const heading = container.querySelector<HTMLElement>('[data-speed-table-heading]');
+  const head = container.querySelector<HTMLTableRowElement>('[data-speed-table-head]');
+  const body = container.querySelector<HTMLTableSectionElement>('[data-speed-table-body]');
+  if (heading) heading.textContent = t.heading;
+  if (head) {
+    const indicated = document.createElement('th'); indicated.scope = 'col'; indicated.textContent = `${t.indicated} (${unit})`;
+    const actual = document.createElement('th'); actual.scope = 'col'; actual.textContent = `${t.actual} (${unit})`;
+    head.replaceChildren(indicated, actual);
+  }
+  if (body) {
+    body.replaceChildren(...result.value.map((row: SpeedometerTableRow) => {
+      const tr = document.createElement('tr');
+      const indicated = document.createElement('th'); indicated.scope = 'row'; indicated.textContent = String(row.indicatedSpeed);
+      const actual = document.createElement('td'); actual.textContent = row.actualSpeed.toFixed(1);
+      tr.append(indicated, actual); return tr;
+    }));
+  }
+  container.hidden = false;
+}
+
+const SINGLE_TIRE_TEXT = {
+  en: {
+    width: (widthMm: number) => `${widthMm} mm width`,
+    rim: (rimInches: number) => `${rimInches} in rim`,
+    taller: 'A taller sidewall is more visually pronounced.',
+    lowerProfile: 'A lower-profile sidewall puts more visual emphasis on the rim.',
+    balanced: 'This profile keeps a balanced sidewall-to-rim proportion.',
+    suffix: ' The drawing follows the entered proportions.',
+  },
+  de: {
+    width: (widthMm: number) => `${widthMm} mm Breite`,
+    rim: (rimInches: number) => `${rimInches} Zoll Felge`,
+    taller: 'Eine höhere Flanke wirkt optisch ausgeprägter.',
+    lowerProfile: 'Eine niedrigere Flanke legt den optischen Schwerpunkt stärker auf die Felge.',
+    balanced: 'Dieses Profil hält ein ausgewogenes Verhältnis zwischen Flanke und Felge.',
+    suffix: ' Die Zeichnung folgt den eingegebenen Proportionen.',
+  },
+  es: {
+    width: (widthMm: number) => `${widthMm} mm de ancho`,
+    rim: (rimInches: number) => `${rimInches} pulg. de llanta`,
+    taller: 'Un flanco más alto es visualmente más pronunciado.',
+    lowerProfile: 'Un perfil más bajo pone más énfasis visual en la llanta.',
+    balanced: 'Este perfil mantiene una proporción equilibrada entre el flanco y la llanta.',
+    suffix: ' El dibujo sigue las proporciones introducidas.',
+  },
+} as const;
+
 function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
   const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
   if (!visual) return;
+  const locale = getPageLocale();
+  const text = SINGLE_TIRE_TEXT[locale];
   const diameterScale = Math.min(1.08, Math.max(.72, result.overallDiameterMm / 680));
   const widthScale = Math.min(1.18, Math.max(.78, input.widthMm / 225));
   const wheel = visual.querySelector<SVGGElement>('[data-single-tire-wheel]');
@@ -59,25 +215,26 @@ function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInpu
   const rimHalf = 64 * rimScale;
   visual.querySelector<SVGPathElement>('[data-single-rim-line]')?.setAttribute('d', `M319 ${(145-rimHalf).toFixed(1)}V${(145+rimHalf).toFixed(1)}`);
   const set = (selector: string, value: string): void => { const el = visual.querySelector<HTMLElement>(selector); if (el) el.textContent = value; };
-  set('[data-single-width-text]', `${input.widthMm} mm width`);
+  set('[data-single-width-text]', text.width(input.widthMm));
   set('[data-single-diameter-text]', `${result.overallDiameterMm.toFixed(1)} mm`);
-  set('[data-single-rim-text]', `${input.rimDiameterInches} in rim`);
+  set('[data-single-rim-text]', text.rim(input.rimDiameterInches));
   set('[data-single-size-label]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
   set('[data-single-sidewall]', `${result.sidewallHeightMm.toFixed(1)} mm`);
   set('[data-single-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
   const profile = input.aspectRatio >= 55 ? 'taller' : input.aspectRatio <= 35 ? 'lower-profile' : 'balanced';
-  set('[data-single-meaning]', `${profile === 'taller' ? 'A taller sidewall is more visually pronounced.' : profile === 'lower-profile' ? 'A lower-profile sidewall puts more visual emphasis on the rim.' : 'This profile keeps a balanced sidewall-to-rim proportion.'} The drawing follows the entered proportions.`);
+  set('[data-single-meaning]', `${profile === 'taller' ? text.taller : profile === 'lower-profile' ? text.lowerProfile : text.balanced}${text.suffix}`);
 }
 
 function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): void {
   const visual = form.querySelector<HTMLElement>('[data-fitment-visualizer]');
   if (!visual) return;
+  const text = WHEEL_DIRECTION_TEXT[getPageLocale()];
   const model = wheelOffsetVisualMapping(inner, outer);
   const proposed = visual.querySelector<SVGRectElement>('[data-new-wheel]');
   proposed?.setAttribute('x', String(model.proposedX)); proposed?.setAttribute('width', String(model.proposedWidth));
   const innerLabel = visual.querySelector<HTMLElement>('[data-inner-label]'); const outerLabel = visual.querySelector<HTMLElement>('[data-outer-label]');
-  if (innerLabel) innerLabel.textContent = `${Math.abs(inner).toFixed(2)} mm ${inner >= 0 ? 'farther inward' : 'less inward'}`;
-  if (outerLabel) outerLabel.textContent = `${Math.abs(outer).toFixed(2)} mm ${outer >= 0 ? 'farther outward' : 'less outward'}`;
+  if (innerLabel) innerLabel.textContent = `${Math.abs(inner).toFixed(2)} mm ${inner >= 0 ? text.fartherInward : text.lessInward}`;
+  if (outerLabel) outerLabel.textContent = `${Math.abs(outer).toFixed(2)} mm ${outer >= 0 ? text.fartherOutward : text.lessOutward}`;
 }
 
 
@@ -91,6 +248,39 @@ function setLineX(path: SVGPathElement | null, left: number, right: number, y: n
 }
 
 
+const TIRE_COMPARISON_TEXT = {
+  en: {
+    sameDiameter: 'The new tire has the same nominal overall diameter.',
+    diffDiameter: (mm: string, taller: boolean) => `The new tire is ${mm} mm ${taller ? 'taller' : 'shorter'} overall.`,
+    actualSpeed: (kmh: string) => `${kmh} km/h actual`,
+    sideMeaning: (mm: string, taller: boolean, rideMm: string) => `New diameter is ${mm} mm ${taller ? 'taller' : 'shorter'}; static ride height changes by about ${rideMm} mm.`,
+    widthSame: 'Both tires have the same nominal section width.',
+    widthDiff: (mm: string, wider: boolean) => `The new tire is ${mm} mm ${wider ? 'wider' : 'narrower'} by nominal section width.`,
+    vehicleSame: 'Both sizes produce the same nominal static ride height.',
+    vehicleDiff: (mm: string, higher: boolean) => `Nominal static ride height is about ${mm} mm ${higher ? 'higher' : 'lower'} with the new tire.`,
+  },
+  de: {
+    sameDiameter: 'Der neue Reifen hat denselben nominalen Gesamtdurchmesser.',
+    diffDiameter: (mm: string, taller: boolean) => `Der neue Reifen hat insgesamt einen um ${mm} mm ${taller ? 'größeren' : 'kleineren'} Gesamtdurchmesser.`,
+    actualSpeed: (kmh: string) => `${kmh} km/h tatsächlich`,
+    sideMeaning: (mm: string, taller: boolean, rideMm: string) => `Der neue Durchmesser ist ${mm} mm ${taller ? 'größer' : 'kleiner'}; die statische Bodenfreiheit ändert sich um etwa ${rideMm} mm.`,
+    widthSame: 'Beide Reifen haben dieselbe nominale Querschnittsbreite.',
+    widthDiff: (mm: string, wider: boolean) => `Der neue Reifen ist bei der nominalen Querschnittsbreite ${mm} mm ${wider ? 'breiter' : 'schmaler'}.`,
+    vehicleSame: 'Beide Größen ergeben dieselbe nominale statische Bodenfreiheit.',
+    vehicleDiff: (mm: string, higher: boolean) => `Die nominale statische Bodenfreiheit ist mit dem neuen Reifen um etwa ${mm} mm ${higher ? 'höher' : 'niedriger'}.`,
+  },
+  es: {
+    sameDiameter: 'El nuevo neumático tiene el mismo diámetro total nominal.',
+    diffDiameter: (mm: string, taller: boolean) => `El nuevo neumático tiene un diámetro total ${mm} mm ${taller ? 'mayor' : 'menor'}.`,
+    actualSpeed: (kmh: string) => `${kmh} km/h real`,
+    sideMeaning: (mm: string, taller: boolean, rideMm: string) => `El nuevo diámetro es ${mm} mm ${taller ? 'mayor' : 'menor'}; la altura estática cambia en unos ${rideMm} mm.`,
+    widthSame: 'Ambos neumáticos tienen el mismo ancho de sección nominal.',
+    widthDiff: (mm: string, wider: boolean) => `El nuevo neumático es ${mm} mm ${wider ? 'más ancho' : 'más estrecho'} en ancho de sección nominal.`,
+    vehicleSame: 'Ambos tamaños producen la misma altura estática nominal.',
+    vehicleDiff: (mm: string, higher: boolean) => `Con el nuevo neumático, la altura estática nominal es unos ${mm} mm ${higher ? 'mayor' : 'menor'}.`,
+  },
+} as const;
+
 function setTireComparisonPrimaryResult(
   form: HTMLFormElement,
   result: Extract<ReturnType<typeof compareTireSizesTool>, { ok: true }>['value'],
@@ -98,9 +288,9 @@ function setTireComparisonPrimaryResult(
   const panel = form.querySelector<HTMLElement>('[data-tire-primary-result]');
   if (!panel) return;
 
+  const text = TIRE_COMPARISON_TEXT[getPageLocale()];
   const percent = result.diameterDifferencePercent;
   const actualAt100Kmh = 100 * (result.proposed.overallDiameterMm / result.current.overallDiameterMm);
-  const direction = result.diameterDifferenceMm > 0 ? 'taller' : result.diameterDifferenceMm < 0 ? 'shorter' : 'the same diameter as';
 
   const percentNode = panel.querySelector<HTMLElement>('[data-tire-primary-percent]');
   const copyNode = panel.querySelector<HTMLElement>('[data-tire-primary-copy]');
@@ -109,10 +299,10 @@ function setTireComparisonPrimaryResult(
   if (percentNode) percentNode.textContent = `${signed(percent, 2)}%`;
   if (copyNode) {
     copyNode.textContent = result.diameterDifferenceMm === 0
-      ? 'The new tire has the same nominal overall diameter.'
-      : `The new tire is ${Math.abs(result.diameterDifferenceMm).toFixed(1)} mm ${direction} overall.`;
+      ? text.sameDiameter
+      : text.diffDiameter(Math.abs(result.diameterDifferenceMm).toFixed(1), result.diameterDifferenceMm > 0);
   }
-  if (speedNode) speedNode.textContent = `${actualAt100Kmh.toFixed(1)} km/h actual`;
+  if (speedNode) speedNode.textContent = text.actualSpeed(actualAt100Kmh.toFixed(1));
 
   panel.classList.remove('is-pending');
   panel.dataset.direction = percent < 0 ? 'negative' : percent > 0 ? 'positive' : 'zero';
@@ -126,6 +316,7 @@ function setTireComparisonTechnicalVisual(
 ): void {
   const visual = form.querySelector<HTMLElement>('[data-tire-tech-visual]');
   if (!visual) return;
+  const text = TIRE_COMPARISON_TEXT[getPageLocale()];
 
   const maxDiameter = Math.max(result.current.overallDiameterMm, result.proposed.overallDiameterMm);
   const sideScale = 76 / maxDiameter;
@@ -189,9 +380,9 @@ function setTireComparisonTechnicalVisual(
   setBar('[data-diff-sidewall-bar]', result.sidewallDifferenceMm);
   setBar('[data-diff-ride-bar]', result.rideHeightDifferenceMm);
   const sideMeaning = visual.querySelector<HTMLElement>('[data-side-meaning]');
-  if (sideMeaning) sideMeaning.textContent = `New diameter is ${Math.abs(result.diameterDifferenceMm).toFixed(1)} mm ${result.diameterDifferenceMm >= 0 ? 'taller' : 'shorter'}; static ride height changes by about ${Math.abs(result.rideHeightDifferenceMm).toFixed(1)} mm.`;
+  if (sideMeaning) sideMeaning.textContent = text.sideMeaning(Math.abs(result.diameterDifferenceMm).toFixed(1), result.diameterDifferenceMm >= 0, Math.abs(result.rideHeightDifferenceMm).toFixed(1));
   const widthMeaning = visual.querySelector<HTMLElement>('[data-width-meaning]');
-  if (widthMeaning) widthMeaning.textContent = widthDifference === 0 ? 'Both tires have the same nominal section width.' : `The new tire is ${Math.abs(widthDifference)} mm ${widthDifference > 0 ? 'wider' : 'narrower'} by nominal section width.`;
+  if (widthMeaning) widthMeaning.textContent = widthDifference === 0 ? text.widthSame : text.widthDiff(String(Math.abs(widthDifference)), widthDifference > 0);
 
   // Vehicle view: both tires sit on the same road line. A larger radius lifts the hub/body.
   const vehicleMaxRadius = 54;
@@ -221,11 +412,44 @@ function setTireComparisonTechnicalVisual(
   }
   const vehicleMeaning = visual.querySelector<HTMLElement>('[data-vehicle-meaning]');
   if (vehicleMeaning) vehicleMeaning.textContent = result.rideHeightDifferenceMm === 0
-    ? 'Both sizes produce the same nominal static ride height.'
-    : `Nominal static ride height is about ${Math.abs(result.rideHeightDifferenceMm).toFixed(1)} mm ${result.rideHeightDifferenceMm > 0 ? 'higher' : 'lower'} with the new tire.`;
+    ? text.vehicleSame
+    : text.vehicleDiff(Math.abs(result.rideHeightDifferenceMm).toFixed(1), result.rideHeightDifferenceMm > 0);
 }
 
 
+
+const WHEEL_OFFSET_COPY = {
+  en: {
+    sameOuter: 'The outer wheel edge stays in the same nominal position.',
+    diffOuter: (mm: string, towardFender: boolean) => `The outer edge moves ${mm} mm ${towardFender ? 'farther toward the fender.' : 'inward.'}`,
+    sameInner: 'The inner wheel edge stays in the same nominal position.',
+    diffInner: (mm: string, towardSuspension: boolean) => `The inner edge moves ${mm} mm ${towardSuspension ? 'toward the suspension.' : 'away from the suspension.'}`,
+    innerMeaningSame: 'Inner edge stays in the same position.',
+    innerMeaningDiff: (mm: string, towardSuspension: boolean) => `Inner edge moves ${mm} mm ${towardSuspension ? 'toward the suspension' : 'away from the suspension'}.`,
+    outerMeaningSame: 'Outer edge stays in the same position.',
+    outerMeaningDiff: (mm: string, towardFender: boolean) => `Outer edge moves ${mm} mm ${towardFender ? 'toward the fender' : 'inward'}.`,
+  },
+  de: {
+    sameOuter: 'Die Außenkante der Felge bleibt in der gleichen nominalen Position.',
+    diffOuter: (mm: string, towardFender: boolean) => `Die Außenkante verschiebt sich um ${mm} mm ${towardFender ? 'weiter Richtung Kotflügel.' : 'nach innen.'}`,
+    sameInner: 'Die Innenkante der Felge bleibt in der gleichen nominalen Position.',
+    diffInner: (mm: string, towardSuspension: boolean) => `Die Innenkante verschiebt sich um ${mm} mm ${towardSuspension ? 'Richtung Fahrwerk.' : 'vom Fahrwerk weg.'}`,
+    innerMeaningSame: 'Die Innenkante bleibt in derselben Position.',
+    innerMeaningDiff: (mm: string, towardSuspension: boolean) => `Die Innenkante verschiebt sich um ${mm} mm ${towardSuspension ? 'Richtung Fahrwerk' : 'vom Fahrwerk weg'}.`,
+    outerMeaningSame: 'Die Außenkante bleibt in derselben Position.',
+    outerMeaningDiff: (mm: string, towardFender: boolean) => `Die Außenkante verschiebt sich um ${mm} mm ${towardFender ? 'Richtung Kotflügel' : 'nach innen'}.`,
+  },
+  es: {
+    sameOuter: 'El borde exterior de la llanta permanece en la misma posición nominal.',
+    diffOuter: (mm: string, towardFender: boolean) => `El borde exterior se desplaza ${mm} mm ${towardFender ? 'más hacia el guardabarros.' : 'hacia adentro.'}`,
+    sameInner: 'El borde interior de la llanta permanece en la misma posición nominal.',
+    diffInner: (mm: string, towardSuspension: boolean) => `El borde interior se desplaza ${mm} mm ${towardSuspension ? 'hacia la suspensión.' : 'alejándose de la suspensión.'}`,
+    innerMeaningSame: 'El borde interior permanece en la misma posición.',
+    innerMeaningDiff: (mm: string, towardSuspension: boolean) => `El borde interior se desplaza ${mm} mm ${towardSuspension ? 'hacia la suspensión' : 'alejándose de la suspensión'}.`,
+    outerMeaningSame: 'El borde exterior permanece en la misma posición.',
+    outerMeaningDiff: (mm: string, towardFender: boolean) => `El borde exterior se desplaza ${mm} mm ${towardFender ? 'hacia el guardabarros' : 'hacia adentro'}.`,
+  },
+} as const;
 
 function setWheelOffsetPrimaryResult(
   form: HTMLFormElement,
@@ -234,6 +458,7 @@ function setWheelOffsetPrimaryResult(
   const panel = form.querySelector<HTMLElement>('[data-wheel-primary-result]');
   if (!panel) return;
 
+  const copy = WHEEL_OFFSET_COPY[getPageLocale()];
   const outerNode = panel.querySelector<HTMLElement>('[data-wheel-primary-outer]');
   const outerCopyNode = panel.querySelector<HTMLElement>('[data-wheel-primary-outer-copy]');
   const innerNode = panel.querySelector<HTMLElement>('[data-wheel-primary-inner]');
@@ -242,15 +467,15 @@ function setWheelOffsetPrimaryResult(
   if (outerNode) outerNode.textContent = `${signed(result.outerPokeChangeMm, 2)} mm`;
   if (outerCopyNode) {
     outerCopyNode.textContent = result.outerPokeChangeMm === 0
-      ? 'The outer wheel edge stays in the same nominal position.'
-      : `The outer edge moves ${Math.abs(result.outerPokeChangeMm).toFixed(2)} mm ${result.outerPokeChangeMm > 0 ? 'farther toward the fender.' : 'inward.'}`;
+      ? copy.sameOuter
+      : copy.diffOuter(Math.abs(result.outerPokeChangeMm).toFixed(2), result.outerPokeChangeMm > 0);
   }
 
   if (innerNode) innerNode.textContent = `${signed(result.innerPositionChangeMm, 2)} mm`;
   if (innerCopyNode) {
     innerCopyNode.textContent = result.innerPositionChangeMm === 0
-      ? 'The inner wheel edge stays in the same nominal position.'
-      : `The inner edge moves ${Math.abs(result.innerPositionChangeMm).toFixed(2)} mm ${result.innerPositionChangeMm > 0 ? 'toward the suspension.' : 'away from the suspension.'}`;
+      ? copy.sameInner
+      : copy.diffInner(Math.abs(result.innerPositionChangeMm).toFixed(2), result.innerPositionChangeMm > 0);
   }
 
   panel.classList.remove('is-pending');
@@ -269,6 +494,9 @@ function setWheelOffsetTechnicalVisual(
 ): void {
   const visual = form.querySelector<HTMLElement>('[data-offset-tech-visual]');
   if (!visual) return;
+  const locale = getPageLocale();
+  const direction = WHEEL_DIRECTION_TEXT[locale];
+  const copy = WHEEL_OFFSET_COPY[locale];
   const hubX = 210;
   const scale = 0.52;
   const position = (widthInches: number, offsetMm: number) => {
@@ -305,10 +533,10 @@ function setWheelOffsetTechnicalVisual(
   setText('[data-new-wheel-spec]', `${newWidthInches}J · ET${newOffsetMm}`);
   setText('[data-inner-value]', `${signed(innerPositionChangeMm, 2)} mm`);
   setText('[data-outer-value]', `${signed(outerPokeChangeMm, 2)} mm`);
-  setText('[data-inner-copy]', innerPositionChangeMm >= 0 ? 'farther inward' : 'more inner clearance');
-  setText('[data-outer-copy]', outerPokeChangeMm >= 0 ? 'farther outward' : 'less outward');
-  setText('[data-inner-meaning]', innerPositionChangeMm === 0 ? 'Inner edge stays in the same position.' : `Inner edge moves ${Math.abs(innerPositionChangeMm).toFixed(2)} mm ${innerPositionChangeMm > 0 ? 'toward the suspension' : 'away from the suspension'}.`);
-  setText('[data-outer-meaning]', outerPokeChangeMm === 0 ? 'Outer edge stays in the same position.' : `Outer edge moves ${Math.abs(outerPokeChangeMm).toFixed(2)} mm ${outerPokeChangeMm > 0 ? 'toward the fender' : 'inward'}.`);
+  setText('[data-inner-copy]', innerPositionChangeMm >= 0 ? direction.fartherInward : direction.moreInnerClearance);
+  setText('[data-outer-copy]', outerPokeChangeMm >= 0 ? direction.fartherOutward : direction.lessOutward);
+  setText('[data-inner-meaning]', innerPositionChangeMm === 0 ? copy.innerMeaningSame : copy.innerMeaningDiff(Math.abs(innerPositionChangeMm).toFixed(2), innerPositionChangeMm > 0));
+  setText('[data-outer-meaning]', outerPokeChangeMm === 0 ? copy.outerMeaningSame : copy.outerMeaningDiff(Math.abs(outerPokeChangeMm).toFixed(2), outerPokeChangeMm > 0));
 
   // Mini stance view magnifies only the outer-edge movement; the cutaway above stays proportional.
   const currentMini = visual.querySelector<SVGRectElement>('[data-current-mini-wheel]');
@@ -338,8 +566,8 @@ export function initializeToolCalculators(): void {
     const calculate = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
-      if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
-      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value));
+      if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); const nearSizes = form.querySelector<HTMLElement>('[data-near-sizes]'); if (nearSizes) nearSizes.hidden = true; return; }
+      errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value)); renderNearEquivalentSizes(form, input);
     };
     const preview = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
@@ -401,8 +629,10 @@ export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="speedometer"]').forEach((form) => {
     bindCalculator(form, () => {
       const unit = new FormData(form).get('unit') === 'mph' ? 'mph' : 'km/h';
-      const result = calculateSpeedometerTool(tireValue(form, 'original-'), tireValue(form, 'new-'), numberValue(form, 'indicatedSpeed'), unit);
-      if (result.ok) setSummary(form, speedometerSummary(result.value));
+      const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
+      const result = calculateSpeedometerTool(original, proposed, numberValue(form, 'indicatedSpeed'), unit);
+      if (result.ok) { setSummary(form, speedometerSummary(result.value)); renderSpeedTable(form, original, proposed, unit); }
+      else { const speedTable = form.querySelector<HTMLElement>('[data-speed-table]'); if (speedTable) speedTable.hidden = true; }
       return result.ok ? { ok: true as const, metrics: speedometerMetrics(result.value) } : result;
     });
   });

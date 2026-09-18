@@ -1,5 +1,6 @@
 import { formatNumber } from './format-number';
 import { renderMetrics, resetStandardAnswer, setErrors, setSummary, syncStandardAnswer } from './standard-answer-helpers';
+import { getPageLocale } from './page-locale';
 
 const LB_PER_KG = 2.2046226218;
 const KM_PER_MI = 1.609344;
@@ -19,9 +20,61 @@ const SPEED_RATING_KMH: Readonly<Record<string, number>> = {
   L: 120, M: 130, N: 140, P: 150, Q: 160, R: 170, S: 180, T: 190, U: 200, H: 210, V: 240, W: 270, Y: 300,
 };
 
+const TIRE_LOAD_SPEED_LABELS = {
+  en: {
+    loadIndexRequired: 'Choose a load index from the list.',
+    speedRatingRequired: 'Choose a speed rating letter from the list.',
+    summaryError: 'Choose a load index and speed rating to look up their ratings.',
+    reset: 'Choose a load index and speed rating.',
+    summary: (loadIndex: number, kg: string, speedRating: string, kmh: string) =>
+      `Load index ${loadIndex} carries ${kg} kg per tire; a ${speedRating}-rated tire sustains up to ${kmh} km/h.`,
+    speedRating: 'Speed rating',
+    secondaryNote: (mph: string) => `${mph} mph maximum sustained speed.`,
+    loadIndexLabel: (loadIndex: number) => `Load index ${loadIndex}`,
+    speedRatingLabel: (speedRating: string) => `Speed rating ${speedRating}`,
+    metricLoadIndex: 'Load index',
+    metricCapacity: 'Load capacity per tire',
+    metricSpeedLetter: 'Speed rating letter',
+    metricMaxSpeed: 'Maximum sustained speed',
+  },
+  de: {
+    loadIndexRequired: 'Wählen Sie einen Tragfähigkeitsindex aus der Liste.',
+    speedRatingRequired: 'Wählen Sie einen Geschwindigkeitsindex-Buchstaben aus der Liste.',
+    summaryError: 'Wählen Sie einen Tragfähigkeitsindex und einen Geschwindigkeitsindex aus, um die Werte nachzuschlagen.',
+    reset: 'Wählen Sie einen Tragfähigkeitsindex und einen Geschwindigkeitsindex.',
+    summary: (loadIndex: number, kg: string, speedRating: string, kmh: string) =>
+      `Tragfähigkeitsindex ${loadIndex} trägt ${kg} kg pro Reifen; ein Reifen mit Geschwindigkeitsindex ${speedRating} hält bis zu ${kmh} km/h aus.`,
+    speedRating: 'Geschwindigkeitsindex',
+    secondaryNote: (mph: string) => `${mph} mph Höchstdauergeschwindigkeit.`,
+    loadIndexLabel: (loadIndex: number) => `Tragfähigkeitsindex ${loadIndex}`,
+    speedRatingLabel: (speedRating: string) => `Geschwindigkeitsindex ${speedRating}`,
+    metricLoadIndex: 'Tragfähigkeitsindex',
+    metricCapacity: 'Tragfähigkeit pro Reifen',
+    metricSpeedLetter: 'Geschwindigkeitsindex-Buchstabe',
+    metricMaxSpeed: 'Maximale Dauergeschwindigkeit',
+  },
+  es: {
+    loadIndexRequired: 'Elija un índice de carga de la lista.',
+    speedRatingRequired: 'Elija una letra de índice de velocidad de la lista.',
+    summaryError: 'Elija un índice de carga y un índice de velocidad para consultar sus valores.',
+    reset: 'Elija un índice de carga y un índice de velocidad.',
+    summary: (loadIndex: number, kg: string, speedRating: string, kmh: string) =>
+      `El índice de carga ${loadIndex} soporta ${kg} kg por neumático; un neumático con índice de velocidad ${speedRating} resiste hasta ${kmh} km/h.`,
+    speedRating: 'Índice de velocidad',
+    secondaryNote: (mph: string) => `${mph} mph de velocidad máxima sostenida.`,
+    loadIndexLabel: (loadIndex: number) => `Índice de carga ${loadIndex}`,
+    speedRatingLabel: (speedRating: string) => `Índice de velocidad ${speedRating}`,
+    metricLoadIndex: 'Índice de carga',
+    metricCapacity: 'Capacidad de carga por neumático',
+    metricSpeedLetter: 'Letra de índice de velocidad',
+    metricMaxSpeed: 'Velocidad máxima sostenida',
+  },
+} as const;
+
 function textValue(form: HTMLFormElement, name: string): string { return String(new FormData(form).get(name) ?? ''); }
 
 export function initializeTireLoadSpeedReference(): void {
+  const t = TIRE_LOAD_SPEED_LABELS[getPageLocale()];
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-load-speed"]').forEach((form) => {
     const calculate = (): void => {
       const loadIndex = Number(textValue(form, 'loadIndex'));
@@ -29,34 +82,34 @@ export function initializeTireLoadSpeedReference(): void {
       const kg = LOAD_INDEX_KG[loadIndex];
       const kmh = SPEED_RATING_KMH[speedRating];
       const issues: string[] = [];
-      if (kg === undefined) issues.push('Choose a load index from the list.');
-      if (kmh === undefined) issues.push('Choose a speed rating letter from the list.');
+      if (kg === undefined) issues.push(t.loadIndexRequired);
+      if (kmh === undefined) issues.push(t.speedRatingRequired);
       if (issues.length || kg === undefined || kmh === undefined) {
         setErrors(form, issues);
-        setSummary(form, 'Choose a load index and speed rating to look up their ratings.', true);
+        setSummary(form, t.summaryError, true);
         renderMetrics(form, []);
-        resetStandardAnswer(form, 'Choose a load index and speed rating.');
+        resetStandardAnswer(form, t.reset);
         return;
       }
       setErrors(form, []);
       const lb = kg * LB_PER_KG;
       const mph = kmh / KM_PER_MI;
-      setSummary(form, `Load index ${loadIndex} carries ${formatNumber(kg, 0)} kg per tire; a ${speedRating}-rated tire sustains up to ${formatNumber(kmh, 0)} km/h.`, false);
+      setSummary(form, t.summary(loadIndex, formatNumber(kg, 0), speedRating, formatNumber(kmh, 0)), false);
       syncStandardAnswer(form, {
         primary: `${formatNumber(kg, 0)} kg`,
-        secondaryLabel: 'Speed rating',
+        secondaryLabel: t.speedRating,
         secondary: `${formatNumber(kmh, 0)} km/h`,
-        secondaryNote: `${formatNumber(mph, 0)} mph maximum sustained speed.`,
-        leftLabel: `Load index ${loadIndex}`,
+        secondaryNote: t.secondaryNote(formatNumber(mph, 0)),
+        leftLabel: t.loadIndexLabel(loadIndex),
         left: `${formatNumber(kg, 0)} kg / ${formatNumber(lb, 0)} lb`,
-        rightLabel: `Speed rating ${speedRating}`,
+        rightLabel: t.speedRatingLabel(speedRating),
         right: `${formatNumber(kmh, 0)} km/h / ${formatNumber(mph, 0)} mph`,
       });
       renderMetrics(form, [
-        ['Load index', String(loadIndex)],
-        ['Load capacity per tire', `${formatNumber(kg, 0)} kg (${formatNumber(lb, 0)} lb)`],
-        ['Speed rating letter', speedRating],
-        ['Maximum sustained speed', `${formatNumber(kmh, 0)} km/h (${formatNumber(mph, 0)} mph)`],
+        [t.metricLoadIndex, String(loadIndex)],
+        [t.metricCapacity, `${formatNumber(kg, 0)} kg (${formatNumber(lb, 0)} lb)`],
+        [t.metricSpeedLetter, speedRating],
+        [t.metricMaxSpeed, `${formatNumber(kmh, 0)} km/h (${formatNumber(mph, 0)} mph)`],
       ]);
     };
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); });

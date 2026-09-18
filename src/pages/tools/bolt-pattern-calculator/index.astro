@@ -21,4 +21,4 @@ const definition = toolById('bolt-pattern-calculator');
     <p>4x100, 4x114.3, 5x100, 5x108, 5x112, 5x114.3, 5x120, 6x139.7, and 8x165.1 are among the most common patterns across mainstream passenger cars, SUVs, and light trucks — but always confirm the exact pattern for your specific vehicle rather than assuming from vehicle class.</p>
   </div>
 </ToolPage>
-<script>import { initializeBoltPatternCalculator } from '../../../ui/bolt-pattern-calculator'; initializeBoltPatternCalculator();</script>
+<script>import { initializeBoltPatternCalculator } from '../../../ui/bolt-pattern-calculator'; import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; initializeBoltPatternCalculator(); initializeShareableToolState();</script>

@@ -4,6 +4,7 @@ import type { GarageState } from '../domain/garage';
 import type { FitmentComparisonResult } from '../domain/vehicle';
 import type { ValidationIssue } from '../domain/validation';
 import { formatNumber } from './format-number';
+import { getPageLocale, type UiLocale } from './page-locale';
 
 export type ProductSection = 'garage' | 'fitment' | 'tools';
 
@@ -11,69 +12,227 @@ function compactMetric(value: number): string {
   return String(Number(value.toFixed(3)));
 }
 
-const FIELD_NAMES: Readonly<Record<string, string>> = Object.freeze({
-  widthMm: 'tire width',
-  aspectRatio: 'tire profile',
-  rimDiameterInches: 'rim diameter',
-  wheelWidthInches: 'wheel width',
-  widthInches: 'wheel width',
-  diameterInches: 'wheel diameter',
-  offsetMm: 'wheel offset',
-  indicatedSpeed: 'indicated speed',
-  distance: 'distance',
-  fuelEconomy: 'fuel economy',
-  fuelPrice: 'fuel price',
-  extraCost: 'extra trip cost',
-  people: 'number of people',
-  pressure: 'pressure',
-  power: 'power',
-  torque: 'torque',
-  weight: 'vehicle weight',
-  measuredInnerClearanceMm: 'inner clearance',
-  measuredOuterClearanceMm: 'outer clearance',
-  minimumDesiredInnerClearanceMm: 'desired inner clearance',
-  minimumDesiredOuterClearanceMm: 'desired outer clearance',
+const FIELD_NAMES: Readonly<Record<UiLocale, Readonly<Record<string, string>>>> = Object.freeze({
+  en: {
+    widthMm: 'tire width',
+    aspectRatio: 'tire profile',
+    rimDiameterInches: 'rim diameter',
+    wheelWidthInches: 'wheel width',
+    widthInches: 'wheel width',
+    diameterInches: 'wheel diameter',
+    offsetMm: 'wheel offset',
+    indicatedSpeed: 'indicated speed',
+    distance: 'distance',
+    fuelEconomy: 'fuel economy',
+    fuelPrice: 'fuel price',
+    extraCost: 'extra trip cost',
+    people: 'number of people',
+    pressure: 'pressure',
+    power: 'power',
+    torque: 'torque',
+    weight: 'vehicle weight',
+    measuredInnerClearanceMm: 'inner clearance',
+    measuredOuterClearanceMm: 'outer clearance',
+    minimumDesiredInnerClearanceMm: 'desired inner clearance',
+    minimumDesiredOuterClearanceMm: 'desired outer clearance',
+  },
+  de: {
+    widthMm: 'Reifenbreite',
+    aspectRatio: 'Reifenprofil',
+    rimDiameterInches: 'Felgendurchmesser',
+    wheelWidthInches: 'Felgenbreite',
+    widthInches: 'Felgenbreite',
+    diameterInches: 'Felgendurchmesser',
+    offsetMm: 'Felgeneinpresstiefe',
+    indicatedSpeed: 'angezeigte Geschwindigkeit',
+    distance: 'Distanz',
+    fuelEconomy: 'Kraftstoffverbrauch',
+    fuelPrice: 'Kraftstoffpreis',
+    extraCost: 'zusätzliche Reisekosten',
+    people: 'Personenzahl',
+    pressure: 'Druck',
+    power: 'Leistung',
+    torque: 'Drehmoment',
+    weight: 'Fahrzeuggewicht',
+    measuredInnerClearanceMm: 'inneren Freigang',
+    measuredOuterClearanceMm: 'äußeren Freigang',
+    minimumDesiredInnerClearanceMm: 'gewünschten inneren Freigang',
+    minimumDesiredOuterClearanceMm: 'gewünschten äußeren Freigang',
+  },
+  es: {
+    widthMm: 'ancho del neumático',
+    aspectRatio: 'perfil del neumático',
+    rimDiameterInches: 'diámetro de llanta',
+    wheelWidthInches: 'ancho de llanta',
+    widthInches: 'ancho de llanta',
+    diameterInches: 'diámetro de llanta',
+    offsetMm: 'offset de llanta',
+    indicatedSpeed: 'velocidad indicada',
+    distance: 'distancia',
+    fuelEconomy: 'consumo de combustible',
+    fuelPrice: 'precio del combustible',
+    extraCost: 'gastos adicionales del viaje',
+    people: 'número de personas',
+    pressure: 'presión',
+    power: 'potencia',
+    torque: 'par motor',
+    weight: 'peso del vehículo',
+    measuredInnerClearanceMm: 'holgura interior',
+    measuredOuterClearanceMm: 'holgura exterior',
+    minimumDesiredInnerClearanceMm: 'holgura interior deseada',
+    minimumDesiredOuterClearanceMm: 'holgura exterior deseada',
+  },
 });
 
-export function validationIssueText(issue: ValidationIssue): string {
+const VALIDATION_TEXT = {
+  en: {
+    original: 'Original',
+    new: 'New',
+    tire: 'Tire',
+    invalidNumber: (label: string) => `Enter a valid ${label.toLowerCase()}.`,
+    wholeNumber: (label: string) => `${label} must be a whole number.`,
+    atLeastZero: (label: string) => `${label} must be zero or greater.`,
+    greaterThanZero: (label: string) => `${label} must be greater than zero.`,
+    between: (label: string, min: number, max: number) => `${label} must be between ${min} and ${max}.`,
+  },
+  de: {
+    original: 'Ursprünglicher',
+    new: 'Neuer',
+    tire: 'Reifen',
+    invalidNumber: (label: string) => `Geben Sie einen gültigen Wert für ${label.toLowerCase()} ein.`,
+    wholeNumber: (label: string) => `${label} muss eine ganze Zahl sein.`,
+    atLeastZero: (label: string) => `${label} muss null oder größer sein.`,
+    greaterThanZero: (label: string) => `${label} muss größer als null sein.`,
+    between: (label: string, min: number, max: number) => `${label} muss zwischen ${min} und ${max} liegen.`,
+  },
+  es: {
+    original: 'Original',
+    new: 'Nuevo',
+    tire: 'Neumático',
+    invalidNumber: (label: string) => `Introduzca un valor válido para ${label.toLowerCase()}.`,
+    wholeNumber: (label: string) => `${label} debe ser un número entero.`,
+    atLeastZero: (label: string) => `${label} debe ser cero o mayor.`,
+    greaterThanZero: (label: string) => `${label} debe ser mayor que cero.`,
+    between: (label: string, min: number, max: number) => `${label} debe estar entre ${min} y ${max}.`,
+  },
+} as const satisfies Record<UiLocale, {
+  original: string; new: string; tire: string;
+  invalidNumber: (label: string) => string; wholeNumber: (label: string) => string;
+  atLeastZero: (label: string) => string; greaterThanZero: (label: string) => string;
+  between: (label: string, min: number, max: number) => string;
+}>;
+
+export function validationIssueText(issue: ValidationIssue, locale: UiLocale = getPageLocale()): string {
+  const fieldNames = FIELD_NAMES[locale];
+  const text = VALIDATION_TEXT[locale];
   const parts = issue.field.split('.');
   const field = parts.at(-1) ?? issue.field;
-  const context = parts[0] === 'current' || parts[0] === 'original' ? 'Original' : parts[0] === 'proposed' || parts[0] === 'new' ? 'New' : parts[0] === 'tire' ? 'Tire' : '';
-  const label = `${context} ${FIELD_NAMES[field] ?? field}`.trim();
-  if (issue.code === 'not-a-number') return `Enter a valid ${label.toLowerCase()}.`;
-  if (issue.code === 'not-an-integer') return `${label} must be a whole number.`;
+  const context = parts[0] === 'current' || parts[0] === 'original' ? text.original : parts[0] === 'proposed' || parts[0] === 'new' ? text.new : parts[0] === 'tire' ? text.tire : '';
+  const label = `${context} ${fieldNames[field] ?? field}`.trim();
+  if (issue.code === 'not-a-number') return text.invalidNumber(label);
+  if (issue.code === 'not-an-integer') return text.wholeNumber(label);
+  if (issue.code === 'out-of-range' && issue.minimum !== undefined) {
+    if (issue.maximum !== undefined) return text.between(label, issue.minimum, issue.maximum);
+    return issue.minimum === 0 ? text.atLeastZero(label) : text.greaterThanZero(label);
+  }
   const message = issue.message.replace(field, label.toLowerCase());
   return `${message.charAt(0).toUpperCase()}${message.slice(1)}`;
 }
 
-export function measurementErrorGuidance(issues: readonly ValidationIssue[]) {
+const MEASUREMENT_GUIDANCE_TEXT = {
+  en: { message: 'We need your inner and outer clearance measurements first.', ctaLabel: 'Measure my car' },
+  de: { message: 'Wir benötigen zuerst Ihre gemessenen Werte für den inneren und äußeren Freigang.', ctaLabel: 'Mein Auto vermessen' },
+  es: { message: 'Primero necesitamos sus medidas de holgura interior y exterior.', ctaLabel: 'Medir mi coche' },
+} as const satisfies Record<UiLocale, { message: string; ctaLabel: string }>;
+
+export function measurementErrorGuidance(issues: readonly ValidationIssue[], locale: UiLocale = getPageLocale()) {
   const needsMeasurement = issues.some(({ field }) => field.includes('measuredInnerClearanceMm') || field.includes('measuredOuterClearanceMm'));
+  const text = MEASUREMENT_GUIDANCE_TEXT[locale];
   return needsMeasurement
-    ? Object.freeze({ message: 'We need your inner and outer clearance measurements first.', ctaLabel: 'Measure my car', href: '#measure-flow' })
+    ? Object.freeze({ message: text.message, ctaLabel: text.ctaLabel, href: '#measure-flow' })
     : null;
 }
 
-export function fitmentComparisonSummary(result: FitmentComparisonResult): string {
-  const diameterDirection = result.diameterDifferenceMm >= 0 ? 'larger' : 'smaller';
-  const outerDirection = result.wheelOuterPokeChangeMm >= 0 ? 'farther outward' : 'less outward';
-  const innerDirection = result.wheelInnerPositionChangeMm >= 0 ? 'farther inward' : 'less inward';
-  return `The new tire is ${formatNumber(Math.abs(result.diameterDifferenceMm))} mm ${diameterDirection} overall. The wheel reaches ${formatNumber(Math.abs(result.wheelOuterPokeChangeMm))} mm ${outerDirection} and ${formatNumber(Math.abs(result.wheelInnerPositionChangeMm))} mm ${innerDirection}.`;
+const FITMENT_COMPARISON_TEXT = {
+  en: {
+    larger: 'larger', smaller: 'smaller', fartherOutward: 'farther outward', lessOutward: 'less outward', fartherInward: 'farther inward', lessInward: 'less inward',
+    summary: (diameterMm: string, direction: string, outerMm: string, outerDirection: string, innerMm: string, innerDirection: string) =>
+      `The new tire is ${diameterMm} mm ${direction} overall. The wheel reaches ${outerMm} mm ${outerDirection} and ${innerMm} mm ${innerDirection}.`,
+  },
+  de: {
+    larger: 'größer', smaller: 'kleiner', fartherOutward: 'weiter nach außen', lessOutward: 'weniger weit nach außen', fartherInward: 'weiter nach innen', lessInward: 'weniger weit nach innen',
+    summary: (diameterMm: string, direction: string, outerMm: string, outerDirection: string, innerMm: string, innerDirection: string) =>
+      `Der neue Reifen ist insgesamt ${diameterMm} mm ${direction}. Das Rad reicht ${outerMm} mm ${outerDirection} und ${innerMm} mm ${innerDirection}.`,
+  },
+  es: {
+    larger: 'más grande', smaller: 'más pequeño', fartherOutward: 'más hacia afuera', lessOutward: 'menos hacia afuera', fartherInward: 'más hacia adentro', lessInward: 'menos hacia adentro',
+    summary: (diameterMm: string, direction: string, outerMm: string, outerDirection: string, innerMm: string, innerDirection: string) =>
+      `El nuevo neumático es ${diameterMm} mm ${direction} en total. La llanta llega ${outerMm} mm ${outerDirection} y ${innerMm} mm ${innerDirection}.`,
+  },
+} as const satisfies Record<UiLocale, {
+  larger: string; smaller: string; fartherOutward: string; lessOutward: string; fartherInward: string; lessInward: string;
+  summary: (diameterMm: string, direction: string, outerMm: string, outerDirection: string, innerMm: string, innerDirection: string) => string;
+}>;
+
+export function fitmentComparisonSummary(result: FitmentComparisonResult, locale: UiLocale = getPageLocale()): string {
+  const text = FITMENT_COMPARISON_TEXT[locale];
+  const diameterDirection = result.diameterDifferenceMm >= 0 ? text.larger : text.smaller;
+  const outerDirection = result.wheelOuterPokeChangeMm >= 0 ? text.fartherOutward : text.lessOutward;
+  const innerDirection = result.wheelInnerPositionChangeMm >= 0 ? text.fartherInward : text.lessInward;
+  return text.summary(
+    formatNumber(Math.abs(result.diameterDifferenceMm)), diameterDirection,
+    formatNumber(Math.abs(result.wheelOuterPokeChangeMm)), outerDirection,
+    formatNumber(Math.abs(result.wheelInnerPositionChangeMm)), innerDirection,
+  );
 }
 
-export const PRODUCT_NAVIGATION = Object.freeze([
-  { id: 'garage', label: 'Garage', href: '#garage' },
-  { id: 'fitment', label: 'Fitment', href: '#fitment' },
-  { id: 'tools', label: 'Tools', href: '#tools' },
-] as const);
+const PRODUCT_NAVIGATION_TEXT = {
+  en: { garage: 'Garage', fitment: 'Fitment', tools: 'Tools' },
+  de: { garage: 'Garage', fitment: 'Passform', tools: 'Tools' },
+  es: { garage: 'Garaje', fitment: 'Ajuste', tools: 'Herramientas' },
+} as const satisfies Record<UiLocale, { garage: string; fitment: string; tools: string }>;
+
+export function productNavigation(locale: UiLocale = getPageLocale()) {
+  const text = PRODUCT_NAVIGATION_TEXT[locale];
+  return Object.freeze([
+    { id: 'garage', label: text.garage, href: '#garage' },
+    { id: 'fitment', label: text.fitment, href: '#fitment' },
+    { id: 'tools', label: text.tools, href: '#tools' },
+  ] as const);
+}
+
+export const PRODUCT_NAVIGATION = productNavigation('en');
 
 export function wizardProgress(step: number, total = 5) {
   const current = Math.min(total, Math.max(1, Math.trunc(step)));
   return Object.freeze({ current, total, percent: (current / total) * 100, canGoBack: current > 1, canContinue: current < total });
 }
 
-export function resultCardModel(candidate: CombinedFitmentCandidate) {
+const RESULT_CARD_TEXT = {
+  en: {
+    meetsTargets: 'Meets the supplied geometric targets',
+    noOverlapNoTargets: 'No calculated wheel overlap in the supplied measurements',
+    missesTargets: 'Misses at least one supplied target without calculated overlap',
+    noOverlapLessClearance: 'No calculated overlap, but less measured clearance remains',
+  },
+  de: {
+    meetsTargets: 'Erfüllt die vorgegebenen geometrischen Zielwerte',
+    noOverlapNoTargets: 'Keine berechnete Radüberschneidung bei den angegebenen Messwerten',
+    missesTargets: 'Verfehlt mindestens einen vorgegebenen Zielwert, ohne berechnete Überschneidung',
+    noOverlapLessClearance: 'Keine berechnete Überschneidung, aber weniger gemessener Freigang bleibt übrig',
+  },
+  es: {
+    meetsTargets: 'Cumple los objetivos geométricos indicados',
+    noOverlapNoTargets: 'Sin solapamiento calculado de la llanta en las medidas indicadas',
+    missesTargets: 'No alcanza al menos un objetivo indicado sin solapamiento calculado',
+    noOverlapLessClearance: 'Sin solapamiento calculado, pero queda menos holgura medida',
+  },
+} as const satisfies Record<UiLocale, { meetsTargets: string; noOverlapNoTargets: string; missesTargets: string; noOverlapLessClearance: string }>;
+
+export function resultCardModel(candidate: CombinedFitmentCandidate, locale: UiLocale = getPageLocale()) {
   const state = candidate.wheelGeometry.state;
   const hasUserTargets = candidate.explanation.constraints.length > 0;
+  const text = RESULT_CARD_TEXT[locale];
   return Object.freeze({
     rank: candidate.rank,
     wheelPrimary: `${candidate.setup.wheel.diameterInches} × ${candidate.setup.wheel.widthInches}J`,
@@ -84,23 +243,30 @@ export function resultCardModel(candidate: CombinedFitmentCandidate) {
     stateSummary:
       state === 'green'
         ? hasUserTargets
-          ? 'Meets the supplied geometric targets'
-          : 'No calculated wheel overlap in the supplied measurements'
+          ? text.meetsTargets
+          : text.noOverlapNoTargets
         : hasUserTargets
-          ? 'Misses at least one supplied target without calculated overlap'
-          : 'No calculated overlap, but less measured clearance remains',
+          ? text.missesTargets
+          : text.noOverlapLessClearance,
   });
 }
 
-export function mapCellPresentation(cell: FitmentMapCell, selected: boolean) {
+const MAP_CELL_TEXT = {
+  en: { checked: 'CHECKED', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projected inner ${innerMm} mm; projected outer ${outerMm} mm` },
+  de: { checked: 'GEPRÜFT', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projizierter innerer Freigang ${innerMm} mm; projizierter äußerer Freigang ${outerMm} mm` },
+  es: { checked: 'VERIFICADO', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; holgura interior proyectada ${innerMm} mm; holgura exterior proyectada ${outerMm} mm` },
+} as const satisfies Record<UiLocale, { checked: string; ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => string }>;
+
+export function mapCellPresentation(cell: FitmentMapCell, selected: boolean, locale: UiLocale = getPageLocale()) {
+  const text = MAP_CELL_TEXT[locale];
   const neutral = cell.reasons?.includes('no-targets') ?? false;
-  const stateLabel = neutral ? 'CHECKED' : cell.state.toUpperCase();
+  const stateLabel = neutral ? text.checked : cell.state.toUpperCase();
   const symbol = neutral ? '•' : cell.state === 'green' ? '✓' : cell.state === 'yellow' ? '!' : '×';
   return Object.freeze({
     stateLabel,
     symbol,
     selected,
-    ariaLabel: `${cell.wheelWidthInches}J ET${cell.offsetMm}: ${stateLabel}; projected inner ${compactMetric(cell.projectedInnerClearanceMm)} mm; projected outer ${compactMetric(cell.projectedOuterClearanceMm)} mm`,
+    ariaLabel: text.ariaLabel(cell.wheelWidthInches, cell.offsetMm, stateLabel, compactMetric(cell.projectedInnerClearanceMm), compactMetric(cell.projectedOuterClearanceMm)),
   });
 }
 

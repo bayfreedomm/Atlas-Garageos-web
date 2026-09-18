@@ -27,7 +27,7 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
-    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(21);
+    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(22);
     expect(hub).toContain('<ToolDirectory mode="all"');
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('data-tool-search-form');

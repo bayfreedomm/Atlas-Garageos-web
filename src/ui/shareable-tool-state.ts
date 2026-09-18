@@ -1,3 +1,11 @@
+import { getPageLocale } from './page-locale';
+
+const SHARE_LABELS = {
+  en: { copied: 'Link copied', prompt: 'Copy this link' },
+  de: { copied: 'Link kopiert', prompt: 'Diesen Link kopieren' },
+  es: { copied: 'Enlace copiado', prompt: 'Copiar este enlace' },
+} as const;
+
 const value = (form: HTMLFormElement, name: string): string => (form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '';
 const setValue = (form: HTMLFormElement, name: string, next: string): void => {
   const field = form.elements.namedItem(name) as HTMLInputElement | null;
@@ -19,13 +27,14 @@ function currentUrlWith(params: URLSearchParams): string {
 }
 
 async function copy(button: HTMLButtonElement, url: string): Promise<void> {
+  const labels = SHARE_LABELS[getPageLocale()];
   try {
     await navigator.clipboard.writeText(url);
     const original = button.textContent;
-    button.textContent = 'Link copied';
+    button.textContent = labels.copied;
     window.setTimeout(() => { button.textContent = original; }, 1600);
   } catch {
-    window.prompt('Copy this link', url);
+    window.prompt(labels.prompt, url);
   }
 }
 
@@ -69,7 +78,32 @@ function initializeWheelOffset(form: HTMLFormElement): void {
   });
 }
 
+function initializeTireSizePrefill(form: HTMLFormElement): void {
+  const params = new URLSearchParams(window.location.search);
+  const token = parseTireToken(params.get('size'));
+  if (!token) return;
+  setValue(form, 'widthMm', token[0]);
+  setValue(form, 'aspectRatio', token[1]);
+  setValue(form, 'rimDiameterInches', token[2]);
+  form.dispatchEvent(new Event('input', { bubbles: true }));
+  form.requestSubmit();
+}
+
+function initializeBoltPatternPrefill(form: HTMLFormElement): void {
+  const params = new URLSearchParams(window.location.search);
+  const lugs = params.get('lugs');
+  const spacing = params.get('spacing');
+  if (!lugs && !spacing) return;
+  if (lugs && Number.isFinite(Number(lugs))) setValue(form, 'lugCount', lugs);
+  if (spacing && Number.isFinite(Number(spacing))) setValue(form, 'spacing', spacing);
+  setValue(form, 'spacingUnit', 'mm');
+  form.dispatchEvent(new Event('input', { bubbles: true }));
+  form.requestSubmit();
+}
+
 export function initializeShareableToolState(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-comparison"]').forEach(initializeTireComparison);
   document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach(initializeWheelOffset);
+  document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach(initializeTireSizePrefill);
+  document.querySelectorAll<HTMLFormElement>('[data-calculator="bolt-pattern"]').forEach(initializeBoltPatternPrefill);
 }

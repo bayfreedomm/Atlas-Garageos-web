@@ -27,6 +27,7 @@ const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'tire-load-speed-rating': ['Code meets capacity', 'Load index and speed rating'],
   'compression-ratio-calculator': ['Volumes meet each other', 'Swept and clearance volume'],
   'tire-date-code-decoder': ['Sidewall meets calendar', 'Week and year of manufacture'],
+  'vehicle-fitment-finder': ['Make and model, decoded', 'OEM tire size and bolt pattern'],
 };
 const [title, copy] = labels[definition.id];
 ---
