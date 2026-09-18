@@ -1,1 +1,0 @@
-import{t as e}from"./gear-ratio-calculator.BAjxXJDS.js";e();

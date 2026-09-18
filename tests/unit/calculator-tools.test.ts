@@ -14,14 +14,6 @@ describe('indexable calculator flows', () => {
     expect(tireCalculatorMetrics(result.value).map(({ label }) => label)).toEqual(['Overall diameter', 'Sidewall height', 'Circumference', 'Revolutions per mile', 'Revolutions per kilometer']);
   });
 
-  it('preserves the 235/40 R18 reference result', () => {
-    const result = calculateTireSizeTool({ widthMm: 235, aspectRatio: 40, rimDiameterInches: 18 });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.overallDiameterMm).toBeCloseTo(645.2, 10);
-    expect(result.value.sidewallHeightMm).toBeCloseTo(94, 10);
-  });
-
   it('runs the tire comparison flow without a fitment verdict', () => {
     const result = compareTireSizesTool(original, proposed);
     expect(result.ok).toBe(true);

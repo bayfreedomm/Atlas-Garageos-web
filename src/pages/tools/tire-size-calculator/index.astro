@@ -3,42 +3,13 @@ import ToolPage from '../../../components/ToolPage.astro';
 import TireSizeTechnicalVisual from '../../../components/TireSizeTechnicalVisual.astro';
 import TireCodeExplainer from '../../../components/TireCodeExplainer.astro';
 import { toolById } from '../../../seo/tool-registry';
-
 const definition = toolById('tire-size-calculator');
 ---
-<ToolPage
-  {definition}
-  visual={false}
-  eyebrow="Tires & wheels"
-  intro="Enter the three numbers on your tire sidewall to see its diameter, sidewall and rolling distance."
-  limitation="These are nominal geometric calculations. Real dimensions vary by tire model, rim width, pressure, load, and manufacturer tolerances."
-  studioCta="Open Wheel & Tire Compare"
->
+<ToolPage {definition} visual={false} eyebrow="Tires & wheels" intro="Enter the three numbers printed on a metric tire sidewall to calculate its physical dimensions and rolling distance." limitation="These are nominal geometric calculations. Real dimensions vary by tire model, rim width, pressure, load, and manufacturer tolerances." studioCta="Open Wheel & Tire Compare">
   <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
-    <fieldset class="calculator-group tire-size-inputs">
-      <legend>Tire size</legend>
-      <div class="tire-input-row">
-        <label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label>
-        <span aria-hidden="true">/</span>
-        <label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label>
-        <span aria-hidden="true">R</span>
-        <label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label>
-      </div>
-    </fieldset>
-    <button type="submit">Calculate tire dimensions</button>
-    <div class="inline-errors" data-errors role="alert" hidden></div>
-    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p>
-    <TireSizeTechnicalVisual />
-    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <fieldset><legend>Tire size</legend><div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
+    <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p><TireSizeTechnicalVisual /><dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
-
-  <div slot="explanation">
-    <TireCodeExplainer />
-    <h2>How the geometry is calculated</h2>
-    <p>Sidewall height is width multiplied by the profile percentage. Two sidewalls plus the rim diameter, converted from inches to millimetres, gives overall diameter.</p>
-    <p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p>
-    <h2>Why the size on the sidewall matters</h2>
-    <p>A tire's overall diameter sets how far your car travels per wheel rotation. Compare a replacement with the <a href="/tools/tire-size-comparison/">Tire Size Comparison</a>, or check the effect with the <a href="/tools/speedometer-error-calculator/">Speedometer Error Calculator</a>.</p>
-  </div>
+  <div slot="explanation"><TireCodeExplainer /><h2>How the geometry is calculated</h2><p>Sidewall height is width multiplied by the profile percentage. Two sidewalls plus the rim diameter, converted from inches to millimetres, gives overall diameter.</p><p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p><h2>Why the size on the sidewall actually matters</h2><p>A tire's overall diameter sets how far your car travels per wheel rotation. Fit a noticeably taller or shorter tire and your speedometer starts reading the wrong number — check the real difference with the <a href="/tools/speedometer-error-calculator/">Speedometer Error Calculator</a>. The same diameter change also shifts your effective gearing, which the <a href="/tools/gear-ratio-calculator/">Gear Ratio Calculator</a> shows directly.</p></div>
 </ToolPage>
 <script>import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeToolCalculators();</script>
