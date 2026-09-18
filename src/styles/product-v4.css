@@ -499,6 +499,30 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 @media(max-width:47.999rem){.tool-machine .utility-fields,.tool-machine .gear-ratio-inputs{grid-template-columns:minmax(0,1fr)!important}.utility-fields>label,.instant-input>label{min-width:0;width:100%}.utility-fields input,.utility-fields select,.instant-input input,.instant-input select{width:100%;min-width:0}}
 @media(max-width:26rem){.tool-workspace{padding:.75rem!important}.utility-fields,.instant-input,.ev-visual-stats{grid-template-columns:1fr!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.5rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.5rem!important;height:2.5rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
 
+/* V5.1 — Tire Size returns to the shared tool shell with denser mobile controls. */
+@media(max-width:47.999rem){
+  .tool-machine--tire-size-calculator .tool-intro{grid-template-columns:2.3rem minmax(0,1fr)!important;gap:.58rem!important;padding:.38rem 0 .68rem!important}
+  .tool-machine--tire-size-calculator .tool-intro .tool-icon{width:2.3rem!important;height:2.3rem!important;border-radius:.62rem!important}
+  .tool-machine--tire-size-calculator .tool-intro .eyebrow{margin-bottom:.18rem!important;font-size:.57rem!important;letter-spacing:.1em!important}
+  .tool-machine--tire-size-calculator .tool-intro h1{margin-bottom:.28rem!important;font-size:clamp(1.42rem,6.3vw,1.75rem)!important;line-height:1.05!important;letter-spacing:-.04em!important}
+  .tool-machine--tire-size-calculator .tool-intro .hero-copy{font-size:.78rem!important;line-height:1.38!important}
+  .tool-machine--tire-size-calculator .tool-workspace{padding:.7rem!important}
+  .tool-machine--tire-size-calculator .calculator-form{gap:.68rem!important}
+  .tool-machine--tire-size-calculator .calculator-group{padding:.68rem!important;border-radius:.75rem!important}
+  .tool-machine--tire-size-calculator .calculator-group legend{margin-bottom:.45rem!important;font-size:.78rem!important}
+  .tool-machine--tire-size-calculator .tire-input-row{gap:.22rem!important}
+  .tool-machine--tire-size-calculator .tire-input-row label{gap:.25rem!important;font-size:.66rem!important}
+  .tool-machine--tire-size-calculator .tire-input-row input{height:2.72rem!important;padding-inline:.48rem!important;border-radius:.58rem!important;font-size:.88rem!important}
+  .tool-machine--tire-size-calculator .tire-input-row>span{padding-bottom:.82rem!important;font-size:.78rem!important}
+  .tool-machine--tire-size-calculator .calculator-form>button{min-height:2.95rem!important;border-radius:.68rem!important;font-size:.85rem!important}
+  .tool-machine--tire-size-calculator .result-summary{padding:.72rem .78rem!important;font-size:.82rem!important}
+  .tool-machine--tire-size-calculator .single-tire-visual{margin-top:.15rem;padding:.68rem;border-radius:.8rem}
+  .tool-machine--tire-size-calculator .single-tire-visual figcaption strong{font-size:.86rem}
+  .tool-machine--tire-size-calculator .single-tire-visual figcaption p{font-size:.66rem}
+  .tool-machine--tire-size-calculator .single-tire-card--facts{padding:.6rem;gap:.42rem}
+  .tool-machine--tire-size-calculator .single-tire-card--facts>div{padding:.55rem}
+}
+
 /* V4.7 — Homepage Concept B: real car, real context.
    The photographic hero remains dark in both themes; light mode applies to the product surface below it.
    This avoids low-contrast hero text and removes the dashboard/diagram-first homepage feel. */

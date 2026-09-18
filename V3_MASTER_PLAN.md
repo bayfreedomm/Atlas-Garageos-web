@@ -180,3 +180,9 @@ Next implementation pass:
 - [x] Browser QA at 390px, tablet, and desktop completed with no document-level horizontal overflow in the sampled release-critical pages.
 - [x] Root-English routes, 20 legacy `/en/...` 301 rules, canonical, hreflang, sitemap, manifest, and internal links verified.
 - [x] 106 tests passed; typecheck and production build clean. RC1 requires only deployed HTTP checks and the planned physical-device acceptance pass.
+
+## V5.1 checkpoint — Tire Size shared-shell return
+- [x] User-directed reversal of the 2026-09-17 independent Tire Size shell: the public root-English Tire Size Calculator now uses the same `ToolPage` shell, navigation, insights and content hierarchy as the other calculators.
+- [x] The live technical tire visual and the established calculation/domain behavior are preserved.
+- [x] Tire Size receives page-specific mobile density only: smaller intro typography, compact three-part size inputs, a shorter action button and tighter result/visual spacing.
+- [x] 390 px browser QA shows no document-level horizontal overflow; 107 tests, Astro typecheck and the static production build pass.

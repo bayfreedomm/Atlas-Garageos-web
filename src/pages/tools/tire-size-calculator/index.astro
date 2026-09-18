@@ -1,60 +1,44 @@
 ---
-import TireCalculatorDiagram from '../../../components/TireCalculatorDiagram.astro';
-import TireCalculatorLayout from '../../../components/TireCalculatorLayout.astro';
+import ToolPage from '../../../components/ToolPage.astro';
+import TireSizeTechnicalVisual from '../../../components/TireSizeTechnicalVisual.astro';
+import TireCodeExplainer from '../../../components/TireCodeExplainer.astro';
 import { toolById } from '../../../seo/tool-registry';
 
 const definition = toolById('tire-size-calculator');
 ---
-<TireCalculatorLayout {definition}>
-  <article class="tire-page">
-    <header class="tire-page__intro">
-      <p class="tire-page__category">Tire tools</p>
-      <h1>Tire Size Calculator</h1>
-      <p>Enter your tire size and see the key measurements instantly.</p>
-    </header>
+<ToolPage
+  {definition}
+  visual={false}
+  eyebrow="Tires & wheels"
+  intro="Enter the three numbers on your tire sidewall to see its diameter, sidewall and rolling distance."
+  limitation="These are nominal geometric calculations. Real dimensions vary by tire model, rim width, pressure, load, and manufacturer tolerances."
+  studioCta="Open Wheel & Tire Compare"
+>
+  <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
+    <fieldset class="calculator-group tire-size-inputs">
+      <legend>Tire size</legend>
+      <div class="tire-input-row">
+        <label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label>
+        <span aria-hidden="true">/</span>
+        <label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label>
+        <span aria-hidden="true">R</span>
+        <label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label>
+      </div>
+    </fieldset>
+    <button type="submit">Calculate tire dimensions</button>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p>
+    <TireSizeTechnicalVisual />
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
 
-    <form class="tire-calculator" data-tire-calculator novalidate>
-      <section class="calculator-panel" aria-labelledby="tire-input-heading">
-        <div class="calculator-panel__heading"><h2 id="tire-input-heading">Your tire</h2><output data-compact-code>235 / 40 R18</output></div>
-        <div class="tire-fields">
-          <label><span>Width</span><span class="tire-field"><input name="widthMm" type="number" value="235" min="80" max="500" inputmode="numeric" /><small>mm</small></span></label>
-          <span class="tire-separator" aria-hidden="true">/</span>
-          <label><span>Aspect</span><span class="tire-field"><input name="aspectRatio" type="number" value="40" min="20" max="100" inputmode="numeric" /><small>%</small></span></label>
-          <span class="tire-separator" aria-hidden="true">R</span>
-          <label><span>Rim</span><span class="tire-field"><input name="rimDiameterInches" type="number" value="18" min="8" max="30" step="0.5" inputmode="decimal" /><small>in</small></span></label>
-        </div>
-        <div class="tire-errors" data-errors role="alert" hidden></div>
-        <button type="submit"><span>Calculate</span><span aria-hidden="true">→</span></button>
-      </section>
-
-      <section class="result-panel" aria-labelledby="primary-result-label" aria-live="polite">
-        <div class="primary-result"><div><p id="primary-result-label">Overall diameter</p><output data-overall-diameter>645.2 <small>mm</small></output></div><span class="primary-result__status"><i></i> Calculated</span></div>
-        <TireCalculatorDiagram />
-        <dl class="metric-rows">
-          <div><dt>Sidewall height</dt><dd data-sidewall>94.0 mm</dd></div>
-          <div><dt>Circumference</dt><dd data-circumference>2,027.0 mm</dd></div>
-          <div><dt>Revolutions / km</dt><dd data-revs-km>493.3</dd></div>
-        </dl>
-      </section>
-    </form>
-
-    <section class="meaning-section" aria-labelledby="meaning-heading">
-      <p class="section-index">01 — Interpretation</p><h2 id="meaning-heading">What this means</h2>
-      <p data-meaning>A 235/40 R18 tire is 645.2 mm tall overall. Its 94.0 mm sidewall sits between the road and the 18-inch rim.</p>
-    </section>
-
-    <section class="seo-content" aria-labelledby="method-heading">
-      <p class="section-index">02 — Method</p><h2 id="method-heading">How the size becomes a measurement</h2>
-      <p>The sidewall is the tire width multiplied by its aspect ratio. Overall diameter adds two sidewalls to the rim diameter after converting inches to millimetres.</p>
-      <p><strong>Keep in mind:</strong> these are nominal dimensions. Actual tires vary by model, rim width, pressure, load and manufacturer tolerances.</p>
-    </section>
-
-    <nav class="related-links" aria-labelledby="related-heading">
-      <p class="section-index">03 — Continue</p><h2 id="related-heading">Related tools</h2>
-      <a href="/tools/tire-size-comparison/"><span>Tire Size Comparison</span><b aria-hidden="true">↗</b></a>
-      <a href="/tools/wheel-offset-calculator/"><span>Wheel Offset Calculator</span><b aria-hidden="true">↗</b></a>
-      <a href="/tools/speedometer-error-calculator/"><span>Speedometer Difference</span><b aria-hidden="true">↗</b></a>
-    </nav>
-  </article>
-</TireCalculatorLayout>
-<script>import { initializeTireSizeCalculator } from '../../../ui/tire-size-calculator'; initializeTireSizeCalculator();</script>
+  <div slot="explanation">
+    <TireCodeExplainer />
+    <h2>How the geometry is calculated</h2>
+    <p>Sidewall height is width multiplied by the profile percentage. Two sidewalls plus the rim diameter, converted from inches to millimetres, gives overall diameter.</p>
+    <p>Diameter and circumference describe rolling geometry. Revolutions show the theoretical number of rotations over one mile or kilometre.</p>
+    <h2>Why the size on the sidewall matters</h2>
+    <p>A tire's overall diameter sets how far your car travels per wheel rotation. Compare a replacement with the <a href="/tools/tire-size-comparison/">Tire Size Comparison</a>, or check the effect with the <a href="/tools/speedometer-error-calculator/">Speedometer Error Calculator</a>.</p>
+  </div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeToolCalculators();</script>

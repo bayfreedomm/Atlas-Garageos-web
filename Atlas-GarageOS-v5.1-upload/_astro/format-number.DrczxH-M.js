@@ -1,0 +1,1 @@
+var e=e=>({ok:!0,value:e}),t=(...e)=>({ok:!1,issues:e});function n(e,t=2,n=`en`){return new Intl.NumberFormat(n,{maximumFractionDigits:t}).format(e)}export{t as n,e as r,n as t};
