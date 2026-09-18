@@ -4,16 +4,25 @@
     <section class="single-tire-card single-tire-card--hero">
       <svg viewBox="0 0 420 300" role="img" aria-label="Technical tire illustration with live dimensions">
         <defs>
-          <radialGradient id="singleTireBody" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#64717a"/><stop offset=".52" stop-color="#232c33"/><stop offset="1" stop-color="#0c1115"/></radialGradient>
+          <radialGradient id="singleTireBody" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#333d45"/><stop offset=".6" stop-color="#181f25"/><stop offset="1" stop-color="#0a0e12"/></radialGradient>
+          <radialGradient id="singleSidewall" cx="45%" cy="38%" r="72%"><stop offset="0" stop-color="#3c464e"/><stop offset="1" stop-color="#20282e"/></radialGradient>
           <radialGradient id="singleRim" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f2f5f7"/><stop offset=".55" stop-color="#9caab4"/><stop offset="1" stop-color="#394650"/></radialGradient>
         </defs>
         <path class="single-ground" d="M45 248H375"/>
         <g data-single-tire-wheel transform="translate(210 145)">
           <ellipse data-single-tire-body cx="0" cy="0" rx="94" ry="110" fill="url(#singleTireBody)"/>
+          <ellipse class="single-tread-ring" cx="0" cy="0" rx="94" ry="110" fill="none"/>
+          <ellipse cx="0" cy="0" rx="72" ry="84" fill="url(#singleSidewall)"/>
           <ellipse data-single-tire-rim cx="0" cy="0" rx="55" ry="64" fill="url(#singleRim)"/>
+          <path class="single-spoke" d="M0 0 0-46M0 0 40-15M0 0 25 41M0 0-25 41M0 0-40-15"/>
           <ellipse cx="0" cy="0" rx="16" ry="18" class="single-hub"/>
-          <path class="single-spokes" d="M0-54V54M-46-27 46 27M-46 27 46-27M-52 0H52"/>
-          <path class="single-tread" d="M-60-90l18 16-16 18 18 16-17 18m117-88-18 16 16 18-18 16 17 18"/>
+          <g class="single-lugs">
+            <circle class="single-lug" cx="0" cy="-24" r="2.6"/>
+            <circle class="single-lug" cx="21" cy="-8" r="2.6"/>
+            <circle class="single-lug" cx="13" cy="21" r="2.6"/>
+            <circle class="single-lug" cx="-13" cy="21" r="2.6"/>
+            <circle class="single-lug" cx="-21" cy="-8" r="2.6"/>
+          </g>
         </g>
         <g class="single-measure single-measure--width"><path data-single-width-line d="M116 22H304"/><path d="M116 16v12M304 16v12"/><text data-single-width-text x="210" y="13" text-anchor="middle">225 mm width</text></g>
         <g class="single-measure single-measure--diameter"><path data-single-diameter-line d="M86 35V255"/><path d="M78 35h16M78 255h16"/><text data-single-diameter-text x="54" y="148" text-anchor="middle">659.7 mm</text></g>
