@@ -1,4 +1,11 @@
 /* Atlas GarageOS V4 — approved visual direction: dark automotive chrome + bright calculator surfaces. */
+/* THIS FILE IS THE AUTHORITATIVE LAYER for page-header sizing (.directory-identity, .tool-intro, .app-header height).
+   It loads last (see SiteLayout.astro) and every rule below that touches these selectors is !important on purpose,
+   so it always wins over the older declarations still sitting in global.css and product-v3.css for the same
+   selectors. Those older declarations are dead weight for sizing/spacing — do not "fix" a header/hero spacing
+   issue by adding yet another override in global.css or product-v3.css; change the value here instead. If you
+   have time to do a real cleanup, the long-term fix is deleting the superseded sizing rules from those two files
+   so there is exactly one definition per selector, not three fighting each other. */
 :root {
   --v4-blue:#0878f9; --v4-blue-2:#0a67d8; --v4-navy:#07131d; --v4-navy-2:#0b1c29;
   --v4-paper:#f6f8fb; --v4-card:#fff; --v4-ink:#152232; --v4-muted:#667486; --v4-line:#dce3ea;
@@ -32,7 +39,7 @@ main{padding-top:0!important}.breadcrumbs{margin-top:1rem}.breadcrumbs a{color:v
 .insight-alert--mistake{background:#fff8e8!important;border-color:#f5cc79!important}.insight-alert--warning{background:#fff0ee!important;border-color:#f0aaa2!important}
 
 /* Directory */
-.directory-identity{padding:1.5rem 0 .8rem!important}.directory-identity h1{font-size:clamp(2.4rem,9vw,4rem)!important}.toolbox{padding:1rem!important;border:1px solid var(--color-line);border-radius:1.15rem;background:#fff;box-shadow:var(--shadow-sm)}.toolbox-search{background:#f5f8fb!important;border-color:#dce5ed!important}.category-filters button[aria-pressed="true"]{background:#eaf4ff!important;border-color:#87bef5!important;color:#0868c6!important}.tool-row{background:#fff!important;border-color:#e0e7ee!important}.fitment-directory-row{background:linear-gradient(135deg,#081722,#0d2d44)!important;border-color:#174968!important;color:#fff!important}
+.directory-identity{padding:.7rem 0 .55rem!important}.directory-identity h1{font-size:clamp(1.65rem,3.4vw,2.35rem)!important}.toolbox{padding:1rem!important;border:1px solid var(--color-line);border-radius:1.15rem;background:#fff;box-shadow:var(--shadow-sm)}.toolbox-search{background:#f5f8fb!important;border-color:#dce5ed!important}.category-filters button[aria-pressed="true"]{background:#eaf4ff!important;border-color:#87bef5!important;color:#0868c6!important}.tool-row{background:#fff!important;border-color:#e0e7ee!important}.fitment-directory-row{background:linear-gradient(135deg,#081722,#0d2d44)!important;border-color:#174968!important;color:#fff!important}
 
 /* Mobile dock */
 .site-footer{padding-bottom:2rem!important}
@@ -142,8 +149,8 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .tool-visual-wrap { margin-top:0!important; padding-top:.2rem!important; border-top:0!important; }
 .tool-visual-label { margin:.25rem 0 .7rem!important; color:var(--color-accent)!important; }
 
-.tool-intro { padding:.85rem 0 .65rem!important; }
-.tool-intro h1 { font-size:clamp(1.9rem,7.6vw,3rem)!important; line-height:1.02!important; }
+.tool-intro { padding:.7rem 0 .55rem!important; }
+.tool-intro h1 { font-size:clamp(1.55rem,3.2vw,2.15rem)!important; line-height:1.08!important; }
 .tool-intro .hero-copy { margin-top:.55rem!important; font-size:.92rem!important; line-height:1.5!important; }
 .tool-workspace { padding:.9rem!important; }
 
@@ -269,7 +276,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
   .home-category-grid a span{font-size:.88rem!important}.home-category-grid a small{font-size:.68rem!important;line-height:1.35!important}
   .tool-launch-list{gap:.52rem!important}.tool-launch-row{min-height:4.35rem!important;padding:.68rem .75rem!important;border-radius:.9rem!important}
   .tool-launch-row .tool-icon{width:2.65rem!important;height:2.65rem!important}.tool-launch-row strong{font-size:.88rem!important}.tool-launch-row small{font-size:.68rem!important}
-  .directory-identity{padding:1.05rem 0 .55rem!important}.directory-identity h1{font-size:clamp(2.05rem,9vw,3rem)!important}
+  .directory-identity{padding:.6rem 0 .5rem!important}.directory-identity h1{font-size:clamp(1.5rem,7vw,1.9rem)!important}
   .toolbox{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
   .toolbox-search{padding:.75rem!important;border-radius:.9rem!important}.category-filters{margin:.7rem 0 .9rem!important;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:.15rem}.category-filters button{flex:0 0 auto!important;padding:.62rem .82rem!important}
   .tool-row{min-height:4.55rem!important;padding:.72rem .8rem!important;border-radius:.95rem!important}.tool-row .tool-icon{width:2.75rem!important;height:2.75rem!important}.tool-row__copy strong{font-size:.9rem!important}.tool-row__copy small{font-size:.68rem!important}

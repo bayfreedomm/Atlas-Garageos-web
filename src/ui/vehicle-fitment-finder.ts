@@ -109,7 +109,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
   },
 } as const;
 
-function formatTorque(t: typeof TEXT['en'], vehicle: VehicleFitment): string {
+function formatTorque(vehicle: VehicleFitment): string {
   if (vehicle.torqueNm === undefined) return '—';
   const lbFt = vehicle.torqueLbFt !== undefined ? ` (${vehicle.torqueLbFt} lb-ft)` : '';
   return `${vehicle.torqueNm} Nm${lbFt}`;
@@ -170,7 +170,7 @@ export function initializeVehicleFitmentFinder(): void {
         [t.boltPattern, vehicle.boltPattern],
         [t.wheelSize, vehicle.wheelSize],
         ...(vehicle.centerBoreMm !== undefined ? [[t.centerBore, `${vehicle.centerBoreMm} mm`] as const] : []),
-        [t.torque, formatTorque(t, vehicle)],
+        [t.torque, formatTorque(vehicle)],
         [t.fastener, vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt],
       ]);
       if (confidenceEl) { confidenceEl.textContent = t.confidence[vehicle.confidence]; confidenceEl.dataset.confidence = vehicle.confidence; }
