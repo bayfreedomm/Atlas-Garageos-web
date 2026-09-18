@@ -1,0 +1,145 @@
+import { vehicleMakes, vehiclesByMake, vehicleById, type VehicleFitment } from '../data/vehicle-fitment';
+import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model-index';
+import { getSelectedVehicle, setSelectedVehicle } from './vehicle-storage';
+
+const UNVERIFIED_PREFIX = 'name:';
+const TIRE_TOKEN = /^(\d+)\/(\d+)R(\d+(?:\.\d+)?)/;
+
+type PickerTarget = 'tire-size' | 'bolt-pattern';
+
+const setFieldValue = (form: HTMLFormElement, name: string, next: string): void => {
+  const field = form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null;
+  if (field) field.value = next;
+};
+
+function applyToTireSizeForm(vehicle: VehicleFitment): boolean {
+  const form = document.querySelector<HTMLFormElement>('[data-calculator="tire-size"]');
+  const match = vehicle.tireSize.match(TIRE_TOKEN);
+  if (!form || !match) return false;
+  setFieldValue(form, 'widthMm', match[1]!);
+  setFieldValue(form, 'aspectRatio', match[2]!);
+  setFieldValue(form, 'rimDiameterInches', match[3]!);
+  form.dispatchEvent(new Event('input', { bubbles: true }));
+  form.requestSubmit();
+  return true;
+}
+
+function applyToBoltPatternForm(vehicle: VehicleFitment): boolean {
+  const form = document.querySelector<HTMLFormElement>('[data-calculator="bolt-pattern"]');
+  if (!form) return false;
+  setFieldValue(form, 'lugCount', String(vehicle.lugCount));
+  setFieldValue(form, 'spacing', String(vehicle.spacingMm));
+  setFieldValue(form, 'spacingUnit', 'mm');
+  form.dispatchEvent(new Event('input', { bubbles: true }));
+  form.requestSubmit();
+  return true;
+}
+
+function hasFieldFor(target: PickerTarget, vehicle: VehicleFitment): boolean {
+  return target === 'tire-size' ? TIRE_TOKEN.test(vehicle.tireSize) : true;
+}
+
+function fieldSummary(target: PickerTarget, vehicle: VehicleFitment): string {
+  return target === 'tire-size' ? `OEM tire size ${vehicle.tireSize}` : `Bolt pattern ${vehicle.boltPattern}`;
+}
+
+export function initializeVehicleFitmentPicker(): void {
+  document.querySelectorAll<HTMLElement>('[data-vehicle-fitment-picker]').forEach((root) => {
+    const target = root.dataset.vfpTarget as PickerTarget | undefined;
+    const makeSelect = root.querySelector<HTMLSelectElement>('[data-vfp-make]');
+    const modelSelect = root.querySelector<HTMLSelectElement>('[data-vfp-model]');
+    const resultEl = root.querySelector<HTMLElement>('[data-vfp-result]');
+    const applyButton = root.querySelector<HTMLButtonElement>('[data-vfp-apply]');
+    if (!target || !makeSelect || !modelSelect || !resultEl || !applyButton) return;
+
+    const allMakes = Object.freeze([...new Set([...vehicleMakes(), ...indexedVehicleMakes()])].sort((a, b) => a.localeCompare(b)));
+    makeSelect.replaceChildren(new Option('Choose a make', ''), ...allMakes.map((make) => new Option(make, make)));
+
+    const populateModels = (make: string, selectValue?: string): void => {
+      if (!make) { modelSelect.replaceChildren(new Option('Choose a make first', '')); modelSelect.disabled = true; return; }
+      const verified = vehiclesByMake(make);
+      const verifiedModelNames = new Set(verified.map((vehicle) => vehicle.model.toLowerCase()));
+      const unverifiedModels = indexedModelsForMake(make).filter((model) => !verifiedModelNames.has(model.toLowerCase()));
+      modelSelect.replaceChildren(
+        new Option('Choose a model', ''),
+        ...verified.map((vehicle) => new Option(vehicle.model, vehicle.id)),
+        ...unverifiedModels.map((model) => new Option(model, `${UNVERIFIED_PREFIX}${model}`)),
+      );
+      modelSelect.disabled = false;
+      if (selectValue) modelSelect.value = selectValue;
+    };
+
+    let currentVehicle: VehicleFitment | null = null;
+
+    const showEmpty = (): void => {
+      currentVehicle = null;
+      resultEl.hidden = true;
+      applyButton.hidden = true;
+    };
+
+    const showUnverified = (make: string, model: string): void => {
+      currentVehicle = null;
+      resultEl.hidden = false;
+      resultEl.textContent = `We don't have verified fitment data for the ${make} ${model} yet — check your door-jamb sticker or owner's manual.`;
+      resultEl.dataset.vfpState = 'unverified';
+      applyButton.hidden = true;
+    };
+
+    const showVehicle = (vehicle: VehicleFitment): void => {
+      resultEl.hidden = false;
+      resultEl.dataset.vfpState = 'verified';
+      if (hasFieldFor(target, vehicle)) {
+        currentVehicle = vehicle;
+        resultEl.textContent = `${vehicle.make} ${vehicle.model} → ${fieldSummary(target, vehicle)}.`;
+        applyButton.hidden = false;
+      } else {
+        currentVehicle = null;
+        resultEl.textContent = `${vehicle.make} ${vehicle.model} — no verified data for this calculator yet.`;
+        applyButton.hidden = true;
+      }
+    };
+
+    makeSelect.addEventListener('change', () => { populateModels(makeSelect.value); showEmpty(); });
+
+    modelSelect.addEventListener('change', () => {
+      const value = modelSelect.value;
+      const make = makeSelect.value;
+      if (!make || !value) { showEmpty(); return; }
+      if (value.startsWith(UNVERIFIED_PREFIX)) {
+        const model = value.slice(UNVERIFIED_PREFIX.length);
+        setSelectedVehicle({ make, model });
+        showUnverified(make, model);
+        return;
+      }
+      const vehicle = vehicleById(value);
+      if (!vehicle) { showEmpty(); return; }
+      setSelectedVehicle({ make: vehicle.make, model: vehicle.model, id: vehicle.id });
+      showVehicle(vehicle);
+    });
+
+    applyButton.addEventListener('click', () => {
+      if (!currentVehicle) return;
+      if (target === 'tire-size') applyToTireSizeForm(currentVehicle);
+      else applyToBoltPatternForm(currentVehicle);
+    });
+
+    // Restore whatever vehicle was picked on another page, so the picker (and its result line)
+    // shows it immediately — but never auto-submit the main calculator form on page load, only
+    // on an explicit click, so we never silently overwrite a value the visitor already typed.
+    const saved = getSelectedVehicle();
+    if (saved) {
+      makeSelect.value = saved.make;
+      populateModels(saved.make, saved.id ?? `${UNVERIFIED_PREFIX}${saved.model}`);
+      if (saved.id) {
+        const vehicle = vehicleById(saved.id);
+        if (vehicle) showVehicle(vehicle);
+        else showEmpty();
+      } else {
+        showUnverified(saved.make, saved.model);
+      }
+    } else {
+      populateModels('');
+      showEmpty();
+    }
+  });
+}

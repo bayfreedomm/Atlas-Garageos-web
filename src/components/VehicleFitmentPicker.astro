@@ -1,0 +1,14 @@
+---
+interface Props { target: 'tire-size' | 'bolt-pattern'; }
+const { target } = Astro.props;
+---
+<div class="vehicle-fitment-picker" data-vehicle-fitment-picker data-vfp-target={target}>
+  <p class="vehicle-fitment-picker__label">Or select your vehicle</p>
+  <div class="vehicle-fitment-picker__row">
+    <select data-vfp-make aria-label="Make"></select>
+    <select data-vfp-model aria-label="Model" disabled><option value="">Choose a make first</option></select>
+  </div>
+  <p class="vehicle-fitment-picker__result" data-vfp-result hidden></p>
+  <button type="button" class="vehicle-fitment-picker__apply" data-vfp-apply hidden>Use this value</button>
+</div>
+<script>import { initializeVehicleFitmentPicker } from '../ui/vehicle-fitment-picker'; initializeVehicleFitmentPicker();</script>

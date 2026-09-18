@@ -107,41 +107,22 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 /* Not enough room for the header language dropdown alongside the wordmark on the smallest phones; the drawer still has the full switcher. */
 @media (max-width: 22rem) { .lang-dropdown { display: none; } }
 
-/* Site-wide vehicle selector: a header-persistent make/model pick, saved to this browser (localStorage)
-   so the same vehicle badge shows on every page. Desktop: a dropdown panel like the language switcher.
-   Mobile (<=47.999rem): a bottom sheet instead — a dropdown near the right edge of a narrow header risks
-   running off-screen, a sheet is thumb-reachable and can't overflow. */
-.vehicle-selector { position:relative; }
-.vehicle-selector__trigger { display:flex; align-items:center; gap:.4rem; height:2.35rem; padding:0 .7rem; border:1px solid var(--color-line); border-radius:.85rem; background:var(--color-surface); color:var(--color-ink-muted); font-size:.72rem; font-weight:750; letter-spacing:.01em; cursor:pointer; list-style:none; max-width:11rem; }
-.vehicle-selector__trigger::-webkit-details-marker { display:none; }
-.vehicle-selector__icon { width:1.05rem; height:1.05rem; flex:none; color:var(--color-brand); }
-.vehicle-selector__badge { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; min-width:0; }
-.vehicle-selector__chevron { width:.8rem; height:.8rem; flex:none; color:currentColor; transition:transform 150ms ease; }
-.vehicle-selector[open] .vehicle-selector__chevron { transform:rotate(180deg); }
-.vehicle-selector[open] .vehicle-selector__trigger { color:var(--color-ink); border-color:var(--color-line-strong); }
-.vehicle-selector--set .vehicle-selector__trigger { border-color:var(--color-brand); color:var(--color-ink); }
-.vehicle-selector__backdrop { display:none; }
-.vehicle-selector__panel { position:absolute; right:0; top:calc(100% + .4rem); z-index:30; width:16.5rem; padding:.85rem; border:1px solid var(--color-line); border-radius:1rem; background:var(--color-surface); box-shadow:0 14px 34px rgb(0 0 0 / 16%); }
-.vehicle-selector__title { margin:0 0 .2rem; color:var(--color-ink); font-size:.85rem; font-weight:800; }
-.vehicle-selector__hint { margin:0 0 .65rem; color:var(--color-ink-muted); font-size:.68rem; line-height:1.4; }
-.vehicle-selector__form { display:grid; gap:.55rem; }
-.vehicle-selector__form label { display:grid; gap:.25rem; color:var(--color-ink-muted); font-size:.68rem; font-weight:750; text-transform:uppercase; letter-spacing:.02em; }
-.vehicle-selector__form select { height:2.35rem; padding:0 .55rem; border:1px solid var(--color-line); border-radius:.6rem; background:var(--color-surface); color:var(--color-ink); font-size:.82rem; font-weight:600; }
-.vehicle-selector__clear { margin-top:.7rem; padding:.5rem .3rem 0; border:0; border-top:1px solid var(--color-line); background:none; color:var(--color-ink-muted); font-size:.72rem; font-weight:700; text-align:left; cursor:pointer; width:100%; }
-.vehicle-selector__clear:hover { color:var(--color-ink); }
-:root[data-theme="dark"] .vehicle-selector__trigger { background:#0d202d; border-color:#29404f; color:#a9bbc8; }
-:root[data-theme="dark"] .vehicle-selector--set .vehicle-selector__trigger { border-color:var(--color-brand); }
-:root[data-theme="dark"] .vehicle-selector__panel { background:#111b24; border-color:#29404f; box-shadow:0 18px 42px rgb(0 0 0 / 34%); }
-:root[data-theme="dark"] .vehicle-selector__form select { background:#0d202d; border-color:#29404f; color:#f3f7fa; }
-:root[data-theme="dark"] .vehicle-selector__clear { border-color:#29404f; }
-@media (max-width: 47.999rem) {
-  .vehicle-selector__badge { display:none; }
-  .vehicle-selector__chevron { display:none; }
-  .vehicle-selector__trigger { max-width:none; padding:0 .55rem; }
-  .vehicle-selector[open] .vehicle-selector__backdrop { display:block; position:fixed; inset:0; z-index:29; background:rgb(6 14 22 / 55%); }
-  .vehicle-selector__panel { position:fixed; inset:auto 0 0 0; z-index:30; width:auto; max-height:80vh; overflow-y:auto; border-radius:1.2rem 1.2rem 0 0; padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom)); box-shadow:0 -18px 42px rgb(0 0 0 / 22%); }
-}
-@media (max-width: 22rem) { .vehicle-selector__trigger { padding:0 .4rem; } }
+/* Inline vehicle-fitment picker: lives inside the calculator's own tool slot (right under the page
+   title), not a header overlay — plain document flow, no position:fixed/backdrop-filter interaction
+   to fight with. Make/model choice is saved (see vehicle-storage.ts) so it's remembered on other
+   picker-equipped tool pages too, but nothing here ever auto-submits the main form on page load. */
+.vehicle-fitment-picker { display:grid; gap:.5rem; margin:0 0 1rem; padding:.75rem .85rem; border:1px solid var(--color-line); border-radius:.9rem; background:var(--color-surface-subtle); }
+.vehicle-fitment-picker__label { margin:0; color:var(--color-ink-muted); font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+.vehicle-fitment-picker__row { display:grid; grid-template-columns:1fr 1fr; gap:.55rem; }
+.vehicle-fitment-picker__row select { height:2.35rem; padding:0 .55rem; border:1px solid var(--color-line); border-radius:.6rem; background:var(--color-surface); color:var(--color-ink); font-size:.82rem; font-weight:600; min-width:0; }
+.vehicle-fitment-picker__result { margin:0; color:var(--color-ink); font-size:.78rem; line-height:1.4; }
+.vehicle-fitment-picker__result[data-vfp-state="unverified"] { color:var(--color-ink-muted); }
+.vehicle-fitment-picker__apply { justify-self:start; height:2.15rem; padding:0 .9rem; border:0; border-radius:.65rem; background:var(--color-brand); color:#fff; font-size:.76rem; font-weight:750; cursor:pointer; }
+.vehicle-fitment-picker__apply:hover { background:var(--color-brand-hover); }
+:root[data-theme="dark"] .vehicle-fitment-picker { background:#16212c; border-color:#29404f; }
+:root[data-theme="dark"] .vehicle-fitment-picker__row select { background:#0d202d; border-color:#29404f; color:#f3f7fa; }
+@media (max-width: 26rem) { .vehicle-fitment-picker__row { grid-template-columns:1fr; } }
+
 .theme-quick-toggle { display:grid; place-items:center; width:2.75rem; height:2.75rem; padding:0; border:1px solid var(--color-line); border-radius:.85rem; background:var(--color-surface); color:var(--color-ink); box-shadow:none; cursor:pointer; }
 .theme-quick-toggle svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .theme-quick-toggle__moon { display:none; }
@@ -217,6 +198,11 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .studio-hero h1 { max-width:11ch!important; margin-bottom:.55rem!important; font-size:clamp(2.35rem,9.6vw,3.7rem)!important; line-height:.95!important; }
 .studio-hero .hero-copy { font-size:.9rem!important; line-height:1.5!important; }
 .studio-primary-cta { margin-top:.8rem!important; }
+/* .studio-hero sits on the dark app-header chrome (background:transparent, showing the dark canvas through),
+   but .button.secondary's default color is var(--color-ink) — tuned for a light card background, so it renders
+   near-black text on a near-black hero and is unreadable. Force a light, legible variant here specifically. */
+.studio-hero .button.secondary { border-color:rgb(255 255 255 / 35%)!important; background:rgb(255 255 255 / 6%)!important; color:#f4f8fb!important; }
+.studio-hero .button.secondary:hover { border-color:rgb(255 255 255 / 55%)!important; background:rgb(255 255 255 / 12%)!important; }
 .studio-capabilities { margin-top:.75rem!important; }
 
 /* Technical scenes adapt to both themes while preserving meaning colors. */

@@ -8,7 +8,6 @@ import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
 import ThemeQuickToggle from './ThemeQuickToggle.astro';
 import LanguageQuickToggle from './LanguageQuickToggle.astro';
-import VehicleSelector from './VehicleSelector.astro';
 import '../styles/global.css';
 import '../styles/product-v3.css';
 import '../styles/product-v4.css';
@@ -76,7 +75,6 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
       <a class="brand" href={locale ? `/${locale}/` : '/'} aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
         <nav class="desktop-nav" aria-label="Primary navigation"><a href={locale ? `/${locale}/` : '/'} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={locale ? `/${locale}/tools/` : '/tools/'} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href="/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a></nav>
-        <VehicleSelector />
         <LanguageQuickToggle links={headerLocaleLinks} current={htmlLang} />
         <ThemeQuickToggle />
         <NavigationDrawer locale={locale} localeLinks={drawerLocaleLinks} />
