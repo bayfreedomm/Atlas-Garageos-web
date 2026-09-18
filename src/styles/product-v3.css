@@ -318,6 +318,14 @@ main { width: min(100% - 2rem, var(--content-wide)); padding: 1.15rem 0 calc(5re
 .insight-alert--warning { border-color: color-mix(in srgb, #c94b3d 42%, var(--color-line)); background: color-mix(in srgb, #d75649 8%, var(--color-surface)); color: var(--color-ink); }
 .insight-alert--warning > span { background: color-mix(in srgb, #d75649 17%, var(--color-surface)); color: #b73529; }
 
+/* FAQ / educational content on tool pages (Task #23). */
+.tool-faqs { margin-top: 1rem; }
+.tool-faqs h3 { margin: 0 0 .65rem; font-size: 1.05rem; letter-spacing: -.02em; color: var(--color-ink); }
+.tool-faqs__list { display: grid; gap: .55rem; margin: 0; }
+.tool-faqs__item { padding: .85rem .95rem; border: 1px solid var(--color-line); border-radius: .85rem; background: var(--color-surface); }
+.tool-faqs__item dt { color: var(--color-ink); font-size: .84rem; font-weight: 700; }
+.tool-faqs__item dd { margin: .35rem 0 0; color: var(--color-ink-muted); font-size: .78rem; line-height: 1.55; }
+
 /* Technical-premium tire comparison: true scale + explicit magnified difference. */
 .tire-tech-visual { margin: .9rem 0 0; padding: .85rem; overflow: hidden; border: 1px solid var(--color-line); border-radius: 1rem; background: #11191f; color: #edf2f3; }
 .tire-tech-visual figcaption { display: grid; gap: .35rem; margin-bottom: .7rem; }

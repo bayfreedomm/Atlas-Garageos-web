@@ -22,6 +22,7 @@ export interface UiStrings {
   readonly whatMattersHere: string;
   readonly commonMistakeLabel: string;
   readonly importantWarningLabel: string;
+  readonly faqHeading: string;
   readonly footerTagline: string;
   readonly footerToolbox: string;
   readonly footerFitment: string;
@@ -50,6 +51,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     whatMattersHere: 'Worauf es hier ankommt',
     commonMistakeLabel: 'Häufiger Fehler',
     importantWarningLabel: 'Wichtiger Hinweis',
+    faqHeading: 'Häufig gestellte Fragen',
     footerTagline: 'Schnelle, ehrliche Kfz-Rechner. Kein Konto, kein Schnickschnack.',
     footerToolbox: 'Werkzeugkasten',
     footerFitment: 'Felgen- & Reifenvergleich',
@@ -76,6 +78,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     whatMattersHere: 'Lo que importa aquí',
     commonMistakeLabel: 'Error común',
     importantWarningLabel: 'Advertencia importante',
+    faqHeading: 'Preguntas frecuentes',
     footerTagline: 'Calculadoras de coche rápidas y honestas. Sin cuenta, sin complicaciones.',
     footerToolbox: 'Caja de herramientas',
     footerFitment: 'Comparador de Llantas y Neumáticos',

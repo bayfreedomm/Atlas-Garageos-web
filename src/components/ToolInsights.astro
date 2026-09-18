@@ -6,6 +6,17 @@ interface Props { id: ToolId; locale?: ContentLocale | undefined; }
 const { id, locale } = Astro.props;
 const insight = locale ? localizedTool(id, locale) : insightForTool(id);
 const t = locale ? uiStrings[locale] : undefined;
+const faqJsonLd = insight.faqs && insight.faqs.length > 0
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: insight.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+      })),
+    })
+  : undefined;
 ---
 <section class="tool-insights" aria-labelledby={`insights-${id}`}>
   <div class="tool-insights__heading">
@@ -19,4 +30,13 @@ const t = locale ? uiStrings[locale] : undefined;
     {insight.commonMistake && <aside class="insight-alert insight-alert--mistake"><span aria-hidden="true">!</span><div><strong>{t?.commonMistakeLabel ?? 'Common mistake'}</strong><p>{insight.commonMistake}</p></div></aside>}
     {insight.warning && <aside class="insight-alert insight-alert--warning"><span aria-hidden="true">!</span><div><strong>{t?.importantWarningLabel ?? 'Important warning'}</strong><p>{insight.warning}</p></div></aside>}
   </div>
+  {insight.faqs && insight.faqs.length > 0 && (
+    <div class="tool-faqs" aria-labelledby={`faqs-${id}`}>
+      <h3 id={`faqs-${id}`}>{t?.faqHeading ?? 'Frequently asked questions'}</h3>
+      <dl class="tool-faqs__list">
+        {insight.faqs.map((faq) => <div class="tool-faqs__item"><dt>{faq.question}</dt><dd>{faq.answer}</dd></div>)}
+      </dl>
+    </div>
+  )}
+  {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
 </section>

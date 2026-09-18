@@ -5,6 +5,11 @@ export interface ExplanationSection {
   readonly paragraphs: readonly string[];
 }
 
+export interface ToolCatalogFaqEntry {
+  readonly question: string;
+  readonly answer: string;
+}
+
 export interface ToolCatalogEntry {
   readonly title: string;
   readonly description: string;
@@ -17,6 +22,7 @@ export interface ToolCatalogEntry {
   readonly facts: readonly { readonly title: string; readonly body: string }[];
   readonly commonMistake?: string;
   readonly warning?: string;
+  readonly faqs?: readonly ToolCatalogFaqEntry[];
 }
 
 export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.freeze({
@@ -61,6 +67,11 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { title: 'Reale Reifen weichen ab', body: 'Die Nenngröße ist eine Normangabe. Die tatsächlich gemessenen Maße variieren je nach Modell, Felgenbreite, Luftdruck, Last und Fertigungstoleranz.' },
     ],
     commonMistake: 'Die Querschnittszahl als Millimeterangabe zu lesen. Sie ist ein Prozentsatz der Reifennennbreite.',
+    faqs: [
+      { question: 'Was bedeuten die Zahlen bei einer Reifengröße wie 225/45R18?', answer: '225 ist die Nennbreite in Millimetern, 45 ist das Querschnittsverhältnis (Flankenhöhe als Prozentsatz dieser Breite), R steht für Radialbauweise, und 18 ist der Felgendurchmesser in Zoll.' },
+      { question: 'Kann ich eine andere Reifengröße montieren?', answer: 'Viele Fahrzeuge vertragen eine leicht abweichende Größe, solange der Gesamtdurchmesser nah am Original bleibt — meist innerhalb von etwa 3 % —, damit Tacho, ABS und Übersetzung genau bleiben. Prüfen Sie dies immer im Fahrzeughandbuch, bevor Sie kaufen.' },
+      { question: 'Warum weicht mein berechneter Durchmesser von der Messung im Reifenfachbetrieb ab?', answer: 'Dieser Rechner nutzt die auf der Flanke aufgedruckte Nenngröße. Reale Reifen variieren leicht je nach Hersteller, Profilverschleiß und Luftdruck, daher ist eine kleine Abweichung von einer physischen Messung normal.' },
+    ],
   },
   'tire-size-comparison': {
     title: 'Reifengrößen-Vergleich',
@@ -83,6 +94,11 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Anzunehmen, ein breiterer Reifen sei automatisch höher, sicherer oder bei Nässe besser. Die Breite allein beantwortet das nicht.',
     warning: 'Dies ist nominale Geometrie, kein Nass-/Trockengriff- oder Passform-Urteil. Profildesign, Mischung, Luftdruck, Last, Felgenbreite und Fahrzeugabstimmung spielen ebenfalls eine Rolle.',
+    faqs: [
+      { question: 'Welcher Unterschied gilt beim Vergleich zweier Reifengrößen als unbedenklich?', answer: 'Eine gängige Faustregel ist, den Gesamtdurchmesser-Unterschied innerhalb von etwa 3 % zu halten, was die Auswirkung auf Tacho, ABS und Übersetzung begrenzt. Dies ist eine geometrische Orientierung, keine gesetzliche oder Herstellervorgabe.' },
+      { question: 'Bedeutet ein breiterer Reifen automatisch mehr Grip?', answer: 'Nicht zwangsläufig. Die Breite allein bestimmt nicht den Grip — Profilmischung, Profildesign, Luftdruck, Last und die Felgenbreite, auf der der Reifen montiert ist, spielen mindestens ebenso eine Rolle.' },
+      { question: 'Beeinflusst eine andere Reifengröße den Kraftstoffverbrauch?', answer: 'Ein größerer oder schwererer Reifen kann den Rollwiderstand erhöhen und den Verbrauch leicht steigern, aber dieser Rechner gibt nur geometrische Unterschiede aus, keine Effizienzwerte.' },
+    ],
   },
   'wheel-offset-calculator': {
     title: 'Einpresstiefen-Rechner (ET)',
@@ -105,6 +121,11 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'ET-Werte zu vergleichen, ohne die Felgenbreiten zu vergleichen. Eine 8J ET35 und eine 9J ET35 sitzen nicht an derselben Stelle.',
     warning: 'Die Radposition allein beweist keinen Brems-, Reifen-, Fahrwerks- oder Kotflügelfreigang an einem bestimmten Fahrzeug.',
+    faqs: [
+      { question: 'Was bedeutet die Einpresstiefe (ET) genau?', answer: 'ET ist der Abstand in Millimetern zwischen der Anlagefläche der Felge und ihrer wahren Mittellinie. Eine höhere positive ET zieht die Felge weiter nach innen; eine niedrigere oder negative ET drückt sie weiter nach außen.' },
+      { question: 'Führt eine niedrigere ET immer zu Reiben?', answer: 'Nicht von allein — es hängt von Felgenbreite, Reifengröße, Federweg und Lenkeinschlag ab. Dieser Rechner zeigt nur die Positionsänderung; er kann den realen Freigang ohne Messung nicht bestätigen.' },
+      { question: 'Kann ich zwei unterschiedliche Felgenbreiten gleichzeitig vergleichen?', answer: 'Ja — eine Änderung der Felgenbreite verändert Innen- und Außenposition auch bei gleicher ET, daher berücksichtigt dieser Rechner Breite und Einpresstiefe gemeinsam statt nur die ET allein.' },
+    ],
   },
   'speedometer-error-calculator': {
     title: 'Tachoabweichungs-Rechner',
@@ -126,6 +147,11 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { title: 'Der reale Abrollradius ändert sich', body: 'Verschleiß, Luftdruck, Temperatur, Last und Reifenaufbau können das reale Ergebnis von der Nenngeometrie abweichen lassen.' },
     ],
     commonMistake: 'Den berechneten Wert als Kalibrierungszertifikat zu behandeln. Es ist eine Geometrieschätzung auf Basis der Nennreifenmaße.',
+    faqs: [
+      { question: 'Warum zeigt mein Tacho nach einer Reifengrößenänderung falsch an?', answer: 'Der Tacho ist auf eine bestimmte Raddrehzahl kalibriert. Ein größerer Reifen legt pro Umdrehung eine weitere Strecke zurück, daher fährt das Auto tatsächlich schneller als angezeigt; ein kleinerer Reifen bewirkt das Gegenteil.' },
+      { question: 'Ist das derselbe Fehler, den ABS oder Traktionskontrolle sehen?', answer: 'Es ist dieselbe zugrunde liegende Abrolldurchmesser-Änderung, aber dieser Rechner schätzt nur die Tachoanzeige — er bildet nicht ab, wie die ABS- oder Traktionskontroll-Software eines bestimmten Fahrzeugs reagiert.' },
+      { question: 'Kann ich damit eine exakte Tachokorrektur ermitteln?', answer: 'Nur als Schätzung. Der reale Abrolldurchmesser wird durch Reifenverschleiß, Luftdruck, Last und Fertigungstoleranz beeinflusst — betrachten Sie dies als Ausgangspunkt, nicht als zertifizierten Kalibrierungswert.' },
+    ],
   },
   'gear-ratio-calculator': {
     title: 'Übersetzungsrechner',
@@ -365,6 +391,11 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Den Abstand zwischen zwei Löchern zu messen, die sich bei einer 5-Loch-Felge direkt gegenüberliegen — das ist nicht der Lochkreisdurchmesser.',
     warning: 'Ein berechneter PCD ist nur ein Ausgangswert. Bestätigen Sie Lochkreis, Nabenbohrung und Bolzengewinde immer anhand der Felgen- und Fahrzeugspezifikation vor dem Kauf.',
+    faqs: [
+      { question: 'Wie messe ich den Lochkreis an einer 5-Loch-Felge?', answer: 'Messen Sie vom Mittelpunkt eines Bolzenlochs bis zum äußeren Rand des Lochs, das zwei Positionen entfernt liegt (nicht direkt gegenüber), und geben Sie diesen Abstand hier ein — der Rechner rechnet ihn über die 5-Loch-Geometrie in den echten Lochkreisdurchmesser um.' },
+      { question: 'Kann ich eine Felge mit anderem Lochkreis als meine Nabe montieren?', answer: 'Nicht sicher ohne Adapter, und Adapter bringen eigene Risiken mit sich. Der Lochkreis (Lochzahl und PCD) muss zur Nabe passen, sonst lässt sich die Felge nicht korrekt montieren.' },
+      { question: 'Ist der Lochkreis dasselbe wie die Nabenbohrung?', answer: 'Nein — der Lochkreis beschreibt, wo die Bolzenlöcher sitzen, während die Nabenbohrung der Mittelloch-Durchmesser ist, der die Felge auf der Nabe zentriert. Beide müssen passen oder separat adaptiert werden.' },
+    ],
   },
   'tire-load-speed-rating': {
     title: 'Reifen-Tragfähigkeits- & Geschwindigkeitsindex',
@@ -490,5 +521,10 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Eine Werksangabe für die gesamte Modellreihe zu übernehmen, obwohl einzelne Ausstattungslinien abweichende Rad- oder Reifenpakete haben.',
     warning: 'Diese Liste wächst mit der Zeit und deckt noch nicht jedes Fahrzeug ab. Prüfen Sie die Angaben immer gegen Ihr eigenes Handbuch, bevor Sie Räder anziehen oder Teile bestellen.',
+    faqs: [
+      { question: 'Wo finde ich die tatsächliche werksseitige Reifengröße und den Lochkreis meines Fahrzeugs?', answer: 'Die zuverlässigste Quelle ist der Aufkleber im Türrahmen der Fahrertür oder Ihr Fahrzeughandbuch — beide zeigen die genaue Spezifikation Ihrer Ausstattung ab Werk, die von generischen Online-Referenzen abweichen kann.' },
+      { question: 'Warum ist mein genaues Fahrzeug hier nicht gelistet?', answer: 'Dies ist eine kuratierte Startauswahl, keine vollständige Herstellerdatenbank. Wenn Marke und Modell erscheinen, aber keine geprüfte Angabe zeigen, oder noch gar nicht erscheinen, nutzen Sie den Aufkleber an der Fahrertür direkt mit dem Reifengrößen- oder Lochkreis-Rechner.' },
+      { question: 'Was bedeutet die Verlässlichkeitseinstufung?', answer: 'Hohe Verlässlichkeit bedeutet, dass mehrere unabhängige Quellen übereinstimmten. Mittlere oder geringe Verlässlichkeit bedeutet, dass Quellen widersprachen oder ein Wert nicht vollständig bestätigt werden konnte — solche Einträge sollten Sie vor Gebrauch gegenprüfen.' },
+    ],
   },
 });

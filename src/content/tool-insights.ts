@@ -1,9 +1,15 @@
 import type { ToolId } from '../seo/tool-registry';
 
+export interface ToolFaqEntry {
+  readonly question: string;
+  readonly answer: string;
+}
+
 export interface ToolInsightContent {
   readonly facts: readonly { readonly title: string; readonly body: string }[];
   readonly commonMistake?: string;
   readonly warning?: string;
+  readonly faqs?: readonly ToolFaqEntry[];
 }
 
 export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object.freeze({
@@ -23,6 +29,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
       { title: 'Real tires vary', body: 'Nominal size is a standard label. Actual measured dimensions vary by model, rim width, pressure, load, and manufacturer tolerance.' },
     ],
     commonMistake: 'Reading the profile number as millimetres. It is a percentage of the nominal tire width.',
+    faqs: [
+      { question: 'What do the numbers in a tire size like 225/45R18 mean?', answer: '225 is the nominal section width in millimetres, 45 is the aspect ratio (sidewall height as a percentage of that width), R means radial construction, and 18 is the rim diameter in inches.' },
+      { question: 'Can I put a different size tire on my car?', answer: 'Many vehicles can run a slightly different size as long as the overall diameter stays close to the original — usually within about 3% — so the speedometer, ABS, and gearing stay accurate. Always confirm against your vehicle’s manual before buying.' },
+      { question: 'Why does my calculated diameter differ from what my tire shop measures?', answer: 'This calculator uses the nominal size printed on the sidewall. Real tires vary slightly by manufacturer, tread wear, and inflation pressure, so a small difference from a physical measurement is normal.' },
+    ],
   },
   'tire-size-comparison': {
     facts: [
@@ -32,6 +43,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     ],
     commonMistake: 'Assuming a wider tire is automatically taller, safer, or better in wet conditions. Width alone cannot answer those questions.',
     warning: 'This is nominal geometry, not a wet/dry grip or fitment verdict. Tread design, compound, pressure, load, wheel width, and vehicle setup also matter.',
+    faqs: [
+      { question: 'How much difference is considered safe when comparing two tire sizes?', answer: 'A common rule of thumb is keeping the overall diameter difference within about 3%, which limits speedometer, ABS, and gearing effects. This is a geometry guideline, not a legal or manufacturer specification.' },
+      { question: 'Does a wider tire always mean better grip?', answer: 'Not necessarily. Width alone does not determine grip — tread compound, tread pattern, pressure, load, and the wheel width it is mounted on all matter at least as much.' },
+      { question: 'Will changing tire size affect my fuel economy?', answer: 'A larger or heavier tire can increase rolling resistance and slightly reduce fuel economy, but this calculator only reports geometric differences, not efficiency.' },
+    ],
   },
   'wheel-offset-calculator': {
     facts: [
@@ -41,6 +57,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     ],
     commonMistake: 'Comparing ET numbers without comparing wheel widths. An 8J ET35 and a 9J ET35 do not sit in the same place.',
     warning: 'Wheel position does not prove brake, tire, suspension, or fender clearance on a specific vehicle.',
+    faqs: [
+      { question: 'What does wheel offset (ET) actually mean?', answer: 'Offset is the distance in millimetres between the wheel’s mounting surface and its true centreline. A higher positive offset tucks the wheel further inward; a lower or negative offset pushes it further outward.' },
+      { question: 'Does a lower offset always cause rubbing?', answer: 'Not by itself — it depends on the wheel width, tire size, suspension travel, and steering angle. This calculator shows the position change only; it cannot confirm real clearance without a measurement.' },
+      { question: 'Can I compare two different wheel widths at once?', answer: 'Yes — changing wheel width changes inner and outer position even at the same ET, so this calculator accounts for width and offset together rather than offset alone.' },
+    ],
   },
   'speedometer-error-calculator': {
     facts: [
@@ -49,6 +70,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
       { title: 'Real rolling radius changes', body: 'Wear, pressure, temperature, load, and tire construction can move the real result away from nominal geometry.' },
     ],
     commonMistake: 'Treating the calculated number as a calibration certificate. It is a geometry estimate based on nominal tire dimensions.',
+    faqs: [
+      { question: 'Why does my speedometer read wrong after changing tire size?', answer: 'A speedometer is calibrated for one wheel rotational speed. A larger tire covers more distance per rotation, so the car is actually going faster than the number shown; a smaller tire has the opposite effect.' },
+      { question: 'Is this the same error my ABS or traction control sees?', answer: 'It is the same underlying rolling-diameter change, but this calculator only estimates the speedometer reading — it does not model how a specific vehicle’s ABS or traction-control software responds.' },
+      { question: 'Can I use this to get an exact speedometer correction?', answer: 'Only as an estimate. Real rolling diameter is affected by tire wear, pressure, load, and manufacturer tolerance, so treat this as a starting point rather than a certified calibration value.' },
+    ],
   },
   'gear-ratio-calculator': {
     facts: [
@@ -150,6 +176,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     ],
     commonMistake: 'Measuring the distance between two lug holes that are directly across from each other on a 5-lug wheel, which is not the bolt circle diameter.',
     warning: 'A calculated PCD is a starting reference only. Always confirm bolt pattern, hub bore, and lug thread against the wheel and vehicle specification before buying.',
+    faqs: [
+      { question: 'How do I measure bolt pattern on a 5-lug wheel?', answer: 'Measure from the center of one lug hole to the outer edge of the hole that is two positions away (not directly across), then enter that distance here — the calculator converts it to the true bolt circle diameter using the 5-lug geometry.' },
+      { question: 'Can I use a wheel with a different bolt pattern than my hub?', answer: 'No, not safely without an adapter, and adapters bring their own risks. The bolt pattern (lug count and PCD) has to match the hub, or the wheel cannot be mounted correctly.' },
+      { question: 'Is bolt pattern the same as hub bore?', answer: 'No — bolt pattern describes where the lug holes sit, while hub bore is the center hole diameter that centers the wheel on the hub. Both need to match or be adapted separately.' },
+    ],
   },
   'tire-load-speed-rating': {
     facts: [
@@ -204,6 +235,11 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     ],
     commonMistake: 'Assuming one factory spec applies across an entire model line when individual trims carry different wheel or tire packages.',
     warning: 'This list grows over time and does not yet cover every vehicle. Always confirm against your own vehicle’s manual or door-jamb sticker before torquing wheels or ordering parts.',
+    faqs: [
+      { question: 'Where can I find my vehicle’s actual factory tire size and bolt pattern?', answer: 'The most reliable source is the sticker inside the driver’s door jamb or your owner’s manual — both list the exact specification for your trim as built, which can differ from generic references online.' },
+      { question: 'Why isn’t my exact vehicle listed here?', answer: 'This is a curated starting set, not a complete manufacturer database. If your make and model appear but show no verified spec, or don’t appear at all yet, use the door-jamb sticker with the Tire Size or Bolt Pattern Calculator directly.' },
+      { question: 'What does the confidence label mean?', answer: 'High confidence means multiple independent sources agreed. Medium or low confidence means sources disagreed or a value could not be fully confirmed — those entries ask you to cross-check before relying on them.' },
+    ],
   },
 });
 

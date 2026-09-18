@@ -41,6 +41,11 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { title: 'Los neumáticos reales varían', body: 'La medida nominal es una etiqueta estándar. Las dimensiones reales medidas varían según el modelo, el ancho de llanta, la presión, la carga y la tolerancia del fabricante.' },
     ],
     commonMistake: 'Leer el número de perfil como milímetros. Es un porcentaje del ancho nominal del neumático.',
+    faqs: [
+      { question: '¿Qué significan los números de una medida de neumático como 225/45R18?', answer: '225 es el ancho nominal en milímetros, 45 es la relación de aspecto (la altura del flanco como porcentaje de ese ancho), R indica construcción radial y 18 es el diámetro de llanta en pulgadas.' },
+      { question: '¿Puedo montar un tamaño de neumático distinto?', answer: 'Muchos vehículos toleran un tamaño ligeramente distinto siempre que el diámetro total se mantenga cerca del original — normalmente dentro de un 3 % aproximadamente — para que el velocímetro, el ABS y la relación de transmisión sigan siendo precisos. Compruebe siempre esto en el manual del vehículo antes de comprar.' },
+      { question: '¿Por qué mi diámetro calculado difiere de la medición en el taller?', answer: 'Esta calculadora usa la medida nominal impresa en el flanco. Los neumáticos reales varían ligeramente según el fabricante, el desgaste de la banda de rodadura y la presión, así que una pequeña diferencia frente a una medición física es normal.' },
+    ],
   },
   'tire-size-comparison': {
     title: 'Comparación de Tamaños de Neumáticos',
@@ -63,6 +68,11 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Asumir que un neumático más ancho es automáticamente más alto, más seguro o mejor en mojado. El ancho por sí solo no responde a eso.',
     warning: 'Esto es geometría nominal, no un veredicto de agarre en mojado/seco ni de ajuste. El diseño de la banda de rodadura, el compuesto, la presión, la carga, el ancho de llanta y la puesta a punto del vehículo también importan.',
+    faqs: [
+      { question: '¿Qué diferencia se considera segura al comparar dos tamaños de neumático?', answer: 'Una regla práctica habitual es mantener la diferencia de diámetro total dentro de un 3 % aproximadamente, lo que limita el efecto sobre el velocímetro, el ABS y la relación de transmisión. Esto es una orientación geométrica, no una norma legal ni del fabricante.' },
+      { question: '¿Un neumático más ancho significa automáticamente más agarre?', answer: 'No necesariamente. El ancho por sí solo no determina el agarre — el compuesto de la banda de rodadura, el diseño del dibujo, la presión, la carga y el ancho de la llanta sobre la que se monta influyen al menos tanto.' },
+      { question: '¿Cambiar el tamaño del neumático afecta al consumo de combustible?', answer: 'Un neumático más grande o más pesado puede aumentar la resistencia a la rodadura y elevar ligeramente el consumo, pero esta calculadora solo muestra diferencias geométricas, no cifras de eficiencia.' },
+    ],
   },
   'wheel-offset-calculator': {
     title: 'Calculadora de Offset de Llanta',
@@ -85,6 +95,11 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Comparar valores de ET sin comparar los anchos de llanta. Una 8J ET35 y una 9J ET35 no ocupan el mismo lugar.',
     warning: 'La posición de la rueda por sí sola no demuestra holgura de frenos, neumático, suspensión o guardabarros en un vehículo concreto.',
+    faqs: [
+      { question: '¿Qué significa exactamente el offset (ET)?', answer: 'ET es la distancia en milímetros entre la superficie de montaje de la llanta y su línea central real. Un ET positivo mayor desplaza la llanta más hacia adentro; un ET menor o negativo la empuja más hacia afuera.' },
+      { question: '¿Un ET menor siempre provoca roces?', answer: 'No por sí solo — depende del ancho de llanta, el tamaño del neumático, el recorrido de la suspensión y el ángulo de dirección. Esta calculadora solo muestra el cambio de posición; no puede confirmar la holgura real sin medición.' },
+      { question: '¿Puedo comparar dos anchos de llanta distintos a la vez?', answer: 'Sí — cambiar el ancho de llanta modifica la posición interior y exterior aunque el ET se mantenga igual, así que esta calculadora tiene en cuenta el ancho y el offset juntos en lugar de solo el ET.' },
+    ],
   },
   'speedometer-error-calculator': {
     title: 'Calculadora de Error del Velocímetro',
@@ -106,6 +121,11 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { title: 'El radio de rodadura real cambia', body: 'El desgaste, la presión, la temperatura, la carga y la construcción del neumático pueden alejar el resultado real de la geometría nominal.' },
     ],
     commonMistake: 'Tratar el número calculado como un certificado de calibración. Es una estimación geométrica basada en las dimensiones nominales del neumático.',
+    faqs: [
+      { question: '¿Por qué mi velocímetro marca mal tras cambiar el tamaño de los neumáticos?', answer: 'El velocímetro está calibrado para una velocidad de rotación de rueda concreta. Un neumático más grande recorre más distancia por vuelta, así que el coche va realmente más rápido de lo que indica; uno más pequeño produce el efecto contrario.' },
+      { question: '¿Es el mismo error que ven el ABS o el control de tracción?', answer: 'Es el mismo cambio de diámetro de rodadura subyacente, pero esta calculadora solo estima la lectura del velocímetro — no representa cómo reacciona el software de ABS o control de tracción de un vehículo concreto.' },
+      { question: '¿Puedo obtener con esto una corrección exacta del velocímetro?', answer: 'Solo como estimación. El diámetro de rodadura real se ve afectado por el desgaste del neumático, la presión, la carga y la tolerancia de fabricación — considérelo un punto de partida, no un valor de calibración certificado.' },
+    ],
   },
   'gear-ratio-calculator': {
     title: 'Calculadora de Relación de Transmisión',
@@ -345,6 +365,11 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Medir la distancia entre dos orificios de birlo que están directamente enfrentados en una llanta de 5 birlos, lo cual no es el diámetro del círculo de birlos.',
     warning: 'Un PCD calculado es solo una referencia inicial. Confirme siempre el patrón de birlos, el diámetro del buje y la rosca de los birlos con la especificación de la llanta y el vehículo antes de comprar.',
+    faqs: [
+      { question: '¿Cómo mido el círculo de birlos en una llanta de 5 orificios?', answer: 'Mida desde el centro de un orificio de birlo hasta el borde exterior del orificio situado dos posiciones más allá (no el directamente opuesto), e introduzca esa distancia aquí — la calculadora la convierte al diámetro real del círculo de birlos usando la geometría de 5 orificios.' },
+      { question: '¿Puedo montar una llanta con un patrón de birlos distinto al de mi buje?', answer: 'No de forma segura sin un adaptador, y los adaptadores conllevan sus propios riesgos. El patrón de birlos (número de orificios y PCD) debe coincidir con el del buje, o la llanta no se montará correctamente.' },
+      { question: '¿Es el patrón de birlos lo mismo que el diámetro del buje?', answer: 'No — el patrón de birlos describe dónde se sitúan los orificios de birlo, mientras que el diámetro del buje es el orificio central que centra la llanta sobre el cubo. Ambos deben coincidir o adaptarse por separado.' },
+    ],
   },
   'tire-load-speed-rating': {
     title: 'Índice de Carga y Velocidad del Neumático',
@@ -470,5 +495,10 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     ],
     commonMistake: 'Asumir una única especificación de fábrica para toda una gama, cuando distintos acabados pueden llevar paquetes de llantas o neumáticos diferentes.',
     warning: 'Esta lista crece con el tiempo y todavía no cubre todos los vehículos. Confirme siempre los datos con el manual de su propio vehículo antes de apretar ruedas o pedir piezas.',
+    faqs: [
+      { question: '¿Dónde encuentro la medida de neumático y el patrón de birlos reales de fábrica de mi vehículo?', answer: 'La fuente más fiable es la etiqueta del marco de la puerta del conductor o el manual del propietario — ambos muestran la especificación exacta de fábrica de su acabado concreto, que puede diferir de referencias genéricas en línea.' },
+      { question: '¿Por qué mi vehículo exacto no aparece aquí?', answer: 'Este es un conjunto inicial curado, no una base de datos completa del fabricante. Si la marca y el modelo aparecen pero sin un dato verificado, o aún no aparecen en absoluto, use directamente la etiqueta de la puerta del conductor con la Calculadora de Tamaño de Neumáticos o de Patrón de Birlos.' },
+      { question: '¿Qué significa el nivel de confianza?', answer: 'Confianza alta significa que varias fuentes independientes coincidieron. Confianza media o baja significa que las fuentes discreparon o que un valor no se pudo confirmar por completo — compruebe estas entradas antes de usarlas.' },
+    ],
   },
 });
