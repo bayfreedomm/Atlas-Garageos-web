@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSetupShareHash, decodeSetupShare, decodeSetupShareHash, encodeSetupShare, type SetupShareV1 } from '../../src/features/share/setup-share';
+import { createSetupShareHash, decodeSetupShare, decodeSetupShareHash, encodeSetupShare, MAX_SETUP_SHARE_LENGTH, type SetupShareV1 } from '../../src/features/share/setup-share';
 
 const payload: SetupShareV1 = {
   v: 1,
@@ -23,5 +23,10 @@ describe('versioned setup sharing', () => {
     const invalidPayload = { ...payload, current: { ...payload.current, tireWidthMm: -1 } };
     expect(decodeSetupShare(encodeURIComponent(JSON.stringify(invalidPayload)))).toMatchObject({ ok: false });
     expect(decodeSetupShareHash('#other=value')).toBeUndefined();
+  });
+
+  it('rejects malformed encodings and oversized payloads without throwing', () => {
+    expect(decodeSetupShare('%E0%A4%A')).toMatchObject({ ok: false, issues: [{ code: 'invalid-format' }] });
+    expect(decodeSetupShare('x'.repeat(MAX_SETUP_SHARE_LENGTH + 1))).toMatchObject({ ok: false, issues: [{ code: 'out-of-range', field: 'share' }] });
   });
 });

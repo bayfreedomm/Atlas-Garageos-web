@@ -141,18 +141,17 @@ export function initializeVehicleFitmentPicker(): void {
       if (!make || !value) { showEmpty(); return; }
       if (value.startsWith(UNVERIFIED_PREFIX)) {
         const model = value.slice(UNVERIFIED_PREFIX.length);
-        setSelectedVehicle({ make, model });
         showUnverified(make, model);
         return;
       }
       const vehicle = vehicleById(value);
       if (!vehicle) { showEmpty(); return; }
-      setSelectedVehicle({ make: vehicle.make, model: vehicle.model, id: vehicle.id });
       showVehicle(vehicle);
     });
 
     applyButton.addEventListener('click', () => {
       if (!currentVehicle) return;
+      setSelectedVehicle({ make: currentVehicle.make, model: currentVehicle.model, id: currentVehicle.id });
       if (target === 'tire-size') applyToTireSizeForm(currentVehicle);
       else applyToBoltPatternForm(currentVehicle);
     });

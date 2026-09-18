@@ -65,11 +65,11 @@ export function initializeBoltPatternCalculator(): void {
   const t = BOLT_PATTERN_LABELS[getPageLocale()];
   document.querySelectorAll<HTMLFormElement>('[data-calculator="bolt-pattern"]').forEach((form) => {
     const calculate = (): void => {
-      const lugCount = Math.round(numberValue(form, 'lugCount'));
+      const lugCount = numberValue(form, 'lugCount');
       const spacingEntered = numberValue(form, 'spacing');
       const unit = textValue(form, 'spacingUnit') === 'in' ? 'in' : 'mm';
       const issues: string[] = [];
-      if (!Number.isFinite(lugCount) || lugCount < 3 || lugCount > 10) issues.push(t.lugCountIssue);
+      if (!Number.isInteger(lugCount) || lugCount < 3 || lugCount > 10) issues.push(t.lugCountIssue);
       if (!Number.isFinite(spacingEntered) || spacingEntered <= 0 || spacingEntered > 500) issues.push(t.spacingIssue);
       if (issues.length) {
         setErrors(form, issues);

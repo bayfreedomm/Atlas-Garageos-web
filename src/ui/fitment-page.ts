@@ -476,9 +476,9 @@ export async function initializeFitmentPage(): Promise<void> {
   function renderGarage(state: GarageState): void {
     garageState = state;
     const presentation = activeGaragePresentation(state);
-    const shellVehicle = required<HTMLElement>('#shell-vehicle');
+    const shellVehicle = document.querySelector<HTMLElement>('#shell-vehicle');
     const vehicleSummary = required<HTMLElement>('#vehicle-summary');
-    shellVehicle.textContent = presentation.vehicle?.displayName ?? 'No vehicle selected';
+    if (shellVehicle) shellVehicle.textContent = presentation.vehicle?.displayName ?? 'No vehicle selected';
     vehicleSummary.replaceChildren();
     const vehicleTitle = document.createElement('h3');
     const vehicleCopy = document.createElement('p');
@@ -557,7 +557,12 @@ export async function initializeFitmentPage(): Promise<void> {
       appendButton(actions, 'Load as current', () => { writeSetup('current', setupToInput(saved)); renderComparison(); });
       appendButton(actions, 'Load as new', () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); });
       appendButton(actions, 'Share', async () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); await copyShare(); }, 'secondary');
-      appendButton(actions, 'Delete', async () => { if (window.confirm(`Delete “${saved.name}”?`)) renderGarage(await service.deleteSetup(saved.id)); }, 'danger');
+      appendButton(actions, 'Delete', async () => {
+        if (!window.confirm(`Delete “${saved.name}”?`)) return;
+        const deleted = await service.deleteSetup(saved.id);
+        if (!deleted.ok) { showIssues(errors, deleted.issues); return; }
+        renderGarage(deleted.value);
+      }, 'danger');
       card.append(title, detail, actions);
       garageList.append(card);
     }

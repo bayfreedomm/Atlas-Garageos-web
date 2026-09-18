@@ -101,8 +101,11 @@ export function serializeGarageState(state: GarageState): string {
   return JSON.stringify(state);
 }
 
+export const MAX_GARAGE_STORAGE_LENGTH = 1_000_000;
+
 export function deserializeGarageState(raw: string | null): GarageLoadResult {
   if (raw === null) return { state: createEmptyGarageState(), status: 'empty' };
+  if (raw.length > MAX_GARAGE_STORAGE_LENGTH) return { state: createEmptyGarageState(), status: 'recovered-invalid' };
   let value: unknown;
   try {
     value = JSON.parse(raw);

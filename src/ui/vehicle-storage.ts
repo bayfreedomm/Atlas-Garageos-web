@@ -6,6 +6,8 @@
  */
 
 const STORAGE_KEY = 'atlas_selected_vehicle';
+const MAX_SAVED_VEHICLE_LENGTH = 2_048;
+const MAX_SAVED_VEHICLE_FIELD_LENGTH = 100;
 
 export interface SavedVehicle {
   readonly make: string;
@@ -17,7 +19,7 @@ export interface SavedVehicle {
 export function getSelectedVehicle(): SavedVehicle | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw || raw.length > MAX_SAVED_VEHICLE_LENGTH) return null;
     const parsed: unknown = JSON.parse(raw);
     if (
       typeof parsed === 'object' && parsed !== null &&
@@ -25,8 +27,12 @@ export function getSelectedVehicle(): SavedVehicle | null {
       typeof (parsed as { make: unknown }).make === 'string' &&
       typeof (parsed as { model: unknown }).model === 'string'
     ) {
+      const make = (parsed as { make: string }).make.trim();
+      const model = (parsed as { model: string }).model.trim();
       const id = (parsed as { id?: unknown }).id;
-      return { make: (parsed as { make: string }).make, model: (parsed as { model: string }).model, ...(typeof id === 'string' ? { id } : {}) };
+      if (!make || !model || make.length > MAX_SAVED_VEHICLE_FIELD_LENGTH || model.length > MAX_SAVED_VEHICLE_FIELD_LENGTH) return null;
+      if (typeof id === 'string' && (id.length === 0 || id.length > MAX_SAVED_VEHICLE_FIELD_LENGTH)) return null;
+      return { make, model, ...(typeof id === 'string' ? { id } : {}) };
     }
   } catch {
     // localStorage unavailable (private browsing, etc.) — behave as if nothing is saved.

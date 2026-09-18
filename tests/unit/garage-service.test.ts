@@ -25,7 +25,9 @@ describe('garage service', () => {
 
     const state = (await garage.load()).state;
     const afterDelete = await garage.deleteSetup(state.savedSetups[0]!.id);
-    expect(afterDelete.savedSetups.map((item) => item.name)).toEqual(['Winter']);
+    expect(afterDelete.ok).toBe(true);
+    if (!afterDelete.ok) return;
+    expect(afterDelete.value.savedSetups.map((item) => item.name)).toEqual(['Winter']);
   });
 
   it('does not mutate garage when a shared setup is decoded, but saves explicitly', async () => {

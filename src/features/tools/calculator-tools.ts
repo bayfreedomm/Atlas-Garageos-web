@@ -107,7 +107,7 @@ export function speedometerTableTool(original: TireToolInput, proposed: TireTool
   if (!comparison.ok) return comparison;
   const factor = 1 + comparison.value.speedometerDifferencePercent / 100;
   const steps = unit === 'mph' ? SPEED_TABLE_STEPS_MPH : SPEED_TABLE_STEPS_KMH;
-  return valid(Object.freeze(steps.map((indicatedSpeed) => Object.freeze({ indicatedSpeed, actualSpeed: Number((indicatedSpeed * factor).toFixed(1)) }))));
+  return valid(Object.freeze(steps.map((indicatedSpeed) => Object.freeze({ indicatedSpeed, actualSpeed: indicatedSpeed * factor }))));
 }
 
 export function calculateWheelOffsetTool(input: WheelOffsetToolInput) {

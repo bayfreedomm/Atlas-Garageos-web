@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { GARAGE_SCHEMA_VERSION } from '../../src/domain/garage';
 import { GarageService } from '../../src/features/garage/garage-service';
 import { LocalStorageGarageRepository, GARAGE_STORAGE_KEY, type StringStorage } from '../../src/storage/local-storage-garage-repository';
+import { MAX_GARAGE_STORAGE_LENGTH } from '../../src/storage/garage-serialization';
 
 class MemoryStorage implements StringStorage {
   public readonly values = new Map<string, string>();
   public getItem(key: string): string | null { return this.values.get(key) ?? null; }
   public setItem(key: string, value: string): void { this.values.set(key, value); }
+}
+
+class FailingStorage extends MemoryStorage {
+  public override setItem(): void { throw new Error('quota exceeded'); }
 }
 
 const setup = {
@@ -57,6 +62,14 @@ describe('garage storage', () => {
     expect(loaded.state.savedSetups).toEqual([]);
   });
 
+  it('rejects oversized persisted state before parsing it', async () => {
+    const storage = new MemoryStorage();
+    storage.values.set(GARAGE_STORAGE_KEY, 'x'.repeat(MAX_GARAGE_STORAGE_LENGTH + 1));
+    const loaded = await new LocalStorageGarageRepository(storage).load();
+    expect(loaded.status).toBe('recovered-invalid');
+    expect(loaded.state.vehicles).toEqual([]);
+  });
+
   it('recovers safely from unsupported and invalid schemas', async () => {
     const storage = new MemoryStorage();
     storage.values.set(GARAGE_STORAGE_KEY, JSON.stringify({ schemaVersion: 99, vehicles: [], activeVehicleId: null, savedSetups: [] }));
@@ -64,6 +77,12 @@ describe('garage storage', () => {
 
     storage.values.set(GARAGE_STORAGE_KEY, JSON.stringify({ schemaVersion: 1, vehicles: 'invalid', activeVehicleId: null, savedSetups: [] }));
     expect((await new LocalStorageGarageRepository(storage).load()).status).toBe('recovered-invalid');
+  });
+
+  it('returns a validation error when browser persistence is unavailable', async () => {
+    const garage = new GarageService(new LocalStorageGarageRepository(new FailingStorage()), dependencies());
+    const saved = await garage.saveSetup({ name: 'Daily', vehicleNickname: 'Roadster', setup });
+    expect(saved).toMatchObject({ ok: false, issues: [{ field: 'browserStorage' }] });
   });
 
   it('migrates Garage v1 to v2 without losing saved setups', async () => {

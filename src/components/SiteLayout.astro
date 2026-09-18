@@ -1,6 +1,7 @@
 ---
 import type { ToolDefinition } from '../seo/tool-registry';
 import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registry';
+import { serializeJsonLd } from '../seo/safe-json-ld';
 import { uiStrings, type ContentLocale } from '../localization/site-catalog';
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
@@ -32,12 +33,12 @@ const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de
 const publishedLocaleAlternates = alternates.filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang in LOCALE_SHORT_LABELS);
 const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
 const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
-const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
-const applicationJsonLd = definition && definition.kind === 'tool' ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
+const websiteJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
+const applicationJsonLd = definition && definition.kind === 'tool' ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
   ? [{ name: definition.title, href: pathname }]
   : definition ? [{ name: 'Home', href: '/' }, { name: 'Tools', href: '/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
-const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
+const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
 <html lang={htmlLang}>

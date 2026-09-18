@@ -6,6 +6,8 @@ import headers from '../../public/_headers?raw';
 import manifestSource from '../../public/site.webmanifest?raw';
 import redirects from '../../public/_redirects?raw';
 import notFoundPage from '../../src/pages/404.astro?raw';
+import fitmentStudio from '../../src/pages/fitment-studio/index.astro?raw';
+import fitmentPageUi from '../../src/ui/fitment-page.ts?raw';
 import { indexableRoutes } from '../../src/seo/tool-registry';
 
 describe('production launch configuration', () => {
@@ -26,13 +28,16 @@ describe('production launch configuration', () => {
   });
 
   it('sets defensive static-site security headers without unsafe eval', () => {
-    expect(headers).toContain("default-src 'self'");
+    expect(config).toContain("default-src 'self'");
+    expect(config).toContain('security:');
+    expect(config).toContain('csp:');
     expect(headers).toContain("frame-ancestors 'none'");
     expect(headers).toContain('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     expect(headers).toContain('X-Content-Type-Options: nosniff');
     expect(headers).toContain('Referrer-Policy: strict-origin-when-cross-origin');
     expect(headers).toContain('Permissions-Policy:');
     expect(headers).not.toContain('unsafe-eval');
+    expect(headers).not.toContain("script-src 'self' 'unsafe-inline'");
   });
 
   it('gives content-addressed assets immutable caching', () => {
@@ -43,6 +48,12 @@ describe('production launch configuration', () => {
     expect(notFoundPage).toContain('noindex,follow');
     expect(notFoundPage).toContain('/fitment-studio/');
     expect(notFoundPage).toContain('/tools/');
+  });
+
+  it('keeps every required Fitment Studio element in the rendered page contract', () => {
+    const requiredIds = [...fitmentPageUi.matchAll(/required(?:<[^>]+>)?\('#([^']+)'\)/g)].map((match) => match[1]);
+    expect(requiredIds.length).toBeGreaterThan(10);
+    for (const id of requiredIds) expect(fitmentStudio).toContain(`id="${id}"`);
   });
 
   it('ships the restrained Atlas monogram without external assets', () => {

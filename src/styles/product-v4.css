@@ -323,7 +323,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
   .tool-launch-row .tool-icon{width:2.65rem!important;height:2.65rem!important}.tool-launch-row strong{font-size:.88rem!important}.tool-launch-row small{font-size:.68rem!important}
   .directory-identity{padding:.15rem 0 .3rem!important}.directory-identity h1{font-size:clamp(1.5rem,7vw,1.9rem)!important}
   .toolbox{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-  .toolbox-search{padding:.75rem!important;border-radius:.9rem!important}.category-filters{margin:.7rem 0 .9rem!important;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:.15rem}.category-filters button{flex:0 0 auto!important;padding:.62rem .82rem!important}
+  .toolbox-search{padding:.75rem!important;border-radius:.9rem!important}.category-filters{margin:.7rem 0 .9rem!important;overflow-x:visible;flex-wrap:wrap!important;padding-bottom:.15rem}.category-filters button{flex:0 0 auto!important;padding:.62rem .82rem!important}
   .tool-row{min-height:4.55rem!important;padding:.72rem .8rem!important;border-radius:.95rem!important}.tool-row .tool-icon{width:2.75rem!important;height:2.75rem!important}.tool-row__copy strong{font-size:.9rem!important}.tool-row__copy small{font-size:.68rem!important}
 }
 

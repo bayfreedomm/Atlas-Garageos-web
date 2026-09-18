@@ -14,17 +14,19 @@ export type TorqueUnit = 'nm' | 'lb-ft';
 export type WeightUnit = 'kg' | 'lb';
 
 const numberIssue = (field: string, value: unknown): ValidationIssue => ({ code: 'not-a-number', field, message: `${field} must be a finite number.`, received: value });
-const rangeIssue = (field: string, value: number, minimum: number): ValidationIssue => ({ code: 'out-of-range', field, message: `${field} must be ${minimum === 0 ? 'zero or greater' : 'greater than zero'}.`, received: value, minimum });
+const MINIMUM_POSITIVE_QUANTITY = 1e-9;
+const MAXIMUM_QUANTITY = 1e9;
+const rangeIssue = (field: string, value: number, minimum: number): ValidationIssue => ({ code: 'out-of-range', field, message: `${field} must be between ${minimum} and ${MAXIMUM_QUANTITY}.`, received: value, minimum, maximum: MAXIMUM_QUANTITY });
 
 export function createPositiveQuantity(value: number, field: string): ValidationResult<PositiveQuantity> {
   if (!Number.isFinite(value)) return invalid(numberIssue(field, value));
-  if (value <= 0) return invalid(rangeIssue(field, value, 1));
+  if (value < MINIMUM_POSITIVE_QUANTITY || value > MAXIMUM_QUANTITY) return invalid(rangeIssue(field, value, MINIMUM_POSITIVE_QUANTITY));
   return valid(value as PositiveQuantity);
 }
 
 export function createNonNegativeQuantity(value: number, field: string): ValidationResult<NonNegativeQuantity> {
   if (!Number.isFinite(value)) return invalid(numberIssue(field, value));
-  if (value < 0) return invalid(rangeIssue(field, value, 0));
+  if (value < 0 || value > MAXIMUM_QUANTITY) return invalid(rangeIssue(field, value, 0));
   return valid(value as NonNegativeQuantity);
 }
 

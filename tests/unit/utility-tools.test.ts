@@ -107,4 +107,10 @@ describe('traffic-first utility calculations', () => {
     expect(calculatePowerToWeightTool({ power: 100, powerUnit: 'kw', weight: -1, weightUnit: 'kg' })).toMatchObject({ ok: false, issues: [{ field: 'weight' }] });
     expect(calculateRoadTripCostTool({ system: 'metric', distance: 100, economy: 5, price: 2, roundTrip: false, people: 1.5 })).toMatchObject({ ok: false, issues: [{ code: 'not-an-integer', field: 'people' }] });
   });
+
+  it('fails closed for finite values that would underflow or overflow calculations', () => {
+    expect(calculateFuelCostTool({ system: 'metric', distance: 1e308, economy: 7, price: 2 })).toMatchObject({ ok: false, issues: [{ code: 'out-of-range', field: 'distance' }] });
+    expect(convertFuelEconomyTool(Number.MIN_VALUE, 'us-mpg')).toMatchObject({ ok: false, issues: [{ code: 'out-of-range', field: 'fuelEconomy' }] });
+    expect(calculateRoadTripCostTool({ system: 'metric', distance: 100, economy: 5, price: 2, roundTrip: false, extraCost: 1e308 })).toMatchObject({ ok: false, issues: [{ code: 'out-of-range', field: 'extraCost' }] });
+  });
 });

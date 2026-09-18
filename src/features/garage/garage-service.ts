@@ -27,6 +27,15 @@ export class GarageService {
     return this.repository.load();
   }
 
+  private async persist(state: GarageState): Promise<ValidationResult<GarageState>> {
+    try {
+      await this.repository.save(state);
+      return valid(state);
+    } catch {
+      return invalid({ code: 'invalid-format', field: 'browserStorage', message: 'Browser storage is unavailable or full. Nothing was saved.' });
+    }
+  }
+
   public async selectVehicle(vehicleId: string): Promise<ValidationResult<GarageState>> {
     const loaded = await this.repository.load();
     if (!loaded.state.vehicles.some((vehicle) => vehicle.id === vehicleId)) {
@@ -34,8 +43,7 @@ export class GarageService {
     }
     const next = createGarageState({ ...loaded.state, activeVehicleId: vehicleId });
     if (!next.ok) return next;
-    await this.repository.save(next.value);
-    return valid(next.value);
+    return this.persist(next.value);
   }
 
   public async saveSetup(command: SaveSetupCommand): Promise<ValidationResult<GarageState>> {
@@ -70,15 +78,14 @@ export class GarageService {
     if (!savedSetup.ok) return invalid(...savedSetup.issues);
     const next = createGarageState({ vehicles, activeVehicleId: vehicleId, savedSetups: [...state.savedSetups, savedSetup.value], clearanceProfiles: state.clearanceProfiles });
     if (!next.ok) return next;
-    await this.repository.save(next.value);
-    return valid(next.value);
+    return this.persist(next.value);
   }
 
   public saveSharedSetup(shared: SetupShareV1, name: string, vehicleNickname: string): Promise<ValidationResult<GarageState>> {
     return this.saveSetup({ name, vehicleNickname, setup: shared.proposed });
   }
 
-  public async deleteSetup(id: string): Promise<GarageState> {
+  public async deleteSetup(id: string): Promise<ValidationResult<GarageState>> {
     const state = (await this.repository.load()).state;
     const next = createGarageState({
       vehicles: state.vehicles,
@@ -86,9 +93,8 @@ export class GarageService {
       savedSetups: state.savedSetups.filter((setup) => setup.id !== id),
       clearanceProfiles: state.clearanceProfiles.map((profile) => profile.baselineSetupId === id ? { ...profile, baselineSetupId: null } : profile),
     });
-    if (!next.ok) return state;
-    await this.repository.save(next.value);
-    return next.value;
+    if (!next.ok) return next;
+    return this.persist(next.value);
   }
 
   public async saveClearanceProfile(command: {
@@ -131,7 +137,6 @@ export class GarageService {
       clearanceProfiles: [...state.clearanceProfiles.filter((item) => item.vehicleId !== vehicleId), profile.value],
     });
     if (!next.ok) return next;
-    await this.repository.save(next.value);
-    return valid(next.value);
+    return this.persist(next.value);
   }
 }

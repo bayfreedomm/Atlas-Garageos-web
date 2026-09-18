@@ -17,6 +17,8 @@ interface CompactSetupShareV1 {
   readonly n: CompactSetup;
 }
 
+export const MAX_SETUP_SHARE_LENGTH = 4_096;
+
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
 function readSetup(value: unknown): SetupInput | undefined {
@@ -50,6 +52,9 @@ function readCompactSetup(value: unknown): SetupInput | undefined {
 }
 
 export function decodeSetupShare(encoded: string): ValidationResult<SetupShareV1> {
+  if (encoded.length > MAX_SETUP_SHARE_LENGTH) {
+    return invalid({ code: 'out-of-range', field: 'share', message: `Share setup must be no more than ${MAX_SETUP_SHARE_LENGTH} characters.`, received: encoded.length, maximum: MAX_SETUP_SHARE_LENGTH });
+  }
   let value: unknown;
   try {
     value = JSON.parse(decodeURIComponent(encoded));
