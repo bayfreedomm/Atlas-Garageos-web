@@ -514,8 +514,14 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 /* Responsive release guardrails. */
 .tool-machine,.tool-workspace,.calculator-form,.utility-fields,.instant-input,.related-grid,.setup-columns,.spec-row,.rpm-matrix{min-width:0}.calculator-form{grid-template-columns:minmax(0,1fr)!important}.tool-machine input,.tool-machine select,.tool-machine button{max-width:100%}.rpm-matrix{width:100%;max-width:100%}.rpm-matrix__scroll,.map-scroll{width:100%;max-width:100%;overflow:auto}.related-grid{overflow:visible}
 @media(min-width:42rem){.standard-answer{grid-template-columns:minmax(0,1.3fr) minmax(14rem,.7fr);padding:1rem}.standard-visual,.gear-technical-visual,.ev-technical-visual{padding:1rem}}
-@media(max-width:47.999rem){.tool-machine .utility-fields,.tool-machine .gear-ratio-inputs{grid-template-columns:minmax(0,1fr)!important}.utility-fields>label,.instant-input>label{min-width:0;width:100%}.utility-fields input,.utility-fields select,.instant-input input,.instant-input select{width:100%;min-width:0}}
-@media(max-width:26rem){.tool-workspace{padding:.75rem!important}.utility-fields,.instant-input,.ev-visual-stats{grid-template-columns:1fr!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.5rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.5rem!important;height:2.5rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
+@media(max-width:47.999rem){.tool-machine .utility-fields,.tool-machine .gear-ratio-inputs{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.6rem!important}.utility-fields>label,.instant-input>label{min-width:0;width:100%}.utility-fields input,.utility-fields select,.instant-input input,.instant-input select{width:100%;min-width:0}.utility-fields>label.field-wide{grid-column:1/-1!important}
+/* Tighten the top of every tool page: smaller title, less breathing room before the calculator. */
+.breadcrumbs.tool-breadcrumbs{margin-top:.4rem!important;padding-bottom:.3rem!important}
+.tool-intro{padding:.55rem 0 .5rem!important;gap:.65rem!important}
+.tool-intro h1{font-size:clamp(1.55rem,6.6vw,2.1rem)!important;margin-bottom:.3rem!important}
+.tool-intro .hero-copy{margin-top:0!important;font-size:.86rem!important;line-height:1.4!important}
+.tool-stage{gap:.7rem!important}}
+@media(max-width:26rem){.tool-workspace{padding:.75rem!important}.instant-input,.ev-visual-stats{grid-template-columns:1fr!important}.utility-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.3rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.3rem!important;height:2.3rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
 
 /* V4.7 — Homepage Concept B: real car, real context.
    The photographic hero remains dark in both themes; light mode applies to the product surface below it.

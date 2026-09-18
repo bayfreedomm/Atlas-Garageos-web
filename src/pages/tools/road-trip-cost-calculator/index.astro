@@ -8,7 +8,7 @@ const definition = toolById('road-trip-cost-calculator');
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
     <FuelFields distance={420} economy={6.5} />
     <fieldset class="trip-options"><legend>Trip</legend>
-      <div class="utility-fields"><label>Direction<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label></div>
+      <div class="utility-fields"><label class="field-wide">Direction<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label></div>
       <details><summary>Add tolls, extras, or travellers</summary><div class="utility-fields">
         <label>Extra trip cost<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
         <label>People<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
