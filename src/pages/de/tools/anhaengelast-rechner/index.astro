@@ -6,7 +6,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('towing-capacity-calculator');
 const c = localizedTool('towing-capacity-calculator', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/anhaengelast-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-capacidad-remolque/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/anhaengelast-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-capacidad-remolque/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }]}>
   <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
     <div class="utility-fields">
       <label class="field-wide">Einheit<select name="unit"><option value="lb" selected>Pfund (lb)</option><option value="kg">Kilogramm (kg)</option></select></label>

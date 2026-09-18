@@ -27,7 +27,7 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
-    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(15);
+    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(21);
     expect(hub).toContain('<ToolDirectory mode="all"');
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('data-tool-search-form');
@@ -39,7 +39,9 @@ describe('toolbox-first product surfaces', () => {
     expect(layout).not.toContain('bottom-nav');
     expect(drawer).toContain('aria-controls="navigation-drawer"');
     expect(drawer).toContain('data-menu-close');
-    expect(drawer).toContain('Wheel &amp; Tire Compare');
+    // The fitment link's label is now locale-aware (uiStrings with an English fallback),
+    // so it renders as a JS string default (plain &) rather than a static HTML entity.
+    expect(drawer).toContain("?? 'Wheel & Tire Compare'");
     expect(drawer).not.toContain('My Garage');
     expect(drawer).toContain('<ThemeControl');
   });

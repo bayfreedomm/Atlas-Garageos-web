@@ -1,7 +1,13 @@
 ---
 import SiteLayout from '../../components/SiteLayout.astro';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/privacy-policy/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/privacy-policy/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/privacy-policy/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/privacy-policy/' },
+];
 ---
-<SiteLayout title="Privacy Policy" description="How Atlas GarageOS handles calculator inputs and locally saved vehicle data." pathname="/privacy-policy/" active="tools" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Privacy Policy', href: '/privacy-policy/' }]}>
+<SiteLayout title="Privacy Policy" description="How Atlas GarageOS handles calculator inputs and locally saved vehicle data." pathname="/privacy-policy/" active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Privacy Policy', href: '/privacy-policy/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Privacy Policy</span></nav>
   <header class="directory-identity"><h1>Privacy policy</h1><p>Last updated September 2026.</p></header>
   <div class="tool-explanation privacy-copy">

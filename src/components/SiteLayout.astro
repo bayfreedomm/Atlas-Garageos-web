@@ -7,6 +7,7 @@ import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
 import Footer from './Footer.astro';
 import ThemeQuickToggle from './ThemeQuickToggle.astro';
+import LanguageQuickToggle from './LanguageQuickToggle.astro';
 import '../styles/global.css';
 import '../styles/product-v3.css';
 import '../styles/product-v4.css';
@@ -26,6 +27,11 @@ const locale = props.locale;
 const t = locale ? uiStrings[locale] : undefined;
 const htmlLang = locale ?? definition?.locale ?? 'en';
 const alternates = props.alternates ?? [{ hreflang: 'en', href: canonical }, { hreflang: 'x-default', href: canonical }];
+const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES' };
+const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español' };
+const publishedLocaleAlternates = alternates.filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang in LOCALE_SHORT_LABELS);
+const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
+const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
 const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
 const applicationJsonLd = definition && definition.kind === 'tool' ? JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
@@ -46,9 +52,13 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
     <meta property="og:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={`${SITE_ORIGIN}/atlas-hero-car.png`} />
+    <meta property="og:image:width" content="1672" />
+    <meta property="og:image:height" content="941" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${SITE_ORIGIN}/atlas-hero-car.png`} />
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
@@ -65,8 +75,9 @@ const breadcrumbJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@ty
       <a class="brand" href={locale ? `/${locale}/` : '/'} aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
         <nav class="desktop-nav" aria-label="Primary navigation"><a href={locale ? `/${locale}/` : '/'} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={locale ? `/${locale}/tools/` : '/tools/'} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href="/fitment-studio/" aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a></nav>
+        <LanguageQuickToggle links={headerLocaleLinks} current={htmlLang} />
         <ThemeQuickToggle />
-        <NavigationDrawer locale={locale} />
+        <NavigationDrawer locale={locale} localeLinks={drawerLocaleLinks} />
       </div>
     </div></header>
     <main id="main-content"><slot /></main>

@@ -3,6 +3,8 @@
 /en/methodology/ /methodology/ 301
 /en/privacy-policy/ /privacy-policy/ 301
 /en/tools/ /tools/ 301
+/en/tools/bolt-pattern-calculator/ /tools/bolt-pattern-calculator/ 301
+/en/tools/compression-ratio-calculator/ /tools/compression-ratio-calculator/ 301
 /en/tools/ev-charging-cost-calculator/ /tools/ev-charging-cost-calculator/ 301
 /en/tools/fitment-map/ /tools/fitment-map/ 301
 /en/tools/fuel-cost-calculator/ /tools/fuel-cost-calculator/ 301
@@ -13,8 +15,12 @@
 /en/tools/nm-lb-ft-converter/ /tools/nm-lb-ft-converter/ 301
 /en/tools/power-to-weight-calculator/ /tools/power-to-weight-calculator/ 301
 /en/tools/psi-bar-converter/ /tools/psi-bar-converter/ 301
+/en/tools/quarter-mile-calculator/ /tools/quarter-mile-calculator/ 301
 /en/tools/road-trip-cost-calculator/ /tools/road-trip-cost-calculator/ 301
 /en/tools/speedometer-error-calculator/ /tools/speedometer-error-calculator/ 301
+/en/tools/tire-date-code-decoder/ /tools/tire-date-code-decoder/ 301
+/en/tools/tire-load-speed-rating/ /tools/tire-load-speed-rating/ 301
 /en/tools/tire-size-calculator/ /tools/tire-size-calculator/ 301
 /en/tools/tire-size-comparison/ /tools/tire-size-comparison/ 301
+/en/tools/towing-capacity-calculator/ /tools/towing-capacity-calculator/ 301
 /en/tools/wheel-offset-calculator/ /tools/wheel-offset-calculator/ 301

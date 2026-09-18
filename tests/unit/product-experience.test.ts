@@ -27,7 +27,9 @@ describe('Milestone 8 product experience', () => {
     expect(brand).toContain('Atlas');
     expect(brand).toContain('Garage');
     expect(brand).toContain('brand-wordmark__os');
-    for (const label of ['Home', 'Tools', 'Wheel &amp; Tire Compare']) expect(`${siteLayout}${navigationDrawer}`).toContain(`>${label}</a>`);
+    // Nav labels are now locale-aware (uiStrings[locale] with an English fallback), so the
+    // literal text is the JS fallback default rather than raw HTML — verify that default instead.
+    for (const label of ['Home', 'Tools', 'Wheel & Tire Compare']) expect(`${siteLayout}${navigationDrawer}`).toContain(`?? '${label}'`);
     expect(siteLayout).not.toContain('>My Garage</a>');
   });
 

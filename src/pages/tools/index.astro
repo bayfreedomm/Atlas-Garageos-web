@@ -1,8 +1,14 @@
 ---
 import SiteLayout from '../../components/SiteLayout.astro';
 import ToolDirectory from '../../components/ToolDirectory.astro';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/tools/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/' },
+];
 ---
-<SiteLayout title="Automotive Tools" description="Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment." pathname="/tools/" active="tools" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Tools', href: '/tools/' }]}>
+<SiteLayout title="Automotive Tools" description="Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment." pathname="/tools/" active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Tools', href: '/tools/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Tools</span></nav>
   <header class="directory-identity"><h1>Automotive tools</h1><p>Choose a job and get a clear answer.</p></header>
   <ToolDirectory mode="all" />

@@ -4,7 +4,7 @@ import UtilityResultStandard from '../../../components/UtilityResultStandard.ast
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('quarter-mile-calculator');
 ---
-<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Performance" intro="Estimate quarter-mile elapsed time and trap speed from vehicle weight and power." limitation="This is a power-to-weight physics estimate, not a performance guarantee. Traction, driver skill, gearing, altitude, and track conditions all change the real result.">
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/quarter-mile-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/viertelmeile-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-cuarto-milla/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/quarter-mile-calculator/' }]} explanationBeforeInsights eyebrow="Performance" intro="Estimate quarter-mile elapsed time and trap speed from vehicle weight and power." limitation="This is a power-to-weight physics estimate, not a performance guarantee. Traction, driver skill, gearing, altitude, and track conditions all change the real result.">
   <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
     <div class="utility-fields">
       <label>Vehicle weight<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>

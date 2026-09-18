@@ -1,7 +1,13 @@
 ---
 import SiteLayout from '../../components/SiteLayout.astro';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/methodology/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/methodology/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/methodology/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/methodology/' },
+];
 ---
-<SiteLayout title="Accuracy & Methodology" description="How Atlas GarageOS automotive calculators work, which formulas and assumptions they use, and where calculated results stop." pathname="/methodology/" active="tools" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Accuracy & Methodology', href: '/methodology/' }]}>
+<SiteLayout title="Accuracy & Methodology" description="How Atlas GarageOS automotive calculators work, which formulas and assumptions they use, and where calculated results stop." pathname="/methodology/" active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Accuracy & Methodology', href: '/methodology/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Accuracy &amp; Methodology</span></nav>
   <header class="directory-identity methodology-hero"><p class="eyebrow">Transparency first</p><h1>Accuracy &amp; methodology</h1><p>Atlas separates exact unit conversion, nominal geometry, user-entered estimates, and real-world uncertainty instead of turning every result into a false verdict.</p></header>
 

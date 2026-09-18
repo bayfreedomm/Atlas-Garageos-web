@@ -3,7 +3,7 @@ import ToolPage from '../../../components/ToolPage.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('ev-charging-cost-calculator');
 ---
-<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This estimate includes the efficiency you enter. Battery temperature, charge taper, and the vehicle's real charging curve can still change the result.">
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/ev-charging-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/ladekosten-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-carga-coche-electrico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/ev-charging-cost-calculator/' }]} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="See the energy, cost, and time to charge your EV — from your own battery size and electricity price." limitation="This estimate includes the efficiency you enter. Battery temperature, charge taper, and the vehicle's real charging curve can still change the result.">
   <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
     <div class="utility-fields">
       <label>Battery capacity · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>

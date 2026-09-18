@@ -5,7 +5,7 @@ import FuelCostTechnicalVisual from '../../../components/FuelCostTechnicalVisual
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('fuel-cost-calculator');
 ---
-<ToolPage {definition} visual={false} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]} visual={false} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
     <FuelFields />
     <button type="submit">Calculate fuel cost</button>

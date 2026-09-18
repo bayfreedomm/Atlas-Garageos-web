@@ -8,19 +8,27 @@ import { toolInsights } from '../../src/content/tool-insights';
 import { toolRegistry } from '../../src/seo/tool-registry';
 
 describe('V3 visual and localization foundation', () => {
-  it('keeps first-wave locale routing explicit without publishing unfinished translations', () => {
+  it('keeps first-wave locale routing explicit, publishing only QA-passed translations', () => {
     expect(LOCALE_CODES).toEqual(['en', 'de', 'es', 'pt-br', 'fr']);
     expect(localeDefinitions.en.published).toBe(true);
-    expect(localeDefinitions.de.published).toBe(false);
+    // German and Spanish completed full professional translation QA this wave and are now published.
+    expect(localeDefinitions.de.published).toBe(true);
+    expect(localeDefinitions.es.published).toBe(true);
+    // Portuguese (BR) and French remain unwired placeholder slugs and stay unpublished.
+    expect(localeDefinitions['pt-br'].published).toBe(false);
+    expect(localeDefinitions.fr.published).toBe(false);
     expect(localizedToolPath('en', 'wheel-offset-calculator', 'tool')).toBe('/tools/wheel-offset-calculator/');
     expect(localizedToolPath('de', 'wheel-offset-calculator', 'tool')).toBe('/de/tools/felgen-et-rechner/');
+    expect(localizedToolPath('es', 'wheel-offset-calculator', 'tool')).toBe('/es/tools/calculadora-offset-llantas/');
     expect(localizedToolPath('pt-br', 'fuel-cost-calculator', 'tool')).toBe('/pt-br/tools/calculadora-gasto-combustivel/');
   });
 
   it('provides page-specific insight content for every registered tool', () => {
     expect(Object.keys(toolInsights)).toHaveLength(toolRegistry.length);
     for (const tool of toolRegistry) expect(toolInsights[tool.id].facts).toHaveLength(3);
-    expect(toolPage).toContain('<ToolInsights id={definition.id} />');
+    // ToolPage now forwards the active content locale to ToolInsights so DE/ES pages
+    // render translated facts/warnings instead of always falling back to English.
+    expect(toolPage).toContain('<ToolInsights id={definition.id} locale={locale} />');
   });
 
   it('uses true-scale and magnified-difference tire visualization together', () => {

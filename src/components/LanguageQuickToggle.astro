@@ -1,0 +1,12 @@
+---
+interface LocaleLink { readonly code: string; readonly label: string; readonly href: string; }
+interface Props { links: readonly LocaleLink[]; current: string; }
+const { links, current } = Astro.props;
+---
+{links.length > 1 && (
+  <nav class="lang-quick-toggle" aria-label="Switch language">
+    {links.map((link) => (
+      <a href={link.href} class:list={['lang-quick-toggle__option', { 'is-active': link.code === current }]} aria-current={link.code === current ? 'page' : undefined}>{link.label}</a>
+    ))}
+  </nav>
+)}

@@ -4,7 +4,7 @@ import UtilityResultStandard from '../../../components/UtilityResultStandard.ast
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('towing-capacity-calculator');
 ---
-<ToolPage {definition} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate maximum trailer weight and tongue weight from your GCWR, curb weight, and load." limitation="This is a simplified GCWR-based estimate. It does not check axle ratings, hitch class, brake requirements, or manufacturer-specific towing limits.">
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/anhaengelast-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-capacidad-remolque/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/towing-capacity-calculator/' }]} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate maximum trailer weight and tongue weight from your GCWR, curb weight, and load." limitation="This is a simplified GCWR-based estimate. It does not check axle ratings, hitch class, brake requirements, or manufacturer-specific towing limits.">
   <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
     <div class="utility-fields">
       <label class="field-wide">Unit<select name="unit"><option value="lb" selected>Pounds (lb)</option><option value="kg">Kilograms (kg)</option></select></label>

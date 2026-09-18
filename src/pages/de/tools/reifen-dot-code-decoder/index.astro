@@ -6,7 +6,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-date-code-decoder');
 const c = localizedTool('tire-date-code-decoder', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifen-dot-code-decoder/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/decodificador-fecha-neumatico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifen-dot-code-decoder/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/decodificador-fecha-neumatico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }]}>
   <form slot="tool" class="calculator-form" data-calculator="tire-date-code" novalidate>
     <div class="utility-fields">
       <label class="field-wide">Letzte 4 Ziffern des DOT-Codes<input name="code" type="text" value="2219" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="z. B. 2219" /></label>

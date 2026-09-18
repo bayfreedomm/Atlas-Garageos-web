@@ -23,6 +23,12 @@ const intendedRoutes = [
   '/tools/hp-kw-converter/',
   '/tools/nm-lb-ft-converter/',
   '/tools/power-to-weight-calculator/',
+  '/tools/bolt-pattern-calculator/',
+  '/tools/tire-load-speed-rating/',
+  '/tools/tire-date-code-decoder/',
+  '/tools/towing-capacity-calculator/',
+  '/tools/quarter-mile-calculator/',
+  '/tools/compression-ratio-calculator/',
 ];
 
 describe('SEO tool registry', () => {
@@ -50,11 +56,23 @@ describe('SEO tool registry', () => {
   });
 
   it('renders a sitemap with intended canonical pages and no app state', () => {
-    expect(sitemapEntries()).toEqual(intendedRoutes.map(canonicalForPath));
+    const entries = sitemapEntries();
+    // Localized (DE/ES) platform + tool pages are appended after the English routes;
+    // the flagship fitment-studio page has no localized version and is intentionally excluded.
+    const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented' && tool.id !== 'fitment-studio').length;
+    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools);
+    expect(entries).toHaveLength(expectedCount);
+    for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
+    expect(entries).toContain('https://atlasgarageos.com/de/');
+    expect(entries).toContain('https://atlasgarageos.com/es/');
+    expect(entries).toContain('https://atlasgarageos.com/de/tools/felgen-et-rechner/');
+    expect(entries).toContain('https://atlasgarageos.com/es/tools/calculadora-offset-llantas/');
+    expect(entries).not.toContain('https://atlasgarageos.com/de/fitment-studio/');
+    expect(entries).not.toContain('https://atlasgarageos.com/es/fitment-studio/');
     const xml = renderSitemapXml();
-    expect(xml.match(/<url>/g)).toHaveLength(intendedRoutes.length);
+    expect(xml.match(/<url>/g)).toHaveLength(expectedCount);
     expect(xml).not.toContain('#');
-    expect(sitemapEntries().every((url) => !url.includes('?'))).toBe(true);
+    expect(entries.every((url) => !url.includes('?'))).toBe(true);
     expect(xml).toContain('<loc>https://atlasgarageos.com/</loc>');
     expect(xml).not.toContain('https://atlasgarageos.com/en/');
   });
