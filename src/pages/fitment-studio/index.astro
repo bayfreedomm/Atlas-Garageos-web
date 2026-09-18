@@ -7,6 +7,7 @@ import NavigationDrawer from '../../components/NavigationDrawer.astro';
 import FitmentVisualizer from '../../components/FitmentVisualizer.astro';
 import Footer from '../../components/Footer.astro';
 import ThemeQuickToggle from '../../components/ThemeQuickToggle.astro';
+import VehicleSelector from '../../components/VehicleSelector.astro';
 import '../../styles/global.css';
 import '../../styles/product-v3.css';
 import '../../styles/product-v4.css';
@@ -37,7 +38,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
     <header class="app-header">
       <div class="app-header__inner">
         <a class="brand" href="/" aria-label="Atlas GarageOS home"><Brand subtitle="Wheel & Tire Compare" /></a>
-        <div class="app-header__actions"><nav class="desktop-nav" aria-label="Primary navigation"><a href="/">Home</a><a href="/tools/">Tools</a><a href="/fitment-studio/" aria-current="page">Wheel &amp; Tire Compare</a></nav><ThemeQuickToggle /><NavigationDrawer /></div>
+        <div class="app-header__actions"><nav class="desktop-nav" aria-label="Primary navigation"><a href="/">Home</a><a href="/tools/">Tools</a><a href="/fitment-studio/" aria-current="page">Wheel &amp; Tire Compare</a></nav><VehicleSelector /><ThemeQuickToggle /><NavigationDrawer /></div>
       </div>
     </header>
 

@@ -50,8 +50,8 @@ describe('production launch configuration', () => {
     expect(manifest.start_url).toBe('/');
     expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ src: '/atlas-mark.svg' })]));
     expect(atlasMark).toContain('aria-label="Atlas GarageOS mark"');
-    expect(atlasMark).toContain('M11 29 17.6 12h4.8l6.6 17');
-    expect(favicon).toContain('M11 29 17.6 12h4.8l6.6 17');
+    expect(atlasMark).toContain('M22 63a26 26 0 0 1 52 0');
+    expect(favicon).toContain('M22 63a26 26 0 0 1 52 0');
     expect(atlasMark).toContain('#1f98ff');
     expect(atlasMark).not.toContain('<text');
   });

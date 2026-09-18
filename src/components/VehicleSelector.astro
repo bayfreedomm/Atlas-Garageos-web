@@ -1,0 +1,20 @@
+---
+---
+<details class="vehicle-selector" data-vehicle-selector>
+  <summary class="vehicle-selector__trigger" aria-label="Select your vehicle">
+    <svg class="vehicle-selector__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 16.2 6 10.9a2.4 2.4 0 0 1 2.3-1.7h7.4a2.4 2.4 0 0 1 2.3 1.7l1.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="2.8" y="16.2" width="18.4" height="3.6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="7.4" cy="19.8" r="1.5" fill="currentColor"/><circle cx="16.6" cy="19.8" r="1.5" fill="currentColor"/><path d="M5.6 13.2h12.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <span class="vehicle-selector__badge" data-vs-badge>Select vehicle</span>
+    <svg class="vehicle-selector__chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </summary>
+  <div class="vehicle-selector__backdrop" data-vs-backdrop></div>
+  <div class="vehicle-selector__panel">
+    <p class="vehicle-selector__title">Select your vehicle</p>
+    <p class="vehicle-selector__hint">Saved on this device — used to prefill matching calculators wherever you go on Atlas.</p>
+    <form class="vehicle-selector__form" data-vs-form>
+      <label>Make<select data-vs-make></select></label>
+      <label>Model<select data-vs-model disabled><option value="">Choose a make first</option></select></label>
+    </form>
+    <button type="button" class="vehicle-selector__clear" data-vs-clear hidden>Clear saved vehicle</button>
+  </div>
+</details>
+<script>import { initializeVehicleSelectorWidget } from '../ui/vehicle-selector-widget'; initializeVehicleSelectorWidget();</script>
