@@ -7,6 +7,7 @@ import siteLayout from '../../src/components/SiteLayout.astro?raw';
 import navigationDrawer from '../../src/components/NavigationDrawer.astro?raw';
 import toolDirectory from '../../src/components/ToolDirectory.astro?raw';
 import studio from '../../src/pages/fitment-studio/index.astro?raw';
+import toolCalculators from '../../src/ui/tool-calculators.ts?raw';
 import { inchesToMillimeters } from '../../src/core/units/conversion';
 import { tireScaleMapping, wheelOffsetVisualMapping } from '../../src/ui/fitment-visualizer-model';
 import { parseThemePreference, resolveTheme, THEME_STORAGE_KEY } from '../../src/ui/theme-preference';
@@ -43,6 +44,8 @@ describe('Milestone 8 product experience', () => {
     expect(toolsHub).toContain('<ToolDirectory mode="all"');
     expect(toolDirectory).toContain("toolRegistry.filter(({ kind }) => kind === 'tool')");
     for (const tool of toolRegistry.filter(({ kind }) => kind === 'tool')) expect(routeForTool(tool)).toMatch(/^\/tools\/.+\/$/);
+    expect(homeLauncher).toContain('src="/atlas-hero-car.webp"');
+    expect(homeLauncher).toContain('width="1672" height="941"');
   });
 
   it('keeps key internal routes connected', () => {
@@ -65,5 +68,13 @@ describe('Milestone 8 product experience', () => {
     expect(unchanged).toEqual({ currentX: 82, currentWidth: 196, proposedX: 82, proposedWidth: 196 });
     expect(moved.proposedX).toBeLessThan(unchanged.proposedX);
     expect(moved.proposedWidth).toBeGreaterThan(unchanged.proposedWidth);
+  });
+
+  it('hides stale result summaries while calculator input is invalid', () => {
+    expect(toolCalculators).toContain('function hideSummary(form: HTMLFormElement)');
+    expect(toolCalculators).toContain('hideSummary(form); renderIssues(errors, result.issues)');
+    expect(toolCalculators).toContain('element.hidden = false; element.textContent = summary');
+    expect(toolCalculators).toContain("if (visual) visual.hidden = true; const nearSizes");
+    expect(toolCalculators).toContain('visual.hidden = false;');
   });
 });

@@ -32,6 +32,13 @@ describe('responsive presentation models', () => {
     expect(validationIssueText({ code: 'out-of-range', field: 'current.widthMm', message: 'widthMm must be between 80 and 500.' })).toBe('Original tire width must be between 80 and 500.');
   });
 
+  it('does not repeat the tire context already present in localized field names', () => {
+    const issue = { code: 'out-of-range', field: 'tire.widthMm', message: 'widthMm must be between 80 and 500.', minimum: 80, maximum: 500 } as const;
+    expect(validationIssueText(issue, 'en')).toBe('Tire width must be between 80 and 500.');
+    expect(validationIssueText(issue, 'de')).toBe('Reifenbreite muss zwischen 80 und 500 liegen.');
+    expect(validationIssueText(issue, 'es')).toBe('Ancho del neumático debe estar entre 80 y 500.');
+  });
+
   it('maps missing numeric measurements to friendly guidance', () => {
     const issue = { code: 'not-a-number' as const, field: 'measuredInnerClearanceMm', message: 'measuredInnerClearanceMm must be a finite number.' };
     expect(validationIssueText(issue)).toBe('Enter a valid inner clearance.');

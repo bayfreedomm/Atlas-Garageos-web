@@ -596,9 +596,10 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .tool-intro .tool-icon{width:2.4rem!important;height:2.4rem!important}
 .tool-intro .eyebrow{margin-bottom:.2rem!important;font-size:.64rem!important}
 .tool-intro h1{font-size:clamp(1.5rem,6.4vw,2rem)!important;margin-bottom:.25rem!important}
-.tool-intro .hero-copy{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:0!important;font-size:.84rem!important;line-height:1.35!important}
+.tool-intro .hero-copy{display:block;overflow:visible;margin-top:0!important;font-size:.84rem!important;line-height:1.35!important}
+.home-section-heading>a,.site-footer__links a{display:inline-flex;min-height:2.75rem;align-items:center}
 .tool-stage{gap:.7rem!important}}
-@media(max-width:26rem){.tool-workspace{padding:.75rem!important}.ev-visual-stats{grid-template-columns:1fr!important}.instant-input{grid-template-columns:minmax(0,1fr) minmax(5.6rem,.4fr)!important;gap:.5rem!important}.utility-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.3rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.3rem!important;height:2.3rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
+@media(max-width:26rem){.tool-workspace{padding:.75rem!important}.ev-visual-stats{grid-template-columns:1fr!important}.instant-input{grid-template-columns:minmax(0,1fr) minmax(5.6rem,.4fr)!important;gap:.5rem!important}.utility-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}[data-calculator="vehicle-finder"] .utility-fields{grid-template-columns:1fr!important}.standard-visual__equation{grid-template-columns:1fr}.standard-visual__equation i{transform:rotate(90deg);justify-self:center}.tool-intro{grid-template-columns:2.3rem minmax(0,1fr)!important}.tool-intro .tool-icon{width:2.3rem!important;height:2.3rem!important}.related-card{grid-template-columns:2.2rem minmax(0,1fr) auto!important;padding-inline:.55rem!important}}
 
 /* V4.7 — Homepage Concept B: real car, real context.
    The photographic hero remains dark in both themes; light mode applies to the product surface below it.

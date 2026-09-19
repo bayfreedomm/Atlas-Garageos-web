@@ -62,7 +62,12 @@ function renderIssues(container: HTMLElement, issues: readonly Parameters<typeof
 
 function setSummary(form: HTMLFormElement, summary: string): void {
   const element = form.querySelector<HTMLElement>('[data-result-summary]');
-  if (element) { element.textContent = summary; element.classList.remove('is-pending'); }
+  if (element) { element.hidden = false; element.textContent = summary; element.classList.remove('is-pending'); }
+}
+
+function hideSummary(form: HTMLFormElement): void {
+  const element = form.querySelector<HTMLElement>('[data-result-summary]');
+  if (element) element.hidden = true;
 }
 
 function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiameterMm: number, proposed?: TireToolInput, proposedDiameterMm?: number): void {
@@ -199,6 +204,7 @@ const SINGLE_TIRE_TEXT = {
 function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
   const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
   if (!visual) return;
+  visual.hidden = false;
   const locale = getPageLocale();
   const text = SINGLE_TIRE_TEXT[locale];
   const diameterScale = Math.min(1.08, Math.max(.72, result.overallDiameterMm / 680));
@@ -566,7 +572,7 @@ export function initializeToolCalculators(): void {
     const calculate = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
       const result = calculateTireSizeTool(input);
-      if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); const nearSizes = form.querySelector<HTMLElement>('[data-near-sizes]'); if (nearSizes) nearSizes.hidden = true; return; }
+      if (!result.ok) { results.replaceChildren(); hideSummary(form); renderIssues(errors, result.issues); const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]'); if (visual) visual.hidden = true; const nearSizes = form.querySelector<HTMLElement>('[data-near-sizes]'); if (nearSizes) nearSizes.hidden = true; return; }
       errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value)); renderNearEquivalentSizes(form, input);
     };
     const preview = () => {
@@ -643,7 +649,7 @@ function bindCalculator(form: HTMLFormElement, calculate: () => { readonly ok: t
   const errors = form.querySelector<HTMLElement>('[data-errors]')!;
   const run = () => {
     const result = calculate();
-    if (!result.ok) { results.replaceChildren(); renderIssues(errors, result.issues); return; }
+    if (!result.ok) { results.replaceChildren(); hideSummary(form); renderIssues(errors, result.issues); return; }
     errors.hidden = true; errors.replaceChildren(); renderMetrics(results, result.metrics);
   };
   form.addEventListener('submit', (event) => { event.preventDefault(); run(); }); run();

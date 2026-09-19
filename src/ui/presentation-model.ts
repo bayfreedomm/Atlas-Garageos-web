@@ -127,8 +127,9 @@ export function validationIssueText(issue: ValidationIssue, locale: UiLocale = g
   const text = VALIDATION_TEXT[locale];
   const parts = issue.field.split('.');
   const field = parts.at(-1) ?? issue.field;
-  const context = parts[0] === 'current' || parts[0] === 'original' ? text.original : parts[0] === 'proposed' || parts[0] === 'new' ? text.new : parts[0] === 'tire' ? text.tire : '';
-  const label = `${context} ${fieldNames[field] ?? field}`.trim();
+  const context = parts[0] === 'current' || parts[0] === 'original' ? text.original : parts[0] === 'proposed' || parts[0] === 'new' ? text.new : '';
+  const fieldLabel = fieldNames[field] ?? field;
+  const label = context ? `${context} ${fieldLabel}` : `${fieldLabel.charAt(0).toUpperCase()}${fieldLabel.slice(1)}`;
   if (issue.code === 'not-a-number') return text.invalidNumber(label);
   if (issue.code === 'not-an-integer') return text.wholeNumber(label);
   if (issue.code === 'out-of-range' && issue.minimum !== undefined) {

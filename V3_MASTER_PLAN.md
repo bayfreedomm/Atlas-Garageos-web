@@ -174,3 +174,10 @@ Next implementation pass:
 - [x] Browser QA at 390px, tablet, and desktop completed with no document-level horizontal overflow in the sampled release-critical pages.
 - [x] Root-English routes, 20 legacy `/en/...` 301 rules, canonical, hreflang, sitemap, manifest, and internal links verified.
 - [x] 106 tests passed; typecheck and production build clean. RC1 requires only deployed HTTP checks and the planned physical-device acceptance pass.
+
+## Hardened visual QA checkpoint — 2026-09-19
+- [x] Isolated uploaded-source audit; mobile intro clipping, narrow vehicle fields, small text-link targets, and stale tire-result presentation corrected without core/domain changes.
+- [x] EN/DE/ES route reflow checked across 320–1440px (80 pages, 800 route/width samples); sampled light/dark and input-error recovery inspected.
+- [x] Hero WebP delivery with intrinsic dimensions; original PNG retained for social metadata.
+- [x] 121 tests passed; Astro check and 80-page production build clean.
+- [ ] Actual browser zoom/text scaling, WebKit/Firefox, physical devices, and production performance remain separate acceptance checks; see visual QA report for coverage limits.
