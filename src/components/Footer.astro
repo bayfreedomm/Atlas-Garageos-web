@@ -4,6 +4,7 @@ interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const t = locale ? uiStrings[locale] : undefined;
 const prefix = locale ? `/${locale}` : '';
+const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : undefined;
 const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are estimates — verify anything safety-critical with your vehicle\'s manual.').replace('{year}', String(new Date().getFullYear()));
 ---
 <footer class="site-footer">
@@ -17,6 +18,7 @@ const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are e
       <a href="/fitment-studio/">{t?.footerFitment ?? 'Wheel & Tire Compare'}</a>
       <a href={`${prefix}/methodology/`}>{t?.footerMethodology ?? 'Accuracy & Methodology'}</a>
       <a href={`${prefix}/privacy-policy/`}>{t?.footerPrivacy ?? 'Privacy Policy'}</a>
+      {fuelPricesPath && <a href={fuelPricesPath}>{t?.footerFuelPrices}</a>}
     </nav>
   </div>
   <p class="site-footer__copy">{copy}</p>

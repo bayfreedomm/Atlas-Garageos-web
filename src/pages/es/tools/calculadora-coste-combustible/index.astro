@@ -4,12 +4,14 @@ import FuelFields from '../../../../components/FuelFields.astro';
 import FuelCostTechnicalVisual from '../../../../components/FuelCostTechnicalVisual.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
+import fuelPrices from '../../../../data/fuel-prices.json';
 const definition = toolById('fuel-cost-calculator');
 const c = localizedTool('fuel-cost-calculator', 'es');
+const livePrice = fuelPrices.es.e5 ?? 1.65;
 ---
 <ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]}>
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
-    <FuelFields locale="es" />
+    <FuelFields locale="es" price={livePrice} currency="EUR" />
     <button type="submit">Calcular coste de combustible</button>
     <div class="fuel-primary-result is-pending" data-fuel-primary-result aria-live="polite" aria-label="Resultado principal del coste de combustible">
       <div class="fuel-primary-result__cost"><span>Coste de combustible estimado</span><strong data-fuel-primary-cost>—</strong><p data-fuel-primary-copy>Introduzca los datos de su trayecto para ver el coste de combustible estimado.</p></div>

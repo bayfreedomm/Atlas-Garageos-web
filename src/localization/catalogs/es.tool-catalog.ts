@@ -202,6 +202,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { heading: 'Un cálculo, dos sistemas de unidades', paragraphs: [
         'El modo métrico usa kilómetros, litros por 100 kilómetros y precio por litro. El modo estadounidense usa millas, MPG estadounidense y precio por galón estadounidense.',
         'La moneda es solo una etiqueta. Atlas no consulta tipos de cambio ni cambia el precio que usted introduce.',
+        'El precio de combustible preestablecido es una media diaria a nivel nacional de una fuente pública, no un precio garantizado en una gasolinera concreta. Sustitúyalo en cualquier momento por el precio que realmente paga.',
       ] },
     ],
     facts: [
@@ -222,6 +223,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { heading: 'Qué significa esta estimación', paragraphs: [
         'El campo de distancia es de ida. Un viaje de ida y vuelta lo duplica antes de calcular el combustible; los extras introducidos se suman una sola vez al viaje completo. El total se divide después entre el número de personas, si se comparte.',
         'El modo métrico usa km, L/100 km y precio por litro; el modo estadounidense usa millas, MPG estadounidense y precio por galón estadounidense. La moneda es una etiqueta, no una conversión de tipo de cambio. El coste por distancia incluye los extras.',
+        'El precio de combustible preestablecido es una media diaria a nivel nacional de una fuente pública, no un precio garantizado en una gasolinera concreta. Sustitúyalo en cualquier momento por el precio que realmente paga.',
       ] },
     ],
     facts: [

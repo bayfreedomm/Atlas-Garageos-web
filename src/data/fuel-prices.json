@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "disclaimer": "National averages are estimates from public/official sources, not a live quote for any specific station. Always treat the number as a reference, not a guarantee.",
+  "es": {
+    "e5": 1.58,
+    "diesel": 1.48,
+    "source": "Ministerio para la Transición Ecológica (official, no key)",
+    "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
+    "fetchedAt": "2026-09-20T00:00:00.000Z",
+    "ok": false,
+    "note": "Seed placeholder committed before the first scheduled run — replace by running the update-fuel-prices workflow once."
+  },
+  "de": {
+    "e5": 1.75,
+    "diesel": 1.65,
+    "source": "Tankerkoenig API (sampled cities)",
+    "sourceUrl": "https://creativecommons.tankerkoenig.de/",
+    "fetchedAt": "2026-09-20T00:00:00.000Z",
+    "ok": false,
+    "note": "Seed placeholder committed before the first scheduled run — replace by running the update-fuel-prices workflow once."
+  }
+}

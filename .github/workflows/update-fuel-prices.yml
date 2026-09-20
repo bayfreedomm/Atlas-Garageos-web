@@ -1,0 +1,45 @@
+name: Update fuel prices
+
+"on":
+  schedule:
+    # Runs 4 times a day, well inside every source's fair-use limits regardless of
+    # site traffic, because visitors never call these APIs directly — only this
+    # scheduled job does. Times are UTC.
+    - cron: '15 3,9,15,21 * * *'
+  workflow_dispatch: {} # lets you trigger it manually from the Actions tab to test it
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-fuel-prices
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Fetch latest fuel prices
+        env:
+          TANKERKOENIG_API_KEY: ${{ secrets.TANKERKOENIG_API_KEY }}
+        run: node scripts/update-fuel-prices.mjs
+
+      - name: Commit updated price file if it changed
+        run: |
+          if git diff --quiet -- src/data/fuel-prices.json; then
+            echo "No price change — nothing to commit."
+            exit 0
+          fi
+          git config user.name "atlas-garageos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/data/fuel-prices.json
+          git commit -m "chore: update daily fuel price averages"
+          git push

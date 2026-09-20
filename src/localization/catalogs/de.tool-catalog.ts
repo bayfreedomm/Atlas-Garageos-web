@@ -228,6 +228,7 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { heading: 'Eine Berechnung, zwei Einheitensysteme', paragraphs: [
         'Der metrische Modus verwendet Kilometer, Liter pro 100 Kilometer und Preis pro Liter. Der US-Modus verwendet Meilen, US-MPG und Preis pro US-Gallone.',
         'Die Währung ist nur eine Beschriftung. Atlas ruft keine Wechselkurse ab und ändert den eingegebenen Preis nicht.',
+        'Der voreingestellte Kraftstoffpreis ist ein deutschlandweiter Tagesdurchschnitt aus einer öffentlichen Quelle, kein garantierter Preis an einer bestimmten Tankstelle. Ersetzen Sie ihn jederzeit durch den Preis, den Sie tatsächlich zahlen.',
       ] },
     ],
     facts: [
@@ -248,6 +249,7 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { heading: 'Was diese Schätzung bedeutet', paragraphs: [
         'Das Distanzfeld ist eine einfache Strecke. Eine Hin- und Rückfahrt verdoppelt diese, bevor der Kraftstoff berechnet wird; die eingegebenen Extras werden einmal zur gesamten Reise addiert. Die Summe wird anschließend durch die Personenzahl geteilt, falls geteilt wird.',
         'Der metrische Modus verwendet km, L/100 km und Preis pro Liter; der US-Modus verwendet Meilen, US-MPG und Preis pro US-Gallone. Die Währung ist eine Beschriftung, keine Wechselkursumrechnung. Die Kosten pro Strecke enthalten die Extras.',
+        'Der voreingestellte Kraftstoffpreis ist ein deutschlandweiter Tagesdurchschnitt aus einer öffentlichen Quelle, kein garantierter Preis an einer bestimmten Tankstelle. Ersetzen Sie ihn jederzeit durch den Preis, den Sie tatsächlich zahlen.',
       ] },
     ],
     facts: [

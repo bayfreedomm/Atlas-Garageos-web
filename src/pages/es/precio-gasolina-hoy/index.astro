@@ -1,0 +1,87 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { serializeJsonLd } from '../../../seo/safe-json-ld';
+import fuelPrices from '../../../data/fuel-prices.json';
+
+const data = fuelPrices.es;
+const title = 'Precio de la gasolina hoy en España — Gasolina 95 y diésel';
+const description = 'Precio medio actual de la gasolina 95 E5 y el diésel A en España, actualizado automáticamente varias veces al día a partir de fuentes oficiales.';
+const pathname = '/es/precio-gasolina-hoy/';
+const alternates = [
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
+];
+const dateLabel = new Date(data.fetchedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+const faqs = [
+  {
+    q: '¿De dónde salen estos precios de la gasolina?',
+    a: `Los precios provienen de ${data.source}, la fuente pública oficial de precios de carburantes en España.`,
+  },
+  {
+    q: '¿Con qué frecuencia se actualizan los precios?',
+    a: 'De forma automática varias veces al día mediante una consulta programada, no en cada visita, para no sobrecargar la fuente oficial.',
+  },
+  {
+    q: '¿Puedo usar este precio para mi gasolinera concreta?',
+    a: 'No. Es una media nacional orientativa, no el precio de una estación en particular. Puede ajustar el precio manualmente en cualquiera de nuestras calculadoras.',
+  },
+];
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const datasetJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'Precio de la gasolina en España (media diaria)',
+  description: 'Precio medio diario de la gasolina 95 E5 y el diésel A en España a partir de fuentes oficiales.',
+  license: 'https://www.mites.gob.es/es/informacion/avisoLegal/index.htm',
+  temporalCoverage: data.fetchedAt,
+  url: 'https://atlasgarageos.com/es/precio-gasolina-hoy/',
+  creator: { '@type': 'Organization', name: 'Atlas GarageOS' },
+});
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="es" alternates={alternates} breadcrumbs={[{ name: 'Inicio', href: '/es/' }, { name: 'Precio de la gasolina hoy', href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Precio de la gasolina hoy</span></nav>
+
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">Actualizado: {dateLabel}</p>
+    <h1>Precio de la gasolina hoy en España</h1>
+    <p>Precios medios a partir de datos públicos, actualizados automáticamente varias veces al día. Use estos valores como punto de partida en nuestras calculadoras — puede ajustar el precio en cualquier momento según su gasolinera habitual.</p>
+  </header>
+
+  <div class="methodology-grid">
+    <section>
+      <h2>Gasolina 95 E5</h2>
+      <p><strong style="font-size: 1.8em;">{data.e5.toFixed(2).replace('.', ',')} €</strong> por litro</p>
+    </section>
+    <section>
+      <h2>Diésel A</h2>
+      <p><strong style="font-size: 1.8em;">{data.diesel.toFixed(2).replace('.', ',')} €</strong> por litro</p>
+    </section>
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="fuel-source-heading">
+    <p class="eyebrow">Fuente</p>
+    <h2 id="fuel-source-heading">¿De dónde salen estos datos?</h2>
+    <p>{data.source}. {fuelPrices.disclaimer}</p>
+    <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">Ver fuente <span>↗</span></a></div>
+  </section>
+
+  <section aria-labelledby="fuel-faq-heading">
+    <h2 id="fuel-faq-heading">Preguntas frecuentes</h2>
+    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+
+  <section class="methodology-sources" aria-labelledby="fuel-tools-heading">
+    <p class="eyebrow">Siguiente paso</p>
+    <h2 id="fuel-tools-heading">Calcular con este precio</h2>
+    <div class="methodology-source-links">
+      <a href="/es/tools/calculadora-coste-combustible/">Calcular coste de combustible <span>↗</span></a>
+      <a href="/es/tools/calculadora-coste-viaje/">Calcular coste del viaje <span>↗</span></a>
+    </div>
+  </section>
+</SiteLayout>

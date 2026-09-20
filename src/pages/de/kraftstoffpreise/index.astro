@@ -1,0 +1,87 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { serializeJsonLd } from '../../../seo/safe-json-ld';
+import fuelPrices from '../../../data/fuel-prices.json';
+
+const data = fuelPrices.de;
+const title = 'Kraftstoffpreise heute in Deutschland — Benzin & Diesel im Schnitt';
+const description = 'Aktueller Durchschnittspreis für Super E5 und Diesel in Deutschland, automatisch mehrmals täglich aktualisiert aus öffentlichen Quellen.';
+const pathname = '/de/kraftstoffpreise/';
+const alternates = [
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
+];
+const dateLabel = new Date(data.fetchedAt).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+const faqs = [
+  {
+    q: 'Woher stammen diese Kraftstoffpreise?',
+    a: `Die Preise stammen aus ${data.source}. Für Deutschland wird der Durchschnitt aus mehreren Großstädten gebildet, nicht aus einer einzelnen Tankstelle.`,
+  },
+  {
+    q: 'Wie oft werden die Preise aktualisiert?',
+    a: 'Automatisch mehrmals täglich über einen geplanten Abruf — nicht bei jedem Seitenaufruf, damit die Quelle nicht überlastet wird.',
+  },
+  {
+    q: 'Kann ich diesen Preis für meine eigene Tankstelle verwenden?',
+    a: 'Nein. Es handelt sich um einen groben Landesdurchschnitt zur Orientierung, nicht um den Preis einer bestimmten Tankstelle. Passen Sie den Preis im Rechner jederzeit manuell an.',
+  },
+];
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const datasetJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'Deutschland Kraftstoffpreise (Tagesdurchschnitt)',
+  description: 'Täglich aktualisierter Durchschnittspreis für Super E5 und Diesel in Deutschland aus öffentlichen Quellen.',
+  license: 'https://creativecommons.org/licenses/by/4.0/',
+  temporalCoverage: data.fetchedAt,
+  url: 'https://atlasgarageos.com/de/kraftstoffpreise/',
+  creator: { '@type': 'Organization', name: 'Atlas GarageOS' },
+});
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="de" alternates={alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: 'Kraftstoffpreise heute', href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><span aria-current="page">Kraftstoffpreise heute</span></nav>
+
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">Aktualisiert: {dateLabel}</p>
+    <h1>Kraftstoffpreise heute in Deutschland</h1>
+    <p>Durchschnittspreise aus öffentlich zugänglichen Daten, automatisch mehrmals täglich aktualisiert. Nutzen Sie diese Werte als Ausgangspunkt in unseren Rechnern — Sie können den Preis dort jederzeit an Ihre eigene Tankstelle anpassen.</p>
+  </header>
+
+  <div class="methodology-grid">
+    <section>
+      <h2>Super E5</h2>
+      <p><strong style="font-size: 1.8em;">{data.e5.toFixed(2).replace('.', ',')} €</strong> pro Liter</p>
+    </section>
+    <section>
+      <h2>Diesel</h2>
+      <p><strong style="font-size: 1.8em;">{data.diesel.toFixed(2).replace('.', ',')} €</strong> pro Liter</p>
+    </section>
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="fuel-source-heading">
+    <p class="eyebrow">Quelle</p>
+    <h2 id="fuel-source-heading">Woher kommen diese Zahlen?</h2>
+    <p>{data.source}. {fuelPrices.disclaimer}</p>
+    <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">Quelle ansehen <span>↗</span></a></div>
+  </section>
+
+  <section aria-labelledby="fuel-faq-heading">
+    <h2 id="fuel-faq-heading">Häufige Fragen</h2>
+    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+
+  <section class="methodology-sources" aria-labelledby="fuel-tools-heading">
+    <p class="eyebrow">Weiter geht's</p>
+    <h2 id="fuel-tools-heading">Mit diesem Preis rechnen</h2>
+    <div class="methodology-source-links">
+      <a href="/de/tools/spritkostenrechner/">Kraftstoffkosten berechnen <span>↗</span></a>
+      <a href="/de/tools/fahrtkostenrechner/">Reisekosten berechnen <span>↗</span></a>
+    </div>
+  </section>
+</SiteLayout>

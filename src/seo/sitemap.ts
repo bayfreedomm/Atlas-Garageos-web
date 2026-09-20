@@ -20,8 +20,10 @@ function localizedRoutes(): readonly string[] {
   return routes;
 }
 
+const STANDALONE_CONTENT_ROUTES = ['/de/kraftstoffpreise/', '/es/precio-gasolina-hoy/'] as const;
+
 export function sitemapEntries(): readonly string[] {
-  return Object.freeze([...indexableRoutes, ...localizedRoutes()].map(canonicalForPath));
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...STANDALONE_CONTENT_ROUTES].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

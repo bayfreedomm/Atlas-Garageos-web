@@ -28,6 +28,7 @@ export interface UiStrings {
   readonly footerFitment: string;
   readonly footerMethodology: string;
   readonly footerPrivacy: string;
+  readonly footerFuelPrices: string;
   readonly footerCopy: string;
   readonly langLabel: string;
   readonly langSwitchAria: string;
@@ -64,6 +65,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerFitment: 'Felgen- & Reifenvergleich',
     footerMethodology: 'Genauigkeit & Methodik',
     footerPrivacy: 'Datenschutz',
+    footerFuelPrices: 'Kraftstoffpreise heute',
     footerCopy: '© {year} Atlas GarageOS. Alle Berechnungen sind Schätzungen — prüfen Sie sicherheitsrelevante Werte immer im Handbuch Ihres Fahrzeugs.',
     langLabel: 'Sprache',
     langSwitchAria: 'Sprache wechseln',
@@ -98,6 +100,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerFitment: 'Comparador de Llantas y Neumáticos',
     footerMethodology: 'Precisión y metodología',
     footerPrivacy: 'Política de privacidad',
+    footerFuelPrices: 'Precio de la gasolina hoy',
     footerCopy: '© {year} Atlas GarageOS. Todos los cálculos son estimaciones — verifique cualquier dato crítico de seguridad con el manual de su vehículo.',
     langLabel: 'Idioma',
     langSwitchAria: 'Cambiar idioma',
