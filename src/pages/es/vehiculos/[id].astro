@@ -84,4 +84,13 @@ const vehicleJsonLd = serializeJsonLd({
       <a href="/es/tools/convertidor-nm-lb-ft/">{t.openTorqueTool} <span>↗</span></a>
     </div>
   </section>
+
+  <section class="vehicle-fuel-journey" aria-labelledby="vehicle-fuel-heading">
+    <p class="eyebrow">{t.fuelHeading}</p>
+    <h2 id="vehicle-fuel-heading">&nbsp;</h2>
+    <div class="vehicle-fuel-journey__cards">
+      <a class="vehicle-fuel-card" href="/es/precio-gasolina-hoy/"><strong>{t.fuelCardTitle}</strong><span>{t.fuelCardCopy}</span><i aria-hidden="true">›</i></a>
+      <a class="vehicle-fuel-card" href="/es/tools/calculadora-coste-viaje/"><strong>{t.tripCardTitle}</strong><span>{t.tripCardCopy}</span><i aria-hidden="true">›</i></a>
+    </div>
+  </section>
 </SiteLayout>

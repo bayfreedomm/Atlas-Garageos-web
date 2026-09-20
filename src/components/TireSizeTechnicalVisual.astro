@@ -1,12 +1,22 @@
 ---
-// Technical tire diagram: a side-elevation wheel ring (rim + tire, radii
-// derived directly from the real rim-diameter/overall-diameter ratio, so
-// proportions are never faked) plus a true-to-scale cross-section "slice"
-// swatch that is the only place section width is shown, since width is not
-// a radius in a face-on wheel view. All four headline measurements —
-// width, sidewall height, rim diameter, overall diameter — get their own
-// external dimension line; none sit on top of the tire body.
+// Two complementary, geometry-driven tire diagrams:
+//   A) SIDE VIEW — a side-elevation wheel ring (rim + tire radii derived
+//      directly from the real rim-diameter / overall-diameter ratio) with
+//      external dimension lines for sidewall height, overall diameter, and
+//      rim diameter.
+//   B) CROSS-SECTION — a true tire cross-sectional shape (bulging sidewall,
+//      tread/crown, bead, a separate rim block, and a hollow inner cavity),
+//      not a capsule/blob/trapezoid/gear. Geometry comes from
+//      computeTireCrossSection() in ui/tire-cross-section.ts, the same
+//      function the live updater uses, so the two never drift apart, and
+//      both axes share one scale factor rather than being independently
+//      clamped.
+// Every numerical label always shows the true calculated value; only drawn
+// extents are ever capped, and every label position is computed from that
+// same geometry (never a fixed pixel guess), so extreme ratios cannot make
+// a label collide, clip, or cross another element.
 import type { ContentLocale } from '../localization/site-catalog';
+import { computeTireCrossSection, CROSS_SECTION_VIEWBOX } from '../ui/tire-cross-section';
 
 interface Props { readonly locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
@@ -15,7 +25,7 @@ const SINGLE_TIRE_VISUAL_TEXT = {
   en: {
     kicker: 'Live tire anatomy',
     title: 'See the tire behind the code',
-    subtitle: 'The diagram updates with width, profile and rim size — proportions are calculated, not decorative.',
+    subtitle: 'Both diagrams update with width, profile and rim size — proportions are calculated, not decorative.',
     sidewallLabel: 'Sidewall',
     sidewallCaption: 'Width × profile %',
     diameterLabel: 'Overall diameter',
@@ -23,12 +33,19 @@ const SINGLE_TIRE_VISUAL_TEXT = {
     meaningLabel: 'What changes visually',
     meaningDefault: 'Higher profile makes the sidewall taller; larger rim makes the metal hub larger relative to the tire.',
     widthCaption: 'Section width',
-    sliceLabel: 'Cross-section slice',
+    sideViewLabel: 'Side view',
+    sideViewAria: 'Side-elevation diagram showing overall diameter, rim diameter, and sidewall height',
+    crossSectionLabel: 'Cross-section',
+    crossSectionAria: 'Tire cross-section diagram showing section width, sidewall height, tread, bead, and rim relationship',
+    treadLabel: 'Tread',
+    sidewallPartLabel: 'Sidewall',
+    beadLabel: 'Bead',
+    rimCavityCaption: (rim: string) => `${rim} · inner cavity above the rim`,
   },
   de: {
     kicker: 'Reifenanatomie live',
     title: 'Sehen Sie den Reifen hinter dem Code',
-    subtitle: 'Die Zeichnung passt sich an Breite, Profil und Felgengröße an — die Proportionen sind berechnet, nicht dekorativ.',
+    subtitle: 'Beide Zeichnungen passen sich an Breite, Profil und Felgengröße an — die Proportionen sind berechnet, nicht dekorativ.',
     sidewallLabel: 'Flankenhöhe',
     sidewallCaption: 'Breite × Profil %',
     diameterLabel: 'Gesamtdurchmesser',
@@ -36,12 +53,19 @@ const SINGLE_TIRE_VISUAL_TEXT = {
     meaningLabel: 'Was sich optisch ändert',
     meaningDefault: 'Ein höheres Profil macht die Flanke höher; eine größere Felge vergrößert die Nabe im Verhältnis zum Reifen.',
     widthCaption: 'Querschnittsbreite',
-    sliceLabel: 'Querschnitt',
+    sideViewLabel: 'Seitenansicht',
+    sideViewAria: 'Seitenansicht-Diagramm mit Gesamtdurchmesser, Felgendurchmesser und Flankenhöhe',
+    crossSectionLabel: 'Querschnitt',
+    crossSectionAria: 'Reifenquerschnitt-Diagramm mit Querschnittsbreite, Flankenhöhe, Lauffläche, Wulst und Felgenverhältnis',
+    treadLabel: 'Lauffläche',
+    sidewallPartLabel: 'Flanke',
+    beadLabel: 'Wulst',
+    rimCavityCaption: (rim: string) => `${rim} · Hohlraum über der Felge`,
   },
   es: {
     kicker: 'Anatomía del neumático en vivo',
     title: 'Vea el neumático detrás del código',
-    subtitle: 'El diagrama se actualiza con el ancho, el perfil y el tamaño de la llanta — las proporciones se calculan, no son decorativas.',
+    subtitle: 'Ambos diagramas se actualizan con el ancho, el perfil y el tamaño de la llanta — las proporciones se calculan, no son decorativas.',
     sidewallLabel: 'Flanco',
     sidewallCaption: 'Ancho × perfil %',
     diameterLabel: 'Diámetro total',
@@ -49,7 +73,14 @@ const SINGLE_TIRE_VISUAL_TEXT = {
     meaningLabel: 'Qué cambia visualmente',
     meaningDefault: 'Un perfil más alto hace el flanco más alto; una llanta más grande agranda el cubo respecto al neumático.',
     widthCaption: 'Ancho de sección',
-    sliceLabel: 'Corte transversal',
+    sideViewLabel: 'Vista lateral',
+    sideViewAria: 'Diagrama de vista lateral con diámetro total, diámetro de llanta y altura del flanco',
+    crossSectionLabel: 'Corte transversal',
+    crossSectionAria: 'Diagrama de corte transversal del neumático con ancho de sección, altura de flanco, banda de rodadura, talón y relación con la llanta',
+    treadLabel: 'Banda de rodadura',
+    sidewallPartLabel: 'Flanco',
+    beadLabel: 'Talón',
+    rimCavityCaption: (rim: string) => `${rim} · cavidad interior sobre la llanta`,
   },
 } as const;
 
@@ -81,82 +112,105 @@ const treadTicks = Array.from({ length: TREAD_TICK_COUNT }, (_, i) => {
 
 const LUG_ANGLES = [ -90, -18, 54, 126, 198 ];
 
-// Matches TIRE_SLICE_PX_PER_MM in ui/tool-calculators.ts (130px per 225mm).
-const SLICE_HALF_WIDTH = 65; // 225mm * (130/225) / 2
-const SLICE_HEIGHT = 58.5; // 101.25mm sidewall * (130/225)
-const SLICE_TOP_HALF = SLICE_HALF_WIDTH * 0.6;
-const sliceShapeD = `M${-SLICE_HALF_WIDTH} 0 C${-SLICE_HALF_WIDTH} ${(-SLICE_HEIGHT * 0.65).toFixed(1)} ${-SLICE_TOP_HALF} ${-SLICE_HEIGHT} ${-SLICE_TOP_HALF} ${-SLICE_HEIGHT} L${SLICE_TOP_HALF} ${-SLICE_HEIGHT} C${SLICE_TOP_HALF} ${-SLICE_HEIGHT} ${SLICE_HALF_WIDTH} ${(-SLICE_HEIGHT * 0.65).toFixed(1)} ${SLICE_HALF_WIDTH} 0 Z`;
+// Cross-section defaults for 225/45 R18 (width 225mm, sidewall 101.25mm).
+const cs = computeTireCrossSection(225, 101.25);
+const crownTreadTicks = [-0.32, -0.16, 0, 0.16, 0.32].map((f) => cs.hw * 0.5 * f);
+const rimDefaultLabel = locale === 'de' ? '⌀ 18 Zoll Felge' : locale === 'es' ? '⌀ 18 pulg. de llanta' : '⌀ 18 in rim';
 ---
 <figure class="single-tire-visual" data-single-tire-visual aria-labelledby="single-tire-title">
   <figcaption><span class="visual-kicker">{t.kicker}</span><strong id="single-tire-title">{t.title}</strong><p>{t.subtitle}</p></figcaption>
   <div class="single-tire-grid">
     <section class="single-tire-card single-tire-card--hero">
-      <svg viewBox="0 0 440 440" role="img" aria-label="Technical side-elevation tire diagram with live dimensions" data-single-tire-svg>
-        <defs>
-          <radialGradient id="singleRim" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#f1f5f7"/><stop offset="1" stop-color="#a7b2ba"/></radialGradient>
-          <linearGradient id="singleSlice" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4652"/><stop offset="1" stop-color="#1c232a"/></linearGradient>
-        </defs>
-
-        <!-- Wheel ring: rim + tire, side elevation. Radii are derived from the
-             real rim-diameter / overall-diameter ratio (see tool-calculators.ts) -->
-        <g data-single-tire-wheel>
-          <ellipse class="single-tire-shadow" cx={CENTER_X} cy={CENTER_Y + OUTER_R + 10} rx={OUTER_R * 0.82} ry="9" />
-          <circle data-single-tire-body class="single-tire-body" cx={CENTER_X} cy={CENTER_Y} r={OUTER_R} />
-          <g class="single-tread-ticks" data-single-tread-ticks>
-            {treadTicks.map((b) => <line x1={b.x1} y1={b.y1} x2={b.x2} y2={b.y2} />)}
-          </g>
-          <circle data-single-tire-rim-seat class="single-tire-rim-seat" cx={CENTER_X} cy={CENTER_Y} r={RIM_R + 6} />
-          <circle data-single-tire-rim class="single-tire-rim" cx={CENTER_X} cy={CENTER_Y} r={RIM_R} fill="url(#singleRim)" />
-          <g class="single-spokes" data-single-spokes>
-            {LUG_ANGLES.map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const x = (CENTER_X + Math.cos(rad) * SPOKE_R).toFixed(1);
-              const y = (CENTER_Y + Math.sin(rad) * SPOKE_R).toFixed(1);
-              return <path class="single-spoke" d={`M${CENTER_X} ${CENTER_Y} L${x} ${y}`} />;
-            })}
-          </g>
-          <circle data-single-tire-hub class="single-hub" cx={CENTER_X} cy={CENTER_Y} r={HUB_R} />
-          <g class="single-lugs" data-single-lugs>
-            {LUG_ANGLES.map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const x = (CENTER_X + Math.cos(rad) * (HUB_R + 6)).toFixed(1);
-              const y = (CENTER_Y + Math.sin(rad) * (HUB_R + 6)).toFixed(1);
-              return <circle class="single-lug" cx={x} cy={y} r="2.4" />;
-            })}
-          </g>
-        </g>
-
-        <!-- External dimension lines: left = sidewall height, right = overall
-             diameter, bottom = rim diameter. None cross the tire body. -->
-        <g class="single-measure single-measure--sidewall">
-          <path data-single-sidewall-tick1 d={`M${CENTER_X} ${CENTER_Y - RIM_R}H66`} />
-          <path data-single-sidewall-tick2 d={`M${CENTER_X} ${CENTER_Y - OUTER_R}H66`} />
-          <path data-single-sidewall-line d={`M66 ${CENTER_Y - RIM_R}V${CENTER_Y - OUTER_R}`} />
-          <text data-single-sidewall-text x="60" y={CENTER_Y - (RIM_R + OUTER_R) / 2} text-anchor="end">101.3 mm</text>
-        </g>
-        <g class="single-measure single-measure--diameter">
-          <path data-single-diameter-tick1 d={`M${CENTER_X} ${CENTER_Y - OUTER_R}H301`} />
-          <path data-single-diameter-tick2 d={`M${CENTER_X} ${CENTER_Y + OUTER_R}H301`} />
-          <path data-single-diameter-line d={`M301 ${CENTER_Y - OUTER_R}V${CENTER_Y + OUTER_R}`} />
-          <text data-single-diameter-text x="308" y={CENTER_Y} text-anchor="start">⌀ 659.7 mm</text>
-        </g>
-        <g class="single-measure single-measure--rim">
-          <path data-single-rim-tick1 d={`M${CENTER_X - RIM_R} ${CENTER_Y}V280`} />
-          <path data-single-rim-tick2 d={`M${CENTER_X + RIM_R} ${CENTER_Y}V280`} />
-          <path data-single-rim-line d={`M${CENTER_X - RIM_R} 280H${CENTER_X + RIM_R}`} />
-          <text data-single-rim-text x={CENTER_X} y="296" text-anchor="middle">⌀ 18 in rim</text>
-        </g>
-
-        <!-- Cross-section slice: the one true-to-scale place section width is
-             shown, since width is not a radius in this face-on view. -->
-        <g class="single-slice" data-single-slice transform="translate(175 390)">
-          <text class="single-slice__label" data-single-slice-label x="0" y="-74" text-anchor="middle">{t.sliceLabel}</text>
-          <path data-single-slice-shape class="single-slice__shape" d={sliceShapeD} />
-          <path data-single-slice-tick1 d={`M${-SLICE_HALF_WIDTH} 6V16`} /><path data-single-slice-tick2 d={`M${SLICE_HALF_WIDTH} 6V16`} />
-          <path data-single-slice-line d={`M${-SLICE_HALF_WIDTH} 12H${SLICE_HALF_WIDTH}`} />
-          <text data-single-slice-text x="0" y="28" text-anchor="middle">225 mm</text>
-        </g>
-      </svg>
+      <div class="single-tire-panels">
+        <div class="single-tire-panel">
+          <p class="single-tire-panel__label">{t.sideViewLabel}</p>
+          <svg viewBox="0 0 440 320" role="img" aria-label={t.sideViewAria} data-single-tire-svg>
+            <defs>
+              <radialGradient id="singleRim" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#f1f5f7"/><stop offset="1" stop-color="#a7b2ba"/></radialGradient>
+            </defs>
+            <g data-single-tire-wheel>
+              <ellipse class="single-tire-shadow" cx={CENTER_X} cy={CENTER_Y + OUTER_R + 10} rx={OUTER_R * 0.82} ry="9" />
+              <circle data-single-tire-body class="single-tire-body" cx={CENTER_X} cy={CENTER_Y} r={OUTER_R} />
+              <g class="single-tread-ticks" data-single-tread-ticks>
+                {treadTicks.map((b) => <line x1={b.x1} y1={b.y1} x2={b.x2} y2={b.y2} />)}
+              </g>
+              <circle data-single-tire-rim-seat class="single-tire-rim-seat" cx={CENTER_X} cy={CENTER_Y} r={RIM_R + 6} />
+              <circle data-single-tire-rim class="single-tire-rim" cx={CENTER_X} cy={CENTER_Y} r={RIM_R} fill="url(#singleRim)" />
+              <g class="single-spokes" data-single-spokes>
+                {LUG_ANGLES.map((deg) => {
+                  const rad = (deg * Math.PI) / 180;
+                  const x = (CENTER_X + Math.cos(rad) * SPOKE_R).toFixed(1);
+                  const y = (CENTER_Y + Math.sin(rad) * SPOKE_R).toFixed(1);
+                  return <path class="single-spoke" d={`M${CENTER_X} ${CENTER_Y} L${x} ${y}`} />;
+                })}
+              </g>
+              <circle data-single-tire-hub class="single-hub" cx={CENTER_X} cy={CENTER_Y} r={HUB_R} />
+              <g class="single-lugs" data-single-lugs>
+                {LUG_ANGLES.map((deg) => {
+                  const rad = (deg * Math.PI) / 180;
+                  const x = (CENTER_X + Math.cos(rad) * (HUB_R + 6)).toFixed(1);
+                  const y = (CENTER_Y + Math.sin(rad) * (HUB_R + 6)).toFixed(1);
+                  return <circle class="single-lug" cx={x} cy={y} r="2.4" />;
+                })}
+              </g>
+            </g>
+            <g class="single-measure single-measure--sidewall">
+              <path data-single-sidewall-tick1 d={`M${CENTER_X} ${CENTER_Y - RIM_R}H66`} />
+              <path data-single-sidewall-tick2 d={`M${CENTER_X} ${CENTER_Y - OUTER_R}H66`} />
+              <path data-single-sidewall-line d={`M66 ${CENTER_Y - RIM_R}V${CENTER_Y - OUTER_R}`} />
+              <text data-single-sidewall-text x="60" y={CENTER_Y - (RIM_R + OUTER_R) / 2} text-anchor="end">101.3 mm</text>
+            </g>
+            <g class="single-measure single-measure--diameter">
+              <path data-single-diameter-tick1 d={`M${CENTER_X} ${CENTER_Y - OUTER_R}H301`} />
+              <path data-single-diameter-tick2 d={`M${CENTER_X} ${CENTER_Y + OUTER_R}H301`} />
+              <path data-single-diameter-line d={`M301 ${CENTER_Y - OUTER_R}V${CENTER_Y + OUTER_R}`} />
+              <text data-single-diameter-text x="308" y={CENTER_Y} text-anchor="start">⌀ 659.7 mm</text>
+            </g>
+            <g class="single-measure single-measure--rim">
+              <path data-single-rim-tick1 d={`M${CENTER_X - RIM_R} ${CENTER_Y}V280`} />
+              <path data-single-rim-tick2 d={`M${CENTER_X + RIM_R} ${CENTER_Y}V280`} />
+              <path data-single-rim-line d={`M${CENTER_X - RIM_R} 280H${CENTER_X + RIM_R}`} />
+              <text data-single-rim-text x={CENTER_X} y="296" text-anchor="middle">⌀ 18 in rim</text>
+            </g>
+          </svg>
+        </div>
+        <div class="single-tire-panel">
+          <p class="single-tire-panel__label">{t.crossSectionLabel}</p>
+          <svg viewBox={`0 0 ${CROSS_SECTION_VIEWBOX.width} ${CROSS_SECTION_VIEWBOX.height}`} role="img" aria-label={t.crossSectionAria} data-single-cross-svg>
+            <g transform={`translate(${cs.originX} ${cs.baselineY})`} data-single-cross-group>
+              <path data-single-cross-cavity class="single-cross-cavity" d={cs.cavityPathD} />
+              <path data-single-cross-outer class="single-cross-outer" d={cs.outerPathD} />
+              <g class="single-cross-tread-ticks" data-single-cross-tread-ticks>
+                {crownTreadTicks.map((x) => <line x1={x.toFixed(1)} y1={(-cs.Hs + 2).toFixed(1)} x2={x.toFixed(1)} y2={(-cs.Hs + 9).toFixed(1)} />)}
+              </g>
+              <rect data-single-cross-rim-bar class="single-cross-rim" x={cs.rim.barX.toFixed(1)} y={cs.rim.barY.toFixed(1)} width={cs.rim.barW.toFixed(1)} height={cs.rim.barH.toFixed(1)} rx="3" />
+              <rect data-single-cross-flange-l class="single-cross-rim" x={cs.rim.flangeLX.toFixed(1)} y={cs.rim.flangeY.toFixed(1)} width={cs.rim.flangeW.toFixed(1)} height={cs.rim.flangeH.toFixed(1)} rx="2" />
+              <rect data-single-cross-flange-r class="single-cross-rim" x={cs.rim.flangeRX.toFixed(1)} y={cs.rim.flangeY.toFixed(1)} width={cs.rim.flangeW.toFixed(1)} height={cs.rim.flangeH.toFixed(1)} rx="2" />
+            </g>
+            <g class="single-cross-measure">
+              <path data-single-cross-width-tick1 d={`M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`} />
+              <path data-single-cross-width-tick2 d={`M${(cs.originX + cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`} />
+              <path data-single-cross-width-line d={`M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}H${(cs.originX + cs.hw).toFixed(1)}`} />
+              <text data-single-cross-width-text x={cs.originX} y={(cs.widthLineY - 6).toFixed(1)} text-anchor="middle">225 mm</text>
+            </g>
+            <g class="single-cross-measure">
+              <path data-single-cross-height-tick1 d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`} />
+              <path data-single-cross-height-tick2 d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineBottomY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`} />
+              <path data-single-cross-height-line d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}V${cs.heightLineBottomY.toFixed(1)}`} />
+              <text data-single-cross-height-text x={(cs.heightLineX + 10).toFixed(1)} y={((cs.heightLineTopY + cs.heightLineBottomY) / 2).toFixed(1)} text-anchor="start">101.3 mm</text>
+            </g>
+            <g class="single-cross-legend">
+              <path data-single-cross-tread-leader d={`M${cs.leaderStartX.toFixed(1)} ${cs.treadLabelY.toFixed(1)}H${cs.treadLeaderX2.toFixed(1)}`} />
+              <path data-single-cross-sidewall-leader d={`M${cs.leaderStartX.toFixed(1)} ${cs.sidewallLabelY.toFixed(1)}H${cs.sidewallLeaderX2.toFixed(1)}`} />
+              <path data-single-cross-bead-leader d={`M${cs.leaderStartX.toFixed(1)} ${cs.beadLabelY.toFixed(1)}H${cs.beadLeaderX2.toFixed(1)}`} />
+              <text data-single-cross-tread-label x={cs.legendX.toFixed(1)} y={cs.treadLabelY.toFixed(1)} text-anchor="end">{t.treadLabel}</text>
+              <text data-single-cross-sidewall-label x={cs.legendX.toFixed(1)} y={cs.sidewallLabelY.toFixed(1)} text-anchor="end">{t.sidewallPartLabel}</text>
+              <text data-single-cross-bead-label x={cs.legendX.toFixed(1)} y={cs.beadLabelY.toFixed(1)} text-anchor="end">{t.beadLabel}</text>
+            </g>
+            <text data-single-cross-rim-label class="single-cross-rim-label" x={cs.originX} y={cs.rimLabelY.toFixed(1)} text-anchor="middle">{t.rimCavityCaption(rimDefaultLabel)}</text>
+          </svg>
+        </div>
+      </div>
       <div class="single-tire-badge" data-single-size-label>225 / 45 R18</div>
     </section>
     <section class="single-tire-card single-tire-card--facts">

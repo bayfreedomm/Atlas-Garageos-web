@@ -12,6 +12,7 @@ const livePrice = fuelPrices.de.e5 ?? 1.75;
 <ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]}>
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
     <FuelFields locale="de" price={livePrice} currency="EUR" />
+    <a class="fuel-price-hint" href="/de/kraftstoffpreise/">Aktuellen Kraftstoffpreis ansehen <span aria-hidden="true">→</span></a>
     <button type="submit">Kraftstoffkosten berechnen</button>
     <div class="fuel-primary-result is-pending" data-fuel-primary-result aria-live="polite" aria-label="Primäres Kraftstoffkosten-Ergebnis">
       <div class="fuel-primary-result__cost"><span>Geschätzte Kraftstoffkosten</span><strong data-fuel-primary-cost>—</strong><p data-fuel-primary-copy>Geben Sie Ihre Fahrtdaten ein, um die geschätzten Kraftstoffkosten zu sehen.</p></div>

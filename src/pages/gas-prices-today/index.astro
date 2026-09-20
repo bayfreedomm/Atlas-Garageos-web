@@ -65,9 +65,11 @@ const datasetJsonLd = serializeJsonLd({
   </header>
 
   <FuelPriceBoard
+    market="United States"
+    cadence="weekly"
+    cadenceLabel="EIA WEEKLY AVERAGE"
     updatedLabel={`Week of ${weekLabel}`}
-    cadenceLabel="EIA weekly average — not a daily price"
-    pulse={false}
+    sourceLabel="U.S. Energy Information Administration"
     rows={[
       { label: 'Regular', value: data.regularPerGallon.toFixed(2), unit: '$/gal' },
       { label: 'Diesel', value: data.dieselPerGallon.toFixed(2), unit: '$/gal' },

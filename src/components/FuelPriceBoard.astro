@@ -1,35 +1,56 @@
 ---
-// A bold "digital signage" style price board — like the lit-up price sign
-// outside a real gas station. Purely visual; the numbers are exactly the
-// same static build-time data as everywhere else on the site (see
-// scripts/update-fuel-prices.mjs). No client JS, no fake live ticker.
+// An original "forecourt price totem" — the physical illuminated sign at a
+// petrol station, reimagined for Atlas GarageOS (no brand's visual identity
+// is copied). Purely presentational; the numbers are exactly the same
+// static build-time data as everywhere else on the site (see
+// scripts/update-fuel-prices.mjs). No client JS, no fake live ticker, no
+// blinking "LIVE" dot for anything that is not genuinely near-real-time.
 interface Row {
   readonly label: string;
   readonly value: string;
   readonly unit: string;
 }
 interface Props {
+  readonly market: string; // e.g. "UNITED STATES", "DEUTSCHLAND", "ESPAÑA"
   readonly rows: readonly Row[];
-  readonly updatedLabel: string;
-  readonly cadenceLabel: string; // e.g. "UPDATED 4×/DAY" or "WEEKLY AVERAGE"
-  readonly pulse?: boolean; // true = green "live-ish" dot, false = amber "periodic" dot
+  readonly updatedLabel: string; // e.g. "Week of September 15, 2026" or "Updated today, 14:20"
+  readonly cadenceLabel: string; // e.g. "EIA WEEKLY AVERAGE" or "UPDATED SEVERAL TIMES A DAY"
+  readonly sourceLabel: string;
+  /** 'live' = refreshed multiple times a day; 'weekly' = a genuinely weekly
+   *  average (EIA). Only ever changes wording — never turned into a
+   *  blinking "LIVE" dot. */
+  readonly cadence: 'live' | 'weekly';
+  /** Whether the underlying fetch actually succeeded. When false (e.g. the
+   *  seed placeholder committed before the first scheduled run), the lamp
+   *  shows amber instead of green regardless of cadence — the sign never
+   *  claims fresher data than it actually has. Defaults to true. */
+  readonly fresh?: boolean;
 }
-const { rows, updatedLabel, cadenceLabel, pulse = true } = Astro.props;
+const { market, rows, updatedLabel, cadenceLabel, sourceLabel, cadence, fresh = true } = Astro.props;
 ---
-<div class="fuel-board" role="group" aria-label="Current fuel price board">
-  <div class="fuel-board__frame">
-    <div class="fuel-board__top">
-      <span class:list={['fuel-board__dot', { 'fuel-board__dot--amber': !pulse }]} aria-hidden="true"></span>
-      <span class="fuel-board__cadence">{cadenceLabel}</span>
-      <span class="fuel-board__updated">{updatedLabel}</span>
+<div class="fuel-totem" role="group" aria-label={`Current fuel price sign for ${market}`}>
+  <div class="fuel-totem__chassis">
+    <div class="fuel-totem__header">
+      <span class:list={['fuel-totem__lamp', { 'fuel-totem__lamp--periodic': cadence === 'live' && fresh, 'fuel-totem__lamp--static': cadence === 'weekly' || !fresh }]} aria-hidden="true"></span>
+      <span class="fuel-totem__market">{market}</span>
+      <span class="fuel-totem__cadence">{cadenceLabel}</span>
     </div>
-    <div class="fuel-board__rows">
-      {rows.map((row) => (
-        <div class="fuel-board__row">
-          <span class="fuel-board__label">{row.label}</span>
-          <span class="fuel-board__value"><span class="fuel-board__digits">{row.value}</span><span class="fuel-board__unit">{row.unit}</span></span>
-        </div>
-      ))}
+    <div class="fuel-totem__display">
+      <div class="fuel-totem__rows">
+        {rows.map((row) => (
+          <div class="fuel-totem__row">
+            <span class="fuel-totem__label">{row.label}</span>
+            <span class="fuel-totem__value">
+              <span class="fuel-totem__digits">{row.value}</span>
+              <span class="fuel-totem__unit">{row.unit}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="fuel-totem__footer">
+      <span class="fuel-totem__updated">{updatedLabel}</span>
+      <span class="fuel-totem__source">{sourceLabel}</span>
     </div>
   </div>
 </div>

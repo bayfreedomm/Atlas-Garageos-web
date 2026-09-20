@@ -66,9 +66,12 @@ const datasetJsonLd = serializeJsonLd({
   </header>
 
   <FuelPriceBoard
+    market="Deutschland"
+    cadence="live"
+    fresh={data.ok}
+    cadenceLabel="MEHRMALS TÄGLICH AKTUALISIERT"
     updatedLabel={`${dateLabel}, ${timeLabel} Uhr`}
-    cadenceLabel="Automatisch mehrmals täglich aktualisiert"
-    pulse={data.ok}
+    sourceLabel={data.source}
     rows={[
       { label: 'Super E5', value: data.e5.toFixed(2).replace('.', ','), unit: '€/L' },
       { label: 'Diesel', value: data.diesel.toFixed(2).replace('.', ','), unit: '€/L' },

@@ -11,6 +11,7 @@ const livePrice = fuelPrices.es.e5 ?? 1.65;
 <ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]}>
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
     <FuelFields locale="es" distance={420} economy={6.5} price={livePrice} currency="EUR" />
+    <a class="fuel-price-hint" href="/es/precio-gasolina-hoy/">Ver el precio de la gasolina hoy <span aria-hidden="true">→</span></a>
     <fieldset class="trip-options"><legend>Trayecto</legend>
       <div class="utility-fields"><label class="field-wide">Dirección<select name="tripType"><option value="one">Solo ida</option><option value="round">Ida y vuelta</option></select></label></div>
       <details><summary>Añadir peajes, extras o acompañantes</summary><div class="utility-fields">

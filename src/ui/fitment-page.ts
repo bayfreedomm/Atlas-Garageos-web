@@ -583,16 +583,25 @@ export async function initializeFitmentPage(): Promise<void> {
   }
 
   async function copyShare(): Promise<void> {
-    const payload: SetupShareV1 = { v: 1, current: readSetup('current'), proposed: readSetup('proposed') };
-    const url = new URL(window.location.href);
-    url.search = '';
-    url.hash = createSetupShareHash(payload).slice(1);
-    const shareUrl = url.toString();
     const feedback = document.querySelector<HTMLElement>('#share-feedback');
     const announce = (message: string): void => {
       status.textContent = message;
       if (feedback) { feedback.textContent = message; feedback.classList.remove('share-toolbar__feedback--visible'); void feedback.offsetWidth; feedback.classList.add('share-toolbar__feedback--visible'); }
     };
+    // Reuse the existing comparison validator — do not build a second, parallel
+    // validation path just for sharing. An invalid current/proposed setup must
+    // never produce a share link.
+    const validation = compareSetupInputs(readSetup('current'), readSetup('proposed'));
+    if (!validation.ok) {
+      showIssues(errors, validation.issues);
+      announce('Fix the highlighted setup issues before sharing.');
+      return;
+    }
+    const payload: SetupShareV1 = { v: 1, current: readSetup('current'), proposed: readSetup('proposed') };
+    const url = new URL(window.location.href);
+    url.search = '';
+    url.hash = createSetupShareHash(payload).slice(1);
+    const shareUrl = url.toString();
     if (typeof navigator.share === 'function') {
       try {
         await navigator.share({ title: 'Atlas GarageOS — wheel & tire setup', text: 'A wheel and tire fitment comparison from Atlas GarageOS.', url: shareUrl });

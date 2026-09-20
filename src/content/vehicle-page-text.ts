@@ -24,6 +24,11 @@ export interface VehiclePageText {
   readonly openTireTool: string;
   readonly openBoltTool: string;
   readonly openTorqueTool: string;
+  readonly fuelHeading: string;
+  readonly fuelCardTitle: string;
+  readonly fuelCardCopy: string;
+  readonly tripCardTitle: string;
+  readonly tripCardCopy: string;
   readonly faqHeading: string;
   readonly faqTireQ: (v: VehicleFitment) => string;
   readonly faqTireA: (v: VehicleFitment) => string;
@@ -63,6 +68,11 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     openTireTool: 'Check this tire size in the Tire Size Calculator',
     openBoltTool: 'Check this bolt pattern in the Bolt Pattern Calculator',
     openTorqueTool: 'Convert this torque spec (Nm ↔ lb-ft)',
+    fuelHeading: 'Fuel & trip costs',
+    fuelCardTitle: "Today's fuel prices",
+    fuelCardCopy: 'Current national average for regular gasoline and diesel.',
+    tripCardTitle: 'Estimate driving cost',
+    tripCardCopy: 'Use this fuel price to estimate cost per trip or per year.',
     faqHeading: 'Frequently asked questions',
     faqTireQ: (v) => `What tire size does a ${v.make} ${v.model} take?`,
     faqTireA: (v) => `A ${v.make} ${v.model} (${v.generation}) commonly comes with ${v.tireSize} tires on a ${v.wheelSize} wheel. Trims vary, so check your door-jamb sticker for your exact vehicle.`,
@@ -100,6 +110,11 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     openTireTool: 'Diese Reifengröße im Reifengrößen-Rechner prüfen',
     openBoltTool: 'Diesen Lochkreis im Lochkreis-Rechner prüfen',
     openTorqueTool: 'Dieses Drehmoment umrechnen (Nm ↔ lb-ft)',
+    fuelHeading: 'Kraftstoff & Fahrtkosten',
+    fuelCardTitle: 'Kraftstoffpreise heute',
+    fuelCardCopy: 'Aktueller Durchschnittspreis für Super E5 und Diesel.',
+    tripCardTitle: 'Fahrtkosten schätzen',
+    tripCardCopy: 'Diesen Kraftstoffpreis nutzen, um Kosten pro Fahrt oder pro Jahr zu schätzen.',
     faqHeading: 'Häufige Fragen',
     faqTireQ: (v) => `Welche Reifengröße hat ein ${v.make} ${v.model}?`,
     faqTireA: (v) => `Ein ${v.make} ${v.model} (${v.generation}) wird üblicherweise mit ${v.tireSize} Reifen auf einer ${v.wheelSize}-Felge ausgeliefert. Je nach Ausstattung kann es Abweichungen geben — prüfen Sie den Aufkleber an der Fahrertür für Ihr genaues Fahrzeug.`,
@@ -137,6 +152,11 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     openTireTool: 'Comprobar esta medida en la Calculadora de Tamaño de Neumático',
     openBoltTool: 'Comprobar este patrón en la Calculadora de Patrón de Birlos',
     openTorqueTool: 'Convertir este par de apriete (Nm ↔ lb-ft)',
+    fuelHeading: 'Combustible y costes de viaje',
+    fuelCardTitle: 'Precio de la gasolina hoy',
+    fuelCardCopy: 'Precio medio actual de la gasolina 95 y el diésel.',
+    tripCardTitle: 'Estimar coste de conducción',
+    tripCardCopy: 'Use este precio de combustible para estimar el coste por viaje o por año.',
     faqHeading: 'Preguntas frecuentes',
     faqTireQ: (v) => `¿Qué medida de neumático lleva un ${v.make} ${v.model}?`,
     faqTireA: (v) => `Un ${v.make} ${v.model} (${v.generation}) suele llevar neumáticos ${v.tireSize} sobre una llanta ${v.wheelSize}. Puede variar según el acabado — consulte la etiqueta del pilar de la puerta de su vehículo concreto.`,

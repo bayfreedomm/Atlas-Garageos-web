@@ -2,6 +2,7 @@ import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTo
 import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 import { getPageLocale } from './page-locale';
+import { computeTireCrossSection } from './tire-cross-section';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
 const tireValue = (form: HTMLFormElement, prefix: string): TireToolInput => ({ widthMm: numberValue(form, `${prefix}widthMm`), aspectRatio: numberValue(form, `${prefix}aspectRatio`), rimDiameterInches: numberValue(form, `${prefix}rimDiameterInches`) });
@@ -182,6 +183,7 @@ const SINGLE_TIRE_TEXT = {
     lowerProfile: 'A lower-profile sidewall puts more visual emphasis on the rim.',
     balanced: 'This profile keeps a balanced sidewall-to-rim proportion.',
     suffix: ' The drawing follows the entered proportions.',
+    rimCavityCaption: (rim: string) => `${rim} · inner cavity above the rim`,
   },
   de: {
     width: (widthMm: number) => `${widthMm} mm Breite`,
@@ -190,6 +192,7 @@ const SINGLE_TIRE_TEXT = {
     lowerProfile: 'Eine niedrigere Flanke legt den optischen Schwerpunkt stärker auf die Felge.',
     balanced: 'Dieses Profil hält ein ausgewogenes Verhältnis zwischen Flanke und Felge.',
     suffix: ' Die Zeichnung folgt den eingegebenen Proportionen.',
+    rimCavityCaption: (rim: string) => `${rim} · Hohlraum über der Felge`,
   },
   es: {
     width: (widthMm: number) => `${widthMm} mm de ancho`,
@@ -198,6 +201,7 @@ const SINGLE_TIRE_TEXT = {
     lowerProfile: 'Un perfil más bajo pone más énfasis visual en la llanta.',
     balanced: 'Este perfil mantiene una proporción equilibrada entre el flanco y la llanta.',
     suffix: ' El dibujo sigue las proporciones introducidas.',
+    rimCavityCaption: (rim: string) => `${rim} · cavidad interior sobre la llanta`,
   },
 } as const;
 
@@ -212,10 +216,6 @@ const TIRE_OUTER_R = 92;
 const TIRE_MIN_RIM_RATIO = 0.22;
 const TIRE_MAX_RIM_RATIO = 0.9;
 const TIRE_LUG_ANGLES_DEG = [-90, -18, 54, 126, 198];
-// Calibrated so the default 225 mm width renders as a 130px-wide slice —
-// the slice is the one part of this diagram drawn to a true, self-consistent
-// mm scale (both its width and height use the same px-per-mm factor).
-const TIRE_SLICE_PX_PER_MM = 130 / 225;
 
 function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
   const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
@@ -269,21 +269,48 @@ function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInpu
   setAttr('[data-single-rim-line]', 'd', `M${rimLeft.toFixed(1)} 280H${rimRight.toFixed(1)}`);
   setText('[data-single-rim-text]', `⌀ ${text.rim(input.rimDiameterInches)}`);
 
-  // Cross-section slice: the one place width is drawn, using a real,
-  // self-consistent mm scale shared between its width and its height.
-  // Capped well short of the space actually available around it (see the
-  // fixed layout in TireSizeTechnicalVisual.astro) so no valid or extreme
-  // input can push the slice into the rim-diameter line below it or the
-  // dimension labels beside it. The mm text always shows the true value;
-  // only the drawn extent is capped.
-  const sliceHalfWidth = Math.min(120, Math.max(20, (input.widthMm * TIRE_SLICE_PX_PER_MM) / 2));
-  const sliceHeight = Math.min(80, Math.max(10, result.sidewallHeightMm * TIRE_SLICE_PX_PER_MM));
-  const topHalf = sliceHalfWidth * 0.6;
-  setAttr('[data-single-slice-shape]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 0 C${(-sliceHalfWidth).toFixed(1)} ${(-sliceHeight * 0.65).toFixed(1)} ${(-topHalf).toFixed(1)} ${(-sliceHeight).toFixed(1)} ${(-topHalf).toFixed(1)} ${(-sliceHeight).toFixed(1)} L${topHalf.toFixed(1)} ${(-sliceHeight).toFixed(1)} C${topHalf.toFixed(1)} ${(-sliceHeight).toFixed(1)} ${sliceHalfWidth.toFixed(1)} ${(-sliceHeight * 0.65).toFixed(1)} ${sliceHalfWidth.toFixed(1)} 0 Z`);
-  setAttr('[data-single-slice-tick1]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 6V16`);
-  setAttr('[data-single-slice-tick2]', 'd', `M${sliceHalfWidth.toFixed(1)} 6V16`);
-  setAttr('[data-single-slice-line]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 12H${sliceHalfWidth.toFixed(1)}`);
-  setText('[data-single-slice-text]', `${input.widthMm} mm`);
+  // Cross-section panel: a real tire cross-sectional shape (bulging
+  // sidewall, tread/crown, bead, a separate rim block, hollow inner
+  // cavity), driven by the same computeTireCrossSection() geometry the
+  // static markup used for its defaults — one scale factor, one source of
+  // truth, so the JS-updated drawing never drifts from the SSR'd one.
+  const cs = computeTireCrossSection(input.widthMm, result.sidewallHeightMm);
+  setAttr('[data-single-cross-group]', 'transform', `translate(${cs.originX.toFixed(1)} ${cs.baselineY.toFixed(1)})`);
+  setAttr('[data-single-cross-outer]', 'd', cs.outerPathD);
+  setAttr('[data-single-cross-cavity]', 'd', cs.cavityPathD);
+  const crownTicks = visual.querySelectorAll<SVGLineElement>('[data-single-cross-tread-ticks] line');
+  [-0.32, -0.16, 0, 0.16, 0.32].forEach((f, i) => {
+    const x = (cs.hw * 0.5 * f).toFixed(1);
+    const tick = crownTicks[i];
+    if (tick) { tick.setAttribute('x1', x); tick.setAttribute('x2', x); tick.setAttribute('y1', (-cs.Hs + 2).toFixed(1)); tick.setAttribute('y2', (-cs.Hs + 9).toFixed(1)); }
+  });
+  setAttr('[data-single-cross-rim-bar]', 'x', cs.rim.barX.toFixed(1)); setAttr('[data-single-cross-rim-bar]', 'y', cs.rim.barY.toFixed(1));
+  setAttr('[data-single-cross-rim-bar]', 'width', cs.rim.barW.toFixed(1)); setAttr('[data-single-cross-rim-bar]', 'height', cs.rim.barH.toFixed(1));
+  setAttr('[data-single-cross-flange-l]', 'x', cs.rim.flangeLX.toFixed(1)); setAttr('[data-single-cross-flange-l]', 'y', cs.rim.flangeY.toFixed(1));
+  setAttr('[data-single-cross-flange-l]', 'width', cs.rim.flangeW.toFixed(1)); setAttr('[data-single-cross-flange-l]', 'height', cs.rim.flangeH.toFixed(1));
+  setAttr('[data-single-cross-flange-r]', 'x', cs.rim.flangeRX.toFixed(1)); setAttr('[data-single-cross-flange-r]', 'y', cs.rim.flangeY.toFixed(1));
+  setAttr('[data-single-cross-flange-r]', 'width', cs.rim.flangeW.toFixed(1)); setAttr('[data-single-cross-flange-r]', 'height', cs.rim.flangeH.toFixed(1));
+
+  setAttr('[data-single-cross-width-tick1]', 'd', `M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`);
+  setAttr('[data-single-cross-width-tick2]', 'd', `M${(cs.originX + cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`);
+  setAttr('[data-single-cross-width-line]', 'd', `M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}H${(cs.originX + cs.hw).toFixed(1)}`);
+  setAttr('[data-single-cross-width-text]', 'x', cs.originX.toFixed(1)); setAttr('[data-single-cross-width-text]', 'y', (cs.widthLineY - 6).toFixed(1));
+  setText('[data-single-cross-width-text]', `${input.widthMm} mm`);
+
+  setAttr('[data-single-cross-height-tick1]', 'd', `M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`);
+  setAttr('[data-single-cross-height-tick2]', 'd', `M${cs.heightLineX.toFixed(1)} ${cs.heightLineBottomY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`);
+  setAttr('[data-single-cross-height-line]', 'd', `M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}V${cs.heightLineBottomY.toFixed(1)}`);
+  setAttr('[data-single-cross-height-text]', 'x', (cs.heightLineX + 10).toFixed(1)); setAttr('[data-single-cross-height-text]', 'y', ((cs.heightLineTopY + cs.heightLineBottomY) / 2).toFixed(1));
+  setText('[data-single-cross-height-text]', `${result.sidewallHeightMm.toFixed(1)} mm`);
+
+  setAttr('[data-single-cross-tread-leader]', 'd', `M${cs.leaderStartX.toFixed(1)} ${cs.treadLabelY.toFixed(1)}H${cs.treadLeaderX2.toFixed(1)}`);
+  setAttr('[data-single-cross-sidewall-leader]', 'd', `M${cs.leaderStartX.toFixed(1)} ${cs.sidewallLabelY.toFixed(1)}H${cs.sidewallLeaderX2.toFixed(1)}`);
+  setAttr('[data-single-cross-bead-leader]', 'd', `M${cs.leaderStartX.toFixed(1)} ${cs.beadLabelY.toFixed(1)}H${cs.beadLeaderX2.toFixed(1)}`);
+  setAttr('[data-single-cross-tread-label]', 'x', cs.legendX.toFixed(1)); setAttr('[data-single-cross-tread-label]', 'y', cs.treadLabelY.toFixed(1));
+  setAttr('[data-single-cross-sidewall-label]', 'x', cs.legendX.toFixed(1)); setAttr('[data-single-cross-sidewall-label]', 'y', cs.sidewallLabelY.toFixed(1));
+  setAttr('[data-single-cross-bead-label]', 'x', cs.legendX.toFixed(1)); setAttr('[data-single-cross-bead-label]', 'y', cs.beadLabelY.toFixed(1));
+  setAttr('[data-single-cross-rim-label]', 'x', cs.originX.toFixed(1)); setAttr('[data-single-cross-rim-label]', 'y', cs.rimLabelY.toFixed(1));
+  setText('[data-single-cross-rim-label]', text.rimCavityCaption(`⌀ ${text.rim(input.rimDiameterInches)}`));
 
   setText('[data-single-size-label]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
   setText('[data-single-sidewall]', `${result.sidewallHeightMm.toFixed(1)} mm`);

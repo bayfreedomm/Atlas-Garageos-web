@@ -9,6 +9,7 @@ const livePrice = fuelPrices.us.regular ?? 0.9;
 <ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate the complete journey cost from fuel and optional expenses, then see the share per traveller." limitation="Trip costs are estimates based on the numbers you enter. Actual consumption can vary with traffic, weather, load, speed, and driving style.">
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
     <FuelFields distance={420} economy={6.5} price={livePrice} currency="USD" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">See today's national fuel price <span aria-hidden="true">→</span></a>
     <fieldset class="trip-options"><legend>Trip</legend>
       <div class="utility-fields"><label class="field-wide">Direction<select name="tripType"><option value="one">One way</option><option value="round">Round trip</option></select></label></div>
       <details><summary>Add tolls, extras, or travellers</summary><div class="utility-fields">

@@ -4,6 +4,15 @@ import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 
+// The hero capability badges (Tires & wheels / Fuel & trips / EV tools /
+// Performance) must route to a real, already-existing destination. Three of
+// them are real tool categories (the same English category strings used by
+// the Tools-page filter buttons and by ?category= on /tools/), so they reuse
+// that existing filter mechanism. There is no dedicated "EV tools" category
+// in the registry (EV charging lives under Fuel & Trips), so rather than
+// invent a thin category page for it, it links straight to the EV Charging
+// Cost Calculator tool page — the single most appropriate existing page.
+
 interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const prefix = locale ? `/${locale}` : '';
@@ -50,6 +59,14 @@ const helper = new Map<ToolId, string>([
   ['power-to-weight-calculator', 'Power relative to vehicle weight'],
 ]);
 const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
+const evChargingTool = tools.find((tool) => tool.id === 'ev-charging-cost-calculator')!;
+const evChargingHref = locale ? localizedToolPath(locale, evChargingTool.id, 'tool') : routeForTool(evChargingTool);
+const heroCapabilities = [
+  { key: 'tires', icon: '◉', label: home?.capTires ?? 'Tires & wheels', href: `${prefix}/tools/?category=${encodeURIComponent('Tires & Wheels')}` },
+  { key: 'fuel', icon: '▰', label: home?.capFuel ?? 'Fuel & trips', href: `${prefix}/tools/?category=${encodeURIComponent('Fuel & Trips')}` },
+  { key: 'ev', icon: '⚡', label: home?.capEv ?? 'EV tools', href: evChargingHref },
+  { key: 'performance', icon: '⌁', label: home?.capPerformance ?? 'Performance', href: `${prefix}/tools/?category=${encodeURIComponent('Performance')}` },
+] as const;
 const categories = home
   ? home.categories.map((c) => [c.name, c.copy] as const)
   : ([
@@ -75,12 +92,13 @@ const categories = home
         <a class="home-v7-cta home-v7-cta--secondary" href="/fitment-studio/">{home?.ctaCompare ?? 'Compare fitment'}</a>
       </div>
 
-      <div class="home-v7-capabilities" aria-label="GarageOS tool families">
-        <div><span aria-hidden="true">◉</span><strong>{home?.capTires ?? 'Tires & wheels'}</strong></div>
-        <div><span aria-hidden="true">▰</span><strong>{home?.capFuel ?? 'Fuel & trips'}</strong></div>
-        <div><span aria-hidden="true">⚡</span><strong>{home?.capEv ?? 'EV tools'}</strong></div>
-        <div><span aria-hidden="true">⌁</span><strong>{home?.capPerformance ?? 'Performance'}</strong></div>
-      </div>
+      <nav class="home-v7-capabilities" aria-label="Tool families">
+        {heroCapabilities.map((cap) => (
+          <a href={cap.href} aria-label={cap.label}>
+            <span aria-hidden="true">{cap.icon}</span><strong>{cap.label}</strong>
+          </a>
+        ))}
+      </nav>
     </div>
   </section>
 
