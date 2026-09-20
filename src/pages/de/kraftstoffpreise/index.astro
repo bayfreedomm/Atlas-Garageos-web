@@ -1,17 +1,25 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
+import FuelPriceBoard from '../../../components/FuelPriceBoard.astro';
+import FuelPriceTrend from '../../../components/FuelPriceTrend.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
 import fuelPrices from '../../../data/fuel-prices.json';
+import fuelPriceHistory from '../../../data/fuel-price-history.json';
 
 const data = fuelPrices.de;
 const title = 'Kraftstoffpreise heute in Deutschland — Benzin & Diesel im Schnitt';
 const description = 'Aktueller Durchschnittspreis für Super E5 und Diesel in Deutschland, automatisch mehrmals täglich aktualisiert aus öffentlichen Quellen.';
 const pathname = '/de/kraftstoffpreise/';
 const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
   { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
   { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
 ];
 const dateLabel = new Date(data.fetchedAt).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+const timeLabel = new Date(data.fetchedAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+const e5History = fuelPriceHistory.map((row) => ({ date: row.date, value: row.de.e5 }));
+const dieselHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.de.diesel }));
 const faqs = [
   {
     q: 'Woher stammen diese Kraftstoffpreise?',
@@ -20,6 +28,10 @@ const faqs = [
   {
     q: 'Wie oft werden die Preise aktualisiert?',
     a: 'Automatisch mehrmals täglich über einen geplanten Abruf — nicht bei jedem Seitenaufruf, damit die Quelle nicht überlastet wird.',
+  },
+  {
+    q: 'Warum ist das kein Live-Ticker wie bei Rohöl-Kursen?',
+    a: 'Kraftstoff-Durchschnittspreise sind keine handelbaren Börsenkurse und ändern sich in der Praxis nicht sekündlich. Ein echter Live-Ticker würde die kostenlose Datenquelle unnötig belasten, ohne einen genaueren Preis zu liefern — deshalb holen wir mehrmals täglich einen frischen, echten Wert statt eine Zahl zu simulieren.',
   },
   {
     q: 'Kann ich diesen Preis für meine eigene Tankstelle verwenden?',
@@ -53,15 +65,35 @@ const datasetJsonLd = serializeJsonLd({
     <p>Durchschnittspreise aus öffentlich zugänglichen Daten, automatisch mehrmals täglich aktualisiert. Nutzen Sie diese Werte als Ausgangspunkt in unseren Rechnern — Sie können den Preis dort jederzeit an Ihre eigene Tankstelle anpassen.</p>
   </header>
 
+  <FuelPriceBoard
+    updatedLabel={`${dateLabel}, ${timeLabel} Uhr`}
+    cadenceLabel="Automatisch mehrmals täglich aktualisiert"
+    pulse={data.ok}
+    rows={[
+      { label: 'Super E5', value: data.e5.toFixed(2).replace('.', ','), unit: '€/L' },
+      { label: 'Diesel', value: data.diesel.toFixed(2).replace('.', ','), unit: '€/L' },
+    ]}
+  />
+
   <div class="methodology-grid">
-    <section>
-      <h2>Super E5</h2>
-      <p><strong style="font-size: 1.8em;">{data.e5.toFixed(2).replace('.', ',')} €</strong> pro Liter</p>
-    </section>
-    <section>
-      <h2>Diesel</h2>
-      <p><strong style="font-size: 1.8em;">{data.diesel.toFixed(2).replace('.', ',')} €</strong> pro Liter</p>
-    </section>
+    <FuelPriceTrend
+      label="Verlauf Super E5"
+      unit="€"
+      points={e5History}
+      buildingLabel="Der Preisverlauf wird täglich aufgebaut — noch nicht genug Tage für einen Trend."
+      sinceLabelTemplate="Letzte {days} Tage"
+      lowLabel="Tief"
+      highLabel="Hoch"
+    />
+    <FuelPriceTrend
+      label="Verlauf Diesel"
+      unit="€"
+      points={dieselHistory}
+      buildingLabel="Der Preisverlauf wird täglich aufgebaut — noch nicht genug Tage für einen Trend."
+      sinceLabelTemplate="Letzte {days} Tage"
+      lowLabel="Tief"
+      highLabel="Hoch"
+    />
   </div>
 
   <section class="methodology-sources" aria-labelledby="fuel-source-heading">

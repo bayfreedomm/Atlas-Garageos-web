@@ -201,34 +201,95 @@ const SINGLE_TIRE_TEXT = {
   },
 } as const;
 
+// Geometry constants shared with TireSizeTechnicalVisual.astro's static
+// markup. The outer tire radius is fixed on purpose: only the rim/tire ratio
+// (a real ratio, rimDiameterMm / overallDiameterMm) drives the drawing, so
+// every valid input produces a geometrically consistent picture rather than
+// an independently-clamped, potentially-colliding one.
+const TIRE_CENTER_X = 175;
+const TIRE_CENTER_Y = 150;
+const TIRE_OUTER_R = 92;
+const TIRE_MIN_RIM_RATIO = 0.22;
+const TIRE_MAX_RIM_RATIO = 0.9;
+const TIRE_LUG_ANGLES_DEG = [-90, -18, 54, 126, 198];
+// Calibrated so the default 225 mm width renders as a 130px-wide slice —
+// the slice is the one part of this diagram drawn to a true, self-consistent
+// mm scale (both its width and height use the same px-per-mm factor).
+const TIRE_SLICE_PX_PER_MM = 130 / 225;
+
 function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInput, result: Extract<ReturnType<typeof calculateTireSizeTool>, { ok: true }>['value']): void {
   const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]');
   if (!visual) return;
   visual.hidden = false;
   const locale = getPageLocale();
   const text = SINGLE_TIRE_TEXT[locale];
-  const diameterScale = Math.min(1.08, Math.max(.72, result.overallDiameterMm / 680));
-  const widthScale = Math.min(1.18, Math.max(.78, input.widthMm / 225));
-  const wheel = visual.querySelector<SVGGElement>('[data-single-tire-wheel]');
-  wheel?.setAttribute('transform', `translate(210 145) scale(${widthScale.toFixed(3)} ${diameterScale.toFixed(3)})`);
-  const rimScale = Math.min(1.18, Math.max(.76, input.rimDiameterInches / 18));
-  const rim = visual.querySelector<SVGEllipseElement>('[data-single-tire-rim]');
-  if (rim) { rim.setAttribute('rx', (55 * rimScale / widthScale).toFixed(1)); rim.setAttribute('ry', (64 * rimScale / diameterScale).toFixed(1)); }
-  const widthHalf = 94 * widthScale;
-  visual.querySelector<SVGPathElement>('[data-single-width-line]')?.setAttribute('d', `M${(210-widthHalf).toFixed(1)} 22H${(210+widthHalf).toFixed(1)}`);
-  const diameterHalf = 110 * diameterScale;
-  visual.querySelector<SVGPathElement>('[data-single-diameter-line]')?.setAttribute('d', `M86 ${(145-diameterHalf).toFixed(1)}V${(145+diameterHalf).toFixed(1)}`);
-  const rimHalf = 64 * rimScale;
-  visual.querySelector<SVGPathElement>('[data-single-rim-line]')?.setAttribute('d', `M344 ${(145-rimHalf).toFixed(1)}V${(145+rimHalf).toFixed(1)}`);
-  const set = (selector: string, value: string): void => { const el = visual.querySelector<HTMLElement>(selector); if (el) el.textContent = value; };
-  set('[data-single-width-text]', text.width(input.widthMm));
-  set('[data-single-diameter-text]', `${result.overallDiameterMm.toFixed(1)} mm`);
-  set('[data-single-rim-text]', text.rim(input.rimDiameterInches));
-  set('[data-single-size-label]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
-  set('[data-single-sidewall]', `${result.sidewallHeightMm.toFixed(1)} mm`);
-  set('[data-single-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
+  const q = <T extends Element>(selector: string): T | null => visual.querySelector<T>(selector);
+  const setAttr = (selector: string, name: string, value: string): void => { q<SVGElement>(selector)?.setAttribute(name, value); };
+  const setText = (selector: string, value: string): void => { const el = q<HTMLElement>(selector); if (el) el.textContent = value; };
+
+  const rimDiameterMm = input.rimDiameterInches * 25.4;
+  const rawRatio = result.overallDiameterMm > 0 ? rimDiameterMm / result.overallDiameterMm : 0.7;
+  const ratio = Math.min(TIRE_MAX_RIM_RATIO, Math.max(TIRE_MIN_RIM_RATIO, rawRatio));
+  const rimR = TIRE_OUTER_R * ratio;
+  const hubR = rimR * 0.3;
+  const spokeR = rimR * 0.74;
+  const lugR = hubR + 6;
+
+  setAttr('[data-single-tire-rim-seat]', 'r', (rimR + 6).toFixed(1));
+  setAttr('[data-single-tire-rim]', 'r', rimR.toFixed(1));
+  setAttr('[data-single-tire-hub]', 'r', hubR.toFixed(1));
+  const spokes = visual.querySelectorAll<SVGPathElement>('[data-single-spokes] .single-spoke');
+  const lugs = visual.querySelectorAll<SVGCircleElement>('[data-single-lugs] .single-lug');
+  TIRE_LUG_ANGLES_DEG.forEach((deg, i) => {
+    const rad = (deg * Math.PI) / 180;
+    const spoke = spokes[i];
+    if (spoke) spoke.setAttribute('d', `M${TIRE_CENTER_X} ${TIRE_CENTER_Y} L${(TIRE_CENTER_X + Math.cos(rad) * spokeR).toFixed(1)} ${(TIRE_CENTER_Y + Math.sin(rad) * spokeR).toFixed(1)}`);
+    const lug = lugs[i];
+    if (lug) { lug.setAttribute('cx', (TIRE_CENTER_X + Math.cos(rad) * lugR).toFixed(1)); lug.setAttribute('cy', (TIRE_CENTER_Y + Math.sin(rad) * lugR).toFixed(1)); }
+  });
+
+  // Sidewall-height dimension (left, rim edge to tread edge, top radius).
+  const sidewallTopY = TIRE_CENTER_Y - rimR;
+  const treadTopY = TIRE_CENTER_Y - TIRE_OUTER_R;
+  setAttr('[data-single-sidewall-tick1]', 'd', `M${TIRE_CENTER_X} ${sidewallTopY.toFixed(1)}H66`);
+  setAttr('[data-single-sidewall-tick2]', 'd', `M${TIRE_CENTER_X} ${treadTopY.toFixed(1)}H66`);
+  setAttr('[data-single-sidewall-line]', 'd', `M66 ${sidewallTopY.toFixed(1)}V${treadTopY.toFixed(1)}`);
+  setAttr('[data-single-sidewall-text]', 'y', ((sidewallTopY + treadTopY) / 2).toFixed(1));
+  setText('[data-single-sidewall-text]', `${result.sidewallHeightMm.toFixed(1)} mm`);
+
+  // Overall-diameter dimension (right) always spans the fixed outer radius —
+  // only its label changes, since the drawing is normalized to fill the box.
+  setText('[data-single-diameter-text]', `⌀ ${result.overallDiameterMm.toFixed(1)} mm`);
+
+  // Rim-diameter dimension (bottom, spans the rim's own width).
+  const rimLeft = TIRE_CENTER_X - rimR;
+  const rimRight = TIRE_CENTER_X + rimR;
+  setAttr('[data-single-rim-tick1]', 'd', `M${rimLeft.toFixed(1)} ${TIRE_CENTER_Y}V280`);
+  setAttr('[data-single-rim-tick2]', 'd', `M${rimRight.toFixed(1)} ${TIRE_CENTER_Y}V280`);
+  setAttr('[data-single-rim-line]', 'd', `M${rimLeft.toFixed(1)} 280H${rimRight.toFixed(1)}`);
+  setText('[data-single-rim-text]', `⌀ ${text.rim(input.rimDiameterInches)}`);
+
+  // Cross-section slice: the one place width is drawn, using a real,
+  // self-consistent mm scale shared between its width and its height.
+  // Capped well short of the space actually available around it (see the
+  // fixed layout in TireSizeTechnicalVisual.astro) so no valid or extreme
+  // input can push the slice into the rim-diameter line below it or the
+  // dimension labels beside it. The mm text always shows the true value;
+  // only the drawn extent is capped.
+  const sliceHalfWidth = Math.min(120, Math.max(20, (input.widthMm * TIRE_SLICE_PX_PER_MM) / 2));
+  const sliceHeight = Math.min(80, Math.max(10, result.sidewallHeightMm * TIRE_SLICE_PX_PER_MM));
+  const topHalf = sliceHalfWidth * 0.6;
+  setAttr('[data-single-slice-shape]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 0 C${(-sliceHalfWidth).toFixed(1)} ${(-sliceHeight * 0.65).toFixed(1)} ${(-topHalf).toFixed(1)} ${(-sliceHeight).toFixed(1)} ${(-topHalf).toFixed(1)} ${(-sliceHeight).toFixed(1)} L${topHalf.toFixed(1)} ${(-sliceHeight).toFixed(1)} C${topHalf.toFixed(1)} ${(-sliceHeight).toFixed(1)} ${sliceHalfWidth.toFixed(1)} ${(-sliceHeight * 0.65).toFixed(1)} ${sliceHalfWidth.toFixed(1)} 0 Z`);
+  setAttr('[data-single-slice-tick1]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 6V16`);
+  setAttr('[data-single-slice-tick2]', 'd', `M${sliceHalfWidth.toFixed(1)} 6V16`);
+  setAttr('[data-single-slice-line]', 'd', `M${(-sliceHalfWidth).toFixed(1)} 12H${sliceHalfWidth.toFixed(1)}`);
+  setText('[data-single-slice-text]', `${input.widthMm} mm`);
+
+  setText('[data-single-size-label]', `${input.widthMm} / ${input.aspectRatio} R${input.rimDiameterInches}`);
+  setText('[data-single-sidewall]', `${result.sidewallHeightMm.toFixed(1)} mm`);
+  setText('[data-single-diameter]', `${result.overallDiameterMm.toFixed(1)} mm`);
   const profile = input.aspectRatio >= 55 ? 'taller' : input.aspectRatio <= 35 ? 'lower-profile' : 'balanced';
-  set('[data-single-meaning]', `${profile === 'taller' ? text.taller : profile === 'lower-profile' ? text.lowerProfile : text.balanced}${text.suffix}`);
+  setText('[data-single-meaning]', `${profile === 'taller' ? text.taller : profile === 'lower-profile' ? text.lowerProfile : text.balanced}${text.suffix}`);
 }
 
 function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): void {

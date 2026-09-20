@@ -587,11 +587,27 @@ export async function initializeFitmentPage(): Promise<void> {
     const url = new URL(window.location.href);
     url.search = '';
     url.hash = createSetupShareHash(payload).slice(1);
+    const shareUrl = url.toString();
+    const feedback = document.querySelector<HTMLElement>('#share-feedback');
+    const announce = (message: string): void => {
+      status.textContent = message;
+      if (feedback) { feedback.textContent = message; feedback.classList.remove('share-toolbar__feedback--visible'); void feedback.offsetWidth; feedback.classList.add('share-toolbar__feedback--visible'); }
+    };
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title: 'Atlas GarageOS — wheel & tire setup', text: 'A wheel and tire fitment comparison from Atlas GarageOS.', url: shareUrl });
+        announce('Setup shared. Opening the link will not save anything automatically.');
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return; // user dismissed the native share sheet
+        // Native share failed for another reason (unsupported context, etc.) — fall through to copy-link.
+      }
+    }
     try {
-      await navigator.clipboard.writeText(url.toString());
-      status.textContent = 'Share link copied. Opening it will not save anything automatically.';
+      await navigator.clipboard.writeText(shareUrl);
+      announce('Link copied. Opening it will not save anything automatically.');
     } catch {
-      status.textContent = `Copy was unavailable. Share this link: ${url.toString()}`;
+      announce(`Copy was unavailable. Share this link: ${shareUrl}`);
     }
   }
 

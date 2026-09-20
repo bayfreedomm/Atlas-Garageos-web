@@ -1,0 +1,71 @@
+---
+// Historical trend sparkline, built from the capped 90-day snapshot log at
+// src/data/fuel-price-history.json (appended to once a day by
+// scripts/update-fuel-prices.mjs). Rendered fully at build time as static
+// SVG — no chart library, no client JS.
+//
+// The log starts with a single real entry and grows by one row per day, so
+// for a while there simply isn't a trend to draw yet. Rather than fabricate
+// history, this shows an honest "building up" state until at least a
+// handful of days exist.
+interface Point {
+  readonly date: string; // ISO yyyy-mm-dd
+  readonly value: number;
+}
+interface Props {
+  readonly label: string;
+  readonly points: readonly Point[];
+  readonly unit: string;
+  readonly buildingLabel: string;
+  readonly sinceLabelTemplate: string; // use "{days}" as a placeholder
+  readonly lowLabel: string;
+  readonly highLabel: string;
+}
+const { label, points, unit, buildingLabel, sinceLabelTemplate, lowLabel, highLabel } = Astro.props;
+
+const MIN_POINTS_FOR_TREND = 4;
+const hasTrend = points.length >= MIN_POINTS_FOR_TREND;
+
+const width = 280;
+const height = 64;
+const pad = 6;
+
+let pathD = '';
+let areaD = '';
+let min = 0;
+let max = 0;
+if (hasTrend) {
+  const values = points.map((p) => p.value);
+  min = Math.min(...values);
+  max = Math.max(...values);
+  const span = max - min || 1;
+  const stepX = (width - pad * 2) / (points.length - 1);
+  const coords = points.map((p, i) => {
+    const x = pad + i * stepX;
+    const y = pad + (height - pad * 2) * (1 - (p.value - min) / span);
+    return [x, y] as const;
+  });
+  pathD = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const first = coords[0]!;
+  const last = coords[coords.length - 1]!;
+  areaD = `${pathD} L${last[0].toFixed(1)},${(height - pad).toFixed(1)} L${first[0].toFixed(1)},${(height - pad).toFixed(1)} Z`;
+}
+const sinceLabel = sinceLabelTemplate.replace('{days}', String(points.length));
+---
+<div class="fuel-trend">
+  <div class="fuel-trend__head"><span>{label}</span>{hasTrend && <small>{sinceLabel}</small>}</div>
+  {hasTrend ? (
+    <>
+      <svg class="fuel-trend__svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`${label} trend`}>
+        <path class="fuel-trend__area" d={areaD}></path>
+        <path class="fuel-trend__line" d={pathD}></path>
+      </svg>
+      <div class="fuel-trend__range"><span>{lowLabel} {min.toFixed(2)}{unit}</span><span>{highLabel} {max.toFixed(2)}{unit}</span></div>
+    </>
+  ) : (
+    <div class="fuel-trend__building">
+      <div class="fuel-trend__building-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <p>{buildingLabel}</p>
+    </div>
+  )}
+</div>

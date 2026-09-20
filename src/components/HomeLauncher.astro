@@ -49,6 +49,7 @@ const helper = new Map<ToolId, string>([
   ['mpg-l100km-converter', 'US MPG, Imperial MPG and L/100km'],
   ['power-to-weight-calculator', 'Power relative to vehicle weight'],
 ]);
+const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
 const categories = home
   ? home.categories.map((c) => [c.name, c.copy] as const)
   : ([
@@ -112,6 +113,7 @@ const categories = home
       <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
     </section>
 
+    <a class="home-fuel-feature" href={fuelPricesPath}><span class="home-fuel-feature__badge"><i aria-hidden="true"></i>{home?.fuelBadge ?? 'LIVE PRICE BOARD'}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Current national average for regular gasoline and diesel, updated several times a day, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
     <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>

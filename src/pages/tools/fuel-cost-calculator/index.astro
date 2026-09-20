@@ -3,11 +3,13 @@ import ToolPage from '../../../components/ToolPage.astro';
 import FuelFields from '../../../components/FuelFields.astro';
 import FuelCostTechnicalVisual from '../../../components/FuelCostTechnicalVisual.astro';
 import { toolById } from '../../../seo/tool-registry';
+import fuelPrices from '../../../data/fuel-prices.json';
 const definition = toolById('fuel-cost-calculator');
+const livePrice = fuelPrices.us.regular ?? 0.9;
 ---
 <ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]} visual={false} eyebrow="Fuel & trips" intro="Estimate fuel used and total cost from your distance, fuel economy, and local fuel price." limitation="This is an estimate. Driving style, traffic, weather, load, and actual vehicle consumption can change the result.">
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
-    <FuelFields />
+    <FuelFields price={livePrice} currency="USD" />
     <button type="submit">Calculate fuel cost</button>
     <div class="fuel-primary-result is-pending" data-fuel-primary-result aria-live="polite" aria-label="Primary fuel cost result">
       <div class="fuel-primary-result__cost"><span>Estimated fuel cost</span><strong data-fuel-primary-cost>—</strong><p data-fuel-primary-copy>Enter your trip details to see the estimated fuel cost.</p></div>

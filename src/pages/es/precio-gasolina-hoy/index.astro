@@ -1,17 +1,25 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
+import FuelPriceBoard from '../../../components/FuelPriceBoard.astro';
+import FuelPriceTrend from '../../../components/FuelPriceTrend.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
 import fuelPrices from '../../../data/fuel-prices.json';
+import fuelPriceHistory from '../../../data/fuel-price-history.json';
 
 const data = fuelPrices.es;
 const title = 'Precio de la gasolina hoy en España — Gasolina 95 y diésel';
 const description = 'Precio medio actual de la gasolina 95 E5 y el diésel A en España, actualizado automáticamente varias veces al día a partir de fuentes oficiales.';
 const pathname = '/es/precio-gasolina-hoy/';
 const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
   { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
   { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
 ];
 const dateLabel = new Date(data.fetchedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+const timeLabel = new Date(data.fetchedAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+const e5History = fuelPriceHistory.map((row) => ({ date: row.date, value: row.es.e5 }));
+const dieselHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.es.diesel }));
 const faqs = [
   {
     q: '¿De dónde salen estos precios de la gasolina?',
@@ -20,6 +28,10 @@ const faqs = [
   {
     q: '¿Con qué frecuencia se actualizan los precios?',
     a: 'De forma automática varias veces al día mediante una consulta programada, no en cada visita, para no sobrecargar la fuente oficial.',
+  },
+  {
+    q: '¿Por qué no es un ticker en vivo como el del petróleo?',
+    a: 'El precio medio del combustible no es una cotización bursátil y no cambia segundo a segundo en la práctica. Un ticker en vivo sobrecargaría innecesariamente la fuente de datos gratuita sin dar un número más preciso, así que preferimos obtener un valor real varias veces al día en lugar de simular uno.',
   },
   {
     q: '¿Puedo usar este precio para mi gasolinera concreta?',
@@ -53,15 +65,35 @@ const datasetJsonLd = serializeJsonLd({
     <p>Precios medios a partir de datos públicos, actualizados automáticamente varias veces al día. Use estos valores como punto de partida en nuestras calculadoras — puede ajustar el precio en cualquier momento según su gasolinera habitual.</p>
   </header>
 
+  <FuelPriceBoard
+    updatedLabel={`${dateLabel}, ${timeLabel}`}
+    cadenceLabel="Actualizado automáticamente varias veces al día"
+    pulse={data.ok}
+    rows={[
+      { label: 'Gasolina 95 E5', value: data.e5.toFixed(2).replace('.', ','), unit: '€/L' },
+      { label: 'Diésel A', value: data.diesel.toFixed(2).replace('.', ','), unit: '€/L' },
+    ]}
+  />
+
   <div class="methodology-grid">
-    <section>
-      <h2>Gasolina 95 E5</h2>
-      <p><strong style="font-size: 1.8em;">{data.e5.toFixed(2).replace('.', ',')} €</strong> por litro</p>
-    </section>
-    <section>
-      <h2>Diésel A</h2>
-      <p><strong style="font-size: 1.8em;">{data.diesel.toFixed(2).replace('.', ',')} €</strong> por litro</p>
-    </section>
+    <FuelPriceTrend
+      label="Histórico Gasolina 95"
+      unit="€"
+      points={e5History}
+      buildingLabel="El histórico se construye día a día — todavía no hay suficientes datos para una tendencia."
+      sinceLabelTemplate="Últimos {days} días"
+      lowLabel="Mín"
+      highLabel="Máx"
+    />
+    <FuelPriceTrend
+      label="Histórico Diésel"
+      unit="€"
+      points={dieselHistory}
+      buildingLabel="El histórico se construye día a día — todavía no hay suficientes datos para una tendencia."
+      sinceLabelTemplate="Últimos {days} días"
+      lowLabel="Mín"
+      highLabel="Máx"
+    />
   </div>
 
   <section class="methodology-sources" aria-labelledby="fuel-source-heading">

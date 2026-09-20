@@ -1,0 +1,35 @@
+---
+// A bold "digital signage" style price board — like the lit-up price sign
+// outside a real gas station. Purely visual; the numbers are exactly the
+// same static build-time data as everywhere else on the site (see
+// scripts/update-fuel-prices.mjs). No client JS, no fake live ticker.
+interface Row {
+  readonly label: string;
+  readonly value: string;
+  readonly unit: string;
+}
+interface Props {
+  readonly rows: readonly Row[];
+  readonly updatedLabel: string;
+  readonly cadenceLabel: string; // e.g. "UPDATED 4×/DAY" or "WEEKLY AVERAGE"
+  readonly pulse?: boolean; // true = green "live-ish" dot, false = amber "periodic" dot
+}
+const { rows, updatedLabel, cadenceLabel, pulse = true } = Astro.props;
+---
+<div class="fuel-board" role="group" aria-label="Current fuel price board">
+  <div class="fuel-board__frame">
+    <div class="fuel-board__top">
+      <span class:list={['fuel-board__dot', { 'fuel-board__dot--amber': !pulse }]} aria-hidden="true"></span>
+      <span class="fuel-board__cadence">{cadenceLabel}</span>
+      <span class="fuel-board__updated">{updatedLabel}</span>
+    </div>
+    <div class="fuel-board__rows">
+      {rows.map((row) => (
+        <div class="fuel-board__row">
+          <span class="fuel-board__label">{row.label}</span>
+          <span class="fuel-board__value"><span class="fuel-board__digits">{row.value}</span><span class="fuel-board__unit">{row.unit}</span></span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

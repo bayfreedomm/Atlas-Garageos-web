@@ -18,5 +18,17 @@
     "fetchedAt": "2026-09-20T00:00:00.000Z",
     "ok": false,
     "note": "Seed placeholder committed before the first scheduled run — replace by running the update-fuel-prices workflow once."
+  },
+  "us": {
+    "regular": 0.86,
+    "diesel": 0.97,
+    "regularPerGallon": 3.25,
+    "dieselPerGallon": 3.67,
+    "weekOf": "2026-09-15",
+    "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)",
+    "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
+    "fetchedAt": "2026-09-20T00:00:00.000Z",
+    "ok": false,
+    "note": "Seed placeholder committed before the first scheduled run — replace by running the update-fuel-prices workflow once."
   }
 }

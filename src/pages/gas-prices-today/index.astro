@@ -1,0 +1,119 @@
+---
+import SiteLayout from '../../components/SiteLayout.astro';
+import FuelPriceBoard from '../../components/FuelPriceBoard.astro';
+import FuelPriceTrend from '../../components/FuelPriceTrend.astro';
+import { serializeJsonLd } from '../../seo/safe-json-ld';
+import fuelPrices from '../../data/fuel-prices.json';
+import fuelPriceHistory from '../../data/fuel-price-history.json';
+
+const data = fuelPrices.us;
+const title = 'Gas Prices Today in the US — Regular & Diesel National Average';
+const description = 'National average price for regular gasoline and diesel in the US, from the EIA weekly retail survey, plus a per-litre and per-gallon breakdown.';
+const pathname = '/gas-prices-today/';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
+];
+const weekLabel = new Date(`${data.weekOf}T00:00:00Z`).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const regularHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.us.regular }));
+const dieselHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.us.diesel }));
+const faqs = [
+  {
+    q: 'Where do these gas prices come from?',
+    a: `${data.source}. This is the official US national average, not a single station's price.`,
+  },
+  {
+    q: 'Why is this a weekly average, not a daily one?',
+    a: "The EIA publishes its Weekly Retail Gasoline and Diesel Prices survey once a week, so a US national average genuinely cannot update daily without inventing numbers between real data points. We refresh from the EIA automatically and show the most recent published week honestly, rather than faking daily movement.",
+  },
+  {
+    q: "Why isn't this a live ticker like oil futures?",
+    a: 'A pump-price national average is not a tradable quote and does not move second by second in reality. A live-looking ticker would just be animating a number that has not actually changed, so we show the real published figure and say plainly how old it is.',
+  },
+  {
+    q: 'Can I use this price for my own gas station?',
+    a: 'No. This is a rough national average for orientation, not the price at any specific pump. Adjust the price manually in any of our calculators to match your local station.',
+  },
+];
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const datasetJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'US Gas Prices (weekly national average)',
+  description: 'Weekly national average price for regular gasoline and diesel in the US from the EIA.',
+  license: 'https://www.usa.gov/government-works',
+  temporalCoverage: data.weekOf,
+  url: 'https://atlasgarageos.com/gas-prices-today/',
+  creator: { '@type': 'Organization', name: 'Atlas GarageOS' },
+});
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Gas prices today', href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Gas prices today</span></nav>
+
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">Week of {weekLabel}</p>
+    <h1>Gas prices today in the US</h1>
+    <p>The national average price for regular gasoline and diesel, from the US Energy Information Administration's official weekly survey. This is a weekly figure, not a daily one — see the FAQ below for why. Use it as a starting point in our calculators, then adjust it to your own station.</p>
+  </header>
+
+  <FuelPriceBoard
+    updatedLabel={`Week of ${weekLabel}`}
+    cadenceLabel="EIA weekly average — not a daily price"
+    pulse={false}
+    rows={[
+      { label: 'Regular', value: data.regularPerGallon.toFixed(2), unit: '$/gal' },
+      { label: 'Diesel', value: data.dieselPerGallon.toFixed(2), unit: '$/gal' },
+    ]}
+  />
+  <p class="fuel-board-note">Per litre for the calculators below: <strong>${data.regular.toFixed(3)}/L</strong> regular, <strong>${data.diesel.toFixed(3)}/L</strong> diesel.</p>
+
+  <div class="methodology-grid">
+    <FuelPriceTrend
+      label="Regular trend"
+      unit="$/gal"
+      points={regularHistory}
+      buildingLabel="History builds up one week at a time — not enough data yet for a trend."
+      sinceLabelTemplate="Last {days} snapshots"
+      lowLabel="Low"
+      highLabel="High"
+    />
+    <FuelPriceTrend
+      label="Diesel trend"
+      unit="$/gal"
+      points={dieselHistory}
+      buildingLabel="History builds up one week at a time — not enough data yet for a trend."
+      sinceLabelTemplate="Last {days} snapshots"
+      lowLabel="Low"
+      highLabel="High"
+    />
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="fuel-source-heading">
+    <p class="eyebrow">Source</p>
+    <h2 id="fuel-source-heading">Where do these numbers come from?</h2>
+    <p>{data.source}. {fuelPrices.disclaimer}</p>
+    <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">View source <span>↗</span></a></div>
+  </section>
+
+  <section aria-labelledby="fuel-faq-heading">
+    <h2 id="fuel-faq-heading">Frequently asked questions</h2>
+    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+
+  <section class="methodology-sources" aria-labelledby="fuel-tools-heading">
+    <p class="eyebrow">Next</p>
+    <h2 id="fuel-tools-heading">Calculate with this price</h2>
+    <div class="methodology-source-links">
+      <a href="/tools/fuel-cost-calculator/">Calculate fuel cost <span>↗</span></a>
+      <a href="/tools/road-trip-cost-calculator/">Calculate road trip cost <span>↗</span></a>
+    </div>
+  </section>
+</SiteLayout>

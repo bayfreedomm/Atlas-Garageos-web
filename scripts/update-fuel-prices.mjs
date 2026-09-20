@@ -19,12 +19,23 @@
  * - Germany: Tankerkoenig API (CC BY 4.0, free registration required for an API key).
  *   https://creativecommons.tankerkoenig.de/
  *   Requires the TANKERKOENIG_API_KEY environment variable (a GitHub Actions secret in CI).
+ * - United States: EIA (U.S. Energy Information Administration) Open Data v2, official,
+ *   free instant self-serve API key (no manual approval wait, unlike Tankerkoenig).
+ *   https://www.eia.gov/opendata/
+ *   Requires the EIA_API_KEY environment variable (a GitHub Actions secret in CI).
+ *   NOTE: EIA's retail gasoline/diesel series are published WEEKLY, not daily — the US
+ *   number on the site is honestly labelled "weekly average", not "daily" like DE/ES.
+ *
+ * This script also appends one row per day to src/data/fuel-price-history.json (capped to
+ * the most recent 90 days) so the public price pages can show a trend, not just today's
+ * number. Multiple runs on the same UTC day update that day's row in place instead of
+ * appending duplicates.
  *
  * IMPORTANT — not yet verified against a live response in this session: the network this
- * script was authored in could not reach either government/API host to confirm the exact
- * current JSON shape. The field names below match each source's long-standing, publicly
- * documented format, but the first real run should be checked by hand (open the Action's
- * log, or run this script locally once) before trusting it unattended.
+ * script was authored in could not reach any of these government/API hosts to confirm the
+ * exact current JSON shape. The field names below match each source's long-standing,
+ * publicly documented format, but the first real run should be checked by hand (open the
+ * Action's log, or run this script locally once) before trusting it unattended.
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -33,8 +44,11 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-prices.json');
+const HISTORY_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-price-history.json');
+const HISTORY_MAX_DAYS = 90;
 
 const FETCH_TIMEOUT_MS = 15_000;
+const US_GALLON_TO_LITRE = 3.785411784;
 
 /** @typedef {{ e5: number | null, diesel: number | null, source: string, sourceUrl: string, fetchedAt: string, ok: boolean, note?: string }} CountryFuelPrice */
 
@@ -139,6 +153,54 @@ async function fetchGermanyAverage() {
   return { e5, diesel, source: `Tankerkoenig API, live average of ${e5Values.length + dieselValues.length} station readings across ${DE_SAMPLE_CITIES.map((c) => c.name).join(', ')}`, sourceUrl, fetchedAt: new Date().toISOString(), ok: true, note: errors.length > 0 ? `Partial failures: ${errors.join('; ')}` : undefined };
 }
 
+/**
+ * United States: EIA Open Data v2 "seriesid" convenience endpoint, weekly national-average
+ * retail prices in USD/gallon. We convert to USD/litre so the site's fuel calculators (which
+ * take a per-litre price everywhere, matching the metric/imperial toggle) stay consistent.
+ */
+const EIA_REGULAR_GAS_SERIES = 'PET.EMM_EPM0_PTE_NUS_DPG.W';
+const EIA_DIESEL_SERIES = 'PET.EMD_EPD2D_PTE_NUS_DPG.W';
+
+async function fetchEiaSeriesLatest(seriesId, apiKey) {
+  const url = `https://api.eia.gov/v2/seriesid/${seriesId}?api_key=${apiKey}`;
+  const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for series ${seriesId}`);
+  const body = await res.json();
+  const rows = body?.response?.data;
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error(`Unexpected EIA response shape for ${seriesId}: ${JSON.stringify(body).slice(0, 200)}`);
+  const latest = rows.reduce((best, row) => (!best || String(row.period) > String(best.period) ? row : best), null);
+  const value = Number.parseFloat(latest?.value);
+  if (!Number.isFinite(value)) throw new Error(`No numeric value in latest row for ${seriesId}`);
+  return { value, period: latest.period };
+}
+
+async function fetchUsAverage() {
+  const sourceUrl = 'https://www.eia.gov/petroleum/gasdiesel/';
+  const apiKey = process.env.EIA_API_KEY;
+  if (!apiKey) {
+    return { regular: null, diesel: null, source: 'EIA Weekly Retail Gasoline and Diesel Prices', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: 'EIA_API_KEY is not set' };
+  }
+  try {
+    const [gas, diesel] = await Promise.all([
+      fetchEiaSeriesLatest(EIA_REGULAR_GAS_SERIES, apiKey),
+      fetchEiaSeriesLatest(EIA_DIESEL_SERIES, apiKey),
+    ]);
+    return {
+      regular: Math.round((gas.value / US_GALLON_TO_LITRE) * 1000) / 1000,
+      diesel: Math.round((diesel.value / US_GALLON_TO_LITRE) * 1000) / 1000,
+      regularPerGallon: gas.value,
+      dieselPerGallon: diesel.value,
+      weekOf: gas.period,
+      source: 'U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)',
+      sourceUrl,
+      fetchedAt: new Date().toISOString(),
+      ok: true,
+    };
+  } catch (err) {
+    return { regular: null, diesel: null, source: 'EIA Weekly Retail Gasoline and Diesel Prices', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: String(err?.message ?? err) };
+  }
+}
+
 async function readPreviousOutput() {
   try {
     const raw = await readFile(OUTPUT_PATH, 'utf8');
@@ -149,34 +211,66 @@ async function readPreviousOutput() {
 }
 
 /** Never let a failed fetch overwrite a previously good value; keep the last-known-good one and flag it as stale instead. */
-function mergeWithFallback(countryKey, freshResult, previous) {
+function mergeWithFallback(countryKey, freshResult, previous, valueKeys) {
   if (freshResult.ok) return freshResult;
   const previousForCountry = previous?.[countryKey];
-  if (previousForCountry?.ok && (previousForCountry.e5 !== null || previousForCountry.diesel !== null)) {
+  const hadValue = previousForCountry?.ok && valueKeys.some((k) => previousForCountry[k] !== null && previousForCountry[k] !== undefined);
+  if (hadValue) {
     return { ...previousForCountry, ok: false, note: `Refresh failed (${freshResult.note}); showing last known value from ${previousForCountry.fetchedAt}` };
   }
   return freshResult;
 }
 
+async function readHistory() {
+  try {
+    const raw = await readFile(HISTORY_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Appends (or updates, if already run today) one row to the daily history log. */
+async function updateHistory(output) {
+  const history = await readHistory();
+  const today = output.generatedAt.slice(0, 10); // YYYY-MM-DD (UTC)
+  const row = {
+    date: today,
+    es: { e5: output.es.e5, diesel: output.es.diesel },
+    de: { e5: output.de.e5, diesel: output.de.diesel },
+    us: { regular: output.us.regular, diesel: output.us.diesel },
+  };
+  const existingIndex = history.findIndex((entry) => entry.date === today);
+  if (existingIndex >= 0) history[existingIndex] = row;
+  else history.push(row);
+  history.sort((a, b) => a.date.localeCompare(b.date));
+  const trimmed = history.slice(-HISTORY_MAX_DAYS);
+  await writeFile(HISTORY_PATH, `${JSON.stringify(trimmed, null, 2)}\n`, 'utf8');
+  console.log('Wrote', HISTORY_PATH, `(${trimmed.length} day${trimmed.length === 1 ? '' : 's'})`);
+}
+
 async function main() {
   const previous = await readPreviousOutput();
-  const [spainFresh, germanyFresh] = await Promise.all([fetchSpainAverage(), fetchGermanyAverage()]);
+  const [spainFresh, germanyFresh, usFresh] = await Promise.all([fetchSpainAverage(), fetchGermanyAverage(), fetchUsAverage()]);
 
   const output = {
     generatedAt: new Date().toISOString(),
     disclaimer: 'National averages are estimates from public/official sources, not a live quote for any specific station. Always treat the number as a reference, not a guarantee.',
-    es: mergeWithFallback('es', spainFresh, previous),
-    de: mergeWithFallback('de', germanyFresh, previous),
+    es: mergeWithFallback('es', spainFresh, previous, ['e5', 'diesel']),
+    de: mergeWithFallback('de', germanyFresh, previous, ['e5', 'diesel']),
+    us: mergeWithFallback('us', usFresh, previous, ['regular', 'diesel']),
   };
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`, 'utf8');
+  await updateHistory(output);
 
   console.log('Wrote', OUTPUT_PATH);
   console.log(JSON.stringify(output, null, 2));
 
-  if (!output.es.ok && !output.de.ok) {
-    console.error('Both sources failed this run — keeping previous file contents (if any) intact.');
+  if (!output.es.ok && !output.de.ok && !output.us.ok) {
+    console.error('All sources failed this run — keeping previous file contents (if any) intact.');
     process.exitCode = 1;
   }
 }

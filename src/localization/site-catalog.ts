@@ -140,6 +140,9 @@ export interface PlatformCatalog {
     readonly fitmentBadge: string;
     readonly fitmentTitle: string;
     readonly fitmentCopy: string;
+    readonly fuelBadge: string;
+    readonly fuelTitle: string;
+    readonly fuelCopy: string;
     readonly categories: readonly { readonly name: string; readonly copy: string }[];
   };
   readonly toolsHub: PlatformPageCopy & { readonly h1: string; readonly lead: string; readonly fitmentRowTitle: string; readonly fitmentRowCopy: string };
@@ -171,6 +174,9 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
       fitmentBadge: 'ERWEITERTES VISUELLES WERKZEUG',
       fitmentTitle: 'Felgen- & Reifenvergleich',
       fitmentCopy: 'Sehen Sie, wie ein neues Setup Durchmesser, Innenposition und Außenstand verändert, bevor Sie kaufen.',
+      fuelBadge: 'LIVE-PREISTAFEL',
+      fuelTitle: 'Kraftstoffpreise heute',
+      fuelCopy: 'Aktueller Durchschnittspreis für Super E5 und Diesel, mehrmals täglich aktualisiert, plus Preisverlauf.',
       categories: [
         { name: 'Kraftstoff & Reisen', copy: 'Kraftstoffkosten, Reisen und E-Auto-Laden' },
         { name: 'Reifen & Felgen', copy: 'Reifengrößen, Einpresstiefe und Geometrie' },
@@ -236,6 +242,9 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
       fitmentBadge: 'HERRAMIENTA VISUAL AVANZADA',
       fitmentTitle: 'Comparador de Llantas y Neumáticos',
       fitmentCopy: 'Vea cómo una nueva configuración cambia el diámetro, la posición interior y la sobresalida exterior antes de comprar.',
+      fuelBadge: 'PANEL DE PRECIOS EN VIVO',
+      fuelTitle: 'Precio de la gasolina hoy',
+      fuelCopy: 'Precio medio actual de la gasolina 95 y el diésel, actualizado varias veces al día, con histórico de precios.',
       categories: [
         { name: 'Combustible y Viajes', copy: 'Coste de combustible, viajes y carga de VE' },
         { name: 'Neumáticos y Llantas', copy: 'Tamaños de neumático, offset y geometría' },

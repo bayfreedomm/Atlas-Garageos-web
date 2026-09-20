@@ -21,7 +21,7 @@ function localizedRoutes(): readonly string[] {
   return routes;
 }
 
-const STANDALONE_CONTENT_ROUTES = ['/de/kraftstoffpreise/', '/es/precio-gasolina-hoy/'] as const;
+const STANDALONE_CONTENT_ROUTES = ['/gas-prices-today/', '/de/kraftstoffpreise/', '/es/precio-gasolina-hoy/'] as const;
 
 function vehiclePageRoutes(): readonly string[] {
   const routes: string[] = ['/vehicles/', '/de/fahrzeuge/', '/es/vehiculos/'];

@@ -102,13 +102,20 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
               <div class="setup-save"><label for="new-name">Setup name<input id="new-name" name="proposed-setup-name" value="New setup" maxlength="80" /></label><button id="save-proposed" type="button" class="secondary">Save new</button></div>
             </fieldset>
           </div>
-          <div class="form-actions"><button type="submit">Compare setups</button><button id="copy-share" type="button" class="secondary">Share comparison</button></div>
+          <div class="form-actions"><button type="submit">Compare setups</button></div>
         </form>
         <div id="errors" class="inline-errors" role="alert" aria-live="assertive" hidden></div>
         <p id="comparison-summary" class="result-summary" aria-live="polite"></p>
         <div class="comparison-layout" aria-labelledby="results-heading">
           <div id="results-heading"><FitmentVisualizer mode="full" title="Current and new geometry" /></div>
           <dl id="results" class="metric-grid" aria-live="polite"></dl>
+        </div>
+        <div class="share-toolbar" role="group" aria-label="Share this comparison">
+          <button id="copy-share" type="button" class="share-toolbar__cta">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .09 4.26L8.6 12.1a3 3 0 1 0 0 3.8l6.5 3.84A3 3 0 1 0 16 17.5a3 3 0 0 0-.09.62L9 14.24a3 3 0 0 0 0-2.48l6.91-4.08c.32.2.68.32 1.09.32Z" /></svg>
+            <span>Share this setup</span>
+          </button>
+          <p id="share-feedback" class="share-toolbar__feedback" role="status" aria-live="polite"></p>
         </div>
       </section>
 
