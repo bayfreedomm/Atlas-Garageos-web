@@ -1,0 +1,30 @@
+---
+// Market snapshot: a compact grid of key metrics, every one of them computed by the page
+// from real data in fuel-prices.json / fuel-price-history.json (see
+// src/ui/fuel-market-metrics.ts). A metric with no real value MUST be passed with
+// `value: null` and an honest `placeholder` — this component never falls back to a dash that
+// could read as a number, and never hides the card to make the grid look fuller.
+import type { SnapshotMetric } from '../ui/fuel-market-metrics';
+
+interface Props {
+  readonly heading: string;
+  readonly metrics: readonly SnapshotMetric[];
+}
+const { heading, metrics } = Astro.props;
+---
+<section class="fuel-dash-snapshot" aria-labelledby="fuel-snapshot-heading">
+  <h2 class="fuel-dash-section-title" id="fuel-snapshot-heading">{heading}</h2>
+  <div class="fuel-dash-metrics">
+    {metrics.map((metric) => (
+      <div class:list={['fuel-metric', { 'fuel-metric--empty': metric.value === null }]}>
+        <span class="fuel-metric__label">{metric.label}</span>
+        {metric.value === null ? (
+          <span class="fuel-metric__placeholder">{metric.placeholder}</span>
+        ) : (
+          <span class:list={['fuel-metric__value', metric.tone ? `fuel-metric__value--${metric.tone}` : undefined]}>{metric.value}</span>
+        )}
+        {metric.detail && <span class="fuel-metric__detail">{metric.detail}</span>}
+      </div>
+    ))}
+  </div>
+</section>

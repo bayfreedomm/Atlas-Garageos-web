@@ -15,8 +15,7 @@ const vehicles = vehicleFitmentData.filter((v) => v.market === 'us').slice().sor
     <p>{t.hubLead}</p>
   </header>
   <section class="vehicle-fuel-journey" aria-labelledby="vehicle-hub-fuel-heading">
-    <p class="eyebrow">{t.fuelHeading}</p>
-    <h2 id="vehicle-hub-fuel-heading">&nbsp;</h2>
+    <h2 id="vehicle-hub-fuel-heading">{t.fuelHeading}</h2>
     <div class="vehicle-fuel-journey__cards">
       <a class="vehicle-fuel-card" href="/gas-prices-today/"><strong>{t.fuelCardTitle}</strong><span>{t.fuelCardCopy}</span><i aria-hidden="true">›</i></a>
       <a class="vehicle-fuel-card" href="/tools/road-trip-cost-calculator/"><strong>{t.tripCardTitle}</strong><span>{t.tripCardCopy}</span><i aria-hidden="true">›</i></a>

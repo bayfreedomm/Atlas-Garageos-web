@@ -18,7 +18,7 @@ const t = locale ? uiStrings[locale] : undefined;
 const backHref = locale ? `/${locale}/tools/` : '/tools/';
 const layoutTitle = titleOverride ?? definition.title;
 const layoutDescription = descriptionOverride ?? definition.description;
-const layoutPathname = locale ? localizedToolPath(locale, definition.id, definition.kind === 'flagship' ? 'flagship' : 'tool') : undefined;
+const layoutPathname = locale ? localizedToolPath(locale, definition.id, definition.kind) : undefined;
 ---
 <SiteLayout definition={definition} title={layoutTitle} description={layoutDescription} pathname={layoutPathname} active="tools" locale={locale} alternates={alternates}>
   <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href={backHref}>{t?.allToolsBack ?? '← All tools'}</a><span class="sr-only" aria-current="page">{displayTitle}</span></nav>
@@ -39,6 +39,6 @@ const layoutPathname = locale ? localizedToolPath(locale, definition.id, definit
   <ToolInsights id={definition.id} locale={locale} />
   {!explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}
   {studioCta && <a class="studio-cta studio-cta--row" href={studioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
-  <section class="related-tools" aria-labelledby="related-heading"><h2 id="related-heading">{t?.relatedTools ?? 'Related tools'}</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={tool.id === 'fitment-studio' ? '/fitment-studio/' : (locale ? localizedToolPath(locale, tool.id, 'tool') : routeForTool(tool))}><ToolIcon id={tool.id} category={tool.category}/><span><strong>{locale ? localizedTool(tool.id, locale).title : tool.title}</strong><small>{locale ? localizedTool(tool.id, locale).category : tool.category}</small></span><i aria-hidden="true">›</i></a>)}</div></section>
+  <section class="related-tools" aria-labelledby="related-heading"><h2 id="related-heading">{t?.relatedTools ?? 'Related tools'}</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={tool.id === 'fitment-studio' ? '/fitment-studio/' : (locale ? localizedToolPath(locale, tool.id, tool.kind) : routeForTool(tool))}><ToolIcon id={tool.id} category={tool.category}/><span><strong>{locale ? localizedTool(tool.id, locale).title : tool.title}</strong><small>{locale ? localizedTool(tool.id, locale).category : tool.category}</small></span><i aria-hidden="true">›</i></a>)}</div></section>
 </SiteLayout>
 <script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; initializeToolVisualMotion();</script>

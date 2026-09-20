@@ -15,13 +15,16 @@ function localizedRoutes(): readonly string[] {
       // The fitment-studio flagship page has no localized version yet; it stays English-only.
       if (tool.id === 'fitment-studio') continue;
       if (!(tool.indexable && tool.status === 'implemented')) continue;
-      routes.push(localizedToolPath(locale, tool.id, 'tool'));
+      routes.push(localizedToolPath(locale, tool.id, tool.kind));
     }
   }
   return routes;
 }
 
-const STANDALONE_CONTENT_ROUTES = ['/gas-prices-today/', '/de/kraftstoffpreise/', '/es/precio-gasolina-hoy/'] as const;
+// The fuel market dashboard used to be listed here by hand. It is now a real registry entry
+// (kind: 'data-product'), so indexableRoutes covers /gas-prices-today/ and localizedRoutes()
+// covers /de/kraftstoffpreise/ and /es/precio-gasolina-hoy/ through the same code path as
+// every other page — listing it again here would only duplicate it.
 
 function vehiclePageRoutes(): readonly string[] {
   const routes: string[] = ['/vehicles/', '/de/fahrzeuge/', '/es/vehiculos/'];
@@ -36,7 +39,7 @@ function vehiclePageRoutes(): readonly string[] {
 }
 
 export function sitemapEntries(): readonly string[] {
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...STANDALONE_CONTENT_ROUTES, ...vehiclePageRoutes()].map(canonicalForPath));
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes()].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

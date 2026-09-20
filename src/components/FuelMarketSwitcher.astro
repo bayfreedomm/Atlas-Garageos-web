@@ -1,0 +1,33 @@
+---
+// Market switcher for the fuel dashboard. Each market is its own dataset with its own
+// source and cadence — these are three different pages, not three translations of one feed,
+// so each entry carries its own short source note rather than implying a shared figure.
+interface Market {
+  readonly id: 'us' | 'de' | 'es';
+  readonly href: string;
+  readonly label: string;
+  readonly note: string;
+}
+interface Props {
+  readonly current: 'us' | 'de' | 'es';
+  readonly legend: string;
+  readonly markets: readonly Market[];
+}
+const { current, legend, markets } = Astro.props;
+---
+<nav class="fuel-dash-switcher" aria-label={legend}>
+  <span class="fuel-dash-switcher__legend">{legend}</span>
+  <div class="fuel-dash-switcher__list">
+    {markets.map((market) => (
+      <a
+        class:list={['fuel-dash-switcher__item', { 'is-current': market.id === current }]}
+        href={market.href}
+        aria-current={market.id === current ? 'page' : undefined}
+        hreflang={market.id === 'us' ? 'en' : market.id}
+      >
+        <strong>{market.label}</strong>
+        <small>{market.note}</small>
+      </a>
+    ))}
+  </div>
+</nav>

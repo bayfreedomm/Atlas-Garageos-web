@@ -112,7 +112,7 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     openTorqueTool: 'Dieses Drehmoment umrechnen (Nm ↔ lb-ft)',
     fuelHeading: 'Kraftstoff & Fahrtkosten',
     fuelCardTitle: 'Kraftstoffpreise heute',
-    fuelCardCopy: 'Aktueller Durchschnittspreis für Super E5 und Diesel.',
+    fuelCardCopy: 'Beobachtete Stichprobe für Super E5, E10 und Diesel.',
     tripCardTitle: 'Fahrtkosten schätzen',
     tripCardCopy: 'Diesen Kraftstoffpreis nutzen, um Kosten pro Fahrt oder pro Jahr zu schätzen.',
     faqHeading: 'Häufige Fragen',

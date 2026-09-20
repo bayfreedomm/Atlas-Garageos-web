@@ -3,10 +3,13 @@ import ToolPage from '../../../../components/ToolPage.astro';
 import FuelFields from '../../../../components/FuelFields.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
-import fuelPrices from '../../../../data/fuel-prices.json';
+import rawFuelPrices from '../../../../data/fuel-prices.json';
+import { asFuelPrices } from '../../../../data/fuel-prices-types';
 const definition = toolById('road-trip-cost-calculator');
 const c = localizedTool('road-trip-cost-calculator', 'es');
-const livePrice = fuelPrices.es.e5 ?? 1.65;
+const fuelPrices = asFuelPrices(rawFuelPrices);
+const e5 = fuelPrices.es.products.find((p) => p.id === 'e5');
+const livePrice = fuelPrices.es.status !== 'pending' ? e5?.value : undefined;
 ---
 <ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]}>
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>

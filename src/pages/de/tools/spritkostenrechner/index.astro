@@ -4,10 +4,13 @@ import FuelFields from '../../../../components/FuelFields.astro';
 import FuelCostTechnicalVisual from '../../../../components/FuelCostTechnicalVisual.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
-import fuelPrices from '../../../../data/fuel-prices.json';
+import rawFuelPrices from '../../../../data/fuel-prices.json';
+import { asFuelPrices } from '../../../../data/fuel-prices-types';
 const definition = toolById('fuel-cost-calculator');
 const c = localizedTool('fuel-cost-calculator', 'de');
-const livePrice = fuelPrices.de.e5 ?? 1.75;
+const fuelPrices = asFuelPrices(rawFuelPrices);
+const e5 = fuelPrices.de.products.find((p) => p.id === 'e5');
+const livePrice = fuelPrices.de.status !== 'pending' ? e5?.value : undefined;
 ---
 <ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]}>
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>

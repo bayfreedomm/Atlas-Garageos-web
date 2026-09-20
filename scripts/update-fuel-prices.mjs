@@ -1,24 +1,69 @@
 #!/usr/bin/env node
 /**
- * Fetches today's national-average fuel prices for Germany and Spain from
- * free, official public sources and writes them to src/data/fuel-prices.json.
+ * Fetches fuel prices for Spain, the United States and (manually only) Germany from free,
+ * official public sources and writes them to src/data/fuel-prices.json.
  *
- * This script is meant to run on a schedule (see .github/workflows/update-fuel-prices.yml),
- * NOT from a visitor's browser. Running it once a day (or a few times a day) from a
- * scheduled job keeps it well inside each source's fair-use limits regardless of how
- * many people visit the site, and keeps the site itself fully static with zero
- * third-party requests from the browser.
+ * This script is meant to run from CI (see .github/workflows/update-fuel-prices.yml),
+ * NOT from a visitor's browser. Running it a few times a day from a scheduled job keeps it
+ * well inside each source's fair-use limits regardless of how many people visit the site,
+ * and keeps the site itself fully static with zero third-party requests from the browser.
  *
- * Design rule: never let a failed fetch erase good data. If a source fails or returns
- * something we don't recognise, we keep the previous value for that country and just
- * record that today's refresh for it failed, rather than writing a broken/empty price.
+ * ---------------------------------------------------------------------------------------
+ * PROVIDER SELECTION — which countries a given run touches
+ * ---------------------------------------------------------------------------------------
+ * Run with `--providers=es,us` (or the FUEL_PROVIDERS env var). Default: `es,us`.
+ *
+ * Germany is deliberately NOT part of any recurring schedule. Tankerkönig is a
+ * community-funded per-station service, not a bulk national feed to be polled on a timer,
+ * and this site has no backend that could fetch it on demand (output: 'static', no adapter,
+ * no API routes). Until a data source suited to automatic national reporting is chosen,
+ * Germany is only ever refreshed by a deliberate manual run
+ * (.github/workflows/update-fuel-prices-germany.yml, workflow_dispatch only), and otherwise
+ * stays honestly `pending` (never verified) or `stale` (verified once, not refreshed since).
+ *
+ * A country that is NOT selected for a run is carried forward byte-for-byte from the
+ * previous snapshot: its status, lastAttemptAt, lastSuccessAt and products are untouched,
+ * and — crucially — it can never write a history point for that run, because no fetch for
+ * it happened (see updateHistory's `ran` argument).
+ *
+ * ---------------------------------------------------------------------------------------
+ * THREE EXPLICIT STATES — pending / fresh / stale
+ * ---------------------------------------------------------------------------------------
+ * Each country snapshot carries an explicit `status`:
+ *   - "pending": this country has NEVER had a successful fetch. There is no real
+ *     last-known value, so every numeric price field for it is `null`. Nothing downstream
+ *     may treat a pending country's numbers as real, because there are no numbers.
+ *   - "fresh": the most recent refresh attempt for this country succeeded. The values are
+ *     from that attempt.
+ *   - "stale": this country has a real last-known-good value from an earlier success, but
+ *     the most recent refresh attempt failed. The values shown are the last genuinely
+ *     fetched ones (never seed/placeholder numbers), tagged with the real `lastSuccessAt`.
+ *
+ * `lastAttemptAt` is when the most recent refresh attempt happened (success or not).
+ * `lastSuccessAt` is when a fetch last actually succeeded for that country, or `null` if
+ * it never has. These are deliberately separate from each other and from `status`, so a
+ * "was verified once, now failing" country is never confused with a "never verified" one.
  *
  * Sources:
  * - Spain: Ministerio para la Transición Ecológica, official open REST service (no key).
  *   https://datos.gob.es/en/catalogo/e05068001-precio-de-carburantes-en-las-gasolineras-espanolas
+ *   Station objects expose several official price fields beyond "Precio Gasolina 95 E5" and
+ *   "Precio Gasoleo A" — this script also reads "Precio Gasolina 98 E5" and
+ *   "Precio Gasoleo Premium" (both are part of the documented schema). LPG ("Precio Gases
+ *   licuados del petróleo") is intentionally NOT included: this session's sandbox could not
+ *   reach the live API to measure real national station coverage for it, and shipping an
+ *   average built from an unknown (possibly tiny) sample would be its own kind of dishonesty.
+ *   See MIN_SAMPLE_SIZE below for how thin-coverage products are suppressed automatically
+ *   once real data does flow.
  * - Germany: Tankerkoenig API (CC BY 4.0, free registration required for an API key).
  *   https://creativecommons.tankerkoenig.de/
- *   Requires the TANKERKOENIG_API_KEY environment variable (a GitHub Actions secret in CI).
+ *   Requires the TANKERKOENIG_API_KEY environment variable (a GitHub Actions secret in CI —
+ *   read only here, via process.env, inside a Node script that only ever runs in CI; it is
+ *   never embedded in the built site, never logged, and never reachable from a browser).
+ *   The radius endpoint (list.php) is documented as limited to 1 request per minute — see
+ *   the spacing note on DE_REQUEST_SPACING_MS below. Manual runs only (see PROVIDER
+ *   SELECTION above). What it produces is a MONITORED SAMPLE of a few large cities, never a
+ *   German national average, and every label in this file and on the site says so.
  * - United States: EIA (U.S. Energy Information Administration) Open Data v2, official,
  *   free instant self-serve API key (no manual approval wait, unlike Tankerkoenig).
  *   https://www.eia.gov/opendata/
@@ -26,16 +71,14 @@
  *   NOTE: EIA's retail gasoline/diesel series are published WEEKLY, not daily — the US
  *   number on the site is honestly labelled "weekly average", not "daily" like DE/ES.
  *
- * This script also appends one row per day to src/data/fuel-price-history.json (capped to
- * the most recent 90 days) so the public price pages can show a trend, not just today's
- * number. Multiple runs on the same UTC day update that day's row in place instead of
- * appending duplicates.
- *
- * IMPORTANT — not yet verified against a live response in this session: the network this
- * script was authored in could not reach any of these government/API hosts to confirm the
- * exact current JSON shape. The field names below match each source's long-standing,
- * publicly documented format, but the first real run should be checked by hand (open the
- * Action's log, or run this script locally once) before trusting it unattended.
+ * This script also updates src/data/fuel-price-history.json, a per-country log (capped to
+ * the most recent 90 real data points per country) so the public price pages can show a
+ * trend, not just today's number. Crucially: a history point for a country is only ever
+ * written when THIS RUN's fetch for that country was a genuine fresh success — a stale
+ * fallback value, or a country that is still pending, can never create or overwrite a
+ * history row. The US, being weekly, is keyed by the real EIA `weekOf` period rather than
+ * by calendar date, and a new US history point is only added when this run's fresh EIA
+ * fetch reports a `weekOf` not already present in history (never one row per day).
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -45,12 +88,62 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-prices.json');
 const HISTORY_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-price-history.json');
-const HISTORY_MAX_DAYS = 90;
+const HISTORY_MAX_POINTS = 90;
 
 const FETCH_TIMEOUT_MS = 15_000;
 const US_GALLON_TO_LITRE = 3.785411784;
 
-/** @typedef {{ e5: number | null, diesel: number | null, source: string, sourceUrl: string, fetchedAt: string, ok: boolean, note?: string }} CountryFuelPrice */
+const DISCLAIMER = 'Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.';
+
+/** Every provider this script knows how to fetch, and the identity fields a country keeps
+ *  even when it has no verified data yet. */
+const PROVIDERS = Object.freeze({
+  es: {
+    source: 'Ministerio para la Transición Ecológica (official national dataset, no key)',
+    sourceUrl: 'https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/',
+  },
+  de: {
+    source: 'Tankerkönig — Atlas monitored sample of selected German city stations (not a national average)',
+    sourceUrl: 'https://creativecommons.tankerkoenig.de/',
+  },
+  us: {
+    source: 'U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)',
+    sourceUrl: 'https://www.eia.gov/petroleum/gasdiesel/',
+    weekOf: null,
+  },
+});
+const PROVIDER_IDS = Object.freeze(Object.keys(PROVIDERS));
+/** Germany is intentionally absent: it is manual-run-only (see the header comment). */
+const DEFAULT_PROVIDERS = Object.freeze(['es', 'us']);
+
+/** Reads `--providers=es,us` (or FUEL_PROVIDERS), defaulting to the scheduled pair. */
+function selectedProviders(argv = process.argv.slice(2)) {
+  const flag = argv.find((arg) => arg.startsWith('--providers='));
+  const raw = flag ? flag.slice('--providers='.length) : (process.env.FUEL_PROVIDERS ?? '');
+  const requested = raw.split(',').map((part) => part.trim().toLowerCase()).filter(Boolean);
+  const chosen = requested.length > 0 ? requested : [...DEFAULT_PROVIDERS];
+  const unknown = chosen.filter((id) => !PROVIDER_IDS.includes(id));
+  if (unknown.length > 0) throw new Error(`Unknown provider(s): ${unknown.join(', ')}. Valid: ${PROVIDER_IDS.join(', ')}`);
+  return new Set(chosen);
+}
+
+/**
+ * Minimum number of stations reporting a non-null value, nationally, before we consider a
+ * product's average meaningful enough to show. Below this, the row is suppressed from the
+ * output entirely (value/sampleSize still recorded internally isn't necessary — we simply
+ * don't include the product) rather than shown next to a two-station "average" that would
+ * look precise but isn't representative. Chosen conservatively: Spain and Germany both have
+ * many thousands of stations nationwide, so a product genuinely sold at meaningful volume
+ * should clear this floor easily; a product that doesn't is either niche or badly reported.
+ */
+const MIN_SAMPLE_SIZE = 50;
+
+function average(numbers) {
+  const valid = numbers.filter((n) => typeof n === 'number' && Number.isFinite(n) && n > 0);
+  if (valid.length === 0) return { value: null, sampleSize: 0 };
+  const sum = valid.reduce((a, b) => a + b, 0);
+  return { value: Math.round((sum / valid.length) * 1000) / 1000, sampleSize: valid.length };
+}
 
 async function fetchWithTimeout(url, init = {}) {
   const controller = new AbortController();
@@ -62,21 +155,26 @@ async function fetchWithTimeout(url, init = {}) {
   }
 }
 
-function average(numbers) {
-  const valid = numbers.filter((n) => typeof n === 'number' && Number.isFinite(n) && n > 0);
-  if (valid.length === 0) return null;
-  const sum = valid.reduce((a, b) => a + b, 0);
-  return Math.round((sum / valid.length) * 1000) / 1000;
+/**
+ * Builds the `products` array for a country from a map of id -> { label, value, sampleSize }.
+ * Products whose sample size is below MIN_SAMPLE_SIZE are dropped (thin coverage is treated
+ * as "we don't have this", not shown as a suspiciously precise number).
+ */
+function buildProducts(entries) {
+  return entries
+    .filter(({ value, sampleSize }) => value !== null && sampleSize >= MIN_SAMPLE_SIZE)
+    .map(({ id, label, value, sampleSize }) => ({ id, label, value, sampleSize }));
 }
 
 /**
  * Spain: official Ministerio REST endpoint. No API key. Returns all stations nationwide
- * with prices as comma-decimal strings (Spanish number format), e.g. "1,559".
- * We average "Precio Gasolina 95 E5" and "Precio Gasoleo A" across every station that
- * reports a non-empty value.
+ * with prices as comma-decimal strings (Spanish number format), e.g. "1,559". We average
+ * four documented price fields across every station that reports a non-empty value for
+ * each: 95 E5, 98 E5, Gasóleo A, and Gasóleo Premium.
  */
 async function fetchSpainAverage() {
-  const sourceUrl = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/';
+  const { source, sourceUrl } = PROVIDERS.es;
+  const lastAttemptAt = new Date().toISOString();
   try {
     const res = await fetchWithTimeout(sourceUrl, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -90,20 +188,31 @@ async function fetchSpainAverage() {
       return Number.isFinite(n) ? n : null;
     };
 
-    const gasolina95 = average(stations.map((s) => parseEsNumber(s['Precio Gasolina 95 E5'])));
+    const e5 = average(stations.map((s) => parseEsNumber(s['Precio Gasolina 95 E5'])));
+    const e5_98 = average(stations.map((s) => parseEsNumber(s['Precio Gasolina 98 E5'])));
     const diesel = average(stations.map((s) => parseEsNumber(s['Precio Gasoleo A'])));
-    if (gasolina95 === null && diesel === null) throw new Error('Could not parse any station prices');
+    const dieselPremium = average(stations.map((s) => parseEsNumber(s['Precio Gasoleo Premium'])));
 
-    return { e5: gasolina95, diesel, source: 'Ministerio para la Transición Ecológica (official, no key)', sourceUrl, fetchedAt: new Date().toISOString(), ok: true };
+    const products = buildProducts([
+      { id: 'e5', label: 'Gasolina 95 E5', ...e5 },
+      { id: 'e5_98', label: 'Gasolina 98 E5', ...e5_98 },
+      { id: 'diesel', label: 'Gasóleo A', ...diesel },
+      { id: 'dieselPremium', label: 'Gasóleo Premium', ...dieselPremium },
+    ]);
+    if (products.length === 0) throw new Error('Could not parse enough station prices for any product');
+
+    return { ok: true, products, source, sourceUrl, lastAttemptAt };
   } catch (err) {
-    return { e5: null, diesel: null, source: 'Ministerio para la Transición Ecológica (official, no key)', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: String(err?.message ?? err) };
+    return { ok: false, products: [], source, sourceUrl, lastAttemptAt, note: String(err?.message ?? err) };
   }
 }
 
 /**
- * Germany: Tankerkoenig gives per-station prices, not a national average, so we sample a
- * spread of major cities and average the open stations found within each. This is a
- * reasonable proxy for a national average, not an official statistic — the site must say so.
+ * Germany: Tankerkoenig gives per-station prices, not a national statistic. We sample a
+ * handful of large cities and average the open stations found within each. The result is an
+ * Atlas MONITORED SAMPLE of those cities and nothing more — it is never described anywhere
+ * (here, in the JSON, or on the site) as a German national average, because it isn't one.
+ * This function only ever runs on a deliberate manual run, never on a recurring schedule.
  */
 const DE_SAMPLE_CITIES = [
   { name: 'Berlin', lat: 52.520008, lng: 13.404954 },
@@ -113,19 +222,29 @@ const DE_SAMPLE_CITIES = [
   { name: 'Frankfurt', lat: 50.110924, lng: 8.682127 },
 ];
 const DE_SAMPLE_RADIUS_KM = 15;
+// Tankerkoenig's documentation for the radius/list endpoint (list.php) states a hard limit
+// of 1 request per minute per API key. We only run a handful of times a day from CI, never
+// from a visitor's browser, but within a single run we still must not issue the 5 city
+// requests faster than that — so every request after the first waits a full 60 seconds.
+const DE_REQUEST_SPACING_MS = 60_000;
 
 async function fetchGermanyAverage() {
-  const sourceUrl = 'https://creativecommons.tankerkoenig.de/';
+  const { source, sourceUrl } = PROVIDERS.de;
+  const lastAttemptAt = new Date().toISOString();
   const apiKey = process.env.TANKERKOENIG_API_KEY;
   if (!apiKey) {
-    return { e5: null, diesel: null, source: 'Tankerkoenig API (sampled cities)', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: 'TANKERKOENIG_API_KEY is not set' };
+    return { ok: false, products: [], source, sourceUrl, lastAttemptAt, note: 'TANKERKOENIG_API_KEY is not set' };
   }
 
   const e5Values = [];
+  const e10Values = [];
   const dieselValues = [];
   const errors = [];
+  let stationReadings = 0;
 
-  for (const city of DE_SAMPLE_CITIES) {
+  for (let i = 0; i < DE_SAMPLE_CITIES.length; i++) {
+    const city = DE_SAMPLE_CITIES[i];
+    if (i > 0) await new Promise((resolve) => setTimeout(resolve, DE_REQUEST_SPACING_MS));
     try {
       const url = `https://creativecommons.tankerkoenig.de/json/list.php?lat=${city.lat}&lng=${city.lng}&rad=${DE_SAMPLE_RADIUS_KM}&sort=dist&type=all&apikey=${apiKey}`;
       const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' } });
@@ -134,32 +253,53 @@ async function fetchGermanyAverage() {
       if (body?.ok !== true || !Array.isArray(body?.stations)) throw new Error(`Unexpected response for ${city.name}: ${JSON.stringify(body).slice(0, 200)}`);
       for (const station of body.stations) {
         if (station?.isOpen === false) continue;
-        if (typeof station.e5 === 'number') e5Values.push(station.e5);
-        if (typeof station.diesel === 'number') dieselValues.push(station.diesel);
+        if (typeof station.e5 === 'number') { e5Values.push(station.e5); stationReadings++; }
+        if (typeof station.e10 === 'number') { e10Values.push(station.e10); stationReadings++; }
+        if (typeof station.diesel === 'number') { dieselValues.push(station.diesel); stationReadings++; }
       }
-      // Stay well inside the 1 request/minute limit even though this whole script only
-      // runs a few times a day from CI, never from a visitor's browser.
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
     } catch (err) {
       errors.push(`${city.name}: ${String(err?.message ?? err)}`);
     }
   }
 
   const e5 = average(e5Values);
+  const e10 = average(e10Values);
   const diesel = average(dieselValues);
-  if (e5 === null && diesel === null) {
-    return { e5: null, diesel: null, source: 'Tankerkoenig API (sampled cities)', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: errors.join('; ') || 'No stations returned prices' };
+  const products = buildProducts([
+    { id: 'e5', label: 'Super E5', ...e5 },
+    { id: 'e10', label: 'Super E10', ...e10 },
+    { id: 'diesel', label: 'Diesel', ...diesel },
+  ]);
+  if (products.length === 0) {
+    return { ok: false, products: [], source, sourceUrl, lastAttemptAt, note: errors.join('; ') || 'No stations returned prices' };
   }
-  return { e5, diesel, source: `Tankerkoenig API, live average of ${e5Values.length + dieselValues.length} station readings across ${DE_SAMPLE_CITIES.map((c) => c.name).join(', ')}`, sourceUrl, fetchedAt: new Date().toISOString(), ok: true, note: errors.length > 0 ? `Partial failures: ${errors.join('; ')}` : undefined };
+  return {
+    ok: true,
+    products,
+    source: `Tankerkönig — Atlas monitored sample: ${stationReadings} station readings across ${DE_SAMPLE_CITIES.map((c) => c.name).join(', ')} (not a national average)`,
+    sourceUrl,
+    lastAttemptAt,
+    note: errors.length > 0 ? `Partial failures: ${errors.join('; ')}` : undefined,
+  };
 }
 
 /**
  * United States: EIA Open Data v2 "seriesid" convenience endpoint, weekly national-average
  * retail prices in USD/gallon. We convert to USD/litre so the site's fuel calculators (which
  * take a per-litre price everywhere, matching the metric/imperial toggle) stay consistent.
+ *
+ * Series IDs below are all in the same official "All Formulations" retail-gasoline family as
+ * the pre-existing Regular series (PET.EMM_EPM0_PTE_NUS_DPG.W); Midgrade and Premium use the
+ * documented EPMM/EPMP product codes (confirmed against eia.gov's own published dnav URLs for
+ * "Weekly U.S. Midgrade All Formulations Retail Gasoline Prices" and "Weekly U.S. Premium All
+ * Formulations Retail Gasoline Prices"), and Diesel keeps the existing EPD2D series.
  */
-const EIA_REGULAR_GAS_SERIES = 'PET.EMM_EPM0_PTE_NUS_DPG.W';
-const EIA_DIESEL_SERIES = 'PET.EMD_EPD2D_PTE_NUS_DPG.W';
+const EIA_SERIES = {
+  regular: { id: 'PET.EMM_EPM0_PTE_NUS_DPG.W', label: 'Regular' },
+  midgrade: { id: 'PET.EMM_EPMM_PTE_NUS_DPG.W', label: 'Midgrade' },
+  premium: { id: 'PET.EMM_EPMP_PTE_NUS_DPG.W', label: 'Premium' },
+  diesel: { id: 'PET.EMD_EPD2D_PTE_NUS_DPG.W', label: 'Diesel' },
+};
 
 async function fetchEiaSeriesLatest(seriesId, apiKey) {
   const url = `https://api.eia.gov/v2/seriesid/${seriesId}?api_key=${apiKey}`;
@@ -175,29 +315,28 @@ async function fetchEiaSeriesLatest(seriesId, apiKey) {
 }
 
 async function fetchUsAverage() {
-  const sourceUrl = 'https://www.eia.gov/petroleum/gasdiesel/';
+  const { source, sourceUrl } = PROVIDERS.us;
+  const lastAttemptAt = new Date().toISOString();
   const apiKey = process.env.EIA_API_KEY;
   if (!apiKey) {
-    return { regular: null, diesel: null, source: 'EIA Weekly Retail Gasoline and Diesel Prices', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: 'EIA_API_KEY is not set' };
+    return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: 'EIA_API_KEY is not set' };
   }
   try {
-    const [gas, diesel] = await Promise.all([
-      fetchEiaSeriesLatest(EIA_REGULAR_GAS_SERIES, apiKey),
-      fetchEiaSeriesLatest(EIA_DIESEL_SERIES, apiKey),
-    ]);
-    return {
-      regular: Math.round((gas.value / US_GALLON_TO_LITRE) * 1000) / 1000,
-      diesel: Math.round((diesel.value / US_GALLON_TO_LITRE) * 1000) / 1000,
-      regularPerGallon: gas.value,
-      dieselPerGallon: diesel.value,
-      weekOf: gas.period,
-      source: 'U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)',
-      sourceUrl,
-      fetchedAt: new Date().toISOString(),
-      ok: true,
-    };
+    const entries = Object.entries(EIA_SERIES);
+    const results = await Promise.all(entries.map(([, series]) => fetchEiaSeriesLatest(series.id, apiKey)));
+    const weekOf = results[0]?.period;
+    const products = entries.map(([id, series], i) => {
+      const perGallon = results[i].value;
+      return {
+        id,
+        label: series.label,
+        valuePerGallon: perGallon,
+        valuePerLitre: Math.round((perGallon / US_GALLON_TO_LITRE) * 1000) / 1000,
+      };
+    });
+    return { ok: true, products, weekOf, source, sourceUrl, lastAttemptAt };
   } catch (err) {
-    return { regular: null, diesel: null, source: 'EIA Weekly Retail Gasoline and Diesel Prices', sourceUrl, fetchedAt: new Date().toISOString(), ok: false, note: String(err?.message ?? err) };
+    return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: String(err?.message ?? err) };
   }
 }
 
@@ -210,67 +349,148 @@ async function readPreviousOutput() {
   }
 }
 
-/** Never let a failed fetch overwrite a previously good value; keep the last-known-good one and flag it as stale instead. */
-function mergeWithFallback(countryKey, freshResult, previous, valueKeys) {
-  if (freshResult.ok) return freshResult;
-  const previousForCountry = previous?.[countryKey];
-  const hadValue = previousForCountry?.ok && valueKeys.some((k) => previousForCountry[k] !== null && previousForCountry[k] !== undefined);
-  if (hadValue) {
-    return { ...previousForCountry, ok: false, note: `Refresh failed (${freshResult.note}); showing last known value from ${previousForCountry.fetchedAt}` };
+/**
+ * Turns a fresh fetch result plus the previous snapshot into the final country entry, with
+ * an explicit status distinguishing "never verified" (pending) from "verified, refresh just
+ * failed" (stale) from "verified, this refresh succeeded" (fresh). Unlike the old boolean
+ * `ok` flag, this never conflates those three cases: a stale snapshot keeps the LAST
+ * genuinely-fetched products and its real lastSuccessAt, never seed/placeholder numbers.
+ */
+function mergeWithStatus(freshResult, previous) {
+  const { ok, products, source, sourceUrl, lastAttemptAt, note, ...rest } = freshResult;
+  if (ok) {
+    return { status: 'fresh', products, source, sourceUrl, lastAttemptAt, lastSuccessAt: lastAttemptAt, note: undefined, ...rest };
   }
-  return freshResult;
+  const hadRealSuccess = previous && (previous.status === 'fresh' || previous.status === 'stale') && previous.lastSuccessAt;
+  if (hadRealSuccess) {
+    return {
+      status: 'stale',
+      products: previous.products,
+      source: previous.source,
+      sourceUrl,
+      lastAttemptAt,
+      lastSuccessAt: previous.lastSuccessAt,
+      note: `Refresh failed (${note}); showing last known value from ${previous.lastSuccessAt}`,
+      ...(previous.weekOf !== undefined ? { weekOf: previous.weekOf } : {}),
+    };
+  }
+  return { status: 'pending', products: [], source, sourceUrl, lastAttemptAt, lastSuccessAt: null, note, ...rest };
+}
+
+/**
+ * For a country this run did NOT fetch (e.g. Germany on the scheduled Spain+US run): keep
+ * the previous snapshot exactly as it was. No attempt happened, so lastAttemptAt must not
+ * move, the status must not change, and — because updateHistory is told which providers ran
+ * — no history point can be written from a carried-forward value. If there is no previous
+ * snapshot at all, the country is honestly `pending` with no numbers and no attempt time.
+ */
+function carryForward(previous, providerId) {
+  if (previous) return previous;
+  const defaults = PROVIDERS[providerId];
+  return {
+    status: 'pending',
+    products: [],
+    source: defaults.source,
+    sourceUrl: defaults.sourceUrl,
+    lastAttemptAt: null,
+    lastSuccessAt: null,
+    note: 'No verified data yet — this market is not part of the recurring automatic refresh.',
+    ...(defaults.weekOf !== undefined ? { weekOf: null } : {}),
+  };
 }
 
 async function readHistory() {
   try {
     const raw = await readFile(HISTORY_PATH, 'utf8');
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (parsed && Array.isArray(parsed.es) && Array.isArray(parsed.de) && Array.isArray(parsed.us)) return parsed;
+    return { es: [], de: [], us: [] };
   } catch {
-    return [];
+    return { es: [], de: [], us: [] };
   }
 }
 
-/** Appends (or updates, if already run today) one row to the daily history log. */
-async function updateHistory(output) {
-  const history = await readHistory();
-  const today = output.generatedAt.slice(0, 10); // YYYY-MM-DD (UTC)
-  const row = {
-    date: today,
-    es: { e5: output.es.e5, diesel: output.es.diesel },
-    de: { e5: output.de.e5, diesel: output.de.diesel },
-    us: { regular: output.us.regular, diesel: output.us.diesel },
-  };
-  const existingIndex = history.findIndex((entry) => entry.date === today);
-  if (existingIndex >= 0) history[existingIndex] = row;
-  else history.push(row);
-  history.sort((a, b) => a.date.localeCompare(b.date));
-  const trimmed = history.slice(-HISTORY_MAX_DAYS);
-  await writeFile(HISTORY_PATH, `${JSON.stringify(trimmed, null, 2)}\n`, 'utf8');
-  console.log('Wrote', HISTORY_PATH, `(${trimmed.length} day${trimmed.length === 1 ? '' : 's'})`);
+function productsToMap(products) {
+  const map = {};
+  for (const p of products) {
+    map[p.id] = p.valuePerLitre !== undefined ? { perLitre: p.valuePerLitre, perGallon: p.valuePerGallon } : p.value;
+  }
+  return map;
 }
 
+/**
+ * Updates the per-country history log. DE/ES are keyed by today's UTC calendar date; a row
+ * is only written/updated when THAT country's fetch this run was a genuine fresh success —
+ * a stale fallback or a still-pending country never touches history. US is keyed by the
+ * real EIA `weekOf` period and only gets a new point when this run's fresh fetch reports a
+ * weekOf not already present (so a week is never duplicated across daily runs).
+ */
+async function updateHistory(output, ran) {
+  const history = await readHistory();
+  const today = output.generatedAt.slice(0, 10); // YYYY-MM-DD (UTC)
+
+  for (const key of ['es', 'de']) {
+    const country = output[key];
+    // Only a country actually fetched in THIS run may touch history. A carried-forward
+    // 'fresh' snapshot from an earlier manual run is last-known data, not a new observation.
+    if (!ran.has(key)) continue;
+    if (country.status !== 'fresh') continue;
+    const row = { date: today, products: productsToMap(country.products) };
+    const idx = history[key].findIndex((entry) => entry.date === today);
+    if (idx >= 0) history[key][idx] = row;
+    else history[key].push(row);
+    history[key].sort((a, b) => a.date.localeCompare(b.date));
+    history[key] = history[key].slice(-HISTORY_MAX_POINTS);
+  }
+
+  if (ran.has('us') && output.us.status === 'fresh' && output.us.weekOf) {
+    const exists = history.us.some((entry) => entry.weekOf === output.us.weekOf);
+    if (!exists) {
+      history.us.push({ weekOf: output.us.weekOf, products: productsToMap(output.us.products) });
+      history.us.sort((a, b) => a.weekOf.localeCompare(b.weekOf));
+      history.us = history.us.slice(-HISTORY_MAX_POINTS);
+    }
+  }
+
+  await writeFile(HISTORY_PATH, `${JSON.stringify(history, null, 2)}\n`, 'utf8');
+  console.log('Wrote', HISTORY_PATH, `(es:${history.es.length} de:${history.de.length} us:${history.us.length})`);
+}
+
+const FETCHERS = {
+  es: fetchSpainAverage,
+  de: fetchGermanyAverage,
+  us: fetchUsAverage,
+};
+
 async function main() {
+  const ran = selectedProviders();
+  console.log(`Providers this run: ${[...ran].join(', ')} (unselected markets are carried forward untouched)`);
   const previous = await readPreviousOutput();
-  const [spainFresh, germanyFresh, usFresh] = await Promise.all([fetchSpainAverage(), fetchGermanyAverage(), fetchUsAverage()]);
+
+  // One shared code path for all providers: fetch the selected ones in parallel, normalize
+  // every result through the same mergeWithStatus(), carry the rest forward verbatim.
+  const fetched = Object.fromEntries(
+    await Promise.all(PROVIDER_IDS.filter((id) => ran.has(id)).map(async (id) => [id, await FETCHERS[id]()])),
+  );
+  const resolve = (id) => (ran.has(id) ? mergeWithStatus(fetched[id], previous?.[id]) : carryForward(previous?.[id], id));
 
   const output = {
     generatedAt: new Date().toISOString(),
-    disclaimer: 'National averages are estimates from public/official sources, not a live quote for any specific station. Always treat the number as a reference, not a guarantee.',
-    es: mergeWithFallback('es', spainFresh, previous, ['e5', 'diesel']),
-    de: mergeWithFallback('de', germanyFresh, previous, ['e5', 'diesel']),
-    us: mergeWithFallback('us', usFresh, previous, ['regular', 'diesel']),
+    disclaimer: DISCLAIMER,
+    es: resolve('es'),
+    de: resolve('de'),
+    us: resolve('us'),
   };
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`, 'utf8');
-  await updateHistory(output);
+  await updateHistory(output, ran);
 
   console.log('Wrote', OUTPUT_PATH);
   console.log(JSON.stringify(output, null, 2));
 
-  if (!output.es.ok && !output.de.ok && !output.us.ok) {
-    console.error('All sources failed this run — keeping previous file contents (if any) intact.');
+  if (![...ran].some((id) => output[id].status === 'fresh')) {
+    console.error('Every source selected for this run failed — keeping previous values intact.');
     process.exitCode = 1;
   }
 }

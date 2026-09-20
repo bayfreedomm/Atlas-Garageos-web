@@ -2,7 +2,7 @@ export const SITE_ORIGIN = 'https://atlasgarageos.com';
 export const SUPPORTED_LOCALES = ['en', 'de', 'es'] as const;
 export type SiteLocale = (typeof SUPPORTED_LOCALES)[number];
 
-export type ToolId = 'fitment-studio' | 'tire-size-calculator' | 'tire-size-comparison' | 'wheel-offset-calculator' | 'speedometer-error-calculator' | 'gear-ratio-calculator' | 'fitment-map' | 'measure-my-car' | 'fuel-cost-calculator' | 'road-trip-cost-calculator' | 'mpg-l100km-converter' | 'psi-bar-converter' | 'hp-kw-converter' | 'nm-lb-ft-converter' | 'power-to-weight-calculator' | 'ev-charging-cost-calculator' | 'bolt-pattern-calculator' | 'towing-capacity-calculator' | 'quarter-mile-calculator' | 'tire-load-speed-rating' | 'compression-ratio-calculator' | 'tire-date-code-decoder' | 'vehicle-fitment-finder';
+export type ToolId = 'fitment-studio' | 'tire-size-calculator' | 'tire-size-comparison' | 'wheel-offset-calculator' | 'speedometer-error-calculator' | 'gear-ratio-calculator' | 'fitment-map' | 'measure-my-car' | 'fuel-cost-calculator' | 'road-trip-cost-calculator' | 'mpg-l100km-converter' | 'psi-bar-converter' | 'hp-kw-converter' | 'nm-lb-ft-converter' | 'power-to-weight-calculator' | 'ev-charging-cost-calculator' | 'bolt-pattern-calculator' | 'towing-capacity-calculator' | 'quarter-mile-calculator' | 'tire-load-speed-rating' | 'compression-ratio-calculator' | 'tire-date-code-decoder' | 'vehicle-fitment-finder' | 'gas-prices-today';
 export type ToolCategory = 'Tires & Wheels' | 'Fuel & Trips' | 'Converters' | 'Performance';
 
 export const TOOL_CATEGORY_ORDER: readonly ToolCategory[] = Object.freeze(['Fuel & Trips', 'Tires & Wheels', 'Converters', 'Performance']);
@@ -24,7 +24,10 @@ export interface ToolDefinition {
   readonly relatedToolIds: readonly ToolId[];
   readonly status: 'implemented';
   readonly indexable: true;
-  readonly kind: 'flagship' | 'tool';
+  /** 'tool' = a calculator under /tools/; 'flagship' = the Fitment Studio app; 'data-product'
+   *  = a published data page (its own top-level route, real registry entity, listed in the
+   *  tool directory and the sitemap like everything else). */
+  readonly kind: 'flagship' | 'tool' | 'data-product';
 }
 
 export const toolRegistry: readonly ToolDefinition[] = Object.freeze([
@@ -50,11 +53,17 @@ export const toolRegistry: readonly ToolDefinition[] = Object.freeze([
   { id: 'towing-capacity-calculator', slug: 'towing-capacity-calculator', locale: 'en', title: 'Towing Capacity Calculator', description: 'Estimate maximum trailer weight and tongue weight from your GCWR, curb weight, and load.', category: 'Fuel & Trips', relatedToolIds: ['road-trip-cost-calculator', 'fuel-cost-calculator', 'power-to-weight-calculator'], status: 'implemented', indexable: true, kind: 'tool' },
   { id: 'quarter-mile-calculator', slug: 'quarter-mile-calculator', locale: 'en', title: 'Quarter Mile Calculator', description: 'Estimate quarter-mile elapsed time and trap speed from vehicle weight and power.', category: 'Performance', relatedToolIds: ['power-to-weight-calculator', 'gear-ratio-calculator', 'hp-kw-converter'], status: 'implemented', indexable: true, kind: 'tool' },
   { id: 'compression-ratio-calculator', slug: 'compression-ratio-calculator', locale: 'en', title: 'Compression Ratio Calculator', description: 'Calculate engine compression ratio from bore, stroke, chamber volume, and other clearance volume.', category: 'Performance', relatedToolIds: ['quarter-mile-calculator', 'power-to-weight-calculator', 'gear-ratio-calculator'], status: 'implemented', indexable: true, kind: 'tool' },
+  // Gas Prices Today is a real, indexable data product — not a calculator, but a
+  // first-class registry entity all the same: it has an id, a category, a route, localized
+  // titles and slugs, and it is listed, searched, counted and sitemapped by exactly the same
+  // code paths as every tool. Nothing about it is special-cased in the directory UI.
+  { id: 'gas-prices-today', slug: 'gas-prices-today', locale: 'en', title: 'Gas Prices Today', description: 'Current gas and diesel prices with price history, market metrics and a direct hand-off into the fuel and road-trip cost calculators.', category: 'Fuel & Trips', relatedToolIds: ['fuel-cost-calculator', 'road-trip-cost-calculator', 'ev-charging-cost-calculator'], status: 'implemented', indexable: true, kind: 'data-product' },
   { id: 'vehicle-fitment-finder', slug: 'find-my-vehicle', locale: 'en', title: 'Find My Vehicle', description: 'Look up OEM tire size, bolt pattern, and wheel torque spec by make and model, sourced and confidence-rated.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-calculator', 'bolt-pattern-calculator', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },
 ]);
 
 export function routeForTool(tool: ToolDefinition): string {
-  return tool.kind === 'flagship' ? `/${tool.slug}/` : `/tools/${tool.slug}/`;
+  // Calculators live under /tools/; the flagship app and data products own a top-level route.
+  return tool.kind === 'tool' ? `/tools/${tool.slug}/` : `/${tool.slug}/`;
 }
 
 export function canonicalForPath(pathname: string): string {

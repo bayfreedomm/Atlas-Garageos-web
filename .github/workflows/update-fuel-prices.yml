@@ -1,10 +1,16 @@
-name: Update fuel prices
+name: Update fuel prices (Spain + US)
+
+# Scheduled automation covers only the two markets whose sources are genuinely meant to be
+# polled automatically: Spain's official Ministerio open dataset and the EIA's weekly US
+# retail survey. Germany is NOT here on purpose — Tankerkönig is a per-station community
+# service, not a bulk national feed, so it is refreshed only by a deliberate manual run
+# (see update-fuel-prices-germany.yml). The Tankerkönig secret is therefore not exposed to
+# this workflow at all.
 
 "on":
   schedule:
-    # Runs 4 times a day, well inside every source's fair-use limits regardless of
-    # site traffic, because visitors never call these APIs directly — only this
-    # scheduled job does. Times are UTC.
+    # Runs 4 times a day, well inside both sources' fair-use limits regardless of site
+    # traffic, because visitors never call these APIs directly — only this job does. UTC.
     - cron: '15 3,9,15,21 * * *'
   workflow_dispatch: {} # lets you trigger it manually from the Actions tab to test it
 
@@ -16,7 +22,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
+  update-scheduled-markets:
+    name: Refresh Spain + US
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -27,11 +34,12 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Fetch latest fuel prices
+      - name: Fetch Spain and US fuel prices
+        # Germany is not selected, so it is carried forward untouched: no request to
+        # Tankerkönig, no change to its status/timestamps, and no history point for it.
         env:
-          TANKERKOENIG_API_KEY: ${{ secrets.TANKERKOENIG_API_KEY }}
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-        run: node scripts/update-fuel-prices.mjs
+        run: node scripts/update-fuel-prices.mjs --providers=es,us
 
       - name: Commit updated price files if they changed
         run: |
@@ -42,5 +50,5 @@ jobs:
           git config user.name "atlas-garageos-bot"
           git config user.email "actions@users.noreply.github.com"
           git add src/data/fuel-prices.json src/data/fuel-price-history.json
-          git commit -m "chore: update daily fuel price averages"
+          git commit -m "chore: update Spain and US fuel prices"
           git push

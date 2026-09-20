@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, routeForTool, toolRegistry } from '../../src/seo/tool-registry';
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
+import { vehicleFitmentData } from '../../src/data/vehicle-fitment';
 
 const intendedRoutes = [
   '/',
@@ -29,6 +30,9 @@ const intendedRoutes = [
   '/tools/towing-capacity-calculator/',
   '/tools/quarter-mile-calculator/',
   '/tools/compression-ratio-calculator/',
+  // The fuel market dashboard is a real registry entry (kind: 'data-product') with its own
+  // top-level route, so it appears here through the same indexableRoutes path as the tools.
+  '/gas-prices-today/',
   '/tools/find-my-vehicle/',
 ];
 
@@ -61,7 +65,10 @@ describe('SEO tool registry', () => {
     // Localized (DE/ES) platform + tool pages are appended after the English routes;
     // the flagship fitment-studio page has no localized version and is intentionally excluded.
     const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented' && tool.id !== 'fitment-studio').length;
-    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools);
+    // Vehicle pages: three localized index routes plus one route per US vehicle and two
+    // (DE + ES) per non-US vehicle.
+    const vehicleRoutes = 3 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
+    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools) + vehicleRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');

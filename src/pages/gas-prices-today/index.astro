@@ -1,14 +1,22 @@
 ---
 import SiteLayout from '../../components/SiteLayout.astro';
+import FuelMarketSwitcher from '../../components/FuelMarketSwitcher.astro';
+import FuelMarketHeader from '../../components/FuelMarketHeader.astro';
 import FuelPriceBoard from '../../components/FuelPriceBoard.astro';
-import FuelPriceTrend from '../../components/FuelPriceTrend.astro';
+import FuelMarketSnapshot from '../../components/FuelMarketSnapshot.astro';
+import FuelTrendPanel from '../../components/FuelTrendPanel.astro';
+import FuelActionPanel from '../../components/FuelActionPanel.astro';
 import { serializeJsonLd } from '../../seo/safe-json-ld';
-import fuelPrices from '../../data/fuel-prices.json';
-import fuelPriceHistory from '../../data/fuel-price-history.json';
+import rawFuelPrices from '../../data/fuel-prices.json';
+import rawFuelPriceHistory from '../../data/fuel-price-history.json';
+import { asFuelPrices, asFuelPriceHistory } from '../../data/fuel-prices-types';
+import { summarizeSeries, type RangeOption, type SnapshotMetric } from '../../ui/fuel-market-metrics';
 
+const fuelPrices = asFuelPrices(rawFuelPrices);
+const fuelPriceHistory = asFuelPriceHistory(rawFuelPriceHistory);
 const data = fuelPrices.us;
-const title = 'Gas Prices Today in the US — Regular & Diesel National Average';
-const description = 'National average price for regular gasoline and diesel in the US, from the EIA weekly retail survey, plus a per-litre and per-gallon breakdown.';
+const title = 'Gas Prices Today in the US — Regular, Midgrade, Premium & Diesel';
+const description = 'US national average gas and diesel prices from the EIA weekly retail survey, with market metrics, price history and a direct hand-off into the fuel and road-trip cost calculators.';
 const pathname = '/gas-prices-today/';
 const alternates = [
   { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
@@ -16,13 +24,56 @@ const alternates = [
   { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
   { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
 ];
-const weekLabel = new Date(`${data.weekOf}T00:00:00Z`).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-const regularHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.us.regular }));
-const dieselHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.us.diesel }));
+
+const findProduct = (id: string) => data.products.find((p) => p.id === id);
+const regular = findProduct('regular');
+const diesel = findProduct('diesel');
+const formatDate = (value: string | null | undefined) => (value ? new Date(value.length === 10 ? `${value}T00:00:00Z` : value).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }) : null);
+const weekLabel = formatDate(data.weekOf);
+const lastSuccessLabel = formatDate(data.lastSuccessAt);
+
+// History for the US is keyed by the real EIA weekOf period; the generic trend/metric
+// helpers take {date, value}, so weekOf becomes the date and nothing is interpolated.
+const historyPoints = (id: string, unit: 'perGallon' | 'perLitre' = 'perGallon') =>
+  fuelPriceHistory.us.map((row) => ({ date: row.weekOf, value: row.products[id]?.[unit] ?? 0 })).filter((point) => point.value > 0);
+
+const regularSummary = summarizeSeries(historyPoints('regular'), regular?.valuePerGallon ?? null);
+const gal = (value: number | null) => (value === null ? null : `$${value.toFixed(2)}`);
+const changeTone = regularSummary.changeAbs === null || regularSummary.changeAbs === 0 ? 'flat' : regularSummary.changeAbs > 0 ? 'up' : 'down';
+const notEnough = 'Not enough data yet';
+
+const metrics: readonly SnapshotMetric[] = [
+  { label: 'Current regular', value: gal(regularSummary.current), placeholder: 'No verified price yet', detail: weekLabel ? `Week of ${weekLabel}` : undefined },
+  { label: 'Previous verified', value: gal(regularSummary.previous), placeholder: notEnough, detail: regularSummary.previous !== null ? 'Prior published week' : undefined },
+  {
+    label: 'Change',
+    value: regularSummary.changeAbs === null ? null : `${regularSummary.changeAbs > 0 ? '+' : ''}$${regularSummary.changeAbs.toFixed(2)}`,
+    placeholder: notEnough,
+    detail: regularSummary.changePct === null ? undefined : `${regularSummary.changePct > 0 ? '+' : ''}${regularSummary.changePct.toFixed(1)}% vs previous week`,
+    tone: changeTone,
+  },
+  { label: 'Period average', value: gal(regularSummary.average), placeholder: notEnough, detail: regularSummary.count > 0 ? `${regularSummary.count} verified week${regularSummary.count === 1 ? '' : 's'}` : undefined },
+  { label: 'Recent low', value: gal(regularSummary.low), placeholder: notEnough, detail: regularSummary.firstDate ? `Since ${formatDate(regularSummary.firstDate)}` : undefined },
+  { label: 'Recent high', value: gal(regularSummary.high), placeholder: notEnough, detail: regularSummary.lastDate ? `To ${formatDate(regularSummary.lastDate)}` : undefined },
+];
+
+// EIA publishes weekly, so a 7-day tab could never hold more than one point.
+const ranges: readonly RangeOption[] = [
+  { id: '30d', label: '30D', days: 30 },
+  { id: '90d', label: '90D', days: 90 },
+  { id: '6m', label: '6M', days: 182 },
+  { id: '1y', label: '1Y', days: 365 },
+];
+
+const statusLabel = data.status === 'fresh' ? 'Verified' : data.status === 'stale' ? 'Last verified value' : 'Awaiting first update';
+const actionNote = data.status === 'pending'
+  ? 'No verified price yet, so the calculators start from their own default — enter your own station price there.'
+  : 'The calculators are pre-filled with this market’s latest verified per-litre price; you can change it at any time.';
+
 const faqs = [
   {
     q: 'Where do these gas prices come from?',
-    a: `${data.source}. This is the official US national average, not a single station's price.`,
+    a: data.status === 'pending' ? "We haven't completed a verified fetch from the EIA yet — check back soon. Once we do, this will be the official US national average, not a single station's price." : `${data.source}. This is the official US national average, not a single station's price.`,
   },
   {
     q: 'Why is this a weekly average, not a daily one?',
@@ -31,6 +82,10 @@ const faqs = [
   {
     q: "Why isn't this a live ticker like oil futures?",
     a: 'A pump-price national average is not a tradable quote and does not move second by second in reality. A live-looking ticker would just be animating a number that has not actually changed, so we show the real published figure and say plainly how old it is.',
+  },
+  {
+    q: 'Why does the German market show a sample instead of a national average?',
+    a: 'Germany has no free official national price dataset comparable to the US or Spanish ones. What we can obtain is a set of individual station prices, so the German page reports an Atlas monitored sample of selected city stations and says so, rather than presenting a handful of cities as a national figure.',
   },
   {
     q: 'Can I use this price for my own gas station?',
@@ -42,80 +97,97 @@ const faqJsonLd = serializeJsonLd({
   '@type': 'FAQPage',
   mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 });
-const datasetJsonLd = serializeJsonLd({
+const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   '@context': 'https://schema.org',
   '@type': 'Dataset',
   name: 'US Gas Prices (weekly national average)',
-  description: 'Weekly national average price for regular gasoline and diesel in the US from the EIA.',
+  description: 'Weekly national average price for regular, midgrade and premium gasoline and diesel in the US from the EIA.',
   license: 'https://www.usa.gov/government-works',
   temporalCoverage: data.weekOf,
   url: 'https://atlasgarageos.com/gas-prices-today/',
   creator: { '@type': 'Organization', name: 'Atlas GarageOS' },
-});
+}) : null;
 ---
 <SiteLayout title={title} description={description} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Gas prices today', href: pathname }]}>
   <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
-  <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>
+  {datasetJsonLd && <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>}
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Gas prices today</span></nav>
 
-  <header class="directory-identity methodology-hero">
-    <p class="eyebrow">Week of {weekLabel}</p>
-    <h1>Gas prices today in the US</h1>
-    <p>The national average price for regular gasoline and diesel, from the US Energy Information Administration's official weekly survey. This is a weekly figure, not a daily one — see the FAQ below for why. Use it as a starting point in our calculators, then adjust it to your own station.</p>
-  </header>
+  <FuelMarketSwitcher
+    current="us"
+    legend="Fuel markets"
+    markets={[
+      { id: 'us', href: '/gas-prices-today/', label: 'United States', note: 'EIA weekly national average' },
+      { id: 'de', href: '/de/kraftstoffpreise/', label: 'Germany', note: 'Atlas monitored station sample' },
+      { id: 'es', href: '/es/precio-gasolina-hoy/', label: 'Spain', note: 'Official national dataset' },
+    ]}
+  />
+
+  <FuelMarketHeader
+    market="Gas prices today in the US"
+    status={data.status}
+    statusLabel={statusLabel}
+    sourceKind="Official national dataset — U.S. Energy Information Administration weekly retail survey."
+    meta={[
+      { label: 'Reporting period', value: weekLabel ? `Week of ${weekLabel}` : 'None yet' },
+      { label: 'Last verified', value: lastSuccessLabel ?? 'Never' },
+      { label: 'Source frequency', value: 'Weekly (EIA publishes once a week)' },
+      { label: 'Refresh', value: 'Automatic, scheduled' },
+    ]}
+  />
 
   <FuelPriceBoard
     market="United States"
+    ariaLabel="Current fuel price sign for United States"
     cadence="weekly"
+    status={data.status}
     cadenceLabel="EIA WEEKLY AVERAGE"
-    updatedLabel={`Week of ${weekLabel}`}
+    updatedLabel={weekLabel ? `Week of ${weekLabel}` : 'No verified data yet'}
     sourceLabel="U.S. Energy Information Administration"
-    rows={[
-      { label: 'Regular', value: data.regularPerGallon.toFixed(2), unit: '$/gal' },
-      { label: 'Diesel', value: data.dieselPerGallon.toFixed(2), unit: '$/gal' },
+    pendingMessage="We haven't completed a verified fetch from the EIA yet. Check back soon — no price is shown here until it's real."
+    staleLabel={lastSuccessLabel ? `Last verified ${lastSuccessLabel}` : 'Last known value'}
+    rows={data.products.map((p) => ({ label: p.label, value: p.valuePerGallon.toFixed(2), unit: '$/gal' }))}
+  />
+  {regular && <p class="fuel-board-note">Per litre for the calculators below: <strong>${regular.valuePerLitre.toFixed(3)}/L</strong> regular{diesel && <>, <strong>${diesel.valuePerLitre.toFixed(3)}/L</strong> diesel</>}.</p>}
+
+  <FuelMarketSnapshot heading="Market snapshot — regular gasoline" metrics={metrics} />
+
+  <FuelTrendPanel
+    heading="Price history"
+    rangeLegend="Choose a time range"
+    ranges={ranges}
+    buildingLabel="History builds up one published week at a time — not enough verified weeks yet for a trend."
+    sinceLabelTemplate="Last {days} verified weeks"
+    lowLabel="Low"
+    highLabel="High"
+    series={[
+      { id: 'us-regular', label: 'Regular', unit: '$/gal', points: historyPoints('regular') },
+      { id: 'us-diesel', label: 'Diesel', unit: '$/gal', points: historyPoints('diesel') },
     ]}
   />
-  <p class="fuel-board-note">Per litre for the calculators below: <strong>${data.regular.toFixed(3)}/L</strong> regular, <strong>${data.diesel.toFixed(3)}/L</strong> diesel.</p>
 
-  <div class="methodology-grid">
-    <FuelPriceTrend
-      label="Regular trend"
-      unit="$/gal"
-      points={regularHistory}
-      buildingLabel="History builds up one week at a time — not enough data yet for a trend."
-      sinceLabelTemplate="Last {days} snapshots"
-      lowLabel="Low"
-      highLabel="High"
-    />
-    <FuelPriceTrend
-      label="Diesel trend"
-      unit="$/gal"
-      points={dieselHistory}
-      buildingLabel="History builds up one week at a time — not enough data yet for a trend."
-      sinceLabelTemplate="Last {days} snapshots"
-      lowLabel="Low"
-      highLabel="High"
-    />
+  <FuelActionPanel
+    heading="Calculate with this price"
+    note={actionNote}
+    actions={[
+      { href: '/tools/fuel-cost-calculator/', title: 'Use this price in the Fuel Cost Calculator', detail: 'Fuel used and total journey cost' },
+      { href: '/tools/road-trip-cost-calculator/', title: 'Calculate a road trip', detail: 'Trips, extras and cost per person' },
+      { href: '/vehicles/', title: 'Estimate a vehicle trip cost', detail: 'Start from a specific vehicle' },
+    ]}
+  />
+
+  <div class="fuel-dash-prose">
+    <section class="methodology-sources" aria-labelledby="fuel-source-heading">
+      <p class="eyebrow">Source</p>
+      <h2 id="fuel-source-heading">Where do these numbers come from?</h2>
+      <p>{data.source}. {fuelPrices.disclaimer}</p>
+      <p>Spain's figures come from the official national Ministerio dataset. Germany's come from an Atlas monitored sample of selected city stations — deliberately not described as a German national average — and are refreshed only by a deliberate manual run, not on a recurring schedule.</p>
+      <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">View source <span>↗</span></a></div>
+    </section>
+
+    <section aria-labelledby="fuel-faq-heading">
+      <h2 id="fuel-faq-heading">Frequently asked questions</h2>
+      {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+    </section>
   </div>
-
-  <section class="methodology-sources" aria-labelledby="fuel-source-heading">
-    <p class="eyebrow">Source</p>
-    <h2 id="fuel-source-heading">Where do these numbers come from?</h2>
-    <p>{data.source}. {fuelPrices.disclaimer}</p>
-    <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">View source <span>↗</span></a></div>
-  </section>
-
-  <section aria-labelledby="fuel-faq-heading">
-    <h2 id="fuel-faq-heading">Frequently asked questions</h2>
-    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-  </section>
-
-  <section class="methodology-sources" aria-labelledby="fuel-tools-heading">
-    <p class="eyebrow">Next</p>
-    <h2 id="fuel-tools-heading">Calculate with this price</h2>
-    <div class="methodology-source-links">
-      <a href="/tools/fuel-cost-calculator/">Calculate fuel cost <span>↗</span></a>
-      <a href="/tools/road-trip-cost-calculator/">Calculate road trip cost <span>↗</span></a>
-    </div>
-  </section>
 </SiteLayout>

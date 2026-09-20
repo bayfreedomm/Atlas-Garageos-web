@@ -3,6 +3,7 @@ import ToolIcon from './ToolIcon.astro';
 import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
+import fuelPrices from '../data/fuel-prices.json';
 
 // The hero capability badges (Tires & wheels / Fuel & trips / EV tools /
 // Performance) must route to a real, already-existing destination. Three of
@@ -59,6 +60,20 @@ const helper = new Map<ToolId, string>([
   ['power-to-weight-calculator', 'Power relative to vehicle weight'],
 ]);
 const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
+// The homepage badge links to a single most-relevant market per locale: the US weekly EIA
+// average for the English site, Spain's official national dataset for the Spanish site, and
+// for the German site the Atlas monitored city sample — which is never called a national
+// average or a live board, because it is neither. The US figure is genuinely weekly, so its
+// badge never uses "live" wording either; only the dot color reflects whether the latest
+// refresh actually succeeded.
+const fuelStatus = locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status;
+const FUEL_BADGE_TEXT: Record<'en' | 'de' | 'es', Record<'pending' | 'fresh' | 'stale', string>> = {
+  en: { pending: 'WEEKLY FUEL DATA — AWAITING FIRST UPDATE', fresh: 'WEEKLY FUEL DATA', stale: 'WEEKLY FUEL DATA — LAST KNOWN PRICE' },
+  de: { pending: 'KRAFTSTOFFDATEN AUSSTEHEND', fresh: 'BEOBACHTETE STICHPROBE', stale: 'LETZTER BESTÄTIGTER PREIS' },
+  es: { pending: 'DATOS PENDIENTES', fresh: 'MEDIA NACIONAL OFICIAL', stale: 'ÚLTIMO PRECIO VERIFICADO' },
+};
+const fuelBadgeText = FUEL_BADGE_TEXT[locale ?? 'en'][fuelStatus];
+const fuelBadgeModifier = fuelStatus === 'pending' ? 'home-fuel-feature__badge--pending' : fuelStatus === 'stale' ? 'home-fuel-feature__badge--stale' : '';
 const evChargingTool = tools.find((tool) => tool.id === 'ev-charging-cost-calculator')!;
 const evChargingHref = locale ? localizedToolPath(locale, evChargingTool.id, 'tool') : routeForTool(evChargingTool);
 const heroCapabilities = [
@@ -131,7 +146,7 @@ const categories = home
       <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
     </section>
 
-    <a class="home-fuel-feature" href={fuelPricesPath}><span class="home-fuel-feature__badge"><i aria-hidden="true"></i>{home?.fuelBadge ?? 'LIVE PRICE BOARD'}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Current national average for regular gasoline and diesel, updated several times a day, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-fuel-feature" href={fuelPricesPath}><span class:list={['home-fuel-feature__badge', fuelBadgeModifier]}><i aria-hidden="true"></i>{fuelBadgeText}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Weekly US average for regular, midgrade, premium and diesel, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
     <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>

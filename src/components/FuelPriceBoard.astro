@@ -12,6 +12,10 @@ interface Row {
 }
 interface Props {
   readonly market: string; // e.g. "UNITED STATES", "DEUTSCHLAND", "ESPAÑA"
+  /** Fully localized aria-label for the whole totem (the shared component
+   *  never hardcodes an English string — the page passes the finished
+   *  sentence, following the same pattern as vehicle-page-text.ts). */
+  readonly ariaLabel: string;
   readonly rows: readonly Row[];
   readonly updatedLabel: string; // e.g. "Week of September 15, 2026" or "Updated today, 14:20"
   readonly cadenceLabel: string; // e.g. "EIA WEEKLY AVERAGE" or "UPDATED SEVERAL TIMES A DAY"
@@ -20,37 +24,70 @@ interface Props {
    *  average (EIA). Only ever changes wording — never turned into a
    *  blinking "LIVE" dot. */
   readonly cadence: 'live' | 'weekly';
-  /** Whether the underlying fetch actually succeeded. When false (e.g. the
-   *  seed placeholder committed before the first scheduled run), the lamp
-   *  shows amber instead of green regardless of cadence — the sign never
-   *  claims fresher data than it actually has. Defaults to true. */
-  readonly fresh?: boolean;
+  /** Explicit state, separate from `cadence`:
+   *  - 'pending': no verified data has ever been fetched. `rows` is ignored
+   *    and `pendingMessage` is shown instead of any digits.
+   *  - 'stale': a real last-known value exists but the latest refresh
+   *    failed. `rows` are shown (they are real, just possibly outdated),
+   *    the lamp is amber, and `staleLabel` is shown next to the date.
+   *  - 'fresh': the latest refresh succeeded; shown normally. */
+  readonly status: 'pending' | 'fresh' | 'stale';
+  /** Localized "data pending / awaiting first verified update" copy, shown
+   *  in place of the row digits when status is 'pending'. */
+  readonly pendingMessage?: string;
+  /** Localized "showing last verified price" copy, shown when status is
+   *  'stale' alongside the (real, last-known) updatedLabel. */
+  readonly staleLabel?: string;
 }
-const { market, rows, updatedLabel, cadenceLabel, sourceLabel, cadence, fresh = true } = Astro.props;
+const { market, ariaLabel, rows, updatedLabel, cadenceLabel, sourceLabel, cadence, status, pendingMessage, staleLabel } = Astro.props;
+const lampState = status === 'pending' ? 'pending' : status === 'stale' ? 'static' : cadence === 'live' ? 'periodic' : 'static';
 ---
-<div class="fuel-totem" role="group" aria-label={`Current fuel price sign for ${market}`}>
+<div class="fuel-totem" role="group" aria-label={ariaLabel}>
   <div class="fuel-totem__chassis">
     <div class="fuel-totem__header">
-      <span class:list={['fuel-totem__lamp', { 'fuel-totem__lamp--periodic': cadence === 'live' && fresh, 'fuel-totem__lamp--static': cadence === 'weekly' || !fresh }]} aria-hidden="true"></span>
+      <span class:list={['fuel-totem__lamp', `fuel-totem__lamp--${lampState}`]} aria-hidden="true"></span>
       <span class="fuel-totem__market">{market}</span>
       <span class="fuel-totem__cadence">{cadenceLabel}</span>
     </div>
     <div class="fuel-totem__display">
-      <div class="fuel-totem__rows">
-        {rows.map((row) => (
-          <div class="fuel-totem__row">
-            <span class="fuel-totem__label">{row.label}</span>
-            <span class="fuel-totem__value">
-              <span class="fuel-totem__digits">{row.value}</span>
-              <span class="fuel-totem__unit">{row.unit}</span>
-            </span>
-          </div>
-        ))}
-      </div>
+      {status === 'pending' ? (
+        <div class="fuel-totem__pending">
+          <p>{pendingMessage}</p>
+        </div>
+      ) : (
+        <div class="fuel-totem__rows">
+          {rows.map((row) => (
+            <div class="fuel-totem__row">
+              <span class="fuel-totem__label">{row.label}</span>
+              <span class="fuel-totem__value">
+                <span class="fuel-totem__digits">{row.value}</span>
+                <span class="fuel-totem__unit">{row.unit}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
     <div class="fuel-totem__footer">
-      <span class="fuel-totem__updated">{updatedLabel}</span>
+      <span class="fuel-totem__updated">{status === 'stale' && staleLabel ? `${staleLabel} · ${updatedLabel}` : updatedLabel}</span>
       <span class="fuel-totem__source">{sourceLabel}</span>
     </div>
   </div>
 </div>
+
+<style>
+  .fuel-totem__pending {
+    padding: 1.1rem 0;
+    text-align: center;
+  }
+  .fuel-totem__pending p {
+    margin: 0;
+    color: var(--totem-label-color);
+    font-size: .85rem;
+    line-height: 1.5;
+  }
+  .fuel-totem__lamp--pending {
+    background: var(--totem-lamp-pending);
+    box-shadow: 0 0 .1rem var(--totem-lamp-pending), 0 0 .5rem .05rem color-mix(in srgb, var(--totem-lamp-pending) 60%, transparent);
+  }
+</style>

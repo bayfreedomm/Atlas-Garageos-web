@@ -1,0 +1,88 @@
+---
+// History panel for the fuel market dashboard.
+//
+// Wraps the existing FuelPriceTrend sparkline (unchanged) and adds range tabs — but only
+// for ranges the committed history can genuinely support (see availableRanges() in
+// src/ui/fuel-market-metrics.ts). A freshly seeded install has no history at all, so this
+// renders exactly one trend in its honest "building" state and NO tabs; tabs appear only
+// once at least two ranges are really backed by data. The tabs are pure CSS (hidden radio
+// inputs + sibling selectors) so the page stays static with no client JavaScript.
+import FuelPriceTrend from './FuelPriceTrend.astro';
+import { availableRanges, type RangeOption, type TrendPoint } from '../ui/fuel-market-metrics';
+
+interface TrendSeries {
+  /** Unique within the page — used to namespace the radio group's ids. */
+  readonly id: string;
+  readonly label: string;
+  readonly unit: string;
+  readonly points: readonly TrendPoint[];
+}
+interface Props {
+  readonly heading: string;
+  readonly series: readonly TrendSeries[];
+  readonly ranges: readonly RangeOption[];
+  readonly buildingLabel: string;
+  readonly sinceLabelTemplate: string;
+  readonly lowLabel: string;
+  readonly highLabel: string;
+  /** Localized sr-only legend for each range group, e.g. "Choose a time range". */
+  readonly rangeLegend: string;
+}
+const { heading, series, ranges, buildingLabel, sinceLabelTemplate, lowLabel, highLabel, rangeLegend } = Astro.props;
+
+const resolved = series.map((entry) => ({ entry, options: availableRanges(entry.points, ranges) }));
+---
+<section class="fuel-dash-history" aria-labelledby="fuel-history-heading">
+  <h2 class="fuel-dash-section-title" id="fuel-history-heading">{heading}</h2>
+  <div class="fuel-dash-history__grid">
+    {resolved.map(({ entry, options }) => (
+      <div class="fuel-trend-panel">
+        {options.length >= 2 ? (
+          <fieldset class="fuel-range">
+            <legend class="sr-only">{`${rangeLegend} — ${entry.label}`}</legend>
+            {options.map(({ range }, index) => (
+              <input
+                class="fuel-range__radio"
+                type="radio"
+                name={`fuel-range-${entry.id}`}
+                id={`fuel-range-${entry.id}-${range.id}`}
+                data-range={range.id}
+                checked={index === 0}
+              />
+            ))}
+            <div class="fuel-range__tabs">
+              {options.map(({ range }) => (
+                <label class="fuel-range__tab" data-range={range.id} for={`fuel-range-${entry.id}-${range.id}`}>{range.label}</label>
+              ))}
+            </div>
+            <div class="fuel-range__panels">
+              {options.map(({ range, points }) => (
+                <div class="fuel-range__panel" data-range={range.id}>
+                  <FuelPriceTrend
+                    label={entry.label}
+                    unit={entry.unit}
+                    points={points}
+                    buildingLabel={buildingLabel}
+                    sinceLabelTemplate={sinceLabelTemplate}
+                    lowLabel={lowLabel}
+                    highLabel={highLabel}
+                  />
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        ) : (
+          <FuelPriceTrend
+            label={entry.label}
+            unit={entry.unit}
+            points={options.length === 1 ? options[0]!.points : entry.points}
+            buildingLabel={buildingLabel}
+            sinceLabelTemplate={sinceLabelTemplate}
+            lowLabel={lowLabel}
+            highLabel={highLabel}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+</section>

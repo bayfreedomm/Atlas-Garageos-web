@@ -1,0 +1,34 @@
+---
+// Dashboard market header: who this market is, what state its data is in, when it was last
+// genuinely verified, and what kind of source it comes from. Compact and scannable — all
+// strings are passed in fully localized (same pattern as FuelPriceBoard).
+interface Meta {
+  readonly label: string;
+  readonly value: string;
+}
+interface Props {
+  readonly market: string;
+  readonly statusLabel: string;
+  readonly status: 'pending' | 'fresh' | 'stale';
+  /** Short, honest one-liner about what this data IS (e.g. "Official national dataset" or
+   *  "Atlas monitored sample — not a national average"). */
+  readonly sourceKind: string;
+  readonly meta: readonly Meta[];
+}
+const { market, statusLabel, status, sourceKind, meta } = Astro.props;
+---
+<header class="fuel-dash-header">
+  <div class="fuel-dash-header__top">
+    <h1 class="fuel-dash-header__market">{market}</h1>
+    <span class:list={['fuel-dash-status', `fuel-dash-status--${status}`]}><i aria-hidden="true"></i>{statusLabel}</span>
+  </div>
+  <p class="fuel-dash-header__kind">{sourceKind}</p>
+  <dl class="fuel-dash-header__meta">
+    {meta.map((item) => (
+      <div>
+        <dt>{item.label}</dt>
+        <dd>{item.value}</dd>
+      </div>
+    ))}
+  </dl>
+</header>

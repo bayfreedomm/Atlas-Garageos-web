@@ -33,6 +33,11 @@ export function initializeToolboxes(): void {
       rows.forEach((row) => {
         const show = toolMatchesFilter({ category: row.dataset.toolCategoryName ?? '', searchText: row.dataset.toolSearchText ?? '', popular: row.dataset.popular === 'true' }, query, category, home);
         row.hidden = !show;
+        // `visible` is incremented from the exact same `show` value that decides row.hidden,
+        // for every row, with no exceptions — so the count and the empty state can never
+        // disagree with what the DOM actually shows. (There used to be a
+        // `data-tool-count-exclude` opt-out here for a hand-written Gas Prices Today row;
+        // that row is now a real registry entry and counts like anything else.)
         if (show) visible++;
       });
       if (empty) empty.hidden = visible !== 0;

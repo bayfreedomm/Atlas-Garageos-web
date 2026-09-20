@@ -503,4 +503,25 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { question: '¿Qué significa el nivel de confianza?', answer: 'Confianza alta significa que varias fuentes independientes coincidieron. Confianza media o baja significa que las fuentes discreparon o que un valor no se pudo confirmar por completo — compruebe estas entradas antes de usarlas.' },
     ],
   },
+  'gas-prices-today': {
+    title: 'Precio de la gasolina hoy',
+    description: 'Precios de carburante actuales con histórico, métricas del mercado y paso directo a las calculadoras de coste de combustible y de viaje.',
+    category: 'Combustible y Viajes',
+    eyebrow: 'Mercado de carburantes',
+    intro: 'Precios de carburante actuales con histórico, métricas y acceso directo a las calculadoras.',
+    limitation: 'Es una media de mercado orientativa, nunca el precio de una gasolinera concreta. En el caso de Alemania se trata de una muestra supervisada por Atlas de estaciones de ciudades seleccionadas, no de una media nacional.',
+    explanation: [
+      { heading: 'De dónde salen los números', paragraphs: [
+        'Cada mercado tiene su propia fuente y su propia frecuencia: Estados Unidos usa la encuesta semanal de la EIA, España el conjunto de datos nacional oficial del Ministerio y Alemania una muestra supervisada de estaciones de ciudades seleccionadas.',
+        'Mientras un mercado no se haya verificado nunca no mostramos ninguna cifra. Si una actualización falla, verá el último valor real con su fecha en lugar de un número inventado.',
+      ] },
+    ],
+    facts: [
+      { title: 'Cifra publicada, no cotización en vivo', body: 'Se muestra el último valor confirmado con su fecha, sin tickers animados que simulen movimiento.' },
+      { title: 'Alemania es una muestra', body: 'Los valores alemanes proceden de ciudades seleccionadas y no son una media nacional oficial.' },
+      { title: 'Calcule y luego ajuste', body: 'Use el valor como punto de partida en las calculadoras y ajústelo a su gasolinera habitual.' },
+    ],
+    commonMistake: 'Leer una media de mercado como si fuera el precio exacto de una gasolinera concreta.',
+    warning: 'Impuestos, marca y ubicación separan bastante el precio real del surtidor de cualquier media.',
+  },
 });

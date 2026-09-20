@@ -1,14 +1,22 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
+import FuelMarketSwitcher from '../../../components/FuelMarketSwitcher.astro';
+import FuelMarketHeader from '../../../components/FuelMarketHeader.astro';
 import FuelPriceBoard from '../../../components/FuelPriceBoard.astro';
-import FuelPriceTrend from '../../../components/FuelPriceTrend.astro';
+import FuelMarketSnapshot from '../../../components/FuelMarketSnapshot.astro';
+import FuelTrendPanel from '../../../components/FuelTrendPanel.astro';
+import FuelActionPanel from '../../../components/FuelActionPanel.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
-import fuelPrices from '../../../data/fuel-prices.json';
-import fuelPriceHistory from '../../../data/fuel-price-history.json';
+import rawFuelPrices from '../../../data/fuel-prices.json';
+import rawFuelPriceHistory from '../../../data/fuel-price-history.json';
+import { asFuelPrices, asFuelPriceHistory } from '../../../data/fuel-prices-types';
+import { summarizeSeries, type RangeOption, type SnapshotMetric } from '../../../ui/fuel-market-metrics';
 
+const fuelPrices = asFuelPrices(rawFuelPrices);
+const fuelPriceHistory = asFuelPriceHistory(rawFuelPriceHistory);
 const data = fuelPrices.de;
-const title = 'Kraftstoffpreise heute in Deutschland — Benzin & Diesel im Schnitt';
-const description = 'Aktueller Durchschnittspreis für Super E5 und Diesel in Deutschland, automatisch mehrmals täglich aktualisiert aus öffentlichen Quellen.';
+const title = 'Kraftstoffpreise heute in Deutschland — beobachtete Stichprobe';
+const description = 'Aktuelle Kraftstoffpreise für Super E5, Super E10 und Diesel aus einer von Atlas beobachteten Stichprobe ausgewählter Stadt-Tankstellen — kein Bundesdurchschnitt — mit Verlauf und Rechnern.';
 const pathname = '/de/kraftstoffpreise/';
 const alternates = [
   { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
@@ -16,26 +24,68 @@ const alternates = [
   { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
   { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
 ];
-const dateLabel = new Date(data.fetchedAt).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
-const timeLabel = new Date(data.fetchedAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-const e5History = fuelPriceHistory.map((row) => ({ date: row.date, value: row.de.e5 }));
-const dieselHistory = fuelPriceHistory.map((row) => ({ date: row.date, value: row.de.diesel }));
+
+// Germany is refreshed only by a deliberate manual run (see
+// .github/workflows/update-fuel-prices-germany.yml), so the reference date is always the
+// last genuine success — never "today" just because a page was rebuilt.
+const referenceDate = data.status === 'pending' ? null : (data.lastSuccessAt ?? null);
+const dateLabel = referenceDate ? new Date(referenceDate).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
+const timeLabel = referenceDate ? new Date(referenceDate).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : null;
+
+const historyPoints = (id: string) => fuelPriceHistory.de.map((row) => ({ date: row.date, value: row.products[id] ?? 0 })).filter((point) => point.value > 0);
+
+const e5 = data.products.find((product) => product.id === 'e5');
+const e5Summary = summarizeSeries(historyPoints('e5'), e5?.value ?? null);
+const euro = (value: number | null) => (value === null ? null : `${value.toFixed(3).replace('.', ',')} €`);
+const changeTone = e5Summary.changeAbs === null || e5Summary.changeAbs === 0 ? 'flat' : e5Summary.changeAbs > 0 ? 'up' : 'down';
+const notEnough = 'Noch nicht genug Daten';
+
+const metrics: readonly SnapshotMetric[] = [
+  { label: 'Aktuell Super E5', value: euro(e5Summary.current), placeholder: 'Noch kein bestätigter Preis', detail: dateLabel ? `Stand ${dateLabel}` : undefined },
+  { label: 'Vorheriger Wert', value: euro(e5Summary.previous), placeholder: notEnough, detail: e5Summary.previous !== null ? 'Letzte vorherige Messung' : undefined },
+  {
+    label: 'Veränderung',
+    value: e5Summary.changeAbs === null ? null : `${e5Summary.changeAbs > 0 ? '+' : '−'}${Math.abs(e5Summary.changeAbs).toFixed(3).replace('.', ',')} €`,
+    placeholder: notEnough,
+    detail: e5Summary.changePct === null ? undefined : `${e5Summary.changePct > 0 ? '+' : '−'}${Math.abs(e5Summary.changePct).toFixed(1).replace('.', ',')} % gegenüber der vorherigen Messung`,
+    tone: changeTone,
+  },
+  { label: 'Durchschnitt im Zeitraum', value: euro(e5Summary.average), placeholder: notEnough, detail: e5Summary.count > 0 ? `${e5Summary.count} bestätigte Messung${e5Summary.count === 1 ? '' : 'en'}` : undefined },
+  { label: 'Tiefstwert', value: euro(e5Summary.low), placeholder: notEnough, detail: e5Summary.firstDate ? `Seit ${e5Summary.firstDate}` : undefined },
+  { label: 'Stichprobengröße', value: e5 ? `${e5.sampleSize}` : null, placeholder: notEnough, detail: e5 ? 'Tankstellen-Messwerte für Super E5' : 'Anzahl ausgewerteter Tankstellen' },
+];
+
+const ranges: readonly RangeOption[] = [
+  { id: '7d', label: '7T', days: 7 },
+  { id: '30d', label: '30T', days: 30 },
+  { id: '90d', label: '90T', days: 90 },
+  { id: '6m', label: '6M', days: 182 },
+  { id: '1y', label: '1J', days: 365 },
+];
+
+const statusLabel = data.status === 'fresh' ? 'Bestätigt' : data.status === 'stale' ? 'Letzter bestätigter Wert' : 'Noch nicht verifiziert';
+const actionNote = data.status === 'pending'
+  ? 'Es liegt noch kein bestätigter Preis vor — die Rechner starten mit ihrem eigenen Standardwert, den Sie selbst anpassen.'
+  : 'Die Rechner starten mit dem zuletzt bestätigten Literpreis dieser Stichprobe; Sie können ihn jederzeit ändern.';
+
 const faqs = [
   {
     q: 'Woher stammen diese Kraftstoffpreise?',
-    a: `Die Preise stammen aus ${data.source}. Für Deutschland wird der Durchschnitt aus mehreren Großstädten gebildet, nicht aus einer einzelnen Tankstelle.`,
+    a: data.status === 'pending'
+      ? 'Für Deutschland liegt noch keine verifizierte Abfrage vor. Sobald eine vorliegt, sehen Sie hier eine von Atlas beobachtete Stichprobe ausgewählter Stadt-Tankstellen — ausdrücklich keinen amtlichen Bundesdurchschnitt.'
+      : `Die Preise stammen aus ${data.source}. Es handelt sich um eine beobachtete Stichprobe ausgewählter Stadt-Tankstellen, nicht um einen Bundesdurchschnitt und nicht um den Preis einer bestimmten Tankstelle.`,
   },
   {
-    q: 'Wie oft werden die Preise aktualisiert?',
-    a: 'Automatisch mehrmals täglich über einen geplanten Abruf — nicht bei jedem Seitenaufruf, damit die Quelle nicht überlastet wird.',
+    q: 'Warum ist das kein Bundesdurchschnitt?',
+    a: 'Für Deutschland gibt es keinen frei nutzbaren amtlichen Gesamtdatensatz wie in Spanien oder den USA. Verfügbar sind Einzelpreise je Tankstelle. Aus wenigen Städten einen „Bundesdurchschnitt" zu machen wäre eine Behauptung, die die Daten nicht hergeben — deshalb nennen wir es, was es ist: eine beobachtete Stichprobe.',
   },
   {
-    q: 'Warum ist das kein Live-Ticker wie bei Rohöl-Kursen?',
-    a: 'Kraftstoff-Durchschnittspreise sind keine handelbaren Börsenkurse und ändern sich in der Praxis nicht sekündlich. Ein echter Live-Ticker würde die kostenlose Datenquelle unnötig belasten, ohne einen genaueren Preis zu liefern — deshalb holen wir mehrmals täglich einen frischen, echten Wert statt eine Zahl zu simulieren.',
+    q: 'Wie oft werden die deutschen Preise aktualisiert?',
+    a: 'Nicht automatisch nach Zeitplan. Die Datenquelle ist ein spendenfinanzierter Einzelstationsdienst, kein Massen-Feed, und diese Website ist vollständig statisch ohne Server, der im Moment Ihres Besuchs abfragen könnte. Deutschland wird deshalb nur durch einen bewussten manuellen Lauf aktualisiert — bis dahin zeigen wir ehrlich den Zustand „noch nicht verifiziert" bzw. den letzten bestätigten Wert mit Datum.',
   },
   {
     q: 'Kann ich diesen Preis für meine eigene Tankstelle verwenden?',
-    a: 'Nein. Es handelt sich um einen groben Landesdurchschnitt zur Orientierung, nicht um den Preis einer bestimmten Tankstelle. Passen Sie den Preis im Rechner jederzeit manuell an.',
+    a: 'Nein. Es ist ein Orientierungswert aus wenigen Städten, nicht der Preis einer bestimmten Tankstelle. Passen Sie den Preis im Rechner jederzeit manuell an.',
   },
 ];
 const faqJsonLd = serializeJsonLd({
@@ -43,80 +93,96 @@ const faqJsonLd = serializeJsonLd({
   '@type': 'FAQPage',
   mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 });
-const datasetJsonLd = serializeJsonLd({
+const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   '@context': 'https://schema.org',
   '@type': 'Dataset',
-  name: 'Deutschland Kraftstoffpreise (Tagesdurchschnitt)',
-  description: 'Täglich aktualisierter Durchschnittspreis für Super E5 und Diesel in Deutschland aus öffentlichen Quellen.',
+  name: 'Kraftstoffpreise Deutschland (beobachtete Stichprobe ausgewählter Städte)',
+  description: 'Von Atlas beobachtete Stichprobe der Preise für Super E5, Super E10 und Diesel an Tankstellen ausgewählter deutscher Städte. Kein amtlicher Bundesdurchschnitt.',
   license: 'https://creativecommons.org/licenses/by/4.0/',
-  temporalCoverage: data.fetchedAt,
+  temporalCoverage: referenceDate,
   url: 'https://atlasgarageos.com/de/kraftstoffpreise/',
   creator: { '@type': 'Organization', name: 'Atlas GarageOS' },
-});
+}) : null;
 ---
 <SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="de" alternates={alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: 'Kraftstoffpreise heute', href: pathname }]}>
   <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
-  <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>
+  {datasetJsonLd && <script is:inline type="application/ld+json" set:html={datasetJsonLd}></script>}
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><span aria-current="page">Kraftstoffpreise heute</span></nav>
 
-  <header class="directory-identity methodology-hero">
-    <p class="eyebrow">Aktualisiert: {dateLabel}</p>
-    <h1>Kraftstoffpreise heute in Deutschland</h1>
-    <p>Durchschnittspreise aus öffentlich zugänglichen Daten, automatisch mehrmals täglich aktualisiert. Nutzen Sie diese Werte als Ausgangspunkt in unseren Rechnern — Sie können den Preis dort jederzeit an Ihre eigene Tankstelle anpassen.</p>
-  </header>
-
-  <FuelPriceBoard
-    market="Deutschland"
-    cadence="live"
-    fresh={data.ok}
-    cadenceLabel="MEHRMALS TÄGLICH AKTUALISIERT"
-    updatedLabel={`${dateLabel}, ${timeLabel} Uhr`}
-    sourceLabel={data.source}
-    rows={[
-      { label: 'Super E5', value: data.e5.toFixed(2).replace('.', ','), unit: '€/L' },
-      { label: 'Diesel', value: data.diesel.toFixed(2).replace('.', ','), unit: '€/L' },
+  <FuelMarketSwitcher
+    current="de"
+    legend="Kraftstoffmärkte"
+    markets={[
+      { id: 'us', href: '/gas-prices-today/', label: 'USA', note: 'EIA-Wochendurchschnitt' },
+      { id: 'de', href: '/de/kraftstoffpreise/', label: 'Deutschland', note: 'Beobachtete Stichprobe' },
+      { id: 'es', href: '/es/precio-gasolina-hoy/', label: 'Spanien', note: 'Amtlicher Landesdatensatz' },
     ]}
   />
 
-  <div class="methodology-grid">
-    <FuelPriceTrend
-      label="Verlauf Super E5"
-      unit="€"
-      points={e5History}
-      buildingLabel="Der Preisverlauf wird täglich aufgebaut — noch nicht genug Tage für einen Trend."
-      sinceLabelTemplate="Letzte {days} Tage"
-      lowLabel="Tief"
-      highLabel="Hoch"
-    />
-    <FuelPriceTrend
-      label="Verlauf Diesel"
-      unit="€"
-      points={dieselHistory}
-      buildingLabel="Der Preisverlauf wird täglich aufgebaut — noch nicht genug Tage für einen Trend."
-      sinceLabelTemplate="Letzte {days} Tage"
-      lowLabel="Tief"
-      highLabel="Hoch"
-    />
+  <FuelMarketHeader
+    market="Kraftstoffpreise heute in Deutschland"
+    status={data.status}
+    statusLabel={statusLabel}
+    sourceKind="Von Atlas beobachtete Stichprobe ausgewählter Stadt-Tankstellen — kein amtlicher Bundesdurchschnitt."
+    meta={[
+      { label: 'Stand der Daten', value: dateLabel ? `${dateLabel}, ${timeLabel} Uhr` : 'Noch keine' },
+      { label: 'Zuletzt bestätigt', value: dateLabel ?? 'Nie' },
+      { label: 'Quelle', value: 'Tankerkönig (CC BY 4.0), Einzelstationspreise' },
+      { label: 'Aktualisierung', value: 'Nur manuell, kein automatischer Zeitplan' },
+    ]}
+  />
+
+  <FuelPriceBoard
+    market="Deutschland"
+    ariaLabel="Aktuelle Kraftstoffpreistafel für Deutschland"
+    cadence="live"
+    status={data.status}
+    cadenceLabel={data.status === 'pending' ? 'DATEN AUSSTEHEND' : 'BEOBACHTETE STICHPROBE'}
+    updatedLabel={dateLabel ? `${dateLabel}, ${timeLabel} Uhr` : 'Keine verifizierten Daten'}
+    sourceLabel={data.source}
+    pendingMessage="Wir haben noch keine verifizierte Abfrage abgeschlossen. Hier wird erst dann ein Preis angezeigt, wenn er echt ist."
+    staleLabel={dateLabel ? `Zuletzt bestätigt am ${dateLabel}` : 'Letzter bekannter Wert'}
+    rows={data.products.map((p) => ({ label: p.label, value: p.value.toFixed(2).replace('.', ','), unit: '€/L' }))}
+  />
+
+  <FuelMarketSnapshot heading="Marktüberblick — Super E5" metrics={metrics} />
+
+  <FuelTrendPanel
+    heading="Preisverlauf"
+    rangeLegend="Zeitraum wählen"
+    ranges={ranges}
+    buildingLabel="Der Verlauf entsteht erst mit jeder bestätigten Messung — noch nicht genug Datenpunkte für einen Trend."
+    sinceLabelTemplate="Letzte {days} Messungen"
+    lowLabel="Tief"
+    highLabel="Hoch"
+    series={[
+      { id: 'de-e5', label: 'Super E5', unit: '€', points: historyPoints('e5') },
+      { id: 'de-diesel', label: 'Diesel', unit: '€', points: historyPoints('diesel') },
+    ]}
+  />
+
+  <FuelActionPanel
+    heading="Mit diesem Preis rechnen"
+    note={actionNote}
+    actions={[
+      { href: '/de/tools/spritkostenrechner/', title: 'Preis im Spritkostenrechner verwenden', detail: 'Verbrauch und Gesamtkosten der Fahrt' },
+      { href: '/de/tools/fahrtkostenrechner/', title: 'Reisekosten berechnen', detail: 'Strecke, Extras und Kosten pro Person' },
+      { href: '/de/fahrzeuge/', title: 'Fahrtkosten je Fahrzeug schätzen', detail: 'Mit einem konkreten Fahrzeug starten' },
+    ]}
+  />
+
+  <div class="fuel-dash-prose">
+    <section class="methodology-sources" aria-labelledby="fuel-source-heading">
+      <p class="eyebrow">Quelle</p>
+      <h2 id="fuel-source-heading">Woher kommen diese Zahlen?</h2>
+      <p>{data.source}. {fuelPrices.disclaimer}</p>
+      <p>Die Werte stammen aus Einzelpreisen von Tankstellen in ausgewählten Großstädten und werden bewusst als beobachtete Stichprobe bezeichnet — nicht als Bundesdurchschnitt. Eine Aktualisierung erfolgt nur durch einen bewussten manuellen Lauf, nicht nach Zeitplan.</p>
+      <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">Quelle ansehen <span>↗</span></a></div>
+    </section>
+
+    <section aria-labelledby="fuel-faq-heading">
+      <h2 id="fuel-faq-heading">Häufige Fragen</h2>
+      {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+    </section>
   </div>
-
-  <section class="methodology-sources" aria-labelledby="fuel-source-heading">
-    <p class="eyebrow">Quelle</p>
-    <h2 id="fuel-source-heading">Woher kommen diese Zahlen?</h2>
-    <p>{data.source}. {fuelPrices.disclaimer}</p>
-    <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">Quelle ansehen <span>↗</span></a></div>
-  </section>
-
-  <section aria-labelledby="fuel-faq-heading">
-    <h2 id="fuel-faq-heading">Häufige Fragen</h2>
-    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-  </section>
-
-  <section class="methodology-sources" aria-labelledby="fuel-tools-heading">
-    <p class="eyebrow">Weiter geht's</p>
-    <h2 id="fuel-tools-heading">Mit diesem Preis rechnen</h2>
-    <div class="methodology-source-links">
-      <a href="/de/tools/spritkostenrechner/">Kraftstoffkosten berechnen <span>↗</span></a>
-      <a href="/de/tools/fahrtkostenrechner/">Reisekosten berechnen <span>↗</span></a>
-    </div>
-  </section>
 </SiteLayout>

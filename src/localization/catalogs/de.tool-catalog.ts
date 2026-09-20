@@ -529,4 +529,25 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { question: 'Was bedeutet die Verlässlichkeitseinstufung?', answer: 'Hohe Verlässlichkeit bedeutet, dass mehrere unabhängige Quellen übereinstimmten. Mittlere oder geringe Verlässlichkeit bedeutet, dass Quellen widersprachen oder ein Wert nicht vollständig bestätigt werden konnte — solche Einträge sollten Sie vor Gebrauch gegenprüfen.' },
     ],
   },
+  'gas-prices-today': {
+    title: 'Kraftstoffpreise heute',
+    description: 'Aktuelle Kraftstoffpreise mit Preisverlauf, Marktkennzahlen und direktem Übergang in die Sprit- und Fahrtkostenrechner.',
+    category: 'Kraftstoff & Reisen',
+    eyebrow: 'Kraftstoffmarkt',
+    intro: 'Aktuelle Kraftstoffpreise mit Verlauf, Kennzahlen und direktem Weg in die Rechner.',
+    limitation: 'Für Deutschland handelt es sich um eine von Atlas beobachtete Stichprobe ausgewählter Stadt-Tankstellen, nicht um einen amtlichen Bundesdurchschnitt — und in keinem Fall um den Preis einer bestimmten Tankstelle.',
+    explanation: [
+      { heading: 'Woher die Zahlen kommen', paragraphs: [
+        'Jeder Markt hat seine eigene Quelle und seinen eigenen Rhythmus: die USA den wöchentlichen EIA-Survey, Spanien den offiziellen landesweiten Datensatz des Ministeriums, Deutschland eine von Atlas beobachtete Stichprobe ausgewählter Stadt-Tankstellen.',
+        'Solange ein Markt noch nie verifiziert wurde, zeigen wir gar keine Ziffern. Schlägt eine Aktualisierung fehl, sehen Sie den letzten echten Wert samt Datum statt einer erfundenen Zahl.',
+      ] },
+    ],
+    facts: [
+      { title: 'Veröffentlichter Wert, kein Live-Kurs', body: 'Angezeigt wird der zuletzt bestätigte Wert mit Datum — kein animierter Ticker, der Bewegung vortäuscht.' },
+      { title: 'Deutschland ist eine Stichprobe', body: 'Die deutschen Werte stammen aus ausgewählten Städten und sind ausdrücklich kein amtlicher Bundesdurchschnitt.' },
+      { title: 'Erst rechnen, dann anpassen', body: 'Übernehmen Sie den Wert als Ausgangspunkt in den Rechnern und passen Sie ihn an Ihre Tankstelle an.' },
+    ],
+    commonMistake: 'Einen Marktdurchschnitt als Preis einer konkreten Tankstelle zu lesen.',
+    warning: 'Steuern, Marke und Lage verschieben den echten Zapfsäulenpreis spürbar gegenüber jedem Durchschnitt.',
+  },
 });

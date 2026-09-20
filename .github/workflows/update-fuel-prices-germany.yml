@@ -1,0 +1,60 @@
+name: Update fuel prices (Germany, manual only)
+
+# MANUAL TRIGGER ONLY — there is deliberately no `schedule:` block here.
+#
+# Tankerkönig is a donation-funded, per-station service whose radius endpoint is limited to
+# one request per minute; it is not a bulk national feed and should not be polled on a timer
+# by a static site. Atlas also has no backend that could fetch it on demand (output:
+# 'static', no adapter, no API routes), so there is no honest "live" path either. Until a
+# data source suited to automatic German national reporting is chosen, Germany is refreshed
+# only when a human runs this workflow from the Actions tab, and the site shows its real
+# state in the meantime: `pending` if it has never been verified, `stale`/last-verified if it
+# was verified once and has not been refreshed since.
+#
+# What this produces is an Atlas monitored sample of selected city stations — it is never
+# labelled a German national average anywhere.
+
+"on":
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-fuel-prices
+  cancel-in-progress: false
+
+jobs:
+  update-germany-sample:
+    name: Refresh Germany monitored sample
+    runs-on: ubuntu-latest
+    # The Tankerkönig radius endpoint allows 1 request/minute, and the script spaces its 5
+    # city requests 60s apart, so this job deliberately takes ~5 minutes.
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Fetch Germany monitored sample
+        # The API key is read only here, by a Node script running in CI, via process.env.
+        # It is never written into the built site and never printed by the script.
+        env:
+          TANKERKOENIG_API_KEY: ${{ secrets.TANKERKOENIG_API_KEY }}
+        run: node scripts/update-fuel-prices.mjs --providers=de
+
+      - name: Commit updated price files if they changed
+        run: |
+          if git diff --quiet -- src/data/fuel-prices.json src/data/fuel-price-history.json; then
+            echo "No price change — nothing to commit."
+            exit 0
+          fi
+          git config user.name "atlas-garageos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/data/fuel-prices.json src/data/fuel-price-history.json
+          git commit -m "chore: refresh Germany monitored fuel sample (manual run)"
+          git push

@@ -2,9 +2,12 @@
 import ToolPage from '../../../components/ToolPage.astro';
 import FuelFields from '../../../components/FuelFields.astro';
 import { toolById } from '../../../seo/tool-registry';
-import fuelPrices from '../../../data/fuel-prices.json';
+import rawFuelPrices from '../../../data/fuel-prices.json';
+import { asFuelPrices } from '../../../data/fuel-prices-types';
 const definition = toolById('road-trip-cost-calculator');
-const livePrice = fuelPrices.us.regular ?? 0.9;
+const fuelPrices = asFuelPrices(rawFuelPrices);
+const regular = fuelPrices.us.products.find((p) => p.id === 'regular');
+const livePrice = fuelPrices.us.status !== 'pending' ? regular?.valuePerLitre : undefined;
 ---
 <ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]} visual={false} explanationBeforeInsights eyebrow="Fuel & trips" intro="Estimate the complete journey cost from fuel and optional expenses, then see the share per traveller." limitation="Trip costs are estimates based on the numbers you enter. Actual consumption can vary with traffic, weather, load, speed, and driving style.">
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>

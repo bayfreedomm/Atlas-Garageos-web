@@ -241,6 +241,15 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
       { question: 'What does the confidence label mean?', answer: 'High confidence means multiple independent sources agreed. Medium or low confidence means sources disagreed or a value could not be fully confirmed — those entries ask you to cross-check before relying on them.' },
     ],
   },
+  'gas-prices-today': {
+    facts: [
+      { title: 'A published figure, not a live quote', body: 'Each market shows the most recent verified figure from its own official source, with the date it was verified — never an animated ticker pretending a number just moved.' },
+      { title: 'Every market has its own cadence', body: 'The US figure is a weekly EIA survey average, Spain comes from the official national Ministerio dataset, and Germany is an Atlas monitored sample of selected city stations rather than a national average.' },
+      { title: 'No number until it is real', body: 'Before a market has ever been verified it shows a pending state with no digits at all, and a failed refresh shows the last genuinely fetched value with its date rather than inventing a fresh one.' },
+    ],
+    commonMistake: 'Treating a market-wide average as the price at one particular station — local taxes, brand and location move the real pump price well away from the average.',
+    warning: 'Use these figures as a starting point in the calculators and adjust them to the station you actually use before relying on a cost estimate.',
+  },
 });
 
 export function insightForTool(id: ToolId): ToolInsightContent {

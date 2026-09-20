@@ -37,6 +37,7 @@
   --totem-header-color: #3a4a44;
   --totem-lamp-live: #37b877;
   --totem-lamp-static: #b58a3a;
+  --totem-lamp-pending: #8a9490;
 }
 
 :root[data-theme="dark"] {
@@ -69,6 +70,7 @@
   --totem-header-color: #9adfc0;
   --totem-lamp-live: #3ef58b;
   --totem-lamp-static: #ffb24d;
+  --totem-lamp-pending: #7a8480;
 }
 
 html { scroll-padding-top: 4.8rem; }
@@ -170,6 +172,12 @@ main { width: min(100% - 2rem, var(--content-wide)); padding: 1.15rem 0 calc(5re
 .toolbox .tool-rows { display: grid; gap: .55rem; border: 0; }
 .toolbox .tool-row, .toolbox .tool-row + .tool-row { display: grid; grid-template-columns: 2.65rem minmax(0, 1fr) auto; min-height: 4.65rem; align-items: center; gap: .75rem; padding: .7rem .85rem; border: 1px solid var(--color-line); border-radius: .9rem; background: var(--color-surface); box-shadow: none; }
 .toolbox .tool-row .tool-icon { width: 2.65rem; height: 2.65rem; }
+/* Data-product rows (currently the fuel market dashboard) — identical row shape and layout
+   to every calculator row; only a 3px edge tint reflects the data's real status. Purely
+   cosmetic: nothing here changes filtering, counting or the empty state. */
+.toolbox .tool-row--data { border-left: 3px solid var(--totem-lamp-live); }
+.toolbox .tool-row--data.is-pending { border-left-color: var(--totem-lamp-pending); }
+.toolbox .tool-row--data.is-stale { border-left-color: var(--totem-lamp-static); }
 .toolbox .tool-row__copy strong { font-size: .9rem; }
 .toolbox .tool-row__copy small { margin-top: .18rem; font-size: .72rem; }
 .fitment-directory-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .25rem 1rem; margin-top: .85rem; padding: 1rem; border: 1px solid #34413d; border-radius: 1rem; background: #202927; color: #f5f1e9; text-decoration: none; }
@@ -547,12 +555,112 @@ main { width: min(100% - 2rem, var(--content-wide)); padding: 1.15rem 0 calc(5re
 @media (prefers-reduced-motion: reduce) { .fuel-trend__building-bars i { animation: none; } }
 
 /* Homepage "find the fuel price board" feature card — mirrors .home-fitment-feature. */
-.home-fuel-feature { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .65rem 1rem; margin-top: .7rem; padding: 1.15rem; overflow: hidden; border-radius: 1.05rem; background: linear-gradient(180deg, var(--totem-chassis-start) 0%, var(--totem-chassis-end) 100%); border: 1px solid var(--totem-chassis-border); color: var(--totem-digit-color); text-decoration: none; }
+.home-fuel-feature { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .65rem 1rem; margin-top: .7rem; padding: 1.15rem; overflow: hidden; border-radius: 1.05rem; background: linear-gradient(180deg, var(--totem-chassis-start) 0%, var(--totem-chassis-end) 100%); border: 1px solid var(--totem-chassis-border); color: var(--totem-header-color); text-decoration: none; }
 .home-fuel-feature::after { content: ""; position: absolute; right: -2.6rem; bottom: -4rem; width: 9rem; height: 9rem; border: 1px solid rgb(255 255 255 / 10%); border-radius: 50%; box-shadow: 0 0 0 1.5rem rgb(255 255 255 / 3%), 0 0 0 3rem rgb(255 255 255 / 2%); }
 .home-fuel-feature__badge { grid-column: 1 / -1; display: flex; align-items: center; gap: .4rem; width: fit-content; color: var(--totem-header-color); font-size: .62rem; font-weight: 900; letter-spacing: .16em; }
 .home-fuel-feature__badge i { width: .45rem; height: .45rem; border-radius: 50%; background: var(--totem-lamp-live); box-shadow: 0 0 .5rem .05rem color-mix(in srgb, var(--totem-lamp-live) 70%, transparent); }
+/* Status dot reflects the real per-market fetch status (see FuelPriceBoard's lamp states):
+   pending = never verified (neutral grey), fresh = live green (default above), stale = amber. */
+.home-fuel-feature__badge--pending i { background: var(--totem-lamp-pending); box-shadow: 0 0 .5rem .05rem color-mix(in srgb, var(--totem-lamp-pending) 60%, transparent); }
+.home-fuel-feature__badge--stale i { background: var(--totem-lamp-static); box-shadow: 0 0 .5rem .05rem color-mix(in srgb, var(--totem-lamp-static) 65%, transparent); }
 .home-fuel-feature__copy { position: relative; z-index: 1; }
 .home-fuel-feature__copy strong, .home-fuel-feature__copy small { display: block; }
 .home-fuel-feature__copy strong { font-size: 1.05rem; }
 .home-fuel-feature__copy small { max-width: 31rem; margin-top: .35rem; color: var(--totem-label-color); font-size: .78rem; line-height: 1.45; }
 .home-fuel-feature__arrow { position: relative; z-index: 1; align-self: center; color: #7fe2b6; font-size: 1.5rem; }
+
+/* ------------------------------------------------------------------------------------- */
+/* Fuel market dashboard (/gas-prices-today/, /de/kraftstoffpreise/,
+   /es/precio-gasolina-hoy/). Built entirely from the existing token set: the totem tokens
+   (--totem-*) for the chassis-like header so it reads as part of the same instrument as the
+   price board, and the general surface tokens (--color-surface/-subtle/-line/-ink*) for the
+   dashboard-native cards. Both themes are defined by those tokens, so nothing here needs a
+   second dark-mode block. Mobile-first: single column by default, wider grids added at the
+   same 34rem/48rem/60rem breakpoints the rest of the product uses. */
+
+/* Market switcher */
+.fuel-dash-switcher { margin: .9rem 0 1rem; }
+.fuel-dash-switcher__legend { display: block; margin-bottom: .4rem; color: var(--color-ink-soft); font-size: .62rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.fuel-dash-switcher__list { display: grid; gap: .45rem; }
+.fuel-dash-switcher__item { display: grid; gap: .1rem; padding: .6rem .75rem; border: 1px solid var(--color-line); border-radius: .75rem; background: var(--color-surface); text-decoration: none; }
+.fuel-dash-switcher__item strong { color: var(--color-ink); font-size: .84rem; }
+.fuel-dash-switcher__item small { color: var(--color-ink-muted); font-size: .68rem; }
+.fuel-dash-switcher__item:hover { border-color: var(--color-line-strong); }
+.fuel-dash-switcher__item.is-current { border-color: var(--color-accent); background: var(--color-surface-subtle); }
+
+/* Market header */
+.fuel-dash-header { padding: 1rem 1.1rem; border: 1px solid var(--totem-chassis-border); border-radius: 1rem; background: linear-gradient(180deg, var(--totem-chassis-start) 0%, var(--totem-chassis-end) 100%); }
+.fuel-dash-header__top { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; }
+/* global.css caps h1 at 12ch; the dashboard title is a line of UI, not a hero headline. */
+.fuel-dash-header__market { flex: 1 1 14rem; max-width: none; margin: 0; color: var(--totem-header-color); font-size: 1.35rem; font-weight: 900; letter-spacing: -.01em; }
+.fuel-dash-header__kind { margin: .35rem 0 0; color: var(--totem-header-color); font-size: .78rem; font-weight: 600; opacity: .9; }
+.fuel-dash-status { display: inline-flex; align-items: center; gap: .35rem; padding: .18rem .5rem; border-radius: .5rem; background: color-mix(in srgb, var(--totem-header-color) 12%, transparent); color: var(--totem-header-color); font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.fuel-dash-status i { width: .45rem; height: .45rem; border-radius: 50%; background: var(--totem-lamp-pending); }
+.fuel-dash-status--fresh i { background: var(--totem-lamp-live); box-shadow: 0 0 .35rem var(--totem-lamp-live); }
+.fuel-dash-status--stale i { background: var(--totem-lamp-static); box-shadow: 0 0 .35rem var(--totem-lamp-static); }
+.fuel-dash-header__meta { display: grid; gap: .55rem; margin: .85rem 0 0; }
+.fuel-dash-header__meta dt { color: var(--totem-header-color); font-size: .58rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+.fuel-dash-header__meta dd { margin: .12rem 0 0; color: var(--totem-header-color); font-size: .8rem; font-weight: 700; }
+
+.fuel-dash-section-title { margin: 0 0 .6rem; color: var(--color-ink); font-size: .95rem; font-weight: 800; }
+
+/* Market snapshot metrics */
+.fuel-dash-snapshot { margin-top: 1.2rem; }
+.fuel-dash-metrics { display: grid; gap: .5rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fuel-metric { display: grid; align-content: start; gap: .18rem; min-width: 0; padding: .7rem .8rem; border: 1px solid var(--color-line); border-radius: .8rem; background: var(--color-surface); }
+.fuel-metric--empty { background: var(--color-surface-subtle); border-style: dashed; }
+.fuel-metric__label { color: var(--color-ink-soft); font-size: .6rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.fuel-metric__value { overflow-wrap: anywhere; color: var(--color-ink); font-size: 1.22rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.fuel-metric__value--up { color: var(--color-red); }
+.fuel-metric__value--down { color: var(--color-green); }
+.fuel-metric__placeholder { color: var(--color-ink-muted); font-size: .76rem; font-weight: 600; line-height: 1.35; }
+.fuel-metric__detail { color: var(--color-ink-muted); font-size: .68rem; font-weight: 600; }
+
+/* History + range tabs (CSS-only; the radios are the state) */
+.fuel-dash-history { margin-top: 1.3rem; }
+.fuel-dash-history__grid { display: grid; gap: .6rem; }
+.fuel-range { margin: 0; padding: 0; border: 0; }
+.fuel-range__radio { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.fuel-range__tabs { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .1rem; }
+.fuel-range__tab { padding: .25rem .6rem; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-surface); color: var(--color-ink-muted); font-size: .68rem; font-weight: 800; cursor: pointer; }
+.fuel-range__tab:hover { border-color: var(--color-line-strong); }
+.fuel-range__panel { display: none; }
+.fuel-range__radio[data-range="7d"]:checked ~ .fuel-range__panels .fuel-range__panel[data-range="7d"],
+.fuel-range__radio[data-range="30d"]:checked ~ .fuel-range__panels .fuel-range__panel[data-range="30d"],
+.fuel-range__radio[data-range="90d"]:checked ~ .fuel-range__panels .fuel-range__panel[data-range="90d"],
+.fuel-range__radio[data-range="6m"]:checked ~ .fuel-range__panels .fuel-range__panel[data-range="6m"],
+.fuel-range__radio[data-range="1y"]:checked ~ .fuel-range__panels .fuel-range__panel[data-range="1y"] { display: block; }
+.fuel-range__radio[data-range="7d"]:checked ~ .fuel-range__tabs .fuel-range__tab[data-range="7d"],
+.fuel-range__radio[data-range="30d"]:checked ~ .fuel-range__tabs .fuel-range__tab[data-range="30d"],
+.fuel-range__radio[data-range="90d"]:checked ~ .fuel-range__tabs .fuel-range__tab[data-range="90d"],
+.fuel-range__radio[data-range="6m"]:checked ~ .fuel-range__tabs .fuel-range__tab[data-range="6m"],
+.fuel-range__radio[data-range="1y"]:checked ~ .fuel-range__tabs .fuel-range__tab[data-range="1y"] { border-color: var(--color-accent); background: var(--color-surface-selected); color: var(--color-ink); }
+.fuel-range__radio:focus-visible ~ .fuel-range__tabs .fuel-range__tab { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Calculator hand-off */
+.fuel-dash-actions { margin-top: 1.3rem; padding: 1rem; border: 1px solid var(--color-accent); border-radius: 1rem; background: var(--color-surface-subtle); }
+.fuel-dash-actions__head p { margin: -.3rem 0 .7rem; color: var(--color-ink-muted); font-size: .76rem; }
+.fuel-dash-actions__grid { display: grid; gap: .5rem; }
+.fuel-action { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .8rem .9rem; border: 1px solid var(--color-line); border-radius: .8rem; background: var(--color-surface); text-decoration: none; }
+.fuel-action:hover { border-color: var(--color-accent); }
+.fuel-action__copy strong { display: block; color: var(--color-ink); font-size: .86rem; }
+.fuel-action__copy small { display: block; margin-top: .15rem; color: var(--color-ink-muted); font-size: .72rem; }
+.fuel-action__arrow { color: var(--color-accent); font-size: 1.05rem; font-weight: 800; }
+
+/* Prose block (methodology + FAQ) sits below the data-dense top of the page. */
+.fuel-dash-prose { margin-top: 1.6rem; }
+
+@media (min-width: 34rem) {
+  .fuel-dash-switcher__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fuel-dash-header__meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fuel-dash-actions__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 48rem) {
+  .fuel-dash-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fuel-dash-history__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fuel-dash-header__meta { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fuel-dash-actions__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 60rem) {
+  .fuel-dash-metrics { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
