@@ -83,3 +83,12 @@ export function asFuelPrices(raw: unknown): FuelPricesData {
 export function asFuelPriceHistory(raw: unknown): FuelPriceHistoryData {
   return raw as FuelPriceHistoryData;
 }
+
+/** Runtime-safe narrowing for a `status` value read off a raw JSON import (which TypeScript
+ *  can only ever infer as `string`, not the literal union, since the file's content is data,
+ *  not a type). Recognised values pass through as themselves; anything else — an unexpected
+ *  string, `undefined`, or a shape TypeScript hasn't seen — safely falls back to `'pending'`,
+ *  which is also the correct product meaning: "not confirmed fresh or stale" is "pending". */
+export function normalizeFuelStatus(raw: unknown): FuelStatus {
+  return raw === 'fresh' || raw === 'stale' ? raw : 'pending';
+}

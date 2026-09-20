@@ -4,6 +4,7 @@ import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
+import { normalizeFuelStatus } from '../data/fuel-prices-types';
 
 // The hero capability badges (Tires & wheels / Fuel & trips / EV tools /
 // Performance) must route to a real, already-existing destination. Three of
@@ -66,7 +67,7 @@ const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'e
 // average or a live board, because it is neither. The US figure is genuinely weekly, so its
 // badge never uses "live" wording either; only the dot color reflects whether the latest
 // refresh actually succeeded.
-const fuelStatus = locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status;
+const fuelStatus = normalizeFuelStatus(locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status);
 const FUEL_BADGE_TEXT: Record<'en' | 'de' | 'es', Record<'pending' | 'fresh' | 'stale', string>> = {
   en: { pending: 'WEEKLY FUEL DATA — AWAITING FIRST UPDATE', fresh: 'WEEKLY FUEL DATA', stale: 'WEEKLY FUEL DATA — LAST KNOWN PRICE' },
   de: { pending: 'KRAFTSTOFFDATEN AUSSTEHEND', fresh: 'BEOBACHTETE STICHPROBE', stale: 'LETZTER BESTÄTIGTER PREIS' },

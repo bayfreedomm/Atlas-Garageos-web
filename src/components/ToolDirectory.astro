@@ -4,6 +4,7 @@ import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry, type ToolId } from '..
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
+import { normalizeFuelStatus } from '../data/fuel-prices-types';
 interface Props { mode?: 'home' | 'all'; locale?: ContentLocale | undefined; }
 const { mode = 'all', locale } = Astro.props;
 
@@ -12,7 +13,7 @@ const { mode = 'all', locale } = Astro.props;
 // bolted on above the list. It is mapped, filtered, searched and counted by exactly the same
 // code as every calculator row below, so it is structurally impossible for it to be visible
 // while the "no matching tools" empty state also shows.
-const fuelStatus = locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status;
+const fuelStatus = normalizeFuelStatus(locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status);
 // Status-aware helper text. Never "LIVE" for the weekly US figure, and never "national
 // average" for Germany, whose data is an Atlas monitored city sample.
 const FUEL_FEATURE_TEXT: Record<'en' | 'de' | 'es', { helper: Record<'pending' | 'fresh' | 'stale', string>; keywords: string }> = {
