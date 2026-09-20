@@ -33,6 +33,7 @@ const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()
     <h2>Currently covers {makeCount} makes with verified fitment data</h2>
     <p>This is a starting set of commonly seen vehicles, not a complete manufacturer database — it will grow over time. If your exact vehicle isn't listed yet, the door-jamb sticker (driver's door frame) or your owner's manual has the manufacturer's own spec, which you can enter directly into the <a href="/tools/tire-size-calculator/">Tire Size Calculator</a> or <a href="/tools/bolt-pattern-calculator/">Bolt Pattern Calculator</a>.</p>
     <p>The make and model picker itself searches a wider list — {searchableMakeCount} makes in total — so you can find and select your vehicle even when we don't have a verified tire/bolt-pattern reference for it yet. In that case we tell you plainly rather than guess a number.</p>
+    <p>Prefer a shareable link for one specific vehicle? Browse the <a href="/vehicles/">Vehicle Fitment Reference</a> pages — one dedicated page per model with the same sourced data.</p>
   </div>
 </ToolPage>
 <script>import { initializeVehicleFitmentFinder } from '../../../ui/vehicle-fitment-finder'; initializeVehicleFitmentFinder();</script>

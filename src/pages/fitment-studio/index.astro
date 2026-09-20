@@ -5,6 +5,7 @@ import Brand from '../../components/Brand.astro';
 import ThemeBoot from '../../components/ThemeBoot.astro';
 import NavigationDrawer from '../../components/NavigationDrawer.astro';
 import FitmentVisualizer from '../../components/FitmentVisualizer.astro';
+import ToolIcon from '../../components/ToolIcon.astro';
 import Footer from '../../components/Footer.astro';
 import ThemeQuickToggle from '../../components/ThemeQuickToggle.astro';
 import '../../styles/global.css';
@@ -149,7 +150,11 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         <div class="garage-shell"><article id="vehicle-summary" class="vehicle-card"></article><div><label for="active-vehicle">Current vehicle<select id="active-vehicle"><option value="">No saved vehicle</option></select></label><label for="vehicle-nickname">New vehicle nickname<input id="vehicle-nickname" name="vehicle-nickname" value="My Vehicle" maxlength="80" /></label><p id="garage-status" role="status" aria-live="polite"></p><div id="saved-setups"></div></div></div>
       </section>
 
-      <section class="product-section subtle-panel related-fitment-tools" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">Related tools</p><h2 id="tools-heading">Continue with one focused calculation</h2><p>Use the same transparent geometry engines through a task-specific entry point.</p><div class="related-grid"><a class="related-card" href="/tools/tire-size-comparison/"><span>Tires & wheels</span><strong>Tire Size Comparison</strong><p>Compare diameter, sidewall, circumference, and speedometer changes.</p></a><a class="related-card" href="/tools/wheel-offset-calculator/"><span>Fitment</span><strong>Wheel Offset Calculator</strong><p>See inner-position and outer-poke changes before using measured clearance.</p></a><a class="related-card" href="#garage"><span>Optional storage</span><strong>Save this setup</strong><p>Keep this vehicle and setup in this browser for later.</p></a></div></section>
+      <section class="product-section subtle-panel related-fitment-tools" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">Related tools</p><h2 id="tools-heading">Continue with one focused calculation</h2><p>Use the same transparent geometry engines through a task-specific entry point.</p><div class="related-grid">
+        <a class="related-card" href="/tools/tire-size-comparison/"><ToolIcon id="tire-size-comparison" category="Tires & Wheels" /><span><strong>Tire Size Comparison</strong><small>Compare diameter, sidewall, circumference, and speedometer changes.</small></span><i aria-hidden="true">›</i></a>
+        <a class="related-card" href="/tools/wheel-offset-calculator/"><ToolIcon id="wheel-offset-calculator" category="Tires & Wheels" /><span><strong>Wheel Offset Calculator</strong><small>See inner-position and outer-poke changes before using measured clearance.</small></span><i aria-hidden="true">›</i></a>
+        <a class="related-card" href="#garage"><ToolIcon id="garage" /><span><strong>Save this setup</strong><small>Keep this vehicle and setup in this browser for later.</small></span><i aria-hidden="true">›</i></a>
+      </div></section>
     </main>
 
 

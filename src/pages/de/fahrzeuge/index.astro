@@ -1,0 +1,20 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { vehiclePageText } from '../../../content/vehicle-page-text';
+import { vehicleFitmentData } from '../../../data/vehicle-fitment';
+
+const t = vehiclePageText.de;
+const pathname = '/de/fahrzeuge/';
+const vehicles = vehicleFitmentData.filter((v) => v.market === 'eu').slice().sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+---
+<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" locale="de" alternates={[{ hreflang: 'de', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/vehiculos/' }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }]} breadcrumbs={[{ name: t.breadcrumbHome, href: '/de/' }, { name: t.breadcrumbVehicles, href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">{t.breadcrumbHome}</a><span aria-hidden="true">/</span><span aria-current="page">{t.breadcrumbVehicles}</span></nav>
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">{t.hubEuMarket}</p>
+    <h1>{t.hubTitle}</h1>
+    <p>{t.hubLead}</p>
+  </header>
+  <div class="methodology-source-links">
+    {vehicles.map((v) => <a href={`/de/fahrzeuge/${v.id}/`}>{v.make} {v.model} — {v.tireSize} <span>↗</span></a>)}
+  </div>
+</SiteLayout>

@@ -1,5 +1,6 @@
 import { canonicalForPath, indexableRoutes, toolRegistry } from './tool-registry';
 import { localizedToolPath } from '../localization/locales';
+import { vehicleFitmentData } from '../data/vehicle-fitment';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/'] as const;
 
@@ -22,8 +23,20 @@ function localizedRoutes(): readonly string[] {
 
 const STANDALONE_CONTENT_ROUTES = ['/de/kraftstoffpreise/', '/es/precio-gasolina-hoy/'] as const;
 
+function vehiclePageRoutes(): readonly string[] {
+  const routes: string[] = ['/vehicles/', '/de/fahrzeuge/', '/es/vehiculos/'];
+  for (const vehicle of vehicleFitmentData) {
+    if (vehicle.market === 'us') routes.push(`/vehicles/${vehicle.id}/`);
+    else {
+      routes.push(`/de/fahrzeuge/${vehicle.id}/`);
+      routes.push(`/es/vehiculos/${vehicle.id}/`);
+    }
+  }
+  return routes;
+}
+
 export function sitemapEntries(): readonly string[] {
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...STANDALONE_CONTENT_ROUTES].map(canonicalForPath));
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...STANDALONE_CONTENT_ROUTES, ...vehiclePageRoutes()].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

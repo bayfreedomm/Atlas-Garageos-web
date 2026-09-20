@@ -1,0 +1,87 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { serializeJsonLd } from '../../../seo/safe-json-ld';
+import { vehiclePageText } from '../../../content/vehicle-page-text';
+import { vehicleFitmentData, type VehicleFitment } from '../../../data/vehicle-fitment';
+
+export function getStaticPaths() {
+  return vehicleFitmentData
+    .filter((v) => v.market === 'eu')
+    .map((vehicle) => ({ params: { id: vehicle.id }, props: { vehicle } }));
+}
+
+interface Props { vehicle: VehicleFitment; }
+const { vehicle } = Astro.props as Props;
+const t = vehiclePageText.de;
+const pathname = `/de/fahrzeuge/${vehicle.id}/`;
+const esPathname = `/es/vehiculos/${vehicle.id}/`;
+const title = `${vehicle.make} ${vehicle.model} Reifengröße & Lochkreis`;
+const description = `Werksseitige Reifengröße ${vehicle.tireSize} und Lochkreis ${vehicle.boltPattern} für den ${vehicle.make} ${vehicle.model} (${vehicle.generation}), mit Quellenangabe und Verlässlichkeitsbewertung.`;
+const faqs = [
+  { q: t.faqTireQ(vehicle), a: t.faqTireA(vehicle) },
+  { q: t.faqBoltQ(vehicle), a: t.faqBoltA(vehicle) },
+  { q: t.faqTorqueQ(vehicle), a: t.faqTorqueA(vehicle) },
+];
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const vehicleJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Vehicle',
+  name: `${vehicle.make} ${vehicle.model}`,
+  brand: { '@type': 'Brand', name: vehicle.make },
+  model: vehicle.model,
+  vehicleModelDate: vehicle.generation,
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: 'Reifengröße', value: vehicle.tireSize },
+    { '@type': 'PropertyValue', name: 'Lochkreis', value: vehicle.boltPattern },
+    { '@type': 'PropertyValue', name: 'Felgengröße', value: vehicle.wheelSize },
+    ...(vehicle.torqueNm !== undefined ? [{ '@type': 'PropertyValue', name: 'Anzugsdrehmoment (Nm)', value: String(vehicle.torqueNm) }] : []),
+  ],
+});
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="de" alternates={[{ hreflang: 'de', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'es', href: `https://atlasgarageos.com${esPathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }]} breadcrumbs={[{ name: t.breadcrumbHome, href: '/de/' }, { name: t.breadcrumbVehicles, href: '/de/fahrzeuge/' }, { name: `${vehicle.make} ${vehicle.model}`, href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <script is:inline type="application/ld+json" set:html={vehicleJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">{t.breadcrumbHome}</a><span aria-hidden="true">/</span><a href="/de/fahrzeuge/">{t.breadcrumbVehicles}</a><span aria-hidden="true">/</span><span aria-current="page">{vehicle.make} {vehicle.model}</span></nav>
+
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">{t.kicker}</p>
+    <h1>{t.h1(vehicle)}</h1>
+    <p>{t.intro(vehicle)}</p>
+  </header>
+
+  <div class="methodology-grid">
+    <section><h2>{t.tireSize}</h2><p><strong>{vehicle.tireSize}</strong></p></section>
+    <section><h2>{t.boltPattern}</h2><p><strong>{vehicle.boltPattern}</strong> ({vehicle.lugCount} {vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt})</p></section>
+    <section><h2>{t.wheelSize}</h2><p><strong>{vehicle.wheelSize}</strong></p></section>
+    <section><h2>{t.torque}</h2><p><strong>{vehicle.torqueNm !== undefined ? `${vehicle.torqueNm} Nm${vehicle.torqueLbFt !== undefined ? ` (${vehicle.torqueLbFt} lb-ft)` : ''}` : '—'}</strong></p></section>
+    {vehicle.centerBoreMm !== undefined && <section><h2>{t.centerBore}</h2><p><strong>{vehicle.centerBoreMm} mm</strong></p></section>}
+    <section><h2>{t.generation}</h2><p><strong>{vehicle.generation}</strong></p></section>
+  </div>
+
+  <section class="methodology-sources" aria-labelledby="vehicle-confidence-heading">
+    <p class="eyebrow">{t.confidenceNote}</p>
+    <h2 id="vehicle-confidence-heading"><span class="vehicle-confidence" data-confidence={vehicle.confidence}>{t.confidence[vehicle.confidence]}</span></h2>
+    <p>{t.sourcesLabel}: {vehicle.sources.join(', ')}</p>
+    {vehicle.notes && <p>{t.notesLabel}: {vehicle.notes}</p>}
+    <p>{t.disclaimer}</p>
+  </section>
+
+  <section aria-labelledby="vehicle-faq-heading">
+    <h2 id="vehicle-faq-heading">{t.faqHeading}</h2>
+    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+
+  <section class="methodology-sources" aria-labelledby="vehicle-tools-heading">
+    <p class="eyebrow">{t.toolsHeading}</p>
+    <h2 id="vehicle-tools-heading">&nbsp;</h2>
+    <div class="methodology-source-links">
+      <a href="/de/tools/reifengroesse-rechner/">{t.openTireTool} <span>↗</span></a>
+      <a href="/de/tools/lochkreis-rechner/">{t.openBoltTool} <span>↗</span></a>
+      <a href="/de/tools/nm-lb-ft-umrechner/">{t.openTorqueTool} <span>↗</span></a>
+    </div>
+  </section>
+</SiteLayout>
