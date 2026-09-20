@@ -1,14 +1,58 @@
+---
+import type { ContentLocale } from '../localization/site-catalog';
+
+interface Props { readonly locale?: ContentLocale | undefined; }
+const { locale } = Astro.props;
+
+const TIRE_CODE_TEXT = {
+  en: {
+    eyebrow: 'READ THE SIDEWALL',
+    heading: 'One code. Three physical clues.',
+    intro: 'The numbers are not three measurements in the same unit. Atlas separates them before doing the geometry.',
+    widthLabel: 'Width',
+    widthCopy: 'Section width in millimetres.',
+    ratioLabel: 'Sidewall ratio',
+    ratioCopy: 'Sidewall height is 45% of width.',
+    rimLabel: 'Rim',
+    rimCopy: 'Radial construction on an 18-inch rim.',
+  },
+  de: {
+    eyebrow: 'DIE FLANKE LESEN',
+    heading: 'Ein Code. Drei physische Hinweise.',
+    intro: 'Die Zahlen sind keine drei Maße in derselben Einheit. Atlas trennt sie, bevor die Geometrie berechnet wird.',
+    widthLabel: 'Breite',
+    widthCopy: 'Querschnittsbreite in Millimetern.',
+    ratioLabel: 'Querschnittsverhältnis',
+    ratioCopy: 'Die Flankenhöhe beträgt 45 % der Breite.',
+    rimLabel: 'Felge',
+    rimCopy: 'Radialbauweise auf einer 18-Zoll-Felge.',
+  },
+  es: {
+    eyebrow: 'LEA EL FLANCO',
+    heading: 'Un código. Tres pistas físicas.',
+    intro: 'Los números no son tres medidas en la misma unidad. Atlas los separa antes de calcular la geometría.',
+    widthLabel: 'Ancho',
+    widthCopy: 'Ancho de sección en milímetros.',
+    ratioLabel: 'Relación de aspecto',
+    ratioCopy: 'La altura del flanco es el 45 % del ancho.',
+    rimLabel: 'Llanta',
+    rimCopy: 'Construcción radial en una llanta de 18 pulgadas.',
+  },
+} as const;
+
+const t = TIRE_CODE_TEXT[locale ?? 'en'];
+---
 <section class="tire-code-explainer" data-tire-code-explainer aria-labelledby="tire-code-heading">
-  <div class="tire-code-explainer__heading"><p class="eyebrow">READ THE SIDEWALL</p><h2 id="tire-code-heading">One code. Three physical clues.</h2><p>The numbers are not three measurements in the same unit. Atlas separates them before doing the geometry.</p></div>
+  <div class="tire-code-explainer__heading"><p class="eyebrow">{t.eyebrow}</p><h2 id="tire-code-heading">{t.heading}</h2><p>{t.intro}</p></div>
   <div class="tire-code" aria-label="Example tire size"><strong data-tire-width>225</strong><b>/</b><strong data-tire-aspect>45</strong><b>R</b><strong data-tire-rim>18</strong></div>
   <div class="tire-code-legend">
-    <article><span>225</span><strong>Width</strong><p>Section width in millimetres.</p></article>
-    <article><span>45</span><strong>Sidewall ratio</strong><p>Sidewall height is 45% of width.</p></article>
-    <article><span>R18</span><strong>Rim</strong><p>Radial construction on an 18-inch rim.</p></article>
+    <article><span>225</span><strong>{t.widthLabel}</strong><p>{t.widthCopy}</p></article>
+    <article><span>45</span><strong>{t.ratioLabel}</strong><p>{t.ratioCopy}</p></article>
+    <article><span>R18</span><strong>{t.rimLabel}</strong><p>{t.rimCopy}</p></article>
   </div>
 </section>
 <script>
-  const form = document.querySelector<HTMLFormElement>('[data-calculator="tire-single"]');
+  const form = document.querySelector<HTMLFormElement>('[data-calculator="tire-size"]');
   const explainer = document.querySelector<HTMLElement>('[data-tire-code-explainer]');
   if (form && explainer) {
     const update = () => {

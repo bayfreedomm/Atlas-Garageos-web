@@ -1,5 +1,49 @@
+---
+import type { ContentLocale } from '../localization/site-catalog';
+
+interface Props { readonly locale?: ContentLocale | undefined; }
+const { locale } = Astro.props;
+
+const SINGLE_TIRE_VISUAL_TEXT = {
+  en: {
+    kicker: 'Live tire anatomy',
+    title: 'See the tire behind the code',
+    subtitle: 'The drawing updates with width, profile and rim size.',
+    sidewallLabel: 'Sidewall',
+    sidewallCaption: 'Width × profile %',
+    diameterLabel: 'Overall diameter',
+    diameterCaption: 'Rim + two sidewalls',
+    meaningLabel: 'What changes visually',
+    meaningDefault: 'Higher profile makes the sidewall taller; larger rim makes the wheel opening larger.',
+  },
+  de: {
+    kicker: 'Reifenanatomie live',
+    title: 'Sehen Sie den Reifen hinter dem Code',
+    subtitle: 'Die Zeichnung passt sich an Breite, Profil und Felgengröße an.',
+    sidewallLabel: 'Flankenhöhe',
+    sidewallCaption: 'Breite × Profil %',
+    diameterLabel: 'Gesamtdurchmesser',
+    diameterCaption: 'Felge + zwei Flanken',
+    meaningLabel: 'Was sich optisch ändert',
+    meaningDefault: 'Ein höheres Profil macht die Flanke höher; eine größere Felge vergrößert die Radöffnung.',
+  },
+  es: {
+    kicker: 'Anatomía del neumático en vivo',
+    title: 'Vea el neumático detrás del código',
+    subtitle: 'El dibujo se actualiza con el ancho, el perfil y el tamaño de la llanta.',
+    sidewallLabel: 'Flanco',
+    sidewallCaption: 'Ancho × perfil %',
+    diameterLabel: 'Diámetro total',
+    diameterCaption: 'Llanta + dos flancos',
+    meaningLabel: 'Qué cambia visualmente',
+    meaningDefault: 'Un perfil más alto hace el flanco más alto; una llanta más grande agranda la abertura de la rueda.',
+  },
+} as const;
+
+const t = SINGLE_TIRE_VISUAL_TEXT[locale ?? 'en'];
+---
 <figure class="single-tire-visual" data-single-tire-visual aria-labelledby="single-tire-title">
-  <figcaption><span class="visual-kicker">Live tire anatomy</span><strong id="single-tire-title">See the tire behind the code</strong><p>The drawing updates with width, profile and rim size.</p></figcaption>
+  <figcaption><span class="visual-kicker">{t.kicker}</span><strong id="single-tire-title">{t.title}</strong><p>{t.subtitle}</p></figcaption>
   <div class="single-tire-grid">
     <section class="single-tire-card single-tire-card--hero">
       <svg viewBox="0 0 420 300" role="img" aria-label="Technical tire illustration with live dimensions">
@@ -31,9 +75,9 @@
       <div class="single-tire-badge" data-single-size-label>225 / 45 R18</div>
     </section>
     <section class="single-tire-card single-tire-card--facts">
-      <div><span>Sidewall</span><strong data-single-sidewall>101.3 mm</strong><small>Width × profile %</small></div>
-      <div><span>Overall diameter</span><strong data-single-diameter>659.7 mm</strong><small>Rim + two sidewalls</small></div>
-      <div><span>What changes visually</span><p data-single-meaning>Higher profile makes the sidewall taller; larger rim makes the wheel opening larger.</p></div>
+      <div><span>{t.sidewallLabel}</span><strong data-single-sidewall>101.3 mm</strong><small>{t.sidewallCaption}</small></div>
+      <div><span>{t.diameterLabel}</span><strong data-single-diameter>659.7 mm</strong><small>{t.diameterCaption}</small></div>
+      <div><span>{t.meaningLabel}</span><p data-single-meaning>{t.meaningDefault}</p></div>
     </section>
   </div>
 </figure>

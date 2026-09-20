@@ -31,6 +31,13 @@ export interface UiStrings {
   readonly footerCopy: string;
   readonly langLabel: string;
   readonly langSwitchAria: string;
+  readonly goStraightTo: string;
+  readonly navHomeHelper: string;
+  readonly allToolsTitle: string;
+  readonly allToolsHelper: string;
+  readonly fitmentHelper: string;
+  readonly toolsByJob: string;
+  readonly displayLabel: string;
 }
 
 export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.freeze({
@@ -60,6 +67,13 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerCopy: '© {year} Atlas GarageOS. Alle Berechnungen sind Schätzungen — prüfen Sie sicherheitsrelevante Werte immer im Handbuch Ihres Fahrzeugs.',
     langLabel: 'Sprache',
     langSwitchAria: 'Sprache wechseln',
+    goStraightTo: 'DIREKT ZU',
+    navHomeHelper: 'Wählen Sie eine Aufgabe und erhalten Sie eine Antwort',
+    allToolsTitle: 'Alle Kfz-Werkzeuge',
+    allToolsHelper: 'Alle Rechner und Umrechner durchsuchen',
+    fitmentHelper: 'Zwei Setups visuell vergleichen',
+    toolsByJob: 'WERKZEUGE NACH AUFGABE',
+    displayLabel: 'ANZEIGE',
   },
   es: {
     skipToContent: 'Saltar al contenido principal',
@@ -87,6 +101,13 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerCopy: '© {year} Atlas GarageOS. Todos los cálculos son estimaciones — verifique cualquier dato crítico de seguridad con el manual de su vehículo.',
     langLabel: 'Idioma',
     langSwitchAria: 'Cambiar idioma',
+    goStraightTo: 'IR DIRECTAMENTE A',
+    navHomeHelper: 'Elija una tarea y obtenga una respuesta',
+    allToolsTitle: 'Todas las herramientas para automóviles',
+    allToolsHelper: 'Explore todas las calculadoras y conversores',
+    fitmentHelper: 'Compare dos configuraciones visualmente',
+    toolsByJob: 'HERRAMIENTAS POR TAREA',
+    displayLabel: 'PANTALLA',
   },
 });
 

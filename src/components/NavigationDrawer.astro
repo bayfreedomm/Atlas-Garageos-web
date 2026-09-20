@@ -1,6 +1,7 @@
 ---
 import ThemeControl from './ThemeControl.astro';
-import { uiStrings, type ContentLocale } from '../localization/site-catalog';
+import { uiStrings, platformCatalog, type ContentLocale } from '../localization/site-catalog';
+import { TOOL_CATEGORY_ORDER, type ToolCategory } from '../seo/tool-registry';
 interface LocaleLink { readonly code: 'en' | 'de' | 'es'; readonly label: string; readonly href: string; }
 interface Props { locale?: ContentLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
 const { locale, localeLinks } = Astro.props;
@@ -11,6 +12,10 @@ const links: readonly LocaleLink[] = localeLinks ?? [
   { code: 'de', label: 'Deutsch', href: '/de/' },
   { code: 'es', label: 'Español', href: '/es/' },
 ];
+const FALLBACK_CATEGORY_LABELS: Readonly<Record<ToolCategory, string>> = { 'Fuel & Trips': 'Fuel & trips', 'Tires & Wheels': 'Tires & wheels', Converters: 'Converters', Performance: 'Performance' };
+const categoryLabels: Readonly<Record<ToolCategory, string>> = locale
+  ? Object.fromEntries(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name])) as Record<ToolCategory, string>
+  : FALLBACK_CATEGORY_LABELS;
 ---
 <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navigation-drawer" aria-expanded="false" data-menu-open><span></span><span></span><span></span></button>
 <dialog id="navigation-drawer" class="drawer-layer" data-drawer-layer aria-label="Atlas menu">
@@ -19,12 +24,12 @@ const links: readonly LocaleLink[] = localeLinks ?? [
       <header><a href={`${prefix}/`} class="drawer-home"><span>ATLAS</span><small>GarageOS</small></a><button class="drawer-close" type="button" aria-label="Close menu" data-menu-close>×</button></header>
       <div class="drawer-grid">
         <nav class="drawer-primary" aria-label="Main navigation">
-          <p>GO STRAIGHT TO</p>
-          <a href={`${prefix}/`}><strong>{t?.navHome ?? 'Home'}</strong><span>Pick a job and get an answer</span><i>01</i></a>
-          <a href={`${prefix}/tools/`}><strong>All automotive tools</strong><span>Browse every calculator and converter</span><i>02</i></a>
-          <a href="/fitment-studio/"><strong>{t?.navFitment ?? 'Wheel & Tire Compare'}</strong><span>Compare two setups visually</span><i>03</i></a>
+          <p>{t?.goStraightTo ?? 'GO STRAIGHT TO'}</p>
+          <a href={`${prefix}/`}><strong>{t?.navHome ?? 'Home'}</strong><span>{t?.navHomeHelper ?? 'Pick a job and get an answer'}</span><i>01</i></a>
+          <a href={`${prefix}/tools/`}><strong>{t?.allToolsTitle ?? 'All automotive tools'}</strong><span>{t?.allToolsHelper ?? 'Browse every calculator and converter'}</span><i>02</i></a>
+          <a href="/fitment-studio/"><strong>{t?.navFitment ?? 'Wheel & Tire Compare'}</strong><span>{t?.fitmentHelper ?? 'Compare two setups visually'}</span><i>03</i></a>
         </nav>
-        <div class="drawer-secondary"><nav aria-label="Tool categories"><p>TOOLS BY JOB</p><a href={`${prefix}/tools/?category=Fuel%20%26%20Trips`}>Fuel &amp; trips <span>›</span></a><a href={`${prefix}/tools/?category=Tires%20%26%20Wheels`}>Tires &amp; wheels <span>›</span></a><a href={`${prefix}/tools/?category=Converters`}>Converters <span>›</span></a><a href={`${prefix}/tools/?category=Performance`}>Performance <span>›</span></a></nav><section class="drawer-settings" aria-labelledby="settings-heading"><p id="settings-heading">DISPLAY</p><ThemeControl /><a class="drawer-methodology-link" href={`${prefix}/methodology/`}>Accuracy &amp; methodology <span>›</span></a><div class="language-setting language-setting--switcher"><span>{t?.langLabel ?? 'Language'}</span><div class="language-options" role="group" aria-label={t?.langSwitchAria ?? 'Switch language'}>{links.map((link) => <a href={link.href} class:list={['language-option', { 'is-active': link.code === (locale ?? 'en') }]} aria-current={link.code === (locale ?? 'en') ? 'true' : undefined}>{link.label}</a>)}</div></div></section></div>
+        <div class="drawer-secondary"><nav aria-label="Tool categories"><p>{t?.toolsByJob ?? 'TOOLS BY JOB'}</p><a href={`${prefix}/tools/?category=Fuel%20%26%20Trips`}>{categoryLabels['Fuel & Trips']} <span>›</span></a><a href={`${prefix}/tools/?category=Tires%20%26%20Wheels`}>{categoryLabels['Tires & Wheels']} <span>›</span></a><a href={`${prefix}/tools/?category=Converters`}>{categoryLabels.Converters} <span>›</span></a><a href={`${prefix}/tools/?category=Performance`}>{categoryLabels.Performance} <span>›</span></a></nav><section class="drawer-settings" aria-labelledby="settings-heading"><p id="settings-heading">{t?.displayLabel ?? 'DISPLAY'}</p><ThemeControl /><a class="drawer-methodology-link" href={`${prefix}/methodology/`}>{t?.footerMethodology ?? 'Accuracy & methodology'} <span>›</span></a><div class="language-setting language-setting--switcher"><span>{t?.langLabel ?? 'Language'}</span><div class="language-options" role="group" aria-label={t?.langSwitchAria ?? 'Switch language'}>{links.map((link) => <a href={link.href} class:list={['language-option', { 'is-active': link.code === (locale ?? 'en') }]} aria-current={link.code === (locale ?? 'en') ? 'true' : undefined}>{link.label}</a>)}</div></div></section></div>
       </div>
     </div>
   </div>
