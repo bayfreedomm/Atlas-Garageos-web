@@ -219,7 +219,7 @@ function setSingleTireTechnicalVisual(form: HTMLFormElement, input: TireToolInpu
   const diameterHalf = 110 * diameterScale;
   visual.querySelector<SVGPathElement>('[data-single-diameter-line]')?.setAttribute('d', `M86 ${(145-diameterHalf).toFixed(1)}V${(145+diameterHalf).toFixed(1)}`);
   const rimHalf = 64 * rimScale;
-  visual.querySelector<SVGPathElement>('[data-single-rim-line]')?.setAttribute('d', `M319 ${(145-rimHalf).toFixed(1)}V${(145+rimHalf).toFixed(1)}`);
+  visual.querySelector<SVGPathElement>('[data-single-rim-line]')?.setAttribute('d', `M344 ${(145-rimHalf).toFixed(1)}V${(145+rimHalf).toFixed(1)}`);
   const set = (selector: string, value: string): void => { const el = visual.querySelector<HTMLElement>(selector); if (el) el.textContent = value; };
   set('[data-single-width-text]', text.width(input.widthMm));
   set('[data-single-diameter-text]', `${result.overallDiameterMm.toFixed(1)} mm`);
