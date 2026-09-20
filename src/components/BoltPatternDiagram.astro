@@ -1,0 +1,49 @@
+---
+// Lug-hole layout for one bolt pattern, drawn from the pattern's own PCD maths.
+//
+// Angles are exact (lugPositions() places hole i at -90° + i × 360/lugs), and the hole radius
+// and stud size scale with lug count so a 4-lug and a 6-lug pattern read differently at a
+// glance. The drawing is normalized to a fixed viewBox rather than to millimetres, because a
+// screen-scaled PCD circle would invite measuring a real wheel off a monitor — the caption
+// says so explicitly.
+import { lugPositions, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
+
+interface Props {
+  readonly entry: BoltPatternEntry;
+  readonly ariaLabel: string;
+  readonly pcdLabel: string;
+  readonly spacingLabel: string;
+  readonly spacingValue: string;
+}
+const { entry, ariaLabel, pcdLabel, spacingLabel, spacingValue } = Astro.props;
+
+const SIZE = 260;
+const C = SIZE / 2;
+const PCD_R = 78;
+const HUB_R = 30;
+const holeR = Math.max(7, 26 - entry.lugCount * 2);
+const positions = lugPositions(entry.lugCount);
+const holes = positions.map(([cos, sin]) => ({ x: C + cos * PCD_R, y: C + sin * PCD_R }));
+const first = holes[0]!;
+const second = holes[1] ?? first;
+// Chord between the first two adjacent holes, drawn as the thing you actually measure.
+// The label is pushed out along the outward normal so it never sits on top of a lug hole.
+const chordMid = { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+const outward = Math.hypot(chordMid.x - C, chordMid.y - C) || 1;
+const chordLabel = { x: C + ((chordMid.x - C) / outward) * (PCD_R + holeR + 8), y: C + ((chordMid.y - C) / outward) * (PCD_R + holeR + 8) };
+---
+<figure class="entity-pcd" aria-label={ariaLabel}>
+  <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={ariaLabel}>
+    <circle class="entity-pcd__face" cx={C} cy={C} r={PCD_R + holeR + 16} />
+    <circle class="entity-pcd__circle" cx={C} cy={C} r={PCD_R} />
+    <circle class="entity-pcd__hub" cx={C} cy={C} r={HUB_R} />
+    <path class="entity-pcd__chord" d={`M${first.x.toFixed(1)} ${first.y.toFixed(1)}L${second.x.toFixed(1)} ${second.y.toFixed(1)}`} />
+    {holes.map((hole) => <circle class="entity-pcd__hole" cx={hole.x.toFixed(1)} cy={hole.y.toFixed(1)} r={holeR} />)}
+    {holes.map((hole) => <circle class="entity-pcd__stud" cx={hole.x.toFixed(1)} cy={hole.y.toFixed(1)} r={(holeR * 0.42).toFixed(1)} />)}
+    <path class="entity-pcd__diameter" d={`M${C - PCD_R} ${C}H${C + PCD_R}`} />
+    <text class="entity-pcd__label" x={C} y={C - 6} text-anchor="middle">{pcdLabel}</text>
+    <text class="entity-pcd__value" x={C} y={C + 12} text-anchor="middle">{`${entry.pcdMm} mm`}</text>
+    <text class="entity-pcd__chord-label" x={chordLabel.x.toFixed(1)} y={chordLabel.y.toFixed(1)} text-anchor="middle">{spacingValue}</text>
+  </svg>
+  <figcaption><strong>{entry.notation}</strong><span>{spacingLabel}: {spacingValue}</span></figcaption>
+</figure>

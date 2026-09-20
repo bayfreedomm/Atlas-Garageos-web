@@ -1,0 +1,24 @@
+---
+// Localized bolt-pattern detail pages (ES).
+//
+// One route file generates every page in this locale: getStaticPaths() returns one entry per
+// row of boltPatternCatalog, which is itself derived from vehicleFitmentData. Adding a vehicle with a
+// new bolt pattern publishes a new page here on the next build with no new file.
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import BoltPatternEntity from '../../../../components/BoltPatternEntity.astro';
+import { boltPatternCatalog, type BoltPatternEntry } from '../../../../data/bolt-pattern-catalog';
+import { boltPatternDetailMeta } from '../../../../ui/entity-page-model';
+
+export function getStaticPaths() {
+  // boltPatternCatalog has already had malformed and vehicle-less entries excluded, so anything
+  // reaching this point is a page with real, validated data behind it.
+  return boltPatternCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+interface Props { entry: BoltPatternEntry; }
+const { entry } = Astro.props as Props;
+const meta = boltPatternDetailMeta(entry, 'es');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="es" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <BoltPatternEntity entry={entry} locale="es" />
+</SiteLayout>

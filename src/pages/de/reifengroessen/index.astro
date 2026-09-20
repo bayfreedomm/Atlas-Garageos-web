@@ -1,0 +1,12 @@
+---
+// Localized tire-size hub (DE). A thin wrapper: the listing, the notation explainer and
+// the filter all live in TireSizeHubBody.astro so there is one copy of that markup, not three.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import TireSizeHubBody from '../../../components/TireSizeHubBody.astro';
+import { tireSizeHubMeta } from '../../../ui/entity-page-model';
+
+const meta = tireSizeHubMeta('de');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="de" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <TireSizeHubBody locale="de" />
+</SiteLayout>

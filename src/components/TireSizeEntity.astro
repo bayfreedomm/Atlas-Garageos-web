@@ -1,0 +1,179 @@
+---
+// Shared body for every tire-size detail page, in every locale.
+//
+// The three route files (/tire-sizes/[slug]/, /de/reifengroessen/[slug]/,
+// /es/medidas-neumaticos/[slug]/) are thin getStaticPaths() wrappers around this one
+// component — there is exactly one copy of this markup, parameterized by `locale`.
+//
+// Section order follows the entity page contract:
+//   HERO → KEY METRICS → CODE BREAKDOWN → TECHNICAL VISUAL → VERIFIED VEHICLES
+//   → GEOMETRIC COMPARISON → CALCULATOR CTA → RELATED DATA → FAQ
+import TireSizeCrossSection from './TireSizeCrossSection.astro';
+import type { TireSizeEntry } from '../data/tire-size-catalog';
+import { vehiclesForTireSize } from '../data/tire-size-catalog';
+import { boltPatternSlug } from '../data/bolt-pattern-catalog';
+import { tireSizePageText } from '../content/entity-page-text';
+import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
+import {
+  boltPatternsForTireSize, formatTireMetrics, homePath, signed, similarTireSizes,
+  tireCalculatorHref, tireComparisonHref, tireSizeMetrics, vehicleHubPath, vehicleLink, vehicleNames,
+} from '../ui/entity-page-model';
+
+interface Props { readonly entry: TireSizeEntry; readonly locale: EntityLocale; }
+const { entry, locale } = Astro.props;
+
+const t = tireSizePageText[locale];
+const metrics = tireSizeMetrics(entry);
+const shown = formatTireMetrics(metrics);
+const vehicles = vehiclesForTireSize(entry.notation);
+const similar = similarTireSizes(entry);
+const relatedPatterns = boltPatternsForTireSize(entry.notation);
+const hubHref = entityHubPath('tire-size', locale);
+const boltHubHref = entityHubPath('bolt-pattern', locale);
+const faqs = t.faqs({ notation: entry.notation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
+const breakdown = t.breakdownParts(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches);
+
+const metricRows = [
+  { label: t.metrics.sectionWidth, value: shown.sectionWidth },
+  { label: t.metrics.aspectRatio, value: shown.aspectRatio },
+  { label: t.metrics.sidewallHeight, value: shown.sidewallHeight },
+  { label: t.metrics.rimDiameterIn, value: shown.rimDiameterIn },
+  { label: t.metrics.rimDiameterMm, value: shown.rimDiameterMm },
+  { label: t.metrics.overallDiameter, value: shown.overallDiameter },
+  { label: t.metrics.circumference, value: shown.circumference },
+  { label: t.metrics.revsPerKm, value: shown.revsPerKm },
+  { label: t.metrics.revsPerMile, value: shown.revsPerMile },
+];
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <a href={hubHref}>{t.breadcrumbHub}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{entry.notation}</span>
+</nav>
+
+<header class="entity-hero">
+  <p class="eyebrow">{t.detailKicker}</p>
+  <h1 class="entity-hero__title">{entry.notation}</h1>
+  <p class="entity-hero__lead">{t.detailLead(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches)}</p>
+</header>
+
+<section class="entity-section" aria-labelledby="entity-metrics">
+  <h2 id="entity-metrics">{t.metricsHeading}</h2>
+  <dl class="entity-metrics">
+    {metricRows.map((row) => <div class="entity-metric"><dt>{row.label}</dt><dd>{row.value}</dd></div>)}
+  </dl>
+  <p class="entity-note">{t.metricNote}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="entity-breakdown">
+  <h2 id="entity-breakdown">{t.breakdownHeading}</h2>
+  <ol class="entity-code">
+    {breakdown.map((part) => (
+      <li class="entity-code__part">
+        <span class="entity-code__token">{part.token}</span>
+        <strong>{part.label}</strong>
+        <span>{part.detail}</span>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="entity-section" aria-labelledby="entity-visual">
+  <h2 id="entity-visual">{t.visualHeading}</h2>
+  <TireSizeCrossSection
+    widthMm={entry.widthMm}
+    sidewallHeightMm={metrics.sidewallHeightMm}
+    rimDiameterInches={entry.rimDiameterInches}
+    notation={entry.notation}
+    ariaLabel={t.crossAria(entry.notation)}
+    treadLabel={t.crossTread}
+    sidewallLabel={t.crossSidewall}
+    beadLabel={t.crossBead}
+    rimCaption={t.crossRimCaption}
+  />
+  <p class="entity-note">{t.visualNote}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="entity-vehicles">
+  <h2 id="entity-vehicles">{t.vehiclesHeading}</h2>
+  {vehicles.length === 0 ? (
+    <p class="entity-empty">{t.vehiclesEmpty}</p>
+  ) : (
+    <>
+      <p class="entity-note">{t.vehiclesIntro(vehicles.length)}</p>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr><th scope="col">{t.colVehicle}</th><th scope="col">{t.colGeneration}</th><th scope="col">{t.colWheel}</th><th scope="col">{t.colBoltPattern}</th></tr></thead>
+          <tbody>
+            {vehicles.map((vehicle) => {
+              const link = vehicleLink(vehicle, locale);
+              return (
+                <tr>
+                  <th scope="row"><a href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{vehicle.make} {vehicle.model}</a></th>
+                  <td>{vehicle.generation}</td>
+                  <td>{vehicle.wheelSize}</td>
+                  <td><a href={entityDetailPath('bolt-pattern', locale, boltPatternSlug(vehicle.boltPattern))}>{vehicle.boltPattern}</a></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+</section>
+
+<section class="entity-section" aria-labelledby="entity-compare">
+  <h2 id="entity-compare">{t.compareHeading}</h2>
+  {similar.length === 0 ? (
+    <p class="entity-empty">{t.compareEmpty}</p>
+  ) : (
+    <>
+      <p class="entity-note">{t.compareIntro}</p>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr><th scope="col">{t.colSize}</th><th scope="col">{t.colDiameter}</th><th scope="col">{t.colDifference}</th><th scope="col">{t.compareLabel}</th></tr></thead>
+          <tbody>
+            {similar.map((match) => (
+              <tr>
+                <th scope="row"><a href={entityDetailPath('tire-size', locale, match.entry.slug)}>{match.entry.notation}</a></th>
+                <td>{match.overallDiameterMm.toFixed(1)} mm</td>
+                <td>{signed(match.differenceMm, 1, 'mm')} ({signed(match.differencePercent, 2, '%')})</td>
+                <td><a class="entity-inline-link" href={tireComparisonHref(locale, entry, match.entry)}>{t.compareLabel}</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+  <p class="entity-caveat"><strong>⚠</strong> {t.compareCaveat}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="entity-cta">
+  <h2 id="entity-cta">{t.ctaHeading}</h2>
+  <div class="entity-links">
+    <a class="entity-link-card" href={tireCalculatorHref(locale, entry)}><strong>{t.calculatorCta}</strong><span>{t.calculatorCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={tireComparisonHref(locale, entry)}><strong>{t.comparisonCta}</strong><span>{t.comparisonCtaDetail}</span><i aria-hidden="true">›</i></a>
+  </div>
+  <p class="entity-note">{t.ctaNote}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="entity-related">
+  <h2 id="entity-related">{t.relatedHeading}</h2>
+  <div class="entity-links">
+    <a class="entity-link-card" href={hubHref}><strong>{t.backToHub}</strong><span>{t.hubKicker}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={vehicleHubPath(locale)}><strong>{t.vehiclesCta}</strong><span>{t.vehiclesCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={boltHubHref}><strong>{t.boltHubCta}</strong><span>{t.boltHubCtaDetail}</span><i aria-hidden="true">›</i></a>
+  </div>
+  {relatedPatterns.length > 0 && (
+    <ul class="entity-chiplist">
+      {relatedPatterns.map((pattern) => <li><a class="entity-chip" href={entityDetailPath('bolt-pattern', locale, pattern.slug)}>{pattern.notation}</a></li>)}
+    </ul>
+  )}
+</section>
+
+<section class="entity-section" aria-labelledby="entity-faq">
+  <h2 id="entity-faq">{t.faqHeading}</h2>
+  {faqs.map((faq) => <details class="entity-faq"><summary>{faq.q}</summary><p>{faq.a}</p></details>)}
+</section>

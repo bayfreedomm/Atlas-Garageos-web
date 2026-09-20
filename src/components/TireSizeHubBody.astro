@@ -1,0 +1,109 @@
+---
+// Shared body for the tire-size hub in every locale.
+//
+// The listing is rendered as real <a href> links, grouped by rim diameter, at build time.
+// The search box only hides rows that are already there, so the hub is crawlable and fully
+// usable without JavaScript. With ~20 entries that is the right amount of interactivity —
+// an index, a filter and jump links, not a search product.
+import { tireSizeCatalog, tireSizesByRimDiameter, vehiclesForTireSize } from '../data/tire-size-catalog';
+import { vehicleFitmentData } from '../data/vehicle-fitment';
+import { tireSizePageText } from '../content/entity-page-text';
+import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
+import { formatTireMetrics, homePath, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
+import { localizedToolPath } from '../localization/locales';
+
+interface Props { readonly locale: EntityLocale; }
+const { locale } = Astro.props;
+
+const t = tireSizePageText[locale];
+const groups = tireSizesByRimDiameter();
+const total = tireSizeCatalog.length;
+
+// Every card is fully resolved here, in the frontmatter, so the template below stays a plain
+// loop over data — no lookups, no assertions, nothing that can silently miss.
+const groupCards = groups.map(([rim, entries]) => ({
+  rim,
+  anchor: `rim-${String(rim).replace('.', '-')}`,
+  cards: entries.map((entry) => {
+    const vehicles = vehiclesForTireSize(entry.notation);
+    const makes = [...new Set(vehicles.map((vehicle) => vehicle.make))];
+    return {
+      notation: entry.notation,
+      href: entityDetailPath('tire-size', locale, entry.slug),
+      diameter: formatTireMetrics(tireSizeMetrics(entry)).overallDiameter,
+      vehicles: vehicles.length,
+      // Everything a reader might type: the code itself, the slug form, and the makes.
+      search: [entry.notation, entry.slug, ...makes].join('|').toLocaleLowerCase().replace(/\s+/g, ''),
+    };
+  }),
+}));
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{t.breadcrumbHub}</span>
+</nav>
+
+<header class="entity-hero">
+  <p class="eyebrow">{t.hubKicker}</p>
+  <h1>{t.hubH1}</h1>
+  <p class="entity-hero__lead">{t.hubLead(total, vehicleFitmentData.length)}</p>
+</header>
+
+<section class="entity-section" aria-labelledby="hub-notation">
+  <h2 id="hub-notation">{t.notationHeading}</h2>
+  <p class="entity-note">{t.notationIntro}</p>
+  <ol class="entity-code">
+    {t.notationParts.map((part) => (
+      <li class="entity-code__part">
+        <span class="entity-code__token">{part.token}</span>
+        <strong>{part.label}</strong>
+        <span>{part.detail}</span>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="entity-section" aria-labelledby="hub-list" data-entity-filter>
+  <h2 id="hub-list">{t.backToHub}</h2>
+  <form class="entity-filterbar" role="search" data-entity-search-form>
+    <label class="entity-filterbar__label" for="tire-size-filter">{t.searchLabel}</label>
+    <input id="tire-size-filter" class="entity-filterbar__input" type="search" autocomplete="off" placeholder={t.searchPlaceholder} data-entity-search />
+    <span class="entity-filterbar__count" data-entity-count data-count-one={t.countLabel(1)} data-count-other={t.countLabel(0).replace('0', '{n}')}>{t.countLabel(total)}</span>
+  </form>
+
+  <nav class="entity-jump" aria-label={t.jumpLabel}>
+    <span>{t.jumpLabel}</span>
+    {groupCards.map((group) => <a href={`#${group.anchor}`}>{group.rim}″</a>)}
+  </nav>
+
+  {groupCards.map((group) => (
+    <div class="entity-group" data-entity-group>
+      <h3 class="entity-group__title" id={group.anchor}>{t.groupHeading(group.rim)}</h3>
+      <ul class="entity-grid">
+        {group.cards.map((card) => (
+          <li class="entity-card" data-entity-card data-entity-search-text={card.search}>
+            <a href={card.href}>
+              <strong class="entity-card__title">{card.notation}</strong>
+              <span class="entity-card__meta">⌀ {card.diameter}</span>
+              <span class="entity-card__meta">{t.listedAs(card.vehicles)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+
+  <p class="entity-empty" data-entity-empty hidden>{t.searchEmpty}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="hub-tools">
+  <h2 id="hub-tools">{t.toolsHeading}</h2>
+  <div class="entity-links">
+    <a class="entity-link-card" href={localizedToolPath(locale, 'tire-size-calculator', 'tool')}><strong>{t.calculatorCta}</strong><span>{t.calculatorCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={localizedToolPath(locale, 'tire-size-comparison', 'tool')}><strong>{t.comparisonCta}</strong><span>{t.comparisonCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={vehicleHubPath(locale)}><strong>{t.vehiclesCta}</strong><span>{t.vehiclesCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={entityHubPath('bolt-pattern', locale)}><strong>{t.boltHubCta}</strong><span>{t.boltHubCtaDetail}</span><i aria-hidden="true">›</i></a>
+  </div>
+</section>
+
+<script>import { initializeEntityFilters } from '../ui/entity-filter'; initializeEntityFilters();</script>

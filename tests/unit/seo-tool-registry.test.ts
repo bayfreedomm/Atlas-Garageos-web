@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, routeForTool, toolRegistry } from '../../src/seo/tool-registry';
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
 import { vehicleFitmentData } from '../../src/data/vehicle-fitment';
+import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
+import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
+import { entityLocales } from '../../src/seo/entity-routes';
 
 const intendedRoutes = [
   '/',
@@ -68,7 +71,12 @@ describe('SEO tool registry', () => {
     // Vehicle pages: three localized index routes plus one route per US vehicle and two
     // (DE + ES) per non-US vehicle.
     const vehicleRoutes = 3 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
-    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools) + vehicleRoutes;
+    // Entity pages: per published locale, one hub per family plus one detail page per catalog
+    // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
+    // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
+    // hand-maintained page count.
+    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
+    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools) + vehicleRoutes + entityRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');

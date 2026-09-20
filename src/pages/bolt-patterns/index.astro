@@ -1,0 +1,12 @@
+---
+// Localized bolt-pattern hub (EN). A thin wrapper: the listing, the notation explainer and
+// the filter all live in BoltPatternHubBody.astro so there is one copy of that markup, not three.
+import SiteLayout from '../../components/SiteLayout.astro';
+import BoltPatternHubBody from '../../components/BoltPatternHubBody.astro';
+import { boltPatternHubMeta } from '../../ui/entity-page-model';
+
+const meta = boltPatternHubMeta('en');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <BoltPatternHubBody locale="en" />
+</SiteLayout>

@@ -1,0 +1,65 @@
+---
+// Cross-section drawing for one specific tire size on an entity page.
+//
+// The geometry is NOT recomputed here: every coordinate comes from
+// computeTireCrossSection() in ui/tire-cross-section.ts — the same shared helper that
+// TireSizeTechnicalVisual.astro and the live calculator updater use. This component exists
+// only because that one renders a fixed 225/45R18 sample (its numbers are driven by the
+// calculator's client-side JS, which does not run on a static entity page), so it cannot show
+// a different size correctly. Nothing about the geometry engine is duplicated.
+import { computeTireCrossSection, CROSS_SECTION_VIEWBOX } from '../ui/tire-cross-section';
+
+interface Props {
+  readonly widthMm: number;
+  readonly sidewallHeightMm: number;
+  readonly rimDiameterInches: number;
+  readonly notation: string;
+  readonly ariaLabel: string;
+  readonly treadLabel: string;
+  readonly sidewallLabel: string;
+  readonly beadLabel: string;
+  readonly rimCaption: string;
+}
+const { widthMm, sidewallHeightMm, rimDiameterInches, notation, ariaLabel, treadLabel, sidewallLabel, beadLabel, rimCaption } = Astro.props;
+
+const cs = computeTireCrossSection(widthMm, sidewallHeightMm);
+const crownTreadTicks = [-0.32, -0.16, 0, 0.16, 0.32].map((f) => cs.hw * 0.5 * f);
+const widthText = `${widthMm} mm`;
+const sidewallText = `${sidewallHeightMm.toFixed(1)} mm`;
+---
+<figure class="entity-cross" aria-label={ariaLabel}>
+  <svg viewBox={`0 0 ${CROSS_SECTION_VIEWBOX.width} ${CROSS_SECTION_VIEWBOX.height}`} role="img" aria-label={ariaLabel}>
+    <g transform={`translate(${cs.originX} ${cs.baselineY})`}>
+      <path class="entity-cross__cavity" d={cs.cavityPathD} />
+      <path class="entity-cross__outer" d={cs.outerPathD} />
+      <g class="entity-cross__ticks">
+        {crownTreadTicks.map((x) => <line x1={x.toFixed(1)} y1={(-cs.Hs + 2).toFixed(1)} x2={x.toFixed(1)} y2={(-cs.Hs + 9).toFixed(1)} />)}
+      </g>
+      <rect class="entity-cross__rim" x={cs.rim.barX.toFixed(1)} y={cs.rim.barY.toFixed(1)} width={cs.rim.barW.toFixed(1)} height={cs.rim.barH.toFixed(1)} rx="3" />
+      <rect class="entity-cross__rim" x={cs.rim.flangeLX.toFixed(1)} y={cs.rim.flangeY.toFixed(1)} width={cs.rim.flangeW.toFixed(1)} height={cs.rim.flangeH.toFixed(1)} rx="2" />
+      <rect class="entity-cross__rim" x={cs.rim.flangeRX.toFixed(1)} y={cs.rim.flangeY.toFixed(1)} width={cs.rim.flangeW.toFixed(1)} height={cs.rim.flangeH.toFixed(1)} rx="2" />
+    </g>
+    <g class="entity-cross__measure">
+      <path d={`M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`} />
+      <path d={`M${(cs.originX + cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}V${(cs.widthLineY + 6).toFixed(1)}`} />
+      <path d={`M${(cs.originX - cs.hw).toFixed(1)} ${cs.widthLineY.toFixed(1)}H${(cs.originX + cs.hw).toFixed(1)}`} />
+      <text x={cs.originX} y={(cs.widthLineY - 6).toFixed(1)} text-anchor="middle">{widthText}</text>
+    </g>
+    <g class="entity-cross__measure">
+      <path d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`} />
+      <path d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineBottomY.toFixed(1)}H${(cs.heightLineX + 6).toFixed(1)}`} />
+      <path d={`M${cs.heightLineX.toFixed(1)} ${cs.heightLineTopY.toFixed(1)}V${cs.heightLineBottomY.toFixed(1)}`} />
+      <text x={(cs.heightLineX + 10).toFixed(1)} y={((cs.heightLineTopY + cs.heightLineBottomY) / 2).toFixed(1)} text-anchor="start">{sidewallText}</text>
+    </g>
+    <g class="entity-cross__legend">
+      <path d={`M${cs.leaderStartX.toFixed(1)} ${cs.treadLabelY.toFixed(1)}H${cs.treadLeaderX2.toFixed(1)}`} />
+      <path d={`M${cs.leaderStartX.toFixed(1)} ${cs.sidewallLabelY.toFixed(1)}H${cs.sidewallLeaderX2.toFixed(1)}`} />
+      <path d={`M${cs.leaderStartX.toFixed(1)} ${cs.beadLabelY.toFixed(1)}H${cs.beadLeaderX2.toFixed(1)}`} />
+      <text x={cs.legendX.toFixed(1)} y={cs.treadLabelY.toFixed(1)} text-anchor="end">{treadLabel}</text>
+      <text x={cs.legendX.toFixed(1)} y={cs.sidewallLabelY.toFixed(1)} text-anchor="end">{sidewallLabel}</text>
+      <text x={cs.legendX.toFixed(1)} y={cs.beadLabelY.toFixed(1)} text-anchor="end">{beadLabel}</text>
+    </g>
+    <text class="entity-cross__rim-label" x={cs.originX} y={cs.rimLabelY.toFixed(1)} text-anchor="middle">{`⌀ ${rimDiameterInches}″ · ${rimCaption}`}</text>
+  </svg>
+  <figcaption>{notation}</figcaption>
+</figure>

@@ -1,6 +1,9 @@
 import { canonicalForPath, indexableRoutes, toolRegistry } from './tool-registry';
 import { localizedToolPath } from '../localization/locales';
 import { vehicleFitmentData } from '../data/vehicle-fitment';
+import { tireSizeCatalog } from '../data/tire-size-catalog';
+import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
+import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/'] as const;
 
@@ -38,8 +41,26 @@ function vehiclePageRoutes(): readonly string[] {
   return routes;
 }
 
+/**
+ * Tire-size and bolt-pattern entity pages, iterated out of their catalogs exactly the way
+ * vehiclePageRoutes() iterates vehicleFitmentData. The catalogs are derived from that same
+ * dataset and have already excluded any malformed or vehicle-less entry, so nothing listed
+ * here can be a URL that does not render — and a new tire size added to vehicle-fitment.ts
+ * appears in the sitemap automatically, with no edit to this file.
+ */
+function entityPageRoutes(): readonly string[] {
+  const routes: string[] = [];
+  for (const locale of entityLocales()) {
+    routes.push(entityHubPath('tire-size', locale));
+    for (const entry of tireSizeCatalog) routes.push(entityDetailPath('tire-size', locale, entry.slug));
+    routes.push(entityHubPath('bolt-pattern', locale));
+    for (const entry of boltPatternCatalog) routes.push(entityDetailPath('bolt-pattern', locale, entry.slug));
+  }
+  return routes;
+}
+
 export function sitemapEntries(): readonly string[] {
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes()].map(canonicalForPath));
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes()].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {
