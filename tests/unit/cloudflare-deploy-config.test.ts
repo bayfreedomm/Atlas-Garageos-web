@@ -16,7 +16,7 @@ describe('Cloudflare Workers static deployment contract', () => {
   it('defines one deterministic assets-only Worker config', () => {
     expect(config).toMatchObject({
       name: 'atlas-garageos-web',
-      compatibility_date: '2026-09-22',
+      compatibility_date: '2026-09-21',
       assets: { directory: './dist', not_found_handling: '404-page', html_handling: 'auto-trailing-slash' },
     });
     expect(config.main).toBeUndefined();
