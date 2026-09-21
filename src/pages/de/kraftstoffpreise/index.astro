@@ -18,12 +18,9 @@ const data = fuelPrices.de;
 const title = 'Kraftstoffpreise heute in Deutschland — beobachtete Stichprobe';
 const description = 'Aktuelle Kraftstoffpreise für Super E5, Super E10 und Diesel aus einer von Atlas beobachteten Stichprobe ausgewählter Stadt-Tankstellen — kein Bundesdurchschnitt — mit Verlauf und Rechnern.';
 const pathname = '/de/kraftstoffpreise/';
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
-];
+// These market dashboards are different datasets, not translations. Keep navigation in
+// FuelMarketSwitcher, but publish no hreflang relationship between them.
+const alternates: readonly [] = [];
 
 // Germany is refreshed only by a deliberate manual run (see
 // .github/workflows/update-fuel-prices-germany.yml), so the reference date is always the

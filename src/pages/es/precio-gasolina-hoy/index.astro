@@ -18,12 +18,9 @@ const data = fuelPrices.es;
 const title = 'Precio de la gasolina hoy en España — Gasolina 95, 98 y diésel';
 const description = 'Precio medio nacional de la gasolina y el diésel en España según el conjunto de datos oficial del Ministerio, con métricas de mercado, histórico y acceso directo a las calculadoras.';
 const pathname = '/es/precio-gasolina-hoy/';
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
-];
+// These market dashboards are different datasets, not translations. Keep navigation in
+// FuelMarketSwitcher, but publish no hreflang relationship between them.
+const alternates: readonly [] = [];
 
 const referenceDate = data.status === 'pending' ? null : data.status === 'stale' ? data.lastSuccessAt : (data.lastSuccessAt ?? data.lastAttemptAt);
 const dateLabel = referenceDate ? new Date(referenceDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : null;

@@ -97,7 +97,7 @@ const DISCLAIMER = 'Prices are averages from public or official sources — a na
 
 /** Every provider this script knows how to fetch, and the identity fields a country keeps
  *  even when it has no verified data yet. */
-const PROVIDERS = Object.freeze({
+export const PROVIDERS = Object.freeze({
   es: {
     source: 'Ministerio para la Transición Ecológica (official national dataset, no key)',
     sourceUrl: 'https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/',
@@ -117,7 +117,7 @@ const PROVIDER_IDS = Object.freeze(Object.keys(PROVIDERS));
 const DEFAULT_PROVIDERS = Object.freeze(['es', 'us']);
 
 /** Reads `--providers=es,us` (or FUEL_PROVIDERS), defaulting to the scheduled pair. */
-function selectedProviders(argv = process.argv.slice(2)) {
+export function selectedProviders(argv = process.argv.slice(2)) {
   const flag = argv.find((arg) => arg.startsWith('--providers='));
   const raw = flag ? flag.slice('--providers='.length) : (process.env.FUEL_PROVIDERS ?? '');
   const requested = raw.split(',').map((part) => part.trim().toLowerCase()).filter(Boolean);
@@ -356,7 +356,7 @@ async function readPreviousOutput() {
  * `ok` flag, this never conflates those three cases: a stale snapshot keeps the LAST
  * genuinely-fetched products and its real lastSuccessAt, never seed/placeholder numbers.
  */
-function mergeWithStatus(freshResult, previous) {
+export function mergeWithStatus(freshResult, previous) {
   const { ok, products, source, sourceUrl, lastAttemptAt, note, ...rest } = freshResult;
   if (ok) {
     return { status: 'fresh', products, source, sourceUrl, lastAttemptAt, lastSuccessAt: lastAttemptAt, note: undefined, ...rest };
@@ -384,7 +384,7 @@ function mergeWithStatus(freshResult, previous) {
  * — no history point can be written from a carried-forward value. If there is no previous
  * snapshot at all, the country is honestly `pending` with no numbers and no attempt time.
  */
-function carryForward(previous, providerId) {
+export function carryForward(previous, providerId) {
   if (previous) return previous;
   const defaults = PROVIDERS[providerId];
   return {
@@ -425,8 +425,12 @@ function productsToMap(products) {
  * real EIA `weekOf` period and only gets a new point when this run's fresh fetch reports a
  * weekOf not already present (so a week is never duplicated across daily runs).
  */
-async function updateHistory(output, ran) {
-  const history = await readHistory();
+export function updateHistoryData(currentHistory, output, ran) {
+  const history = {
+    es: [...currentHistory.es],
+    de: [...currentHistory.de],
+    us: [...currentHistory.us],
+  };
   const today = output.generatedAt.slice(0, 10); // YYYY-MM-DD (UTC)
 
   for (const key of ['es', 'de']) {
@@ -452,6 +456,11 @@ async function updateHistory(output, ran) {
     }
   }
 
+  return history;
+}
+
+async function updateHistory(output, ran) {
+  const history = updateHistoryData(await readHistory(), output, ran);
   await writeFile(HISTORY_PATH, `${JSON.stringify(history, null, 2)}\n`, 'utf8');
   console.log('Wrote', HISTORY_PATH, `(es:${history.es.length} de:${history.de.length} us:${history.us.length})`);
 }
@@ -495,7 +504,10 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error('Fatal error in update-fuel-prices:', err);
-  process.exitCode = 1;
-});
+const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+if (invokedPath === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error('Fatal error in update-fuel-prices:', err);
+    process.exitCode = 1;
+  });
+}

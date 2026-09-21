@@ -18,12 +18,9 @@ const data = fuelPrices.us;
 const title = 'Gas Prices Today in the US — Regular, Midgrade, Premium & Diesel';
 const description = 'US national average gas and diesel prices from the EIA weekly retail survey, with market metrics, price history and a direct hand-off into the fuel and road-trip cost calculators.';
 const pathname = '/gas-prices-today/';
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/gas-prices-today/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/kraftstoffpreise/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/precio-gasolina-hoy/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/gas-prices-today/' },
-];
+// These market dashboards are different datasets, not translations. Keep navigation in
+// FuelMarketSwitcher, but publish no hreflang relationship between them.
+const alternates: readonly [] = [];
 
 const findProduct = (id: string) => data.products.find((p) => p.id === id);
 const regular = findProduct('regular');
