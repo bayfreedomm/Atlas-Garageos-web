@@ -10,6 +10,7 @@ import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { formatTireMetrics, homePath, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
+import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
 
 interface Props { readonly locale: EntityLocale; }
@@ -33,7 +34,9 @@ const groupCards = groups.map(([rim, entries]) => ({
       diameter: formatTireMetrics(tireSizeMetrics(entry)).overallDiameter,
       vehicles: vehicles.length,
       // Everything a reader might type: the code itself, the slug form, and the makes.
-      search: [entry.notation, entry.slug, ...makes].join('|').toLocaleLowerCase().replace(/\s+/g, ''),
+      // Normalized with the same function the live filter applies to the query, so a
+      // reader typing any separator spelling of this entity still matches it.
+      search: entitySearchText([entry.notation, entry.slug, ...makes]),
     };
   }),
 }));

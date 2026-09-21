@@ -9,7 +9,8 @@
 import { calculateTireSizeTool, compareTireSizesTool } from '../features/tools/calculator-tools';
 import { inchesToMillimeters } from '../core/units/conversion';
 import { tireSizeCatalog, vehiclesForTireSize, type TireSizeEntry } from '../data/tire-size-catalog';
-import { adjacentHoleSpacingMm, boltPatternCatalog, vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
+import { boltPatternCatalog, vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
+import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { localizedToolPath } from '../localization/locales';
 import type { EntityLocale } from '../seo/entity-routes';
 import type { VehicleFitment } from '../data/vehicle-fitment';
@@ -134,7 +135,7 @@ export function tireComparisonHref(locale: EntityLocale, current: TireSizeEntry,
 }
 
 export function boltPatternCalculatorHref(locale: EntityLocale, entry: BoltPatternEntry): string {
-  const spacing = adjacentHoleSpacingMm(entry).toFixed(2);
+  const spacing = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount).toFixed(2);
   return `${localizedToolPath(locale, 'bolt-pattern-calculator', 'tool')}?lugs=${entry.lugCount}&spacing=${spacing}`;
 }
 
@@ -173,9 +174,58 @@ export function vehicleNames(vehicles: readonly VehicleFitment[]): string {
   return [...new Set(vehicles.map((vehicle) => `${vehicle.make} ${vehicle.model}`))].join(', ');
 }
 
-/** Distinct center bore values present on a set of vehicles, ascending. */
-export function centerBoreRange(vehicles: readonly VehicleFitment[]): readonly number[] {
+/**
+ * The distinct center-bore values actually present on a set of vehicles, deduped and sorted
+ * ascending.
+ *
+ * Deliberately NOT a min–max range. Rendering "57.1–66.6 mm" would imply every value in
+ * between is a real fitment, when in fact only 57.1, 66.5 and 66.6 occur — and center bore is
+ * one of the reasons a shared bolt pattern is not interchangeability, so a fake continuum
+ * here would undercut the safety section on the same page.
+ */
+export function distinctCenterBores(vehicles: readonly VehicleFitment[]): readonly number[] {
   return Object.freeze([...new Set(vehicles.flatMap((vehicle) => (vehicle.centerBoreMm === undefined ? [] : [vehicle.centerBoreMm])))].sort((a, b) => a - b));
+}
+
+/** "57.1 / 66.5 / 66.6 mm", or an em dash when no vehicle in the set reports a bore. */
+export function formatCenterBores(bores: readonly number[]): string {
+  return bores.length === 0 ? '—' : `${bores.join(' / ')} mm`;
+}
+
+/* ---------------------------------------------------------------------------------------
+ * Per-row honesty helpers
+ *
+ * vehicle-fitment.ts carries a `confidence` and optional `notes` per row precisely because the
+ * rows are not uniformly solid. These two helpers let the entity tables surface that variation
+ * instead of presenting a 'low'-confidence extrapolated torque figure exactly like a
+ * manual-sourced one.
+ * ------------------------------------------------------------------------------------ */
+
+/** Phrases used in `notes` when a number was extrapolated, contested or not directly confirmed. */
+const UNCONFIRMED_NOTE = /extrapolat|not independently confirmed|could not be (confirmed|verified)|treat as (approximate|needing)|inconsistent across sources|not (FY|W206|Mk4)-specific|prior .* generation|verify before use/i;
+
+/**
+ * True when this row's torque figure should be shown de-emphasized: either the whole row is
+ * low-confidence, or its note says the torque number specifically was extrapolated or could
+ * not be confirmed. Rows with no torque at all are not "unconfirmed" — they show an em dash.
+ */
+export function torqueIsUnconfirmed(vehicle: VehicleFitment): boolean {
+  if (vehicle.torqueNm === undefined) return false;
+  if (vehicle.confidence === 'low') return true;
+  return vehicle.notes !== undefined && UNCONFIRMED_NOTE.test(vehicle.notes);
+}
+
+/**
+ * Split a localized H1 such as "235/45R18 tire size" or "Reifengröße 235/45R18" around the
+ * notation, so the notation can stay visually dominant inside a semantically complete <h1>
+ * without hardcoding word order per locale.
+ */
+export interface HeadingParts { readonly before: string; readonly key: string; readonly after: string; }
+
+export function splitHeadingAroundKey(heading: string, key: string): HeadingParts {
+  const index = heading.indexOf(key);
+  if (index < 0) return Object.freeze({ before: heading, key: '', after: '' });
+  return Object.freeze({ before: heading.slice(0, index), key, after: heading.slice(index + key.length) });
 }
 
 /* ---------------------------------------------------------------------------------------

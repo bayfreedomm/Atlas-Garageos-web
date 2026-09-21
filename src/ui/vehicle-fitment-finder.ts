@@ -1,5 +1,6 @@
 import { vehicleFitmentData, vehicleMakes, vehiclesByMake, vehicleById, type VehicleFitment } from '../data/vehicle-fitment';
 import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model-index';
+import { boltPatternSpacingMm } from '../data/bolt-pattern-geometry';
 import { setSummary, renderMetrics } from './standard-answer-helpers';
 import { getPageLocale } from './page-locale';
 
@@ -189,8 +190,15 @@ export function initializeVehicleFitmentFinder(): void {
         }
       }
       if (boltLink) {
-        const params = new URLSearchParams({ lugs: String(vehicle.lugCount), spacing: String(vehicle.spacingMm) });
-        boltLink.href = `${boltLink.dataset.baseHref ?? ''}?${params.toString()}`;
+        // `spacing` is the hole-to-hole chord the calculator inverts, derived from the bolt
+        // pattern via the shared geometry function — never the raw PCD.
+        const boltSpacing = boltPatternSpacingMm(vehicle.boltPattern);
+        if (boltSpacing === null) boltLink.hidden = true;
+        else {
+          boltLink.hidden = false;
+          const params = new URLSearchParams({ lugs: String(vehicle.lugCount), spacing: boltSpacing.toFixed(2) });
+          boltLink.href = `${boltLink.dataset.baseHref ?? ''}?${params.toString()}`;
+        }
       }
       if (actions) actions.hidden = false;
     };

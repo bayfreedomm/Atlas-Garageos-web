@@ -8,6 +8,12 @@
  */
 import { vehicleFitmentData, type VehicleFitment } from './vehicle-fitment';
 import type { ExcludedEntry } from './tire-size-catalog';
+import { parseBoltPattern, type ParsedBoltPattern } from './bolt-pattern-geometry';
+
+// Re-exported so existing importers of this catalog keep working, but there is exactly ONE
+// implementation of each — in bolt-pattern-geometry.ts.
+export { adjacentHoleSpacingMm, boltPatternSpacingMm, parseBoltPattern } from './bolt-pattern-geometry';
+export type { ParsedBoltPattern } from './bolt-pattern-geometry';
 
 export interface BoltPatternEntry {
   /** e.g. "5x114.3" — exactly as written in vehicleFitmentData */
@@ -18,24 +24,26 @@ export interface BoltPatternEntry {
   readonly pcdMm: number;
 }
 
-/** Bolt pattern notation: {lug count}x{PCD in mm}, with an optional one-decimal PCD. */
-const BOLT_NOTATION = /^(\d{1,2})x(\d{2,3}(?:\.\d)?)$/;
-
+/**
+ * Sane-range bounds for a publishable bolt pattern.
+ *
+ * SUPPORTED SCOPE: passenger cars, SUVs and light trucks (Atlas's own dataset already
+ * includes an F-150 on 6x135 and a Silverado 1500 on 6x139.7). The ranges below are set to
+ * clear that scope with headroom rather than to fence in today's 30 rows:
+ *   - lugCount 3–10: 3-lug city cars (Smart) at the bottom, 10-lug heavy-duty hubs at the
+ *     top. Intentionally capped there — beyond 10 lugs is commercial/trailer territory,
+ *     which Atlas does not publish torque or fitment guidance for.
+ *   - pcdMm 80–230: 80 mm clears small 3/4-lug kei and city cars (e.g. 4x100 and below,
+ *     down to 3x98); 230 mm clears the widest light-truck/HD patterns in common use
+ *     (8x170 Ford Super Duty, 8x180 GM 2500, 8x200 Ram, 10x225). Previously 90–180, which
+ *     would have silently excluded a legitimate 8x200 fitment.
+ * Malformed notation (anything that is not {lugs}x{PCD}) still hard-fails in parsing above
+ * these bounds; widening the sane range does not widen what counts as parseable.
+ */
 export const BOLT_PATTERN_BOUNDS = Object.freeze({
   lugCount: Object.freeze({ min: 3, max: 10 }),
-  pcdMm: Object.freeze({ min: 90, max: 180 }),
+  pcdMm: Object.freeze({ min: 80, max: 230 }),
 });
-
-export interface ParsedBoltPattern { readonly lugCount: number; readonly pcdMm: number; }
-
-export function parseBoltPattern(notation: string): ParsedBoltPattern | null {
-  const match = BOLT_NOTATION.exec(notation.trim());
-  if (!match) return null;
-  const lugCount = Number(match[1]);
-  const pcdMm = Number(match[2]);
-  if (!Number.isFinite(lugCount) || !Number.isFinite(pcdMm)) return null;
-  return { lugCount, pcdMm };
-}
 
 /**
  * URL slug for a bolt pattern: the decimal point in the PCD becomes a hyphen, everything
@@ -70,8 +78,15 @@ export interface BoltPatternCatalogBuild {
 export function buildBoltPatternCatalog(vehicles: readonly VehicleFitment[]): BoltPatternCatalogBuild {
   const byNotation = new Map<string, VehicleFitment[]>();
   for (const vehicle of vehicles) {
-    if (parseBoltPattern(vehicle.boltPattern) === null) {
+    const parsedVehicle = parseBoltPattern(vehicle.boltPattern);
+    if (parsedVehicle === null) {
       throw new Error(`Malformed bolt pattern ${JSON.stringify(vehicle.boltPattern)} on vehicle "${vehicle.id}". Expected {lugs}x{PCD mm}, e.g. "5x114.3". Fix src/data/vehicle-fitment.ts — a malformed pattern must not become a published URL.`);
+    }
+    // `lugCount` is the one remaining field that restates part of `boltPattern`, so it is
+    // checked against the notation here rather than trusted. Adjacent-hole spacing is no
+    // longer stored at all — it is derived from `boltPattern` wherever it is needed.
+    if (parsedVehicle.lugCount !== vehicle.lugCount) {
+      throw new Error(`Vehicle "${vehicle.id}" declares lugCount ${vehicle.lugCount} but its bolt pattern ${JSON.stringify(vehicle.boltPattern)} says ${parsedVehicle.lugCount}. Fix src/data/vehicle-fitment.ts — these must never disagree.`);
     }
     const bucket = byNotation.get(vehicle.boltPattern);
     if (bucket) bucket.push(vehicle);
@@ -86,7 +101,7 @@ export function buildBoltPatternCatalog(vehicles: readonly VehicleFitment[]): Bo
     const parsed = parseBoltPattern(notation)!;
     const problem = boltPatternProblem(parsed);
     if (problem !== null) { excluded.push({ notation, reason: problem }); continue; }
-    if (matched.length === 0) { excluded.push({ notation, reason: 'no verified vehicle uses this bolt pattern' }); continue; }
+    if (matched.length === 0) { excluded.push({ notation, reason: 'no sourced Atlas vehicle entry uses this bolt pattern' }); continue; }
     entries.push(Object.freeze({ notation, slug: boltPatternSlug(notation), ...parsed }));
     vehiclesByNotation.set(notation, Object.freeze([...matched]));
   }
@@ -116,16 +131,6 @@ export function boltPatternsByLugCount(): readonly (readonly [number, readonly B
     else groups.set(entry.lugCount, [entry]);
   }
   return Object.freeze([...groups.entries()].sort((a, b) => a[0] - b[0]).map(([lugs, list]) => Object.freeze([lugs, Object.freeze(list)] as const)));
-}
-
-/**
- * Hole-to-hole (adjacent lug) chord for a PCD circle: c = PCD × sin(π / lugs).
- * This is the number a person actually measures with a ruler between two neighbouring lug
- * holes, and it is what the Bolt Pattern Calculator inverts — so showing it here keeps the
- * page and the tool describing the same quantity.
- */
-export function adjacentHoleSpacingMm(entry: BoltPatternEntry): number {
-  return entry.pcdMm * Math.sin(Math.PI / entry.lugCount);
 }
 
 /** Lug hole positions on a unit circle, first hole at 12 o'clock — used by the PCD diagram. */

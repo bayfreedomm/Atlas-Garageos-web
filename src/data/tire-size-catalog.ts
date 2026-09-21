@@ -34,11 +34,26 @@ export interface ExcludedEntry {
 /** Metric tire notation: {width}/{aspect}R{rim}. Half-inch rims (R17.5) are accepted. */
 const TIRE_NOTATION = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)$/;
 
-/** Sane physical bounds for a passenger-vehicle tire. Outside these, we do not publish. */
+/**
+ * Sane physical bounds for a publishable tire size. Outside these, we do not publish.
+ *
+ * SUPPORTED SCOPE: passenger cars, SUVs and light trucks — Atlas's dataset already carries an
+ * F-150 on 275/65R18 and a Silverado 1500 on 265/65R18, and the architecture is meant to grow
+ * well past today's 30 rows. The ranges are therefore set to clear that scope with headroom,
+ * not to fence in the current data:
+ *   - widthMm 80–420: 80 mm covers narrow city-car and space-saver spare fitments; 420 mm
+ *     covers the widest light-truck/performance sizes in common metric notation.
+ *   - aspectRatio 20–95: 20 covers modern low-profile performance tires; 95 covers tall
+ *     light-truck sidewalls (previously capped at 90, which would have rejected a real 95).
+ *   - rimDiameterInches 10–30: 10″ covers small city cars and spares; 30″ leaves room for the
+ *     26″/28″ wheels that already exist on light trucks (previously capped at 24″).
+ * Widening the sane range does NOT widen what parses: a string that is not {width}/{aspect}R{rim}
+ * still hard-fails in parseTireNotation() and throws at catalog build time.
+ */
 export const TIRE_GEOMETRY_BOUNDS = Object.freeze({
-  widthMm: Object.freeze({ min: 100, max: 400 }),
-  aspectRatio: Object.freeze({ min: 20, max: 90 }),
-  rimDiameterInches: Object.freeze({ min: 10, max: 24 }),
+  widthMm: Object.freeze({ min: 80, max: 420 }),
+  aspectRatio: Object.freeze({ min: 20, max: 95 }),
+  rimDiameterInches: Object.freeze({ min: 10, max: 30 }),
 });
 
 export interface ParsedTireNotation {
@@ -115,8 +130,8 @@ export function buildTireSizeCatalog(vehicles: readonly VehicleFitment[]): TireS
     if (problem !== null) { excluded.push({ notation, reason: problem }); continue; }
     // Defensive: the catalog is derived FROM the vehicles, so this cannot be empty today.
     // It is still checked, because a future refactor that sources notations from anywhere
-    // else must not be able to publish a page with no verified vehicle behind it.
-    if (matched.length === 0) { excluded.push({ notation, reason: 'no verified vehicle uses this size' }); continue; }
+    // else must not be able to publish a page with no sourced vehicle entry behind it.
+    if (matched.length === 0) { excluded.push({ notation, reason: 'no sourced Atlas vehicle entry uses this size' }); continue; }
     entries.push(Object.freeze({ notation, slug: tireSizeSlug(notation), ...parsed }));
     vehiclesByNotation.set(notation, Object.freeze([...matched]));
   }

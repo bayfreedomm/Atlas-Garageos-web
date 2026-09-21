@@ -1,5 +1,6 @@
 import { vehicleMakes, vehiclesByMake, vehicleById, type VehicleFitment } from '../data/vehicle-fitment';
 import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model-index';
+import { boltPatternSpacingMm } from '../data/bolt-pattern-geometry';
 import { getSelectedVehicle, setSelectedVehicle } from './vehicle-storage';
 
 const UNVERIFIED_PREFIX = 'name:';
@@ -41,8 +42,13 @@ function applyToTireSizeForm(vehicle: VehicleFitment): boolean {
 function applyToBoltPatternForm(vehicle: VehicleFitment): boolean {
   const form = document.querySelector<HTMLFormElement>('[data-calculator="bolt-pattern"]');
   if (!form) return false;
+  // The calculator's "spacing" field is the measured hole-to-hole chord, NOT the PCD. It is
+  // derived here from the bolt pattern through the one shared function so the pre-filled
+  // number is the same one the bolt-pattern entity pages and the diagram show.
+  const spacing = boltPatternSpacingMm(vehicle.boltPattern);
+  if (spacing === null) return false;
   setFieldValue(form, 'lugCount', String(vehicle.lugCount));
-  setFieldValue(form, 'spacing', String(vehicle.spacingMm));
+  setFieldValue(form, 'spacing', spacing.toFixed(2));
   setFieldValue(form, 'spacingUnit', 'mm');
   form.dispatchEvent(new Event('input', { bubbles: true }));
   form.requestSubmit();

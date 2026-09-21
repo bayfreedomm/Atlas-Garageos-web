@@ -1,11 +1,13 @@
 ---
 // Shared body for the bolt-pattern hub in every locale. Same construction as the tire-size
 // hub: build-time <a href> listing grouped by lug count, with a filter that only hides rows.
-import { adjacentHoleSpacingMm, boltPatternCatalog, boltPatternsByLugCount, vehiclesForBoltPattern } from '../data/bolt-pattern-catalog';
+import { boltPatternCatalog, boltPatternsByLugCount, vehiclesForBoltPattern } from '../data/bolt-pattern-catalog';
+import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { boltPatternPageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { homePath, vehicleHubPath } from '../ui/entity-page-model';
+import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
 
 interface Props { readonly locale: EntityLocale; }
@@ -29,9 +31,11 @@ const groupCards = groups.map(([lugs, entries]) => ({
     return {
       notation: entry.notation,
       href: entityDetailPath('bolt-pattern', locale, entry.slug),
-      spacing: `${adjacentHoleSpacingMm(entry).toFixed(2)} mm`,
+      spacing: `${adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount).toFixed(2)} mm`,
       vehicles: vehicles.length,
-      search: [entry.notation, entry.slug, ...makes].join('|').toLocaleLowerCase().replace(/\s+/g, ''),
+      // Normalized with the same function the live filter applies to the query, so a
+      // reader typing any separator spelling of this entity still matches it.
+      search: entitySearchText([entry.notation, entry.slug, ...makes]),
     };
   }),
 }));

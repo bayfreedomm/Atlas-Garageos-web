@@ -5,7 +5,12 @@
  * rows that are already in the HTML. Every entity link is a real <a href> rendered at build
  * time, so the hubs are fully crawlable and fully usable with JavaScript disabled — this
  * script is a convenience layer over static markup, never the source of navigation.
+ *
+ * The query and the stored per-card haystack both go through normalizeEntitySearchText(), so
+ * "205/55R16", "205-55-r16" and "20555r16" are the same search.
  */
+import { normalizeEntitySearchText } from './entity-search';
+
 export function initializeEntityFilters(): void {
   document.querySelectorAll<HTMLElement>('[data-entity-filter]').forEach((panel) => {
     if (panel.dataset.ready === 'true') return;
@@ -21,7 +26,7 @@ export function initializeEntityFilters(): void {
     if (!input) return;
 
     const apply = (): void => {
-      const query = input.value.trim().toLocaleLowerCase().replace(/\s+/g, '');
+      const query = normalizeEntitySearchText(input.value);
       let visible = 0;
       for (const card of cards) {
         const haystack = card.dataset.entitySearchText ?? '';
