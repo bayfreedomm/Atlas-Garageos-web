@@ -13,7 +13,7 @@ const config = JSON.parse(read('wrangler.jsonc')) as {
 const packageJson = JSON.parse(read('package.json')) as { devDependencies?: Record<string, string> };
 
 describe('Cloudflare Workers static deployment contract', () => {
-  it('defines one deterministic assets-only Worker config', () => {
+  it('defines one assets-only Worker config for the Astro dist output', () => {
     expect(config).toMatchObject({
       name: 'atlas-garageos-web',
       compatibility_date: '2026-09-21',
@@ -22,8 +22,10 @@ describe('Cloudflare Workers static deployment contract', () => {
     expect(config.main).toBeUndefined();
   });
 
-  it('pins Wrangler 4 exactly instead of relying on npx latest', () => {
-    expect(packageJson.devDependencies?.wrangler).toBe('4.136.1');
+  it('does not pin a just-published Wrangler into the project lockfile', () => {
+    expect(packageJson.devDependencies?.wrangler).toBeUndefined();
+    expect(read('pnpm-lock.yaml')).not.toContain('wrangler@4.136.1');
+    expect(read('pnpm-lock.yaml')).not.toContain('workerd@1.20260921.1');
   });
 
   it('keeps the existing fuel workflow split and rolling branch', () => {
