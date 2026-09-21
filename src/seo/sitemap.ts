@@ -30,7 +30,11 @@ function localizedRoutes(): readonly string[] {
 // every other page — listing it again here would only duplicate it.
 
 function vehiclePageRoutes(): readonly string[] {
-  const routes: string[] = ['/vehicles/', '/de/fahrzeuge/', '/es/vehiculos/'];
+  const routes: string[] = [
+    '/vehicles/', '/vehicles/compare/',
+    '/de/fahrzeuge/', '/de/fahrzeuge/vergleichen/',
+    '/es/vehiculos/', '/es/vehiculos/comparar/',
+  ];
   for (const vehicle of vehicleFitmentData) {
     if (vehicle.market === 'us') routes.push(`/vehicles/${vehicle.id}/`);
     else {

@@ -189,3 +189,11 @@ Next implementation pass:
 - [x] Fuel market pages link to localized fuel-cost and road-trip actions without changing provider, workflow, history, canonical, or hreflang behavior.
 - [x] Fixed release coverage remains 30 vehicle records, 20 tire entities, 10 bolt-pattern entities, and 96 pSEO entity URLs.
 - [x] Focused graph coverage, full tests, typecheck, production build, and representative mobile light/dark browser QA completed.
+
+## Vehicle comparison + vehicle-specific trip cost checkpoint — 2026-09-22
+- [x] One shared EN/DE/ES comparison engine covers sourced identity, tire geometry, wheel/PCD, center bore, fastener and qualified torque fields only.
+- [x] Three indexable comparison hubs use deterministic query-state ordering; pair-page generation is intentionally deferred to avoid thin duplicate pages.
+- [x] Vehicle decision graphs link into comparison and carry validated identity into localized road-trip calculators.
+- [x] No trustworthy vehicle-consumption field exists, so users must enter actual consumption; pending market prices remain blank.
+- [x] Model-specific trip-cost pSEO pages are intentionally deferred until materially vehicle-specific consumption data exists.
+- [x] Locked counts remain 30 vehicle records, 20 tire entities, 10 PCD entities and 96 existing pSEO entity URLs.

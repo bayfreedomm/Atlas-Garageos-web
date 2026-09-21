@@ -1,0 +1,17 @@
+---
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import VehicleComparison from '../../../../components/VehicleComparison.astro';
+const pathname = '/de/fahrzeuge/vergleichen/';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/vehicles/compare/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/fahrzeuge/vergleichen/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/vehiculos/comparar/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/vehicles/compare/' },
+];
+---
+<SiteLayout title="Fahrzeug-Rad- und Reifenvergleich" description="Dokumentierte Reifengeometrie, Felgenreferenz, Lochkreis, Nabenbohrung und qualifiziertes Drehmoment zweier Atlas-Fahrzeuge vergleichen." {pathname} active="tools" locale="de" {alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: 'Fahrzeuge', href: '/de/fahrzeuge/' }, { name: 'Vergleichen', href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><a href="/de/fahrzeuge/">Fahrzeuge</a><span aria-hidden="true">/</span><span aria-current="page">Vergleichen</span></nav>
+  <header class="directory-identity methodology-hero"><p class="eyebrow">Fitment-Entscheidungshilfe</p><h1>Rad- und Reifenreferenzen vergleichen</h1><p>Erkennen Sie die belegbaren Unterschiede zwischen zwei Atlas-Fahrzeugeinträgen: Reifengeometrie, Felge, Lochkreis, Nabenbohrung und vorsichtig qualifiziertes Drehmoment.</p></header>
+  <VehicleComparison locale="de" />
+  <section class="methodology-sources"><h2>Was dieser Vergleich leisten kann — und was nicht</h2><p>Atlas vergleicht nur Felder aus dem belegten Fitment-Datensatz. Leistung, Verbrauch, Beschleunigung, Zuverlässigkeit, Ladevolumen oder ein „besseres“ Fahrzeug werden nicht abgeleitet. Gleiche Geometrie beweist keine Radkompatibilität.</p></section>
+</SiteLayout>

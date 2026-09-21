@@ -1,0 +1,17 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import VehicleComparison from '../../../components/VehicleComparison.astro';
+const pathname = '/vehicles/compare/';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/vehicles/compare/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/fahrzeuge/vergleichen/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/vehiculos/comparar/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/vehicles/compare/' },
+];
+---
+<SiteLayout title="Vehicle Wheel & Tire Comparison" description="Compare documented Atlas vehicle tire geometry, wheel references, PCD, center bore and qualified torque without unsupported performance claims." {pathname} active="tools" {alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Vehicles', href: '/vehicles/' }, { name: 'Compare', href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/vehicles/">Vehicles</a><span aria-hidden="true">/</span><span aria-current="page">Compare</span></nav>
+  <header class="directory-identity methodology-hero"><p class="eyebrow">Fitment decision support</p><h1>Compare vehicle wheel &amp; tire references</h1><p>See what actually differs between two Atlas vehicle entries: reference tire geometry, wheel size, PCD, center bore and carefully qualified torque.</p></header>
+  <VehicleComparison locale="en" />
+  <section class="methodology-sources"><h2>What this comparison can — and cannot — tell you</h2><p>Atlas compares only fields present in its sourced fitment dataset. It does not infer horsepower, consumption, acceleration, reliability, cargo capacity or which vehicle is “better.” Matching geometry does not prove wheel compatibility.</p></section>
+</SiteLayout>

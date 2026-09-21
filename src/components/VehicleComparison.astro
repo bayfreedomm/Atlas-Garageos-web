@@ -1,0 +1,36 @@
+---
+import { vehicleFitmentData } from '../data/vehicle-fitment';
+import type { EntityLocale } from '../seo/entity-routes';
+
+interface Props { readonly locale: EntityLocale; }
+const { locale } = Astro.props;
+const copy = {
+  en: { a: 'Vehicle A', b: 'Vehicle B', choose: 'Choose a vehicle', compare: 'Compare vehicles', prompt: 'Choose two vehicles to see the differences Atlas can support.', summary: 'What is actually different', field: 'Reference field' },
+  de: { a: 'Fahrzeug A', b: 'Fahrzeug B', choose: 'Fahrzeug wählen', compare: 'Fahrzeuge vergleichen', prompt: 'Wählen Sie zwei Fahrzeuge, um die von Atlas belegbaren Unterschiede zu sehen.', summary: 'Was unterscheidet sich tatsächlich', field: 'Referenzfeld' },
+  es: { a: 'Vehículo A', b: 'Vehículo B', choose: 'Elegir vehículo', compare: 'Comparar vehículos', prompt: 'Elija dos vehículos para ver las diferencias que Atlas puede respaldar.', summary: 'Qué es realmente diferente', field: 'Campo de referencia' },
+}[locale];
+const vehicles = vehicleFitmentData
+  .filter((vehicle) => locale === 'en' ? vehicle.market === 'us' : vehicle.market === 'eu')
+  .slice()
+  .sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+---
+<section class="vehicle-comparison" data-vehicle-comparison data-locale={locale} aria-labelledby="vehicle-comparison-heading">
+  <form class="vehicle-comparison__picker" data-vehicle-comparison-form>
+    <label>{copy.a}<select name="vehicleA"><option value="">{copy.choose}</option>{vehicles.map((vehicle) => <option value={vehicle.id}>{vehicle.make} {vehicle.model} — {vehicle.generation}</option>)}</select></label>
+    <span aria-hidden="true">VS</span>
+    <label>{copy.b}<select name="vehicleB"><option value="">{copy.choose}</option>{vehicles.map((vehicle) => <option value={vehicle.id}>{vehicle.make} {vehicle.model} — {vehicle.generation}</option>)}</select></label>
+    <button type="submit">{copy.compare}</button>
+  </form>
+  <p class="vehicle-comparison__message" data-comparison-message>{copy.prompt}</p>
+  <div data-comparison-result hidden>
+    <div class="vehicle-comparison__head" id="vehicle-comparison-heading"><span>{copy.field}</span><strong data-comparison-name-a>—</strong><strong data-comparison-name-b>—</strong></div>
+    <section class="vehicle-comparison__summary" aria-labelledby="vehicle-difference-heading">
+      <h2 id="vehicle-difference-heading">{copy.summary}</h2>
+      <ul data-comparison-summary></ul>
+    </section>
+    <div class="vehicle-comparison__rows" data-comparison-rows></div>
+    <nav class="vehicle-comparison__actions" data-comparison-actions aria-label={copy.summary}></nav>
+    <p class="vehicle-comparison__caution">{locale === 'de' ? 'Geometrische Unterschiede sind keine Kompatibilitäts- oder Sicherheitsfreigabe. Prüfen Sie Ausstattung, Freigang und Fahrzeugunterlagen.' : locale === 'es' ? 'Las diferencias geométricas no son una aprobación de compatibilidad o seguridad. Compruebe acabado, holguras y documentación del vehículo.' : 'Geometric differences are not a compatibility or safety approval. Check trim, clearance and vehicle documentation.'}</p>
+  </div>
+</section>
+<script>import { initializeVehicleComparisons } from '../ui/vehicle-comparison-page'; initializeVehicleComparisons();</script>

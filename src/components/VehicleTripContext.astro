@@ -1,0 +1,17 @@
+---
+import type { EntityLocale } from '../seo/entity-routes';
+interface Props { readonly locale: EntityLocale; }
+const { locale } = Astro.props;
+const copy = {
+  en: { eyebrow: 'Vehicle context', text: 'Atlas does not store a trusted consumption figure for this vehicle. Enter your actual consumption below; any available market fuel price remains an editable reference.', open: 'Open vehicle reference' },
+  de: { eyebrow: 'Fahrzeugkontext', text: 'Atlas speichert für dieses Fahrzeug keinen belastbaren Verbrauchswert. Geben Sie unten Ihren tatsächlichen Verbrauch ein; ein verfügbarer Marktpreis bleibt eine editierbare Referenz.', open: 'Fahrzeugreferenz öffnen' },
+  es: { eyebrow: 'Contexto del vehículo', text: 'Atlas no guarda un consumo fiable para este vehículo. Introduzca abajo su consumo real; cualquier precio de mercado disponible seguirá siendo una referencia editable.', open: 'Abrir referencia del vehículo' },
+}[locale];
+---
+<aside class="vehicle-trip-context" data-vehicle-trip-context data-locale={locale} hidden>
+  <p class="eyebrow">{copy.eyebrow}</p>
+  <h2 data-trip-vehicle-name></h2>
+  <p>{copy.text}</p>
+  <a data-trip-vehicle-link>{copy.open}<span aria-hidden="true"> →</span></a>
+</aside>
+<script>import { initializeVehicleTripContext } from '../ui/vehicle-trip-context'; initializeVehicleTripContext();</script>

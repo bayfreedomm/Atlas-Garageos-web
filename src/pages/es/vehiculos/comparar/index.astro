@@ -1,0 +1,17 @@
+---
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import VehicleComparison from '../../../../components/VehicleComparison.astro';
+const pathname = '/es/vehiculos/comparar/';
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/vehicles/compare/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/fahrzeuge/vergleichen/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/vehiculos/comparar/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/vehicles/compare/' },
+];
+---
+<SiteLayout title="Comparación de Ruedas y Neumáticos por Vehículo" description="Compare geometría documentada de neumáticos, llantas, PCD, buje y par cualificado de dos vehículos Atlas." {pathname} active="tools" locale="es" {alternates} breadcrumbs={[{ name: 'Inicio', href: '/es/' }, { name: 'Vehículos', href: '/es/vehiculos/' }, { name: 'Comparar', href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">Inicio</a><span aria-hidden="true">/</span><a href="/es/vehiculos/">Vehículos</a><span aria-hidden="true">/</span><span aria-current="page">Comparar</span></nav>
+  <header class="directory-identity methodology-hero"><p class="eyebrow">Ayuda para decisiones de ajuste</p><h1>Comparar referencias de ruedas y neumáticos</h1><p>Vea las diferencias respaldadas entre dos entradas Atlas: geometría del neumático, llanta, PCD, buje y par claramente cualificado.</p></header>
+  <VehicleComparison locale="es" />
+  <section class="methodology-sources"><h2>Qué puede — y qué no puede — indicar esta comparación</h2><p>Atlas compara solo campos presentes en sus datos de ajuste con fuentes. No deduce potencia, consumo, aceleración, fiabilidad, maletero ni qué vehículo es “mejor”. Una geometría coincidente no demuestra compatibilidad.</p></section>
+</SiteLayout>

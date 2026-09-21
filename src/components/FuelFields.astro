@@ -1,7 +1,10 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
 interface Props { distance?: number; economy?: number; price?: number | undefined; currency?: 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD'; compact?: boolean; locale?: ContentLocale | undefined; }
-const { distance = 500, economy = 7.2, price = 1.8, currency = 'USD', compact = false, locale } = Astro.props;
+const { distance = 500, economy = 7.2, currency = 'USD', compact = false, locale } = Astro.props;
+// An explicitly supplied `undefined` means the market feed is pending and must stay blank.
+// The generic 1.8 example is used only when a caller omits the price prop entirely.
+const price = Object.prototype.hasOwnProperty.call(Astro.props, 'price') ? Astro.props.price : 1.8;
 const L = {
   en: { units: 'Units', metric: 'Metric · km, L/100km', imperial: 'US · miles, MPG', distance: 'Distance · km', economy: 'Fuel economy · L/100km', price: 'Fuel price · per litre', currency: 'Currency label' },
   de: { units: 'Einheiten', metric: 'Metrisch · km, L/100km', imperial: 'US · Meilen, MPG', distance: 'Distanz · km', economy: 'Kraftstoffverbrauch · L/100km', price: 'Kraftstoffpreis · pro Liter', currency: 'Währung' },

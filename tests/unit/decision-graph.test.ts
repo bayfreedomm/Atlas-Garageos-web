@@ -19,11 +19,12 @@ describe('shared automotive decision graph', () => {
     const graph = vehicleDecisionGraph(vehicle, 'en');
     const actions = [...graph.actions, ...(graph.supportingActions ?? [])];
     expect(actions.map(({ id }) => id)).toEqual([
-      'vehicle-tire', 'vehicle-bolt', 'vehicle-setup', 'vehicle-trip',
+      'vehicle-tire', 'vehicle-bolt', 'vehicle-compare', 'vehicle-setup', 'vehicle-trip',
       'vehicle-tire-calculator', 'vehicle-tire-compare', 'vehicle-bolt-calculator', 'vehicle-fuel-cost',
     ]);
     expect(actions.find(({ id }) => id === 'vehicle-tire')?.href).toBe('/tire-sizes/205-55-r16/');
     expect(actions.find(({ id }) => id === 'vehicle-bolt')?.href).toBe('/bolt-patterns/5x100/');
+    expect(actions.find(({ id }) => id === 'vehicle-compare')?.href).toBe('/vehicles/compare/?a=toyota-corolla');
     expect(actions.find(({ id }) => id === 'vehicle-tire-compare')?.href).toBe('/tools/tire-size-comparison/?current=205-55-16');
     expect(actions.find(({ id }) => id === 'vehicle-bolt-calculator')?.href).toMatch(/^\/tools\/bolt-pattern-calculator\/\?lugs=5&spacing=/);
     expect(actions.find(({ id }) => id === 'vehicle-fuel-cost')?.detail).toMatch(/does not invent/i);
@@ -33,11 +34,11 @@ describe('shared automotive decision graph', () => {
     const vehicle = vehicleFitmentData.find(({ id }) => id === 'vw-golf')!;
     const de = [...vehicleDecisionGraph(vehicle, 'de').actions, ...(vehicleDecisionGraph(vehicle, 'de').supportingActions ?? [])];
     const es = [...vehicleDecisionGraph(vehicle, 'es').actions, ...(vehicleDecisionGraph(vehicle, 'es').supportingActions ?? [])];
-    expect(de).toHaveLength(8);
-    expect(es).toHaveLength(8);
+    expect(de).toHaveLength(9);
+    expect(es).toHaveLength(9);
     expect(de.find(({ id }) => id === 'vehicle-tire')?.href).toBe('/de/reifengroessen/205-55-r16/');
     expect(es.find(({ id }) => id === 'vehicle-bolt')?.href).toBe('/es/patrones-birlos/5x112/');
-    expect(de.find(({ id }) => id === 'vehicle-trip')?.href).toBe('/de/tools/fahrtkostenrechner/');
+    expect(de.find(({ id }) => id === 'vehicle-trip')?.href).toBe('/de/tools/fahrtkostenrechner/?vehicle=vw-golf');
     expect(es.find(({ id }) => id === 'vehicle-fuel-cost')?.href).toBe('/es/tools/calculadora-coste-combustible/');
   });
 

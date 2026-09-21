@@ -68,9 +68,9 @@ describe('SEO tool registry', () => {
     // Localized (DE/ES) platform + tool pages are appended after the English routes;
     // the flagship fitment-studio page has no localized version and is intentionally excluded.
     const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented' && tool.id !== 'fitment-studio').length;
-    // Vehicle pages: three localized index routes plus one route per US vehicle and two
-    // (DE + ES) per non-US vehicle.
-    const vehicleRoutes = 3 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
+    // Vehicle pages: three localized index routes, three comparison hubs, plus one route per
+    // US vehicle and two (DE + ES) per non-US vehicle. Pair state stays query-only.
+    const vehicleRoutes = 6 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
     // Entity pages: per published locale, one hub per family plus one detail page per catalog
     // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
@@ -83,6 +83,9 @@ describe('SEO tool registry', () => {
     expect(entries).toContain('https://atlasgarageos.com/es/');
     expect(entries).toContain('https://atlasgarageos.com/de/tools/felgen-et-rechner/');
     expect(entries).toContain('https://atlasgarageos.com/es/tools/calculadora-offset-llantas/');
+    expect(entries).toContain('https://atlasgarageos.com/vehicles/compare/');
+    expect(entries).toContain('https://atlasgarageos.com/de/fahrzeuge/vergleichen/');
+    expect(entries).toContain('https://atlasgarageos.com/es/vehiculos/comparar/');
     expect(entries).not.toContain('https://atlasgarageos.com/de/fitment-studio/');
     expect(entries).not.toContain('https://atlasgarageos.com/es/fitment-studio/');
     const xml = renderSitemapXml();

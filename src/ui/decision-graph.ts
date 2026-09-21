@@ -4,6 +4,7 @@ import { boltPatternCatalog, boltPatternSlug, type BoltPatternEntry } from '../d
 import { localizedToolPath } from '../localization/locales';
 import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
 import { boltPatternCalculatorHref, tireCalculatorHref, tireComparisonHref, vehicleHubPath } from './entity-page-model';
+import { vehicleComparisonHref, vehicleTripHref } from './vehicle-comparison';
 
 export interface DecisionAction { readonly id: string; readonly href: string; readonly title: string; readonly detail: string; }
 export interface DecisionGraphModel {
@@ -19,7 +20,7 @@ type Pair = readonly [string, string];
 interface DecisionCopy {
   readonly eyebrow: string; readonly heading: string; readonly support: string;
   readonly intros: { readonly vehicle: string; readonly tire: string; readonly bolt: string; readonly fuel: string };
-  readonly vehicle: { readonly tire: Pair; readonly bolt: Pair; readonly setup: Pair; readonly trip: Pair; readonly tireCalc: Pair; readonly tireCompare: Pair; readonly boltCalc: Pair; readonly fuel: Pair };
+  readonly vehicle: { readonly tire: Pair; readonly bolt: Pair; readonly compare: Pair; readonly setup: Pair; readonly trip: Pair; readonly tireCalc: Pair; readonly tireCompare: Pair; readonly boltCalc: Pair; readonly fuel: Pair };
   readonly tire: { readonly compare: Pair; readonly calculate: Pair; readonly vehicles: Pair; readonly pcd: Pair; readonly caution: string };
   readonly bolt: { readonly vehicles: Pair; readonly measure: Pair; readonly offset: Pair; readonly setup: Pair; readonly tires: Pair; readonly directory: Pair; readonly caution: string };
   readonly fuel: { readonly cost: Pair; readonly trip: Pair; readonly vehicles: Pair };
@@ -37,6 +38,7 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
     vehicle: {
       tire: ['Open the referenced tire size', 'See diameter, sidewall, circumference and vehicles using it.'],
       bolt: ['Open the bolt pattern / PCD', 'Check lug geometry, center-bore values and vehicles using it.'],
+      compare: ['Compare with another vehicle', 'Highlight documented wheel, tire and fitment differences without ranking either vehicle.'],
       setup: ['Compare wheel and tire setup', 'Work through tire, wheel and clearance geometry without a compatibility claim.'],
       trip: ['Estimate a road trip cost', 'Add distance, fuel use, extras and passenger split.'],
       tireCalc: ['Calculate this tire size', 'Open the tire calculator with the reference size prefilled.'],
@@ -77,6 +79,7 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
     vehicle: {
       tire: ['Referenz-Reifengröße öffnen', 'Durchmesser, Flankenhöhe, Umfang und Fahrzeuge mit dieser Größe ansehen.'],
       bolt: ['Lochkreis / PCD öffnen', 'Lochgeometrie, Nabenbohrungen und weitere Fahrzeuge prüfen.'],
+      compare: ['Mit einem anderen Fahrzeug vergleichen', 'Belegte Rad-, Reifen- und Fitment-Unterschiede ohne Rangliste hervorheben.'],
       setup: ['Rad- und Reifensetup vergleichen', 'Reifen-, Felgen- und Freiganggeometrie ohne Kompatibilitätsversprechen prüfen.'],
       trip: ['Fahrtkosten berechnen', 'Strecke, Verbrauch, Extras und Kosten pro Person eingeben.'],
       tireCalc: ['Diese Reifengröße berechnen', 'Reifenrechner mit der Referenzgröße vorausgefüllt öffnen.'],
@@ -117,6 +120,7 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
     vehicle: {
       tire: ['Abrir la medida de referencia', 'Ver diámetro, flanco, circunferencia y vehículos que la usan.'],
       bolt: ['Abrir el patrón / PCD', 'Comprobar geometría, bujes y otros vehículos que lo usan.'],
+      compare: ['Comparar con otro vehículo', 'Destacar diferencias documentadas de ruedas, neumáticos y ajuste sin clasificarlos.'],
       setup: ['Comparar llanta y neumático', 'Revisar geometría de neumático, llanta y holgura sin prometer compatibilidad.'],
       trip: ['Estimar el coste de un viaje', 'Añadir distancia, consumo, extras y reparto entre pasajeros.'],
       tireCalc: ['Calcular esta medida', 'Abrir la calculadora con la medida de referencia precargada.'],
@@ -166,8 +170,9 @@ export function vehicleDecisionGraph(vehicle: VehicleFitment, locale: EntityLoca
     actions: Object.freeze([
       makeAction('vehicle-tire', entityDetailPath('tire-size', locale, tire.slug), copy.vehicle.tire),
       makeAction('vehicle-bolt', entityDetailPath('bolt-pattern', locale, boltPatternSlug(vehicle.boltPattern)), copy.vehicle.bolt),
+      makeAction('vehicle-compare', vehicleComparisonHref(locale, vehicle.id), copy.vehicle.compare),
       makeAction('vehicle-setup', '/fitment-studio/', copy.vehicle.setup),
-      makeAction('vehicle-trip', localizedToolPath(locale, 'road-trip-cost-calculator', 'tool'), copy.vehicle.trip),
+      makeAction('vehicle-trip', vehicleTripHref(locale, vehicle.id), copy.vehicle.trip),
     ]),
     supportingActions: Object.freeze([
       makeAction('vehicle-tire-calculator', tireCalculatorHref(locale, tire), copy.vehicle.tireCalc),
