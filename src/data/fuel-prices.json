@@ -1,73 +1,50 @@
 {
-<<<<<<< HEAD
-  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "generatedAt": "2026-09-21T19:50:37.021Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "pending",
     "products": [],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
+    "lastAttemptAt": null,
     "lastSuccessAt": null,
-    "note": "Seed placeholder committed before the first scheduled run — no verified data yet."
-=======
-  "generatedAt": "2026-09-21T15:24:11.109Z",
-  "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
-  "es": {
+    "note": "No verified data yet — this market is not part of the recurring automatic refresh."
+  },
+  "de": {
     "status": "fresh",
     "products": [
       {
         "id": "e5",
-        "label": "Gasolina 95 E5",
-        "value": 1.925,
-        "sampleSize": 10919
+        "label": "Super E5",
+        "value": 2.291,
+        "sampleSize": 905
       },
       {
-        "id": "e5_98",
-        "label": "Gasolina 98 E5",
-        "value": 2.079,
-        "sampleSize": 5490
+        "id": "e10",
+        "label": "Super E10",
+        "value": 2.234,
+        "sampleSize": 890
       },
       {
         "id": "diesel",
-        "label": "Gasóleo A",
-        "value": 1.931,
-        "sampleSize": 11268
-      },
-      {
-        "id": "dieselPremium",
-        "label": "Gasóleo Premium",
-        "value": 2.023,
-        "sampleSize": 5902
+        "label": "Diesel",
+        "value": 2.402,
+        "sampleSize": 906
       }
     ],
-    "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
-    "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-09-21T15:23:45.251Z",
-    "lastSuccessAt": "2026-09-21T15:23:45.251Z"
->>>>>>> 3ba9a9366b89a9a18e395beafa0b974b5e545da5
-  },
-  "de": {
-    "status": "pending",
-    "products": [],
-    "source": "Tankerkönig — Atlas monitored sample of selected German city stations (not a national average)",
+    "source": "Tankerkönig — Atlas monitored sample: 2701 station readings across Berlin, Hamburg, Munich, Cologne, Frankfurt (not a national average)",
     "sourceUrl": "https://creativecommons.tankerkoenig.de/",
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
-    "lastSuccessAt": null,
-    "note": "No verified data yet — Germany is refreshed only by a deliberate manual run, never on a recurring schedule."
+    "lastAttemptAt": "2026-09-21T19:46:32.446Z",
+    "lastSuccessAt": "2026-09-21T19:46:32.446Z"
   },
   "us": {
     "status": "pending",
     "products": [],
-    "weekOf": null,
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-<<<<<<< HEAD
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
-=======
-    "lastAttemptAt": "2026-09-21T15:23:45.299Z",
->>>>>>> 3ba9a9366b89a9a18e395beafa0b974b5e545da5
+    "lastAttemptAt": null,
     "lastSuccessAt": null,
-    "note": "Seed placeholder committed before the first scheduled run — no verified data yet."
+    "note": "No verified data yet — this market is not part of the recurring automatic refresh.",
+    "weekOf": null
   }
 }
