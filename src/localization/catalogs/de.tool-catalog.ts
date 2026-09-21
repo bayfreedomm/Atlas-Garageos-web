@@ -505,10 +505,10 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
   },
   'vehicle-fitment-finder': {
     title: 'Fahrzeug finden',
-    description: 'Werksseitige Reifengröße, Lochkreis und Anzugsdrehmoment nach Marke und Modell nachschlagen, mit Quellenangabe und Verlässlichkeitseinstufung.',
+    description: 'Atlas-Referenzwerte für Reifengröße, Lochkreis und qualifiziertes Anzugsdrehmoment nach Marke und Modell nachschlagen, mit Quellenangabe und Verlässlichkeitseinstufung.',
     category: 'Reifen & Felgen',
     eyebrow: 'Reifen & Felgen',
-    intro: 'Wählen Sie Marke und Modell, um werksseitige Reifengröße, Lochkreis und Anzugsdrehmoment als Referenz zu sehen — und direkt in den passenden Rechner zu springen.',
+    intro: 'Wählen Sie Marke und Modell, um belegte Referenzwerte für Reifengröße, Lochkreis und qualifiziertes Anzugsdrehmoment zu sehen — und direkt in den passenden Rechner zu springen.',
     limitation: 'Dies ist eine kuratierte Referenzsammlung, keine Live-Herstellerdatenbank. Ausstattungslinien und Modelljahre variieren, prüfen Sie daher immer das Handbuch oder den Aufkleber an der Fahrertür Ihres Fahrzeugs, bevor Sie Teile kaufen.',
     studioCta: 'Passung in Felgen- & Reifenvergleich bestätigen',
     explanation: [

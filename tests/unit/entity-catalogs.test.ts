@@ -10,6 +10,7 @@ import {
 import { adjacentHoleSpacingMm, boltPatternSpacingMm, parseBoltPattern } from '../../src/data/bolt-pattern-geometry';
 import { entitySearchText, normalizeEntitySearchText } from '../../src/ui/entity-search';
 import { boltPatternPageText, tireSizePageText } from '../../src/content/entity-page-text';
+import { vehiclePageText } from '../../src/content/vehicle-page-text';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { entityAlternates, entityDetailPath, entityHubPath, entityLocales } from '../../src/seo/entity-routes';
@@ -18,6 +19,7 @@ import {
   splitHeadingAroundKey, tireSizeMetrics, torqueIsUnconfirmed,
 } from '../../src/ui/entity-page-model';
 import { vehicleFitmentData, type VehicleFitment } from '../../src/data/vehicle-fitment';
+import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
 
 /** A syntactically complete vehicle row, so a test can vary exactly one field. */
@@ -26,6 +28,10 @@ const fakeVehicle = (overrides: Partial<VehicleFitment>): VehicleFitment => ({
   tireSize: '205/55R16', boltPattern: '5x112', lugCount: 5,
   wheelSize: '7Jx16', fastenerType: 'wheel-bolt', confidence: 'low', sources: ['test'],
   ...overrides,
+});
+
+it('loads Node built-ins in the checked test environment', () => {
+  expect(fs.existsSync(fileURLToPath(new URL('../../src/data/vehicle-fitment.ts', import.meta.url)))).toBe(true);
 });
 
 describe('tire-size catalog', () => {
@@ -382,11 +388,53 @@ describe('per-row confidence is surfaced instead of a uniform claim', () => {
     for (const file of ['components/TireSizeEntity.astro', 'components/BoltPatternEntity.astro']) {
       expect(readSrc(file)).toContain('t.confidence[vehicle.confidence]');
     }
-    expect(readSrc('components/BoltPatternEntity.astro')).toContain('torqueIsUnconfirmed(vehicle)');
+    expect(readSrc('components/BoltPatternEntity.astro')).toContain('torquePresentation(vehicle, locale)');
   });
 
   it('makes no blanket "verified vehicle" claim in any locale of the entity copy', () => {
     const copy = readSrc('content/entity-page-text.ts');
     expect(copy).not.toMatch(/verified vehicle|vehículos? verificad|verified vehicles/i);
+  });
+});
+
+describe('field-level wheel torque trust', () => {
+  it('requires explicit trust metadata for every published torque value', () => {
+    for (const vehicle of vehicleFitmentData) {
+      if (vehicle.torqueNm !== undefined) expect(vehicle.torqueTrust).toBeDefined();
+    }
+  });
+
+  it('distinguishes documented high-confidence torque from extrapolated torque', () => {
+    const tesla = vehicleFitmentData.find((vehicle) => vehicle.id === 'tesla-model-3')!;
+    const audi = vehicleFitmentData.find((vehicle) => vehicle.id === 'audi-a3')!;
+    expect(torqueIsTrusted(tesla)).toBe(true);
+    expect(torquePresentation(tesla, 'en').qualified).toBe(false);
+    expect(torqueIsTrusted(audi)).toBe(false);
+    expect(torquePresentation(audi, 'en')).toMatchObject({ qualified: true });
+    expect(torquePresentation(audi, 'en').qualifier).toMatch(/Extrapolated reference/);
+  });
+
+  it('excludes insufficient torque evidence from structured data', () => {
+    const trusted = vehicleFitmentData.find((vehicle) => vehicle.id === 'tesla-model-3')!;
+    const extrapolated = vehicleFitmentData.find((vehicle) => vehicle.id === 'audi-a3')!;
+    const medium = vehicleFitmentData.find((vehicle) => vehicle.id === 'toyota-rav4')!;
+    expect(torqueJsonLdProperty(trusted, 'Wheel torque (Nm)')).toHaveLength(1);
+    expect(torqueJsonLdProperty(extrapolated, 'Wheel torque (Nm)')).toEqual([]);
+    expect(torqueJsonLdProperty(medium, 'Wheel torque (Nm)')).toEqual([]);
+  });
+
+  it('qualifies uncertain torque in every localized FAQ answer', () => {
+    const vehicle = vehicleFitmentData.find((candidate) => candidate.id === 'audi-a3')!;
+    expect(vehiclePageText.en.faqTorqueA(vehicle)).toMatch(/Extrapolated reference/);
+    expect(vehiclePageText.de.faqTorqueA(vehicle)).toMatch(/Übertragener Referenzwert/);
+    expect(vehiclePageText.es.faqTorqueA(vehicle)).toMatch(/Referencia extrapolada/);
+  });
+
+  it('routes all vehicle JSON-LD torque properties through the trust gate', () => {
+    for (const file of ['pages/vehicles/[id].astro', 'pages/de/fahrzeuge/[id].astro', 'pages/es/vehiculos/[id].astro']) {
+      const source = readSrc(file);
+      expect(source).toContain('torqueJsonLdProperty(vehicle');
+      expect(source).not.toMatch(/vehicle\.torqueNm !== undefined \? \[\{ '@type': 'PropertyValue'/);
+    }
   });
 });

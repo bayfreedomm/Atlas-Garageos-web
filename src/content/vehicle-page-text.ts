@@ -1,4 +1,5 @@
 import type { VehicleFitment } from '../data/vehicle-fitment';
+import { torquePresentation } from '../ui/vehicle-torque';
 
 export type VehicleLocale = 'en' | 'de' | 'es';
 
@@ -47,12 +48,12 @@ export interface VehiclePageText {
 
 export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
   en: {
-    kicker: 'OEM fitment reference',
+    kicker: 'Atlas fitment reference',
     h1: (v) => `${v.make} ${v.model} — Tire Size & Bolt Pattern`,
     intro: (v) => `Reference wheel and tire fitment for the ${v.make} ${v.model} (${v.generation}). Cross-checked against public fitment references — always confirm against your own vehicle's door-jamb sticker or owner's manual before buying parts.`,
-    tireSize: 'OEM tire size',
+    tireSize: 'Referenced tire size',
     boltPattern: 'Bolt pattern (PCD)',
-    wheelSize: 'OEM wheel size',
+    wheelSize: 'Referenced wheel size',
     centerBore: 'Center bore',
     torque: 'Wheel torque',
     fastener: 'Fastener type',
@@ -79,9 +80,14 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     faqBoltQ: (v) => `What is the bolt pattern of a ${v.make} ${v.model}?`,
     faqBoltA: (v) => `The ${v.make} ${v.model} uses a ${v.boltPattern} bolt pattern (${v.lugCount} ${v.fastenerType === 'lug-nut' ? 'lug nuts' : 'wheel bolts'}).`,
     faqTorqueQ: (v) => `What is the wheel torque spec for a ${v.make} ${v.model}?`,
-    faqTorqueA: (v) => v.torqueNm !== undefined ? `The reference wheel torque for the ${v.make} ${v.model} is ${v.torqueNm} Nm${v.torqueLbFt !== undefined ? ` (${v.torqueLbFt} lb-ft)` : ''}. Always confirm with your owner's manual before torquing wheels.` : `We don't have a confirmed torque spec for the ${v.make} ${v.model} yet — check your owner's manual.`,
+    faqTorqueA: (v) => {
+      const torque = torquePresentation(v, 'en');
+      return v.torqueNm === undefined
+        ? `Atlas does not have a documented torque reference for the ${v.make} ${v.model} yet — check your owner's manual.`
+        : `Atlas lists ${torque.value} as a wheel-torque reference for the ${v.make} ${v.model}. ${torque.qualifier ?? 'Confirm it in the vehicle manual before torquing wheels.'}`;
+    },
     hubTitle: 'Vehicle Fitment Reference',
-    hubDescription: 'OEM tire size, bolt pattern, and wheel torque reference pages for common vehicles, sourced and confidence-rated.',
+    hubDescription: 'Sourced tire size, bolt pattern, and wheel torque reference pages for common vehicles, with confidence ratings.',
     hubLead: 'Pick a vehicle to see its reference tire size, bolt pattern, wheel size, and torque spec — each cross-checked against public fitment sources and rated for confidence.',
     hubUsMarket: 'US market',
     hubEuMarket: 'European market',
@@ -89,12 +95,12 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     breadcrumbVehicles: 'Vehicles',
   },
   de: {
-    kicker: 'Werksseitige Referenzdaten',
+    kicker: 'Atlas-Fitment-Referenz',
     h1: (v) => `${v.make} ${v.model} — Reifengröße & Lochkreis`,
-    intro: (v) => `Referenz-Rad- und Reifendaten für den ${v.make} ${v.model} (${v.generation}). Gegengeprüft mit öffentlichen Referenzquellen — prüfen Sie vor dem Kauf immer den Aufkleber an der Fahrertür oder das Handbuch Ihres Fahrzeugs.`,
-    tireSize: 'Werksseitige Reifengröße',
+    intro: (v) => `Atlas-Referenzdaten für Räder und Reifen des ${v.make} ${v.model} (${v.generation}), mit öffentlichen Quellen und Verlässlichkeitsstufe. Prüfen Sie vor dem Kauf immer den Aufkleber an der Fahrertür oder das Fahrzeughandbuch.`,
+    tireSize: 'Referenz-Reifengröße',
     boltPattern: 'Lochkreis (PCD)',
-    wheelSize: 'Werksseitige Felgengröße',
+    wheelSize: 'Referenz-Felgengröße',
     centerBore: 'Nabenbohrung',
     torque: 'Anzugsdrehmoment',
     fastener: 'Befestigungsart',
@@ -121,22 +127,27 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     faqBoltQ: (v) => `Welchen Lochkreis hat ein ${v.make} ${v.model}?`,
     faqBoltA: (v) => `Der ${v.make} ${v.model} hat einen Lochkreis von ${v.boltPattern} (${v.lugCount} ${v.fastenerType === 'lug-nut' ? 'Radmuttern' : 'Radschrauben'}).`,
     faqTorqueQ: (v) => `Welches Anzugsdrehmoment gilt für einen ${v.make} ${v.model}?`,
-    faqTorqueA: (v) => v.torqueNm !== undefined ? `Das Referenz-Anzugsdrehmoment für den ${v.make} ${v.model} beträgt ${v.torqueNm} Nm${v.torqueLbFt !== undefined ? ` (${v.torqueLbFt} lb-ft)` : ''}. Prüfen Sie vor dem Anziehen der Räder immer das Handbuch Ihres Fahrzeugs.` : `Für den ${v.make} ${v.model} liegt uns noch kein bestätigtes Anzugsdrehmoment vor — prüfen Sie das Handbuch Ihres Fahrzeugs.`,
+    faqTorqueA: (v) => {
+      const torque = torquePresentation(v, 'de');
+      return v.torqueNm === undefined
+        ? `Atlas hat noch keinen dokumentierten Drehmoment-Referenzwert für den ${v.make} ${v.model} — prüfen Sie das Fahrzeughandbuch.`
+        : `Atlas führt ${torque.value} als Drehmoment-Referenzwert für den ${v.make} ${v.model}. ${torque.qualifier ?? 'Bestätigen Sie den Wert vor dem Anziehen der Räder im Fahrzeughandbuch.'}`;
+    },
     hubTitle: 'Fahrzeug-Referenzdaten',
-    hubDescription: 'Referenzseiten mit werksseitiger Reifengröße, Lochkreis und Anzugsdrehmoment für gängige Fahrzeuge, mit Quellenangabe und Verlässlichkeitsbewertung.',
-    hubLead: 'Wählen Sie ein Fahrzeug, um die Referenz-Reifengröße, den Lochkreis, die Felgengröße und das Anzugsdrehmoment zu sehen — jeweils mit öffentlichen Quellen gegengeprüft und mit Verlässlichkeitsstufe.',
+    hubDescription: 'Belegte Referenzseiten mit Reifengröße, Lochkreis und qualifiziertem Anzugsdrehmoment für gängige Fahrzeuge.',
+    hubLead: 'Wählen Sie ein Fahrzeug, um dokumentierte Referenzwerte für Reifengröße, Lochkreis, Felgengröße und Anzugsdrehmoment mit Quellen und Verlässlichkeitsstufe zu sehen.',
     hubUsMarket: 'US-Markt',
     hubEuMarket: 'Europäischer Markt',
     breadcrumbHome: 'Start',
     breadcrumbVehicles: 'Fahrzeuge',
   },
   es: {
-    kicker: 'Referencia de ajuste OEM',
+    kicker: 'Referencia de ajuste Atlas',
     h1: (v) => `${v.make} ${v.model} — Medida de Neumático y Patrón de Birlos`,
-    intro: (v) => `Datos de referencia de ruedas y neumáticos para el ${v.make} ${v.model} (${v.generation}). Verificados con fuentes públicas de referencia — confirme siempre con la etiqueta del pilar de la puerta o el manual de su vehículo antes de comprar piezas.`,
-    tireSize: 'Medida de neumático OEM',
+    intro: (v) => `Datos de referencia Atlas para las ruedas y neumáticos del ${v.make} ${v.model} (${v.generation}), con fuentes públicas y nivel de confianza. Confirme siempre con la etiqueta del pilar de la puerta o el manual antes de comprar piezas.`,
+    tireSize: 'Medida de neumático de referencia',
     boltPattern: 'Patrón de birlos (PCD)',
-    wheelSize: 'Medida de llanta OEM',
+    wheelSize: 'Medida de llanta de referencia',
     centerBore: 'Diámetro de buje',
     torque: 'Par de apriete',
     fastener: 'Tipo de fijación',
@@ -163,10 +174,15 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     faqBoltQ: (v) => `¿Cuál es el patrón de birlos de un ${v.make} ${v.model}?`,
     faqBoltA: (v) => `El ${v.make} ${v.model} usa un patrón de birlos ${v.boltPattern} (${v.lugCount} ${v.fastenerType === 'lug-nut' ? 'tuercas de rueda' : 'birlos de rueda'}).`,
     faqTorqueQ: (v) => `¿Cuál es el par de apriete de las ruedas de un ${v.make} ${v.model}?`,
-    faqTorqueA: (v) => v.torqueNm !== undefined ? `El par de apriete de referencia para el ${v.make} ${v.model} es de ${v.torqueNm} Nm${v.torqueLbFt !== undefined ? ` (${v.torqueLbFt} lb-ft)` : ''}. Confirme siempre con el manual de su vehículo antes de apretar las ruedas.` : `Todavía no tenemos un par de apriete confirmado para el ${v.make} ${v.model} — consulte el manual de su vehículo.`,
+    faqTorqueA: (v) => {
+      const torque = torquePresentation(v, 'es');
+      return v.torqueNm === undefined
+        ? `Atlas todavía no tiene una referencia documentada de par para el ${v.make} ${v.model} — consulte el manual del vehículo.`
+        : `Atlas indica ${torque.value} como referencia de par para el ${v.make} ${v.model}. ${torque.qualifier ?? 'Confirme el valor en el manual antes de apretar las ruedas.'}`;
+    },
     hubTitle: 'Referencia de Ajuste de Vehículos',
-    hubDescription: 'Páginas de referencia con medida de neumático OEM, patrón de birlos y par de apriete para vehículos comunes, con fuentes y nivel de confianza.',
-    hubLead: 'Elija un vehículo para ver su medida de neumático de referencia, patrón de birlos, medida de llanta y par de apriete — cada uno verificado con fuentes públicas y con un nivel de confianza indicado.',
+    hubDescription: 'Páginas de referencia con medida de neumático, patrón de birlos y par de apriete para vehículos comunes, con fuentes y nivel de confianza.',
+    hubLead: 'Elija un vehículo para ver referencias documentadas de neumático, patrón de birlos, llanta y par, con sus fuentes y nivel de confianza.',
     hubUsMarket: 'Mercado de EE. UU.',
     hubEuMarket: 'Mercado europeo',
     breadcrumbHome: 'Inicio',

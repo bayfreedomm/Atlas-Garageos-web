@@ -14,6 +14,7 @@ import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { localizedToolPath } from '../localization/locales';
 import type { EntityLocale } from '../seo/entity-routes';
 import type { VehicleFitment } from '../data/vehicle-fitment';
+export { torqueIsUnconfirmed } from './vehicle-torque';
 
 const fixed = (value: number, digits: number): string => value.toFixed(digits);
 
@@ -190,29 +191,6 @@ export function distinctCenterBores(vehicles: readonly VehicleFitment[]): readon
 /** "57.1 / 66.5 / 66.6 mm", or an em dash when no vehicle in the set reports a bore. */
 export function formatCenterBores(bores: readonly number[]): string {
   return bores.length === 0 ? '—' : `${bores.join(' / ')} mm`;
-}
-
-/* ---------------------------------------------------------------------------------------
- * Per-row honesty helpers
- *
- * vehicle-fitment.ts carries a `confidence` and optional `notes` per row precisely because the
- * rows are not uniformly solid. These two helpers let the entity tables surface that variation
- * instead of presenting a 'low'-confidence extrapolated torque figure exactly like a
- * manual-sourced one.
- * ------------------------------------------------------------------------------------ */
-
-/** Phrases used in `notes` when a number was extrapolated, contested or not directly confirmed. */
-const UNCONFIRMED_NOTE = /extrapolat|not independently confirmed|could not be (confirmed|verified)|treat as (approximate|needing)|inconsistent across sources|not (FY|W206|Mk4)-specific|prior .* generation|verify before use/i;
-
-/**
- * True when this row's torque figure should be shown de-emphasized: either the whole row is
- * low-confidence, or its note says the torque number specifically was extrapolated or could
- * not be confirmed. Rows with no torque at all are not "unconfirmed" — they show an em dash.
- */
-export function torqueIsUnconfirmed(vehicle: VehicleFitment): boolean {
-  if (vehicle.torqueNm === undefined) return false;
-  if (vehicle.confidence === 'low') return true;
-  return vehicle.notes !== undefined && UNCONFIRMED_NOTE.test(vehicle.notes);
 }
 
 /**

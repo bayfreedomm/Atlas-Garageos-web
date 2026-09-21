@@ -3,6 +3,7 @@ import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model
 import { boltPatternSpacingMm } from '../data/bolt-pattern-geometry';
 import { setSummary, renderMetrics } from './standard-answer-helpers';
 import { getPageLocale } from './page-locale';
+import { torquePresentation, type TorqueLocale } from './vehicle-torque';
 
 const UNVERIFIED_PREFIX = 'name:';
 
@@ -39,9 +40,9 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     selectModel: 'Select a model',
     pendingSummary: 'Pick a make and model to see reference fitment data.',
     summary: (v: VehicleFitment): string => `${v.make} ${v.model} — ${v.tireSize}, bolt pattern ${v.boltPattern}.`,
-    tireSize: 'OEM tire size',
+    tireSize: 'Referenced tire size',
     boltPattern: 'Bolt pattern',
-    wheelSize: 'OEM wheel size',
+    wheelSize: 'Referenced wheel size',
     centerBore: 'Center bore',
     torque: 'Wheel torque',
     fastener: 'Fastener type',
@@ -56,7 +57,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     openBoltTool: 'Open in Bolt Pattern Calculator',
     prefilled: 'Prefilled from this vehicle',
     notPrefilled: 'Enter your own size',
-    unverifiedSummary: (make: string, model: string): string => `We don't have a verified reference fitment for the ${make} ${model} yet — check your door-jamb sticker or owner's manual and enter the size directly below.`,
+    unverifiedSummary: (make: string, model: string): string => `We don't have a documented Atlas fitment entry for the ${make} ${model} yet — check your door-jamb sticker or owner's manual and enter the size directly below.`,
   },
   de: {
     selectMake: 'Marke auswählen',
@@ -81,7 +82,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     openBoltTool: 'Im Lochkreis-Rechner öffnen',
     prefilled: 'Aus diesem Fahrzeug vorausgefüllt',
     notPrefilled: 'Eigene Größe eingeben',
-    unverifiedSummary: (make: string, model: string): string => `Für den ${make} ${model} haben wir noch keine geprüfte Referenz-Bereifung — prüfen Sie den Aufkleber an der Fahrertür oder das Handbuch und geben Sie die Größe unten direkt ein.`,
+    unverifiedSummary: (make: string, model: string): string => `Für den ${make} ${model} hat Atlas noch keinen dokumentierten Referenzeintrag — prüfen Sie den Aufkleber an der Fahrertür oder das Handbuch und geben Sie die Größe unten direkt ein.`,
   },
   es: {
     selectMake: 'Seleccione una marca',
@@ -89,9 +90,9 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     selectModel: 'Seleccione un modelo',
     pendingSummary: 'Elija una marca y un modelo para ver los datos de referencia.',
     summary: (v: VehicleFitment): string => `${v.make} ${v.model} — ${v.tireSize}, patrón de birlos ${v.boltPattern}.`,
-    tireSize: 'Medida de neumático OEM',
+    tireSize: 'Medida de neumático de referencia',
     boltPattern: 'Patrón de birlos',
-    wheelSize: 'Medida de llanta OEM',
+    wheelSize: 'Medida de llanta de referencia',
     centerBore: 'Diámetro de buje',
     torque: 'Par de apriete',
     fastener: 'Tipo de fijación',
@@ -106,19 +107,19 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     openBoltTool: 'Abrir en la Calculadora de Patrón de Birlos',
     prefilled: 'Rellenado con los datos de este vehículo',
     notPrefilled: 'Introduzca su propia medida',
-    unverifiedSummary: (make: string, model: string): string => `Todavía no tenemos una referencia de ajuste verificada para el ${make} ${model} — consulte la etiqueta del pilar de la puerta o el manual del propietario e introduzca la medida directamente abajo.`,
+    unverifiedSummary: (make: string, model: string): string => `Atlas todavía no tiene una entrada de ajuste documentada para el ${make} ${model} — consulte la etiqueta del pilar de la puerta o el manual e introduzca la medida directamente abajo.`,
   },
 } as const;
 
-function formatTorque(vehicle: VehicleFitment): string {
-  if (vehicle.torqueNm === undefined) return '—';
-  const lbFt = vehicle.torqueLbFt !== undefined ? ` (${vehicle.torqueLbFt} lb-ft)` : '';
-  return `${vehicle.torqueNm} Nm${lbFt}`;
+function formatTorque(vehicle: VehicleFitment, locale: TorqueLocale): string {
+  const torque = torquePresentation(vehicle, locale);
+  return torque.qualifier ? `${torque.value} — ${torque.qualifier}` : torque.value;
 }
 
 export function initializeVehicleFitmentFinder(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="vehicle-finder"]').forEach((form) => {
-    const t = TEXT[getPageLocale()];
+    const locale = getPageLocale();
+    const t = TEXT[locale];
     const makeSelect = form.querySelector<HTMLSelectElement>('[data-vehicle-make]');
     const modelSelect = form.querySelector<HTMLSelectElement>('[data-vehicle-model]');
     const meta = form.querySelector<HTMLElement>('[data-vehicle-meta]');
@@ -171,7 +172,7 @@ export function initializeVehicleFitmentFinder(): void {
         [t.boltPattern, vehicle.boltPattern],
         [t.wheelSize, vehicle.wheelSize],
         ...(vehicle.centerBoreMm !== undefined ? [[t.centerBore, `${vehicle.centerBoreMm} mm`] as const] : []),
-        [t.torque, formatTorque(vehicle)],
+        [t.torque, formatTorque(vehicle, locale)],
         [t.fastener, vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt],
       ]);
       if (confidenceEl) { confidenceEl.textContent = t.confidence[vehicle.confidence]; confidenceEl.dataset.confidence = vehicle.confidence; }

@@ -17,7 +17,7 @@ export interface FuelProduct {
   readonly id: string;
   readonly label: string;
   readonly value: number;
-  /** Number of stations nationally that contributed a non-null reading to this average. */
+  /** Number of station readings contributing to this average within the provider's stated coverage. */
   readonly sampleSize: number;
 }
 

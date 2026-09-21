@@ -173,10 +173,10 @@ const plural = (n: number, one: string, many: string): string => (n === 1 ? one 
 export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Object.freeze({
   en: {
     hubTitle: 'Tire Sizes — Dimensions, Diameter & Vehicle Matches',
-    hubDescription: 'Every tire size in the Atlas OEM fitment reference, with calculated sidewall, overall diameter and circumference, and the Atlas vehicle entries that list each one.',
+    hubDescription: 'Every tire size in the sourced Atlas fitment reference, with calculated sidewall, overall diameter and circumference, and the documented vehicle entries that list each one.',
     hubKicker: 'Tire size reference',
     hubH1: 'Tire sizes in the Atlas fitment reference',
-    hubLead: (count, vehicles) => `${count} tire ${plural(count, 'size', 'sizes')} appear as an OEM fitment on the ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')} in the Atlas reference. Each size below has its own page with calculated geometry and the exact vehicles it is listed on — nothing here is a size we have not seen on a real, sourced vehicle entry.`,
+    hubLead: (count, vehicles) => `${count} tire ${plural(count, 'size', 'sizes')} appear across the ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')} in the Atlas reference. Each size below has its own page with calculated geometry and the exact vehicles it is listed on — nothing here is a size we have not seen on a documented vehicle entry.`,
     notationHeading: 'How to read a tire size',
     notationIntro: 'A metric tire code such as 205/55R16 packs three separate measurements plus a construction letter into one string:',
     notationParts: [
@@ -198,13 +198,13 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     comparisonCta: 'Tire Size Comparison',
     comparisonCtaDetail: 'Put two sizes side by side with the real diameter difference',
     vehiclesCta: 'Vehicle fitment reference',
-    vehiclesCtaDetail: 'OEM tire size, bolt pattern and torque by vehicle',
+    vehiclesCtaDetail: 'Sourced tire size, bolt pattern and qualified torque by vehicle',
     boltHubCta: 'Bolt patterns',
     boltHubCtaDetail: 'The PCD side of the same fitment data',
 
     detailKicker: 'Tire size',
     detailTitle: (notation) => `${notation} Tire Size — Dimensions, Diameter & Sidewall`,
-    detailDescription: (notation, diameterMm, vehicles) => `${notation} has a calculated overall diameter of ${diameterMm} mm. See its sidewall height, circumference and revolutions per mile, and the ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')} currently listed in the Atlas fitment reference with it as an OEM fitment.`,
+    detailDescription: (notation, diameterMm, vehicles) => `${notation} has a calculated overall diameter of ${diameterMm} mm. See its sidewall height, circumference and revolutions per mile, and the ${vehicles} documented ${plural(vehicles, 'vehicle', 'vehicles')} currently listed with it in the Atlas fitment reference.`,
     detailH1: (notation) => `${notation} tire size`,
     detailLead: (width, aspect, rim) => `A ${width} mm wide tire with a sidewall ${aspect}% of that width, mounted on a ${rim}-inch rim.`,
     metricsHeading: 'Calculated dimensions',
@@ -229,9 +229,9 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     crossRimCaption: 'inner cavity above the rim',
     visualNote: 'Drawn to the real section width and sidewall height of this size, using the same geometry helper as the calculator — proportions are calculated, not decorative.',
     vehiclesHeading: 'Vehicles listed with this size',
-    vehiclesIntro: (n) => `Atlas lists ${n} sourced ${plural(n, 'vehicle', 'vehicles')} with this size as an OEM fitment. Trims and model years vary — always check the placard on the vehicle in front of you.`,
+    vehiclesIntro: (n) => `Atlas lists ${n} sourced ${plural(n, 'vehicle', 'vehicles')} with this referenced size. Trims and model years vary — always check the placard on the vehicle in front of you.`,
     vehiclesEmpty: 'No vehicle in the Atlas fitment reference is currently listed with this size.',
-    colVehicle: 'Vehicle', colGeneration: 'Generation', colWheel: 'OEM wheel', colBoltPattern: 'Bolt pattern',
+    colVehicle: 'Vehicle', colGeneration: 'Generation', colWheel: 'Referenced wheel', colBoltPattern: 'Bolt pattern',
     colConfidence: 'Source confidence',
     confidence: { high: 'High', medium: 'Medium', low: 'Low' },
     confidenceNote: 'Confidence is per entry, not per page: it records how directly Atlas could source that particular row. Open a vehicle for its sources and caveats.',
@@ -248,7 +248,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     backToHub: 'All tire sizes',
     faqHeading: 'Frequently asked questions',
     faqs: ({ notation, vehicles, makes, rim }) => [
-      { q: `Is ${notation} a common tire size?`, a: `In the Atlas OEM fitment reference it appears on ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}${makes ? ` (${makes})` : ''}. That is a sample of sourced vehicles, not a market-share figure — it tells you the size is genuinely used from the factory, not how many are sold.` },
+      { q: `Is ${notation} a common tire size?`, a: `In the sourced Atlas fitment reference it appears on ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}${makes ? ` (${makes})` : ''}. That is a documented sample, not a market-share figure or a universal fitment claim.` },
       { q: `What vehicles use ${notation}?`, a: vehicles > 0 ? `The vehicles listed on this page: ${makes}. Each links to its own fitment page with the bolt pattern, wheel size and torque spec.` : 'No vehicle in the Atlas fitment reference is currently listed with this size.' },
       { q: `Can I fit a different tire size instead?`, a: `Often yes, but only within limits the vehicle manufacturer sets. The geometric comparison above shows which sizes in this reference come out within 3% of the same overall diameter, which is the starting filter — it is not permission. Wheel width, load index, speed rating and clearance all still have to work, and the vehicle’s placard and manual are the authority.` },
       { q: `What does the ${rim} in ${notation} mean?`, a: `It is the rim diameter in inches: this tire mounts on a ${rim}-inch wheel. The first two numbers are metric (millimetres and a percentage), so a tire code deliberately mixes unit systems.` },
@@ -258,10 +258,10 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
 
   de: {
     hubTitle: 'Reifengrößen — Maße, Durchmesser & Fahrzeugzuordnung',
-    hubDescription: 'Alle Reifengrößen aus der Atlas-Werksdatenbank, mit berechneter Flankenhöhe, Gesamtdurchmesser und Abrollumfang sowie den belegten Fahrzeugen, die sie fahren.',
+    hubDescription: 'Alle Reifengrößen aus der belegten Atlas-Fitment-Referenz, mit berechneter Flankenhöhe, Gesamtdurchmesser und Abrollumfang sowie den dokumentierten Fahrzeugeinträgen.',
     hubKicker: 'Reifengrößen-Referenz',
     hubH1: 'Reifengrößen in der Atlas-Fitment-Referenz',
-    hubLead: (count, vehicles) => `${count} ${plural(count, 'Reifengröße ist', 'Reifengrößen sind')} bei den ${vehicles} belegten Fahrzeugen der Atlas-Referenz als Werksbereifung eingetragen. Jede Größe hat eine eigene Seite mit berechneter Geometrie und den Fahrzeugen, bei denen sie gelistet ist — hier steht keine Größe, die wir nicht an einem echten, mit Quelle belegten Fahrzeugeintrag gesehen haben.`,
+    hubLead: (count, vehicles) => `${count} ${plural(count, 'Reifengröße ist', 'Reifengrößen sind')} bei den ${vehicles} belegten Fahrzeugen der Atlas-Referenz eingetragen. Jede Größe hat eine eigene Seite mit berechneter Geometrie und den Fahrzeugeinträgen, bei denen sie gelistet ist.`,
     notationHeading: 'So lesen Sie eine Reifengröße',
     notationIntro: 'Ein metrischer Reifencode wie 205/55R16 fasst drei getrennte Maße und einen Bauart-Buchstaben in einer Zeichenfolge zusammen:',
     notationParts: [
@@ -316,7 +316,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     vehiclesHeading: 'Fahrzeuge mit dieser Größe',
     vehiclesIntro: (n) => `Atlas führt ${n} ${plural(n, 'belegtes Fahrzeug', 'belegte Fahrzeuge')} mit dieser Größe als Werksbereifung. Ausstattungen und Modelljahre unterscheiden sich — prüfen Sie immer den Aufkleber am Fahrzeug selbst.`,
     vehiclesEmpty: 'Atlas hat für diese Größe noch keine belegte Fahrzeugzuordnung.',
-    colVehicle: 'Fahrzeug', colGeneration: 'Generation', colWheel: 'Werksfelge', colBoltPattern: 'Lochkreis',
+    colVehicle: 'Fahrzeug', colGeneration: 'Generation', colWheel: 'Referenzfelge', colBoltPattern: 'Lochkreis',
     colConfidence: 'Quellenlage',
     confidence: { high: 'Hoch', medium: 'Mittel', low: 'Niedrig' },
     confidenceNote: 'Die Quellenlage gilt pro Eintrag, nicht pro Seite: Sie hält fest, wie direkt Atlas genau diese Zeile belegen konnte. Quellen und Vorbehalte stehen auf der jeweiligen Fahrzeugseite.',
@@ -343,10 +343,10 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
 
   es: {
     hubTitle: 'Medidas de neumáticos — Dimensiones, diámetro y vehículos',
-    hubDescription: 'Todas las medidas de neumático de la referencia de equipo original de Atlas, con flanco, diámetro total y circunferencia calculados, y los vehículos documentados en la referencia Atlas que las montan.',
+    hubDescription: 'Todas las medidas de neumático de la referencia documentada de Atlas, con flanco, diámetro total y circunferencia calculados, y los vehículos registrados con cada medida.',
     hubKicker: 'Referencia de medidas',
     hubH1: 'Medidas de neumático en la referencia Atlas',
-    hubLead: (count, vehicles) => `${count} ${plural(count, 'medida figura', 'medidas figuran')} como equipo original en los ${vehicles} ${plural(vehicles, 'vehículo documentado', 'vehículos documentados')} de la referencia Atlas. Cada medida tiene su propia página con la geometría calculada y los vehículos exactos en los que aparece — aquí no hay ninguna medida que no hayamos visto en una ficha de vehículo real y documentada.`,
+    hubLead: (count, vehicles) => `${count} ${plural(count, 'medida figura', 'medidas figuran')} en los ${vehicles} ${plural(vehicles, 'vehículo documentado', 'vehículos documentados')} de la referencia Atlas. Cada medida tiene su propia página con la geometría calculada y los vehículos en los que está registrada.`,
     notationHeading: 'Cómo se lee una medida de neumático',
     notationIntro: 'Un código métrico como 205/55R16 reúne tres medidas distintas y una letra de construcción en una sola cadena:',
     notationParts: [
@@ -430,10 +430,10 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
 export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>> = Object.freeze({
   en: {
     hubTitle: 'Bolt Patterns (PCD) — Lug Count, Circle Diameter & Vehicles',
-    hubDescription: 'Every wheel bolt pattern in the Atlas OEM fitment reference, with lug count, pitch circle diameter, measured hole spacing and the Atlas vehicle entries that use each one.',
+    hubDescription: 'Every wheel bolt pattern in the sourced Atlas fitment reference, with lug count, pitch circle diameter, measured hole spacing and the documented vehicle entries that use each one.',
     hubKicker: 'Bolt pattern reference',
     hubH1: 'Bolt patterns in the Atlas fitment reference',
-    hubLead: (count, vehicles) => `${count} bolt ${plural(count, 'pattern appears', 'patterns appear')} across the ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')} in the Atlas reference. Each pattern below has its own page with the vehicles it is listed on, their center bore values, and the OEM tire sizes they run.`,
+    hubLead: (count, vehicles) => `${count} bolt ${plural(count, 'pattern appears', 'patterns appear')} across the ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')} in the Atlas reference. Each pattern below has its own page with the vehicles it is listed on, their center bore values, and their referenced tire sizes.`,
     notationHeading: 'How to read a bolt pattern',
     notationIntro: (example, lugs, pcd) => `A bolt pattern such as ${example} is two numbers: the lug count and the pitch circle diameter (PCD). ${example} means ${lugs} lug holes evenly spaced around an imaginary circle ${pcd} mm across, measured through the centre of the wheel.`,
     notationParts: [
@@ -474,7 +474,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     vehiclesHeading: 'Vehicles with this bolt pattern',
     vehiclesIntro: (n) => `Atlas lists ${n} sourced ${plural(n, 'vehicle', 'vehicles')} with this pattern. Center bore, wheel size and torque differ between them — that is exactly why a shared pattern is not interchangeability.`,
     vehiclesEmpty: 'No vehicle in the Atlas fitment reference is currently listed with this bolt pattern.',
-    colVehicle: 'Vehicle', colTireSize: 'OEM tire size', colCenterBore: 'Center bore', colWheel: 'OEM wheel', colTorque: 'Wheel torque', colFastener: 'Fastener',
+    colVehicle: 'Vehicle', colTireSize: 'Referenced tire size', colCenterBore: 'Center bore', colWheel: 'Referenced wheel', colTorque: 'Wheel torque', colFastener: 'Fastener',
     colConfidence: 'Source confidence',
     confidence: { high: 'High', medium: 'Medium', low: 'Low' },
     confidenceNote: 'Confidence is per entry, not per page: it records how directly Atlas could source that particular row. Open a vehicle for its sources and caveats.',
@@ -495,7 +495,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     ctaHeading: 'Check a measurement',
     ctaNote: 'The calculator opens pre-filled with this pattern’s lug count and spacing.',
     relatedHeading: 'Related data',
-    relatedTireIntro: 'OEM tire sizes on the vehicles that use this pattern:',
+    relatedTireIntro: 'Referenced tire sizes on the vehicles that use this pattern:',
     backToHub: 'All bolt patterns',
     faqHeading: 'Frequently asked questions',
     faqs: ({ notation, lugs, pcd, vehicles, makes }) => [
@@ -509,7 +509,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
 
   de: {
     hubTitle: 'Lochkreise (LK) — Lochzahl, Lochkreisdurchmesser & Fahrzeuge',
-    hubDescription: 'Alle Radlochkreise aus der Atlas-Werksdatenbank, mit Lochzahl, Lochkreisdurchmesser, messbarem Lochabstand und den belegten Fahrzeugen, die sie verwenden.',
+    hubDescription: 'Alle Radlochkreise aus der belegten Atlas-Fitment-Referenz, mit Lochzahl, Lochkreisdurchmesser, messbarem Lochabstand und den dokumentierten Fahrzeugeinträgen.',
     hubKicker: 'Lochkreis-Referenz',
     hubH1: 'Lochkreise in der Atlas-Fitment-Referenz',
     hubLead: (count, vehicles) => `${count} ${plural(count, 'Lochkreis kommt', 'Lochkreise kommen')} bei den ${vehicles} belegten Fahrzeugen der Atlas-Referenz vor. Jeder Lochkreis hat eine eigene Seite mit den gelisteten Fahrzeugen, ihren Mittenlochwerten und den Werksreifengrößen, die sie fahren.`,
@@ -553,7 +553,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     vehiclesHeading: 'Fahrzeuge mit diesem Lochkreis',
     vehiclesIntro: (n) => `Atlas führt ${n} ${plural(n, 'belegtes Fahrzeug', 'belegte Fahrzeuge')} mit diesem Lochkreis. Mittenloch, Felgengröße und Drehmoment unterscheiden sich dabei — genau deshalb bedeutet ein gleicher Lochkreis noch keine Austauschbarkeit.`,
     vehiclesEmpty: 'Atlas hat für diesen Lochkreis noch keine belegte Fahrzeugzuordnung.',
-    colVehicle: 'Fahrzeug', colTireSize: 'Werksreifengröße', colCenterBore: 'Mittenloch', colWheel: 'Werksfelge', colTorque: 'Anzugsdrehmoment', colFastener: 'Befestigung',
+    colVehicle: 'Fahrzeug', colTireSize: 'Referenz-Reifengröße', colCenterBore: 'Mittenloch', colWheel: 'Referenzfelge', colTorque: 'Anzugsdrehmoment', colFastener: 'Befestigung',
     colConfidence: 'Quellenlage',
     confidence: { high: 'Hoch', medium: 'Mittel', low: 'Niedrig' },
     confidenceNote: 'Die Quellenlage gilt pro Eintrag, nicht pro Seite: Sie hält fest, wie direkt Atlas genau diese Zeile belegen konnte. Quellen und Vorbehalte stehen auf der jeweiligen Fahrzeugseite.',
@@ -588,7 +588,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
 
   es: {
     hubTitle: 'Patrones de birlos (PCD) — Número de birlos, diámetro y vehículos',
-    hubDescription: 'Todos los patrones de birlos de la referencia de equipo original de Atlas, con número de birlos, diámetro del círculo de paso, separación medible entre agujeros y los vehículos documentados en la referencia Atlas que los usan.',
+    hubDescription: 'Todos los patrones de birlos de la referencia documentada de Atlas, con número de birlos, diámetro del círculo de paso, separación medible entre agujeros y los vehículos registrados con cada patrón.',
     hubKicker: 'Referencia de patrones',
     hubH1: 'Patrones de birlos en la referencia Atlas',
     hubLead: (count, vehicles) => `${count} ${plural(count, 'patrón aparece', 'patrones aparecen')} entre los ${vehicles} ${plural(vehicles, 'vehículo documentado', 'vehículos documentados')} de la referencia Atlas. Cada patrón tiene su propia página con los vehículos en los que figura, sus valores de centro de rueda y las medidas de neumático de origen que montan.`,

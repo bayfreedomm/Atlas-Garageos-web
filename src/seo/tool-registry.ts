@@ -58,7 +58,7 @@ export const toolRegistry: readonly ToolDefinition[] = Object.freeze([
   // titles and slugs, and it is listed, searched, counted and sitemapped by exactly the same
   // code paths as every tool. Nothing about it is special-cased in the directory UI.
   { id: 'gas-prices-today', slug: 'gas-prices-today', locale: 'en', title: 'Gas Prices Today', description: 'Current gas and diesel prices with price history, market metrics and a direct hand-off into the fuel and road-trip cost calculators.', category: 'Fuel & Trips', relatedToolIds: ['fuel-cost-calculator', 'road-trip-cost-calculator', 'ev-charging-cost-calculator'], status: 'implemented', indexable: true, kind: 'data-product' },
-  { id: 'vehicle-fitment-finder', slug: 'find-my-vehicle', locale: 'en', title: 'Find My Vehicle', description: 'Look up OEM tire size, bolt pattern, and wheel torque spec by make and model, sourced and confidence-rated.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-calculator', 'bolt-pattern-calculator', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },
+  { id: 'vehicle-fitment-finder', slug: 'find-my-vehicle', locale: 'en', title: 'Find My Vehicle', description: 'Look up sourced tire size, bolt pattern, and qualified wheel torque references by make and model.', category: 'Tires & Wheels', relatedToolIds: ['tire-size-calculator', 'bolt-pattern-calculator', 'fitment-studio'], status: 'implemented', indexable: true, kind: 'tool' },
 ]);
 
 export function routeForTool(tool: ToolDefinition): string {

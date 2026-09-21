@@ -6,8 +6,9 @@ import { vehicleFitmentData, type VehicleFitment } from '../../data/vehicle-fitm
 import { tireSizeSlug } from '../../data/tire-size-catalog';
 import { boltPatternSlug } from '../../data/bolt-pattern-catalog';
 import { entityDetailPath, type EntityLocale } from '../../seo/entity-routes';
+import { torqueJsonLdProperty, torquePresentation } from '../../ui/vehicle-torque';
 
-// The OEM tire size and bolt pattern below link through to their own reference pages.
+// The sourced tire size and bolt pattern below link through to their own reference pages.
 const LOCALE: EntityLocale = 'en';
 
 export function getStaticPaths() {
@@ -21,7 +22,8 @@ const { vehicle } = Astro.props as Props;
 const t = vehiclePageText.en;
 const pathname = `/vehicles/${vehicle.id}/`;
 const title = `${vehicle.make} ${vehicle.model} Tire Size & Bolt Pattern`;
-const description = `OEM tire size ${vehicle.tireSize} and bolt pattern ${vehicle.boltPattern} reference for the ${vehicle.make} ${vehicle.model} (${vehicle.generation}), sourced and confidence-rated.`;
+const description = `Atlas tire size ${vehicle.tireSize} and bolt pattern ${vehicle.boltPattern} reference for the ${vehicle.make} ${vehicle.model} (${vehicle.generation}), sourced and confidence-rated.`;
+const torque = torquePresentation(vehicle, LOCALE);
 const faqs = [
   { q: t.faqTireQ(vehicle), a: t.faqTireA(vehicle) },
   { q: t.faqBoltQ(vehicle), a: t.faqBoltA(vehicle) },
@@ -43,7 +45,7 @@ const vehicleJsonLd = serializeJsonLd({
     { '@type': 'PropertyValue', name: 'Tire size', value: vehicle.tireSize },
     { '@type': 'PropertyValue', name: 'Bolt pattern', value: vehicle.boltPattern },
     { '@type': 'PropertyValue', name: 'Wheel size', value: vehicle.wheelSize },
-    ...(vehicle.torqueNm !== undefined ? [{ '@type': 'PropertyValue', name: 'Wheel torque (Nm)', value: String(vehicle.torqueNm) }] : []),
+    ...torqueJsonLdProperty(vehicle, 'Wheel torque (Nm)'),
   ],
 });
 ---
@@ -62,7 +64,7 @@ const vehicleJsonLd = serializeJsonLd({
     <section><h2>{t.tireSize}</h2><p><strong><a href={entityDetailPath('tire-size', LOCALE, tireSizeSlug(vehicle.tireSize))}>{vehicle.tireSize}</a></strong></p></section>
     <section><h2>{t.boltPattern}</h2><p><strong><a href={entityDetailPath('bolt-pattern', LOCALE, boltPatternSlug(vehicle.boltPattern))}>{vehicle.boltPattern}</a></strong> ({vehicle.lugCount} {vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt})</p></section>
     <section><h2>{t.wheelSize}</h2><p><strong>{vehicle.wheelSize}</strong></p></section>
-    <section><h2>{t.torque}</h2><p><strong>{vehicle.torqueNm !== undefined ? `${vehicle.torqueNm} Nm${vehicle.torqueLbFt !== undefined ? ` (${vehicle.torqueLbFt} lb-ft)` : ''}` : '—'}</strong></p></section>
+    <section><h2>{t.torque}</h2><p><strong class={torque.qualified ? 'entity-soft' : undefined}>{torque.value}</strong>{torque.qualifier && <><br /><small>{torque.qualifier}</small></>}</p></section>
     {vehicle.centerBoreMm !== undefined && <section><h2>{t.centerBore}</h2><p><strong>{vehicle.centerBoreMm} mm</strong></p></section>}
     <section><h2>{t.generation}</h2><p><strong>{vehicle.generation}</strong></p></section>
   </div>
@@ -81,8 +83,7 @@ const vehicleJsonLd = serializeJsonLd({
   </section>
 
   <section class="methodology-sources" aria-labelledby="vehicle-tools-heading">
-    <p class="eyebrow">{t.toolsHeading}</p>
-    <h2 id="vehicle-tools-heading">&nbsp;</h2>
+    <h2 id="vehicle-tools-heading">{t.toolsHeading}</h2>
     <div class="methodology-source-links">
       <a href="/tools/tire-size-calculator/">{t.openTireTool} <span>↗</span></a>
       <a href="/tools/bolt-pattern-calculator/">{t.openBoltTool} <span>↗</span></a>

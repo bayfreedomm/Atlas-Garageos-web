@@ -237,7 +237,7 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     warning: 'This list grows over time and does not yet cover every vehicle. Always confirm against your own vehicle’s manual or door-jamb sticker before torquing wheels or ordering parts.',
     faqs: [
       { question: 'Where can I find my vehicle’s actual factory tire size and bolt pattern?', answer: 'The most reliable source is the sticker inside the driver’s door jamb or your owner’s manual — both list the exact specification for your trim as built, which can differ from generic references online.' },
-      { question: 'Why isn’t my exact vehicle listed here?', answer: 'This is a curated starting set, not a complete manufacturer database. If your make and model appear but show no verified spec, or don’t appear at all yet, use the door-jamb sticker with the Tire Size or Bolt Pattern Calculator directly.' },
+      { question: 'Why isn’t my exact vehicle listed here?', answer: 'This is a curated starting set, not a complete manufacturer database. If your make and model appear but have no documented Atlas entry, or don’t appear at all yet, use the door-jamb sticker with the Tire Size or Bolt Pattern Calculator directly.' },
       { question: 'What does the confidence label mean?', answer: 'High confidence means multiple independent sources agreed. Medium or low confidence means sources disagreed or a value could not be fully confirmed — those entries ask you to cross-check before relying on them.' },
     ],
   },

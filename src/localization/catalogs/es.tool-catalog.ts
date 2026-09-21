@@ -479,7 +479,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
   },
   'vehicle-fitment-finder': {
     title: 'Encontrar mi Vehículo',
-    description: 'Consulte la medida de neumático, el patrón de birlos y el par de apriete de fábrica por marca y modelo, con fuentes y nivel de confianza.',
+    description: 'Consulte referencias Atlas de medida de neumático, patrón de birlos y par de apriete cualificado por marca y modelo, con fuentes y nivel de confianza.',
     category: 'Neumáticos y Llantas',
     eyebrow: 'Neumáticos y llantas',
     intro: 'Elija una marca y un modelo para ver la medida de neumático, el patrón de birlos y el par de apriete de referencia — y pase directamente a la calculadora correspondiente.',
@@ -487,7 +487,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     studioCta: 'Confirmar el ajuste en el Comparador de Llantas y Neumáticos',
     explanation: [
       { heading: 'De dónde vienen estos datos', paragraphs: [
-        'Cada entrada se ha investigado manualmente a partir de referencias públicas y, cuando ha sido posible, se ha verificado con al menos dos fuentes. Cada vehículo muestra un nivel de confianza y sus fuentes para que pueda juzgar cuán sólido es el dato.',
+        'Cada entrada se ha documentado manualmente a partir de referencias públicas y, cuando ha sido posible, se ha contrastado con al menos dos fuentes. Cada vehículo muestra un nivel de confianza y sus fuentes para que pueda juzgar cuán sólido es el dato.',
         'Algunos valores de par de apriete no se pudieron confirmar con certeza o difirieron entre fuentes — estos casos están señalados como tales en lugar de inventar una cifra.',
       ] },
     ],
@@ -499,7 +499,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     warning: 'Esta lista crece con el tiempo y todavía no cubre todos los vehículos. Confirme siempre los datos con el manual de su propio vehículo antes de apretar ruedas o pedir piezas.',
     faqs: [
       { question: '¿Dónde encuentro la medida de neumático y el patrón de birlos reales de fábrica de mi vehículo?', answer: 'La fuente más fiable es la etiqueta del marco de la puerta del conductor o el manual del propietario — ambos muestran la especificación exacta de fábrica de su acabado concreto, que puede diferir de referencias genéricas en línea.' },
-      { question: '¿Por qué mi vehículo exacto no aparece aquí?', answer: 'Este es un conjunto inicial curado, no una base de datos completa del fabricante. Si la marca y el modelo aparecen pero sin un dato verificado, o aún no aparecen en absoluto, use directamente la etiqueta de la puerta del conductor con la Calculadora de Tamaño de Neumáticos o de Patrón de Birlos.' },
+      { question: '¿Por qué mi vehículo exacto no aparece aquí?', answer: 'Este es un conjunto inicial curado, no una base de datos completa del fabricante. Si la marca y el modelo aparecen pero sin una entrada documentada, o aún no aparecen en absoluto, use directamente la etiqueta de la puerta del conductor con la Calculadora de Tamaño de Neumáticos o de Patrón de Birlos.' },
       { question: '¿Qué significa el nivel de confianza?', answer: 'Confianza alta significa que varias fuentes independientes coincidieron. Confianza media o baja significa que las fuentes discreparon o que un valor no se pudo confirmar por completo — compruebe estas entradas antes de usarlas.' },
     ],
   },

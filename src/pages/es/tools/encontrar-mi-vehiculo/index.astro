@@ -31,10 +31,10 @@ const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()
   </form>
   <div slot="explanation">
     {c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}
-    <h2>Actualmente cubre {makeCount} marcas con datos de ajuste verificados</h2>
+    <h2>Actualmente cubre {makeCount} marcas con entradas de ajuste Atlas documentadas</h2>
     <p>Este es un conjunto inicial de vehículos habituales, no una base de datos completa del fabricante — irá creciendo con el tiempo. Si su vehículo exacto aún no aparece, la etiqueta del pilar de la puerta del conductor o el manual del propietario tienen la especificación del fabricante, que puede introducir directamente en la <a href="/es/tools/calculadora-tamano-neumaticos/">Calculadora de Tamaño de Neumático</a> o la <a href="/es/tools/calculadora-patron-birlos/">Calculadora de Patrón de Birlos</a>.</p>
-    <p>El propio selector de marca y modelo busca en una lista más amplia — {searchableMakeCount} marcas en total — para que pueda encontrar y elegir su vehículo aunque todavía no tengamos una referencia de neumático/patrón de birlos verificada para él. En ese caso se lo decimos claramente en vez de adivinar una medida.</p>
-    <p>¿Busca un enlace para compartir sobre un vehículo concreto? Consulte las páginas de <a href="/es/vehiculos/">Referencia de Ajuste de Vehículos</a> — una página dedicada por modelo con los mismos datos verificados.</p>
+    <p>El selector de marca y modelo busca en una lista más amplia — {searchableMakeCount} marcas en total — para que pueda elegir su vehículo aunque Atlas todavía no tenga una entrada documentada para él. En ese caso se lo decimos claramente en vez de adivinar una medida.</p>
+    <p>¿Busca un enlace para compartir sobre un vehículo concreto? Consulte las páginas de <a href="/es/vehiculos/">Referencia de Ajuste de Vehículos</a> — una página por modelo documentado.</p>
   </div>
 </ToolPage>
 <script>import { initializeVehicleFitmentFinder } from '../../../../ui/vehicle-fitment-finder'; initializeVehicleFitmentFinder();</script>

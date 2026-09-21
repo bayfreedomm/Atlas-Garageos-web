@@ -17,9 +17,10 @@ import { millimetersToInches } from '../core/units/conversion';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import {
   boltPatternCalculatorHref, distinctCenterBores, formatCenterBores, homePath, splitHeadingAroundKey,
-  tireSizesForBoltPattern, torqueIsUnconfirmed, vehicleHubPath, vehicleLink, vehicleNames,
+  tireSizesForBoltPattern, vehicleHubPath, vehicleLink, vehicleNames,
 } from '../ui/entity-page-model';
 import { localizedToolPath } from '../localization/locales';
+import { torquePresentation } from '../ui/vehicle-torque';
 
 interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocale; }
 const { entry, locale } = Astro.props;
@@ -100,16 +101,16 @@ const metricRows = [
               // Torque is the one safety-critical number in this table, so a low-confidence or
               // explicitly extrapolated figure is muted and marked rather than shown as if it
               // carried the same weight as a manual-sourced one.
-              const softTorque = torqueIsUnconfirmed(vehicle);
+              const torque = torquePresentation(vehicle, locale);
               return (
                 <tr>
                   <th scope="row"><a href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{vehicle.make} {vehicle.model}</a></th>
                   <td><a href={entityDetailPath('tire-size', locale, tireSizeSlug(vehicle.tireSize))}>{vehicle.tireSize}</a></td>
                   <td>{vehicle.centerBoreMm === undefined ? '—' : `${vehicle.centerBoreMm} mm`}</td>
                   <td>{vehicle.wheelSize}</td>
-                  <td class={softTorque ? 'entity-soft' : undefined} title={softTorque ? t.torqueUnconfirmedTitle : undefined}>
-                    {vehicle.torqueNm === undefined ? '—' : `${vehicle.torqueNm} Nm${vehicle.torqueLbFt === undefined ? '' : ` (${vehicle.torqueLbFt} lb-ft)`}`}
-                    {softTorque && <abbr class="entity-soft__mark" title={t.torqueUnconfirmedTitle}>*</abbr>}
+                  <td class={torque.qualified ? 'entity-soft' : undefined} title={torque.qualifier ?? undefined}>
+                    {torque.value}
+                    {torque.qualified && <abbr class="entity-soft__mark" title={torque.qualifier ?? t.torqueUnconfirmedTitle}>*</abbr>}
                   </td>
                   <td>{vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt}</td>
                   <td><span class={`entity-confidence entity-confidence--${vehicle.confidence}`}>{t.confidence[vehicle.confidence]}</span></td>

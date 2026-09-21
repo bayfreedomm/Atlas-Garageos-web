@@ -60,7 +60,7 @@ function hasFieldFor(target: PickerTarget, vehicle: VehicleFitment): boolean {
 }
 
 function fieldSummary(target: PickerTarget, vehicle: VehicleFitment): string {
-  return target === 'tire-size' ? `OEM tire size ${vehicle.tireSize}` : `Bolt pattern ${vehicle.boltPattern}`;
+  return target === 'tire-size' ? `Referenced tire size ${vehicle.tireSize}` : `Referenced bolt pattern ${vehicle.boltPattern}`;
 }
 
 export function initializeVehicleFitmentPicker(): void {
@@ -118,7 +118,7 @@ export function initializeVehicleFitmentPicker(): void {
       resultEl.hidden = false;
       resultEl.dataset.vfpState = 'unverified';
       resultValueEl.textContent = `${make} ${model}`;
-      resultNoteEl.textContent = "We don't have verified fitment data for this vehicle yet — check your door-jamb sticker or owner's manual.";
+      resultNoteEl.textContent = "Atlas doesn't have a documented fitment entry for this vehicle yet — check your door-jamb sticker or owner's manual.";
       applyButton.hidden = true;
     };
 
@@ -133,7 +133,7 @@ export function initializeVehicleFitmentPicker(): void {
       } else {
         currentVehicle = null;
         resultValueEl.textContent = `${vehicle.make} ${vehicle.model}`;
-        resultNoteEl.textContent = 'No verified data for this calculator yet.';
+        resultNoteEl.textContent = 'No documented Atlas reference for this calculator yet.';
         applyButton.hidden = true;
       }
     };
