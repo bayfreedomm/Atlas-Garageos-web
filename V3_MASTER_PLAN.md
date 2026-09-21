@@ -197,3 +197,9 @@ Next implementation pass:
 - [x] No trustworthy vehicle-consumption field exists, so users must enter actual consumption; pending market prices remain blank.
 - [x] Model-specific trip-cost pSEO pages are intentionally deferred until materially vehicle-specific consumption data exists.
 - [x] Locked counts remain 30 vehicle records, 20 tire entities, 10 PCD entities and 96 existing pSEO entity URLs.
+
+## Cloudflare deploy hardening checkpoint — 2026-09-22
+- [x] Root `wrangler.jsonc` defines the `atlas-garageos-web` assets-only Worker, fixed compatibility date, `./dist` assets, Astro trailing-slash handling and custom 404 behavior without a Worker entry file.
+- [x] Wrangler 4.136.1 is an exact devDependency under the existing Node 24 / pnpm 11 contract.
+- [x] Production deploy and preview version-upload dry-runs pass with repository config alone and with Cloudflare's explicit `--assets ./dist` flag.
+- [x] Static Astro output, fuel workflows/data, product logic, entity counts and Package 1–4 features remain unchanged.
