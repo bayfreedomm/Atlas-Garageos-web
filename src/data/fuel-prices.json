@@ -1,32 +1,50 @@
 {
-  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "generatedAt": "2026-09-21T19:50:37.021Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "pending",
     "products": [],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
+    "lastAttemptAt": null,
     "lastSuccessAt": null,
-    "note": "Seed placeholder committed before the first scheduled run — no verified data yet."
+    "note": "No verified data yet — this market is not part of the recurring automatic refresh."
   },
   "de": {
-    "status": "pending",
-    "products": [],
-    "source": "Tankerkönig — Atlas monitored sample of selected German city stations (not a national average)",
+    "status": "fresh",
+    "products": [
+      {
+        "id": "e5",
+        "label": "Super E5",
+        "value": 2.291,
+        "sampleSize": 905
+      },
+      {
+        "id": "e10",
+        "label": "Super E10",
+        "value": 2.234,
+        "sampleSize": 890
+      },
+      {
+        "id": "diesel",
+        "label": "Diesel",
+        "value": 2.402,
+        "sampleSize": 906
+      }
+    ],
+    "source": "Tankerkönig — Atlas monitored sample: 2701 station readings across Berlin, Hamburg, Munich, Cologne, Frankfurt (not a national average)",
     "sourceUrl": "https://creativecommons.tankerkoenig.de/",
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
-    "lastSuccessAt": null,
-    "note": "No verified data yet — Germany is refreshed only by a deliberate manual run, never on a recurring schedule."
+    "lastAttemptAt": "2026-09-21T19:46:32.446Z",
+    "lastSuccessAt": "2026-09-21T19:46:32.446Z"
   },
   "us": {
     "status": "pending",
     "products": [],
-    "weekOf": null,
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-09-20T00:00:00.000Z",
+    "lastAttemptAt": null,
     "lastSuccessAt": null,
-    "note": "Seed placeholder committed before the first scheduled run — no verified data yet."
+    "note": "No verified data yet — this market is not part of the recurring automatic refresh.",
+    "weekOf": null
   }
 }
