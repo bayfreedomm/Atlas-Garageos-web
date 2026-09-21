@@ -181,3 +181,11 @@ Next implementation pass:
 - [x] Hero WebP delivery with intrinsic dimensions; original PNG retained for social metadata.
 - [x] 121 tests passed; Astro check and 80-page production build clean.
 - [ ] Actual browser zoom/text scaling, WebKit/Firefox, physical devices, and production performance remain separate acceptance checks; see visual QA report for coverage limits.
+
+## Problem-solving graph v1 checkpoint — 2026-09-22
+- [x] Shared EN/DE/ES decision graph connects vehicle, tire-size, bolt-pattern, fuel-market, comparison, and calculator journeys with crawlable HTML links.
+- [x] Vehicle pages expose documented tire/PCD references and practical tools without inventing fuel-consumption values.
+- [x] Tire and bolt-pattern entities preserve geometry, vehicle context, trust qualifiers, and fitment caveats while adding safe calculator prefills.
+- [x] Fuel market pages link to localized fuel-cost and road-trip actions without changing provider, workflow, history, canonical, or hreflang behavior.
+- [x] Fixed release coverage remains 30 vehicle records, 20 tire entities, 10 bolt-pattern entities, and 96 pSEO entity URLs.
+- [x] Focused graph coverage, full tests, typecheck, production build, and representative mobile light/dark browser QA completed.

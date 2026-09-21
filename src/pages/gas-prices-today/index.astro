@@ -164,13 +164,8 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   />
 
   <FuelActionPanel
-    heading="Calculate with this price"
+    locale="en"
     note={actionNote}
-    actions={[
-      { href: '/tools/fuel-cost-calculator/', title: 'Use this price in the Fuel Cost Calculator', detail: 'Fuel used and total journey cost' },
-      { href: '/tools/road-trip-cost-calculator/', title: 'Calculate a road trip', detail: 'Trips, extras and cost per person' },
-      { href: '/vehicles/', title: 'Estimate a vehicle trip cost', detail: 'Start from a specific vehicle' },
-    ]}
   />
 
   <div class="fuel-dash-prose">

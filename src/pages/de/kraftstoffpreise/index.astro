@@ -159,13 +159,8 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   />
 
   <FuelActionPanel
-    heading="Mit diesem Preis rechnen"
+    locale="de"
     note={actionNote}
-    actions={[
-      { href: '/de/tools/spritkostenrechner/', title: 'Preis im Spritkostenrechner verwenden', detail: 'Verbrauch und Gesamtkosten der Fahrt' },
-      { href: '/de/tools/fahrtkostenrechner/', title: 'Reisekosten berechnen', detail: 'Strecke, Extras und Kosten pro Person' },
-      { href: '/de/fahrzeuge/', title: 'Fahrtkosten je Fahrzeug schätzen', detail: 'Mit einem konkreten Fahrzeug starten' },
-    ]}
   />
 
   <div class="fuel-dash-prose">

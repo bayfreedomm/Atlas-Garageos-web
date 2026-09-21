@@ -9,6 +9,7 @@
 // common reason someone buys a wheel that does not fit, so it is rendered as a first-class
 // section on every one of these pages, above the tool CTA rather than buried under it.
 import BoltPatternDiagram from './BoltPatternDiagram.astro';
+import DecisionGraph from './DecisionGraph.astro';
 import { vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
 import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { tireSizeSlug } from '../data/tire-size-catalog';
@@ -16,11 +17,11 @@ import { boltPatternPageText } from '../content/entity-page-text';
 import { millimetersToInches } from '../core/units/conversion';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import {
-  boltPatternCalculatorHref, distinctCenterBores, formatCenterBores, homePath, splitHeadingAroundKey,
+  distinctCenterBores, formatCenterBores, homePath, splitHeadingAroundKey,
   tireSizesForBoltPattern, vehicleHubPath, vehicleLink, vehicleNames,
 } from '../ui/entity-page-model';
-import { localizedToolPath } from '../localization/locales';
 import { torquePresentation } from '../ui/vehicle-torque';
+import { boltDecisionGraph } from '../ui/decision-graph';
 
 interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocale; }
 const { entry, locale } = Astro.props;
@@ -47,6 +48,7 @@ const metricRows = [
   { label: t.metrics.vehicleCount, value: String(vehicles.length) },
   { label: t.metrics.centerBore, value: boreLabel },
 ];
+const decisions = boltDecisionGraph(entry, locale);
 ---
 <nav class="breadcrumbs" aria-label="Breadcrumb">
   <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
@@ -134,14 +136,7 @@ const metricRows = [
   <p class="entity-note">{t.safetyClose}</p>
 </section>
 
-<section class="entity-section" aria-labelledby="entity-cta">
-  <h2 id="entity-cta">{t.ctaHeading}</h2>
-  <div class="entity-links">
-    <a class="entity-link-card" href={boltPatternCalculatorHref(locale, entry)}><strong>{t.calculatorCta}</strong><span>{t.calculatorCtaDetail}</span><i aria-hidden="true">›</i></a>
-    <a class="entity-link-card" href={localizedToolPath(locale, 'wheel-offset-calculator', 'tool')}><strong>{t.fitmentCta}</strong><span>{t.fitmentCtaDetail}</span><i aria-hidden="true">›</i></a>
-  </div>
-  <p class="entity-note">{t.ctaNote}</p>
-</section>
+<DecisionGraph model={decisions} {locale} id="bolt-decisions" />
 
 <section class="entity-section" aria-labelledby="entity-related">
   <h2 id="entity-related">{t.relatedHeading}</h2>

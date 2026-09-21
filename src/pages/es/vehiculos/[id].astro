@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../../../components/SiteLayout.astro';
+import DecisionGraph from '../../../components/DecisionGraph.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
 import { vehiclePageText } from '../../../content/vehicle-page-text';
 import { vehicleFitmentData, type VehicleFitment } from '../../../data/vehicle-fitment';
@@ -7,6 +8,7 @@ import { tireSizeSlug } from '../../../data/tire-size-catalog';
 import { boltPatternSlug } from '../../../data/bolt-pattern-catalog';
 import { entityDetailPath, type EntityLocale } from '../../../seo/entity-routes';
 import { torqueJsonLdProperty, torquePresentation } from '../../../ui/vehicle-torque';
+import { vehicleDecisionGraph } from '../../../ui/decision-graph';
 
 // The sourced tire size and bolt pattern below link through to their own reference pages.
 const LOCALE: EntityLocale = 'es';
@@ -25,6 +27,7 @@ const dePathname = `/de/fahrzeuge/${vehicle.id}/`;
 const title = `${vehicle.make} ${vehicle.model} Medida de Neumático y Patrón de Birlos`;
 const description = `Referencia Atlas de neumático ${vehicle.tireSize} y patrón de birlos ${vehicle.boltPattern} para el ${vehicle.make} ${vehicle.model} (${vehicle.generation}), con fuentes y nivel de confianza.`;
 const torque = torquePresentation(vehicle, LOCALE);
+const decisions = vehicleDecisionGraph(vehicle, LOCALE);
 const faqs = [
   { q: t.faqTireQ(vehicle), a: t.faqTireA(vehicle) },
   { q: t.faqBoltQ(vehicle), a: t.faqBoltA(vehicle) },
@@ -83,20 +86,5 @@ const vehicleJsonLd = serializeJsonLd({
     {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
   </section>
 
-  <section class="methodology-sources" aria-labelledby="vehicle-tools-heading">
-    <h2 id="vehicle-tools-heading">{t.toolsHeading}</h2>
-    <div class="methodology-source-links">
-      <a href="/es/tools/calculadora-tamano-neumaticos/">{t.openTireTool} <span>↗</span></a>
-      <a href="/es/tools/calculadora-patron-birlos/">{t.openBoltTool} <span>↗</span></a>
-      <a href="/es/tools/convertidor-nm-lb-ft/">{t.openTorqueTool} <span>↗</span></a>
-    </div>
-  </section>
-
-  <section class="vehicle-fuel-journey" aria-labelledby="vehicle-fuel-heading">
-    <h2 id="vehicle-fuel-heading">{t.fuelHeading}</h2>
-    <div class="vehicle-fuel-journey__cards">
-      <a class="vehicle-fuel-card" href="/es/precio-gasolina-hoy/"><strong>{t.fuelCardTitle}</strong><span>{t.fuelCardCopy}</span><i aria-hidden="true">›</i></a>
-      <a class="vehicle-fuel-card" href="/es/tools/calculadora-coste-viaje/"><strong>{t.tripCardTitle}</strong><span>{t.tripCardCopy}</span><i aria-hidden="true">›</i></a>
-    </div>
-  </section>
+  <DecisionGraph model={decisions} locale={LOCALE} id="vehicle-decisions" />
 </SiteLayout>

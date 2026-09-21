@@ -154,13 +154,8 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   />
 
   <FuelActionPanel
-    heading="Calcular con este precio"
+    locale="es"
     note={actionNote}
-    actions={[
-      { href: '/es/tools/calculadora-coste-combustible/', title: 'Usar este precio en la calculadora de combustible', detail: 'Combustible usado y coste total del trayecto' },
-      { href: '/es/tools/calculadora-coste-viaje/', title: 'Calcular el coste de un viaje', detail: 'Trayecto, extras y coste por persona' },
-      { href: '/es/vehiculos/', title: 'Estimar el coste por vehículo', detail: 'Partir de un vehículo concreto' },
-    ]}
   />
 
   <div class="fuel-dash-prose">

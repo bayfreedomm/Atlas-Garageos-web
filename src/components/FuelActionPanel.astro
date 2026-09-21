@@ -1,32 +1,16 @@
 ---
-// Calculator hand-off panel. The calculators already read fuel-prices.json at build time and
-// prefill their price field from it (and deliberately do NOT prefill while a market is
-// pending), so these are plain links — no client-side price passing is invented here.
-interface Action {
-  readonly href: string;
-  readonly title: string;
-  readonly detail: string;
-}
+// Fuel dashboards keep their existing market-specific status note, while the destinations
+// and decision copy come from the same shared graph used by vehicle and entity pages.
+import DecisionGraph from './DecisionGraph.astro';
+import { fuelDecisionGraph } from '../ui/decision-graph';
+import type { EntityLocale } from '../seo/entity-routes';
 interface Props {
-  readonly heading: string;
+  readonly locale: EntityLocale;
   /** Localized line saying whether a price will be carried into the calculators. Must be
    *  neutral while the market is pending — never promise a prefill that cannot happen. */
   readonly note: string;
-  readonly actions: readonly Action[];
 }
-const { heading, note, actions } = Astro.props;
+const { locale, note } = Astro.props;
+const model = fuelDecisionGraph(locale, note);
 ---
-<section class="fuel-dash-actions" aria-labelledby="fuel-actions-heading">
-  <div class="fuel-dash-actions__head">
-    <h2 class="fuel-dash-section-title" id="fuel-actions-heading">{heading}</h2>
-    <p>{note}</p>
-  </div>
-  <div class="fuel-dash-actions__grid">
-    {actions.map((action) => (
-      <a class="fuel-action" href={action.href}>
-        <span class="fuel-action__copy"><strong>{action.title}</strong><small>{action.detail}</small></span>
-        <span class="fuel-action__arrow" aria-hidden="true">→</span>
-      </a>
-    ))}
-  </div>
-</section>
+<DecisionGraph {model} {locale} id="fuel-decisions" />

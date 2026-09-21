@@ -1,0 +1,30 @@
+---
+import type { DecisionGraphModel } from '../ui/decision-graph';
+import { decisionSupportingLabel } from '../ui/decision-graph';
+import type { EntityLocale } from '../seo/entity-routes';
+
+interface Props { readonly model: DecisionGraphModel; readonly locale: EntityLocale; readonly id?: string; }
+const { model, locale, id = 'next-decisions' } = Astro.props;
+const headingId = `${id}-heading`;
+---
+<section id={id} class="decision-graph" aria-labelledby={headingId} data-decision-graph>
+  <header class="decision-graph__head">
+    <p class="eyebrow">{model.eyebrow}</p>
+    <h2 id={headingId}>{model.heading}</h2>
+    <p>{model.intro}</p>
+  </header>
+  <div class="decision-graph__actions">
+    {model.actions.map((item) => (
+      <a class="decision-action" href={item.href} data-decision={item.id}>
+        <span><strong>{item.title}</strong><small>{item.detail}</small></span><i aria-hidden="true">›</i>
+      </a>
+    ))}
+  </div>
+  {model.supportingActions && model.supportingActions.length > 0 && (
+    <nav class="decision-graph__support" aria-label={decisionSupportingLabel(locale)}>
+      <strong>{decisionSupportingLabel(locale)}</strong>
+      <div>{model.supportingActions.map((item) => <a href={item.href} data-decision={item.id}>{item.title}<span aria-hidden="true">→</span></a>)}</div>
+    </nav>
+  )}
+  {model.caution && <p class="decision-graph__caution"><strong aria-hidden="true">!</strong><span>{model.caution}</span></p>}
+</section>
