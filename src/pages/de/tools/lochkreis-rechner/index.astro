@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('bolt-pattern-calculator');
@@ -14,6 +15,7 @@ const c = localizedTool('bolt-pattern-calculator', 'de');
       <label>Einheit<select name="spacingUnit"><option value="mm" selected>mm</option><option value="in">in</option></select></label>
     </div>
     <UtilityResultStandard primaryLabel="Lochkreisdurchmesser (PCD)" pending="Geben Sie Lochanzahl und Loch-zu-Loch-Abstand ein." visualTitle="Benachbarte Löcher → Lochkreis" visualNote="Trigonometrische Beziehung, keine gerade Messung" />
+    <Parametric3DPanel mode="pcd" locale="de" />
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>

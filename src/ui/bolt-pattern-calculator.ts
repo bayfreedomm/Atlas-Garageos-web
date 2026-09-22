@@ -1,3 +1,4 @@
+import { pcdFromAdjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { formatNumber } from './format-number';
 import { getPageLocale } from './page-locale';
 import { renderMetrics, resetStandardAnswer, setErrors, setSummary, syncStandardAnswer } from './standard-answer-helpers';
@@ -80,7 +81,7 @@ export function initializeBoltPatternCalculator(): void {
       }
       setErrors(form, []);
       const spacingMm = unit === 'in' ? spacingEntered * MM_PER_INCH : spacingEntered;
-      const pcdMm = spacingMm / Math.sin(Math.PI / lugCount);
+      const pcdMm = pcdFromAdjacentHoleSpacingMm(spacingMm, lugCount);
       const pcdIn = pcdMm / MM_PER_INCH;
       const label = `${lugCount}x${formatNumber(pcdMm, 1)}`;
       setSummary(form, t.summary(lugCount, formatNumber(spacingMm, 1), label), false);

@@ -12,7 +12,7 @@ import { parseBoltPattern, type ParsedBoltPattern } from './bolt-pattern-geometr
 
 // Re-exported so existing importers of this catalog keep working, but there is exactly ONE
 // implementation of each — in bolt-pattern-geometry.ts.
-export { adjacentHoleSpacingMm, boltPatternSpacingMm, parseBoltPattern } from './bolt-pattern-geometry';
+export { adjacentHoleSpacingMm, boltPatternSpacingMm, lugPositions, parseBoltPattern } from './bolt-pattern-geometry';
 export type { ParsedBoltPattern } from './bolt-pattern-geometry';
 
 export interface BoltPatternEntry {
@@ -131,12 +131,4 @@ export function boltPatternsByLugCount(): readonly (readonly [number, readonly B
     else groups.set(entry.lugCount, [entry]);
   }
   return Object.freeze([...groups.entries()].sort((a, b) => a[0] - b[0]).map(([lugs, list]) => Object.freeze([lugs, Object.freeze(list)] as const)));
-}
-
-/** Lug hole positions on a unit circle, first hole at 12 o'clock — used by the PCD diagram. */
-export function lugPositions(lugCount: number): readonly (readonly [number, number])[] {
-  return Object.freeze(Array.from({ length: lugCount }, (_, index) => {
-    const angle = -Math.PI / 2 + (index / lugCount) * Math.PI * 2;
-    return Object.freeze([Math.cos(angle), Math.sin(angle)] as const);
-  }));
 }

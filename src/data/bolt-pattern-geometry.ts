@@ -47,6 +47,15 @@ export function adjacentHoleSpacingMm(pcdMm: number, lugCount: number): number {
   return pcdMm * Math.sin(Math.PI / lugCount);
 }
 
+
+/** Inverse of adjacentHoleSpacingMm: recover PCD from an adjacent-hole chord. */
+export function pcdFromAdjacentHoleSpacingMm(spacingMm: number, lugCount: number): number {
+  if (!Number.isFinite(spacingMm) || spacingMm <= 0 || !Number.isInteger(lugCount) || lugCount < 2) {
+    throw new Error(`Cannot compute PCD from spacing ${spacingMm} mm and ${lugCount} lugs.`);
+  }
+  return spacingMm / Math.sin(Math.PI / lugCount);
+}
+
 /**
  * Adjacent-hole spacing straight from a notation string such as "5x114.3".
  * Returns null when the notation cannot be parsed, so a caller in the browser can decline to
@@ -56,4 +65,13 @@ export function boltPatternSpacingMm(notation: string): number | null {
   const parsed = parseBoltPattern(notation);
   if (parsed === null) return null;
   return adjacentHoleSpacingMm(parsed.pcdMm, parsed.lugCount);
+}
+
+/** Lug-hole positions on a unit circle, first hole at 12 o'clock. */
+export function lugPositions(lugCount: number): readonly (readonly [number, number])[] {
+  if (!Number.isInteger(lugCount) || lugCount < 2) throw new Error(`Cannot compute lug positions for ${lugCount} lugs.`);
+  return Object.freeze(Array.from({ length: lugCount }, (_, index) => {
+    const angle = -Math.PI / 2 + (index / lugCount) * Math.PI * 2;
+    return Object.freeze([Math.cos(angle), Math.sin(angle)] as const);
+  }));
 }

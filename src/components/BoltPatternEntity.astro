@@ -9,6 +9,7 @@
 // common reason someone buys a wheel that does not fit, so it is rendered as a first-class
 // section on every one of these pages, above the tool CTA rather than buried under it.
 import BoltPatternDiagram from './BoltPatternDiagram.astro';
+import Parametric3DPanel from './Parametric3DPanel.astro';
 import DecisionGraph from './DecisionGraph.astro';
 import { vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
 import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
@@ -31,6 +32,7 @@ const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
 const spacingValue = `${spacingMm.toFixed(2)} mm`;
 const bores = distinctCenterBores(vehicles);
+const singleCenterBore = bores.length === 1 ? bores[0] : undefined;
 const relatedTires = tireSizesForBoltPattern(entry.notation);
 const hubHref = entityHubPath('bolt-pattern', locale);
 const tireHubHref = entityHubPath('tire-size', locale);
@@ -80,6 +82,7 @@ const decisions = boltDecisionGraph(entry, locale);
     spacingLabel={t.metrics.holeSpacing}
     spacingValue={spacingValue}
   />
+  <Parametric3DPanel mode="pcd" locale={locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
   <p class="entity-note">{t.diagramNote(entry.lugCount, entry.pcdMm)}</p>
 </section>
 

@@ -1,0 +1,118 @@
+---
+import { visualization3DLocale, visualization3DText, type Visualization3DLocale } from '../localization/visualization-3d';
+
+interface Props {
+  readonly mode: 'tire' | 'offset' | 'pcd';
+  readonly locale?: Visualization3DLocale | undefined;
+  readonly lugCount?: number | undefined;
+  readonly pcdMm?: number | undefined;
+  readonly centerBoreMm?: number | null | undefined;
+}
+
+const { mode, locale: requestedLocale = 'en', lugCount, pcdMm, centerBoreMm } = Astro.props;
+const locale = visualization3DLocale(requestedLocale);
+const t = visualization3DText[locale];
+const title = mode === 'tire' ? t.tireTitle : mode === 'offset' ? t.offsetTitle : t.pcdTitle;
+const intro = mode === 'tire' ? t.tireIntro : mode === 'offset' ? t.offsetIntro : t.pcdIntro;
+const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
+---
+<section
+  class:list={['parametric-3d', `parametric-3d--${mode}`]}
+  data-parametric-3d
+  data-mode={mode}
+  data-locale={locale}
+  data-lug-count={lugCount}
+  data-pcd-mm={pcdMm}
+  data-center-bore-mm={centerBoreMm ?? undefined}
+  aria-label={title}
+>
+  <header class="parametric-3d__head">
+    <div>
+      <span>{t.badge}</span>
+      <h3>{title}</h3>
+      <p>{intro}</p>
+    </div>
+    <p class="parametric-3d__hint">{t.dragHint}</p>
+  </header>
+
+  {mode === 'tire' && (
+    <div class="parametric-3d__view-switch" aria-label={title}>
+      <button type="button" data-p3d-tire-view="side-by-side" aria-pressed="true">{t.sideBySide}</button>
+      <button type="button" data-p3d-tire-view="overlay" aria-pressed="false">{t.overlay}</button>
+    </div>
+  )}
+
+  <div class="parametric-3d__stage">
+    <canvas data-p3d-canvas width="960" height="600"></canvas>
+    <div class="parametric-3d__loading" data-p3d-loading>{t.loading}</div>
+    <div class="parametric-3d__fallback" data-p3d-fallback hidden>{t.unavailable}</div>
+    <div class="parametric-3d__legend" aria-hidden="true">
+      {mode !== 'pcd' && <><span class="is-current"></span>{t.current}<span class="is-proposed"></span>{t.proposed}</>}
+      {mode === 'pcd' && <><span class="is-current"></span>{t.lugCount}<span class="is-accent"></span>{t.pcd}</>}
+    </div>
+  </div>
+
+  <div class="parametric-3d__controls" aria-label={t.dragHint}>
+    <button type="button" data-p3d-zoom-out aria-label={t.zoomOut}>−</button>
+    <button type="button" data-p3d-reset>{t.reset}</button>
+    <button type="button" data-p3d-zoom-in aria-label={t.zoomIn}>+</button>
+  </div>
+
+  {mode === 'tire' && (
+    <dl class="parametric-3d__metrics">
+      <div><dt>{t.current} · {t.diameter}</dt><dd data-p3d-value="current">—</dd></div>
+      <div><dt>{t.proposed} · {t.diameter}</dt><dd data-p3d-value="proposed">—</dd></div>
+      <div><dt>{t.width}</dt><dd data-p3d-value="width">—</dd></div>
+      <div><dt>{t.sidewall}</dt><dd data-p3d-value="sidewall">—</dd></div>
+      <div><dt>{t.rim}</dt><dd data-p3d-value="rim">—</dd></div>
+      <div><dt>{t.diameterDelta}</dt><dd data-p3d-value="diameterDelta">—</dd></div>
+      <div><dt>{t.circumferenceDelta}</dt><dd data-p3d-value="circumferenceDelta">—</dd></div>
+      <div><dt>{t.speedometerDelta}</dt><dd data-p3d-value="speedometerDelta">—</dd></div>
+    </dl>
+  )}
+
+  {mode === 'offset' && (
+    <dl class="parametric-3d__metrics">
+      <div><dt>{t.currentOffset}</dt><dd data-p3d-value="currentOffset">—</dd></div>
+      <div><dt>{t.newOffset}</dt><dd data-p3d-value="newOffset">—</dd></div>
+      <div><dt>{t.width}</dt><dd data-p3d-value="width">—</dd></div>
+      <div><dt>{t.innerDelta}</dt><dd data-p3d-value="innerDelta">—</dd></div>
+      <div><dt>{t.outerDelta}</dt><dd data-p3d-value="outerDelta">—</dd></div>
+    </dl>
+  )}
+
+  {mode === 'pcd' && (
+    <dl class="parametric-3d__metrics">
+      <div><dt>{t.pcd}</dt><dd data-p3d-value="pcd">—</dd></div>
+      <div><dt>{t.lugCount}</dt><dd data-p3d-value="lugCount">—</dd></div>
+      <div><dt>{t.holeSpacing}</dt><dd data-p3d-value="holeSpacing">—</dd></div>
+      <div><dt>{t.centerBore}</dt><dd data-p3d-value="centerBore">—</dd></div>
+    </dl>
+  )}
+
+  <p class="parametric-3d__caution">{caution}</p>
+</section>
+
+<script>
+  const pending3D = new WeakSet<HTMLElement>();
+  const load3D = async (panel: HTMLElement) => {
+    if (pending3D.has(panel) || panel.classList.contains('is-ready')) return;
+    pending3D.add(panel);
+    try {
+      const module = await import('../ui/parametric-3d');
+      module.mountParametric3DPanel(panel);
+    } finally {
+      pending3D.delete(panel);
+    }
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-parametric-3d]').forEach((panel) => {
+    if (!('IntersectionObserver' in window)) { void load3D(panel); return; }
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      void load3D(panel);
+    }, { rootMargin: '360px 0px' });
+    observer.observe(panel);
+  });
+</script>

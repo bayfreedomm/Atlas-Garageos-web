@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('bolt-pattern-calculator');
@@ -14,6 +15,7 @@ const c = localizedTool('bolt-pattern-calculator', 'es');
       <label>Unidad<select name="spacingUnit"><option value="mm" selected>mm</option><option value="in">in</option></select></label>
     </div>
     <UtilityResultStandard locale="es" primaryLabel="Diámetro del círculo de birlos (PCD)" pending="Introduzca el número de birlos y la distancia entre orificios." visualTitle="Orificios adyacentes → círculo de birlos" visualNote="Relación trigonométrica, no una medida en línea recta" />
+    <Parametric3DPanel mode="pcd" locale="es" />
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>

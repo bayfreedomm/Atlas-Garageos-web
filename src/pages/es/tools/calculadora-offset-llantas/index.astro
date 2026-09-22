@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import WheelOffsetTechnicalVisual from '../../../../components/WheelOffsetTechnicalVisual.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('wheel-offset-calculator');
@@ -28,6 +29,7 @@ const c = localizedTool('wheel-offset-calculator', 'es');
     </section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Su resumen de posición aparecerá aquí.</p>
     <WheelOffsetTechnicalVisual />
+    <Parametric3DPanel mode="offset" locale="es" />
     <div class="wheel-detail-heading" aria-hidden="true"><span>Detalles</span><small>Geometría estática de la rueda</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>

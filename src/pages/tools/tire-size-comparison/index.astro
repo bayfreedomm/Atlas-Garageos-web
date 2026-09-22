@@ -2,6 +2,7 @@
 import ToolPage from '../../../components/ToolPage.astro';
 import TireInputGroup from '../../../components/TireInputGroup.astro';
 import TireComparisonVisual from '../../../components/TireComparisonVisual.astro';
+import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('tire-size-comparison');
 ---
@@ -34,6 +35,7 @@ const definition = toolById('tire-size-comparison');
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Your comparison summary will appear here.</p>
 
     <TireComparisonVisual />
+    <Parametric3DPanel mode="tire" locale="en" />
 
     <div class="tire-detail-heading" aria-hidden="true"><span>Details</span><small>Nominal geometry</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>

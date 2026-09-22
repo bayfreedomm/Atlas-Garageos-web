@@ -6,7 +6,8 @@
 // glance. The drawing is normalized to a fixed viewBox rather than to millimetres, because a
 // screen-scaled PCD circle would invite measuring a real wheel off a monitor — the caption
 // says so explicitly.
-import { lugPositions, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
+import type { BoltPatternEntry } from '../data/bolt-pattern-catalog';
+import { lugPositions } from '../data/bolt-pattern-geometry';
 
 interface Props {
   readonly entry: BoltPatternEntry;
