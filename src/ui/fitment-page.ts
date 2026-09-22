@@ -13,6 +13,7 @@ import { createBrowserGarageRepository } from '../storage/local-storage-garage-r
 import { formatNumber } from './format-number';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 import { activeGaragePresentation, fitmentComparisonSummary, mapCellPresentation, measurementErrorGuidance, PRODUCT_NAVIGATION, resultCardModel, validationIssueText, wizardProgress, type ProductSection } from './presentation-model';
+import { parseJourneyPrefill } from './journey-prefill';
 
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -411,17 +412,31 @@ export async function initializeFitmentPage(): Promise<void> {
     input('desired-outer').value = profile.minimumDesiredOuterClearanceMm === null ? '' : String(profile.minimumDesiredOuterClearanceMm);
   }
 
+  function updateMeasurementDecision(): void {
+    const measuredInner = input('measured-inner').value.trim();
+    const measuredOuter = input('measured-outer').value.trim();
+    required<HTMLElement>('#decision-measure').textContent = measuredInner !== '' && measuredOuter !== '' && Number.isFinite(Number(measuredInner)) && Number.isFinite(Number(measuredOuter)) && Number(measuredInner) >= 0 && Number(measuredOuter) >= 0
+      ? `Entered: inner ${measuredInner} mm · outer ${measuredOuter} mm`
+      : 'Inner and outer gaps not entered';
+  }
+
   function renderComparison(): void {
     const comparison = compareSetupInputs(readSetup('current'), readSetup('proposed'));
     if (!comparison.ok) {
       showIssues(errors, comparison.issues);
       results.replaceChildren();
+      required<HTMLElement>('#decision-tire').textContent = 'Enter valid tire and wheel values to compare';
+      required<HTMLElement>('#decision-wheel').textContent = 'No valid wheel-position result yet';
+      updateMeasurementDecision();
       return;
     }
     errors.hidden = true;
     const value = comparison.value;
     const currentSetup = readSetup('current');
     const proposedSetup = readSetup('proposed');
+    required<HTMLElement>('#decision-tire').textContent = `${formatNumber(value.current.overallDiameterMm, 1)} → ${formatNumber(value.proposed.overallDiameterMm, 1)} mm diameter`;
+    required<HTMLElement>('#decision-wheel').textContent = `Inner ${formatNumber(value.wheelInnerPositionChangeMm, 1)} mm · outer ${formatNumber(value.wheelOuterPokeChangeMm, 1)} mm`;
+    updateMeasurementDecision();
     const visual = required<HTMLElement>('[data-fitment-visualizer]');
     const tireScale = tireScaleMapping({
       currentDiameterMm: value.current.overallDiameterMm,
@@ -712,12 +727,27 @@ export async function initializeFitmentPage(): Promise<void> {
   });
 
   const loaded = await service.load();
+  input('measured-inner').addEventListener('input', updateMeasurementDecision);
+  input('measured-outer').addEventListener('input', updateMeasurementDecision);
   renderGarage(loaded.state);
   const storedClearance = loaded.state.clearanceProfiles.find((profile) => profile.vehicleId === loaded.state.activeVehicleId);
   if (storedClearance) populateClearance(storedClearance);
   if (loaded.status.startsWith('recovered-')) status.textContent = 'Invalid garage data was ignored and a safe empty garage was opened.';
 
   const decoded = decodeSetupShareHash(window.location.hash);
+  const journey = decoded ? null : parseJourneyPrefill(window.location.search, readSetup('current'), readSetup('proposed'));
+  if (journey) {
+    writeSetup('current', journey.current);
+    writeSetup('proposed', journey.proposed);
+    input('measured-inner').value = '';
+    input('measured-outer').value = '';
+    input('desired-inner').value = '';
+    input('desired-outer').value = '';
+    required<HTMLElement>('#journey-import').hidden = false;
+    required<HTMLElement>('#journey-import-copy').textContent = journey.source === 'tire'
+      ? 'Both tire sizes were carried over. Wheel widths and ET values are still example defaults: replace them with your actual wheels before interpreting the comparison.'
+      : 'Wheel dimensions were carried over. Tire sizes still use the values shown in the form: confirm them before interpreting the comparison.';
+  }
   if (decoded) {
     sharedPanel.hidden = false;
     if (decoded.ok) {
@@ -733,5 +763,5 @@ export async function initializeFitmentPage(): Promise<void> {
   renderComparison();
   showMeasurementStep(1);
   updatePreflight();
-  if (storedClearance) generateMap();
+  if (storedClearance && !journey) generateMap();
 }

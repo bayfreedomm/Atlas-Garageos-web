@@ -9,6 +9,7 @@ describe('guided tire decision', () => {
     const guide = guidedTireDecision('en', original, proposed, 10.9);
     expect(guide.primaryHref).toBe('/tools/speedometer-error-calculator/?current=225-45-18&new=235-40-19');
     expect(guide.secondaryHref).toBe('/tools/tire-size-calculator/?size=235-40-19');
+    expect(guide.setupHref).toBe('/fitment-studio/?current=225-45-18&new=235-40-19#compare');
     expect(guide.observation).toContain('larger nominal diameter');
   });
 

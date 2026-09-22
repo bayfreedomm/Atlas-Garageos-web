@@ -6,6 +6,7 @@ import methodology from '../../src/pages/methodology/index.astro?raw';
 import { LOCALE_CODES, localeDefinitions, localizedToolPath } from '../../src/localization/locales';
 import { toolInsights } from '../../src/content/tool-insights';
 import { toolRegistry } from '../../src/seo/tool-registry';
+import { localizedTool } from '../../src/localization/site-catalog';
 
 describe('V3 visual and localization foundation', () => {
   it('keeps first-wave locale routing explicit, publishing only QA-passed translations', () => {
@@ -48,5 +49,15 @@ describe('V3 visual and localization foundation', () => {
     expect(methodology).toContain('Accuracy &amp; methodology');
     expect(methodology).toContain('static wheel geometry only');
     expect(methodology).toContain('idealized constant-power estimate');
+  });
+
+  it('describes the PCD calculator input as adjacent center-to-center spacing in every locale', () => {
+    const english = toolInsights['bolt-pattern-calculator'];
+    expect(english.faqs?.[0]?.answer).toContain('center-to-center');
+    expect(english.facts[2]?.body).toContain('neighboring holes');
+    const german = localizedTool('bolt-pattern-calculator', 'de');
+    const spanish = localizedTool('bolt-pattern-calculator', 'es');
+    expect(german.faqs?.[0]?.answer).toContain('Mittelpunktabstand');
+    expect(spanish.faqs?.[0]?.answer).toContain('distancia entre centros');
   });
 });

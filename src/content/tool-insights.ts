@@ -172,12 +172,12 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
     facts: [
       { title: 'Bolt pattern is written lugs×PCD', body: 'A "5x114.3" pattern means 5 lug holes arranged on a 114.3 mm bolt circle diameter.' },
       { title: 'Measure hole-to-hole, not edge-to-edge', body: 'The distance between two adjacent bolt centers is what the geometry formula needs, not the outer rim edge.' },
-      { title: 'Odd lug counts need the diagonal method', body: 'On 5-lug wheels the bolt circle is not a straight measurement across, which is why this calculator uses the trigonometric relationship instead.' },
+      { title: 'Adjacent centers work for odd lug counts', body: 'On a 5-lug wheel there are no directly opposite holes. This calculator uses the center-to-center spacing of two neighboring holes and the angle between them.' },
     ],
     commonMistake: 'Measuring the distance between two lug holes that are directly across from each other on a 5-lug wheel, which is not the bolt circle diameter.',
     warning: 'A calculated PCD is a starting reference only. Always confirm bolt pattern, hub bore, and lug thread against the wheel and vehicle specification before buying.',
     faqs: [
-      { question: 'How do I measure bolt pattern on a 5-lug wheel?', answer: 'Measure from the center of one lug hole to the outer edge of the hole that is two positions away (not directly across), then enter that distance here — the calculator converts it to the true bolt circle diameter using the 5-lug geometry.' },
+      { question: 'How do I measure bolt pattern on a 5-lug wheel?', answer: 'Measure the straight-line distance from the center of one lug hole to the center of an adjacent lug hole. Enter that center-to-center spacing here; the calculator uses the 5-lug angle to calculate the bolt circle diameter. Do not enter an edge-to-edge or two-positions-away measurement.' },
       { question: 'Can I use a wheel with a different bolt pattern than my hub?', answer: 'No, not safely without an adapter, and adapters bring their own risks. The bolt pattern (lug count and PCD) has to match the hub, or the wheel cannot be mounted correctly.' },
       { question: 'Is bolt pattern the same as hub bore?', answer: 'No — bolt pattern describes where the lug holes sit, while hub bore is the center hole diameter that centers the wheel on the hub. Both need to match or be adapted separately.' },
     ],

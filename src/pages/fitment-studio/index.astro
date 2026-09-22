@@ -57,6 +57,11 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         </div>
       </section>
 
+      <aside id="journey-import" class="journey-import" hidden aria-live="polite">
+        <strong>Setup carried into this workspace</strong>
+        <p id="journey-import-copy"></p>
+      </aside>
+
       <aside id="shared-setup" class="shared-panel" hidden aria-labelledby="shared-heading">
         <h2 id="shared-heading">{t('sharedTitle')}</h2>
         <p id="shared-message">{t('sharedNotice')}</p>
@@ -117,6 +122,17 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
           </div>
           <dl id="results" class="metric-grid" aria-live="polite"></dl>
         </div>
+        <section class="setup-decision-summary" aria-labelledby="setup-decision-heading">
+          <p class="eyebrow">Decision record</p>
+          <h3 id="setup-decision-heading">What this comparison knows — and does not</h3>
+          <div class="setup-decision-summary__grid">
+            <div><small>Calculated · tire</small><strong id="decision-tire">Enter both tire sizes</strong><p>Nominal geometry and theoretical speed effect, not tire approval.</p></div>
+            <div><small>Calculated · wheel</small><strong id="decision-wheel">Enter both wheel specifications</strong><p>Static inner and outer movement, not real vehicle clearance.</p></div>
+            <div><small>User measurement</small><strong id="decision-measure">Inner and outer gaps not entered</strong><p>Use the guided measurement steps below; entered values are not independently verified.</p></div>
+          </div>
+          <p class="setup-decision-summary__limit">Still to verify for your vehicle: bolt pattern and center bore, load/speed rating, brakes, suspension travel, body clearance and manufacturer/local requirements. Atlas does not turn these calculations into a road-use approval.</p>
+          <nav aria-label="Continue the fitment decision"><a href="/tools/bolt-pattern-calculator/">Check PCD and center bore →</a><a href="/tools/tire-load-speed-rating/">Check tire rating →</a><a href="#measure-flow">Measure real gaps →</a></nav>
+        </section>
       </section>
 
       <section class="product-section product-section--advanced" id="measure-flow" aria-labelledby="measure-heading">

@@ -1,17 +1,19 @@
 ---
 import SiteLayout from './SiteLayout.astro';
 import type { ToolDefinition } from '../seo/tool-registry';
-import { relatedTools, routeForTool } from '../seo/tool-registry';
-import { uiStrings, localizedTool, type ContentLocale } from '../localization/site-catalog';
+import { uiStrings, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 import ToolIcon from './ToolIcon.astro';
 import ToolVisual from './ToolVisual.astro';
 import ToolInsights from './ToolInsights.astro';
+import DecisionGraph from './DecisionGraph.astro';
+import { toolNextDecision } from '../ui/tool-next-decision';
 
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string | undefined; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale | undefined; titleOverride?: string | undefined; descriptionOverride?: string | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
 const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/fitment-studio/', visual = true, explanationBeforeInsights = false, locale, titleOverride, descriptionOverride, alternates } = Astro.props;
-const related = relatedTools(definition);
+const journeyLocale = locale ?? 'en';
+const nextDecision = toolNextDecision(definition.id, journeyLocale);
 const displayTitle = titleOverride ?? definition.title;
 const hasLongTitle = displayTitle.length > 24;
 const t = locale ? uiStrings[locale] : undefined;
@@ -39,6 +41,6 @@ const layoutPathname = locale ? localizedToolPath(locale, definition.id, definit
   <ToolInsights id={definition.id} locale={locale} />
   {!explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}
   {studioCta && <a class="studio-cta studio-cta--row" href={studioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
-  <section class="related-tools" aria-labelledby="related-heading"><h2 id="related-heading">{t?.relatedTools ?? 'Related tools'}</h2><div class="related-grid">{related.map((tool) => <a class="related-card" href={tool.id === 'fitment-studio' ? '/fitment-studio/' : (locale ? localizedToolPath(locale, tool.id, tool.kind) : routeForTool(tool))}><ToolIcon id={tool.id} category={tool.category}/><span><strong>{locale ? localizedTool(tool.id, locale).title : tool.title}</strong><small>{locale ? localizedTool(tool.id, locale).category : tool.category}</small></span><i aria-hidden="true">›</i></a>)}</div></section>
+  {definition.id !== 'tire-size-comparison' && <section class="tool-decision-area" aria-label={t?.relatedTools ?? 'Related tools'}><DecisionGraph model={nextDecision} locale={journeyLocale} id="tool-next-decision" /></section>}
 </SiteLayout>
 <script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; initializeToolVisualMotion();</script>

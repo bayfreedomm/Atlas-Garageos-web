@@ -240,3 +240,12 @@ Next implementation pass:
 - [x] EN/DE/ES tire comparison offers a result-driven next check: speedometer for diameter change, wheel width/ET for width-only change, or load/speed specification when nominal dimensions match.
 - [x] Proposed size carries into the localized tire-size calculator; physical clearance remains an explicit final check, never an inferred approval.
 - [ ] Actual phone pinch, forced context loss, WebKit/Firefox and deployed performance still require separate device/deployment acceptance.
+
+## Package 6.0 connected decision journeys — 2026-09-23
+- [x] Calculator pages now lead with one authored next decision and supporting checks in EN/DE/ES; vehicle, tire, bolt-pattern and fuel-market entity pages retain their existing decision graph.
+- [x] Tire Comparison carries both sizes into the full Fitment Studio, in addition to its localized speedometer and size-calculator actions.
+- [x] Tire Size Calculator, Speedometer and Wheel Offset carry validated working values into their next tools without changing canonical formulas.
+- [x] Fitment Studio accepts bounded incoming URL state and clearly distinguishes calculated geometry, user-entered measurements and still-unverified vehicle checks. Imported values do not silently save to My Garage, and a share hash retains precedence.
+- [x] PCD instructional text now consistently specifies adjacent lug center-to-center measurement, matching the existing canonical calculator.
+- [x] Package 6.0 adds no dependency and leaves canonical math, fuel history/data and Wrangler/Cloudflare configuration untouched.
+- [ ] Physical-device touch, forced context loss, WebKit/Firefox and deployed performance remain separate acceptance checks.

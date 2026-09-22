@@ -16,6 +16,9 @@ export interface GuidedTireDecision {
   readonly finalTitle: string;
   readonly finalHref: string;
   readonly finalDetail: string;
+  readonly setupTitle: string;
+  readonly setupHref: string;
+  readonly setupDetail: string;
 }
 
 const COPY = {
@@ -31,6 +34,7 @@ const COPY = {
     sizeTitle: 'Inspect the proposed size', sizeDetail: 'Open its nominal dimensions with this size already entered.',
     pcdTitle: 'Check the bolt pattern', pcdDetail: 'Measure lug geometry separately; tire size does not determine PCD.',
     finalTitle: 'Measure real clearance', finalDetail: 'Geometry alone cannot establish fitment or road-use approval.',
+    setupTitle: 'Compare the complete setup', setupDetail: 'Carry both tire sizes into the wheel-and-tire workspace; add your actual wheel width and ET.',
   },
   de: {
     diameter: { same: 'Der Nenndurchmesser bleibt gleich.', larger: 'Der neue Reifen hat einen größeren Nenndurchmesser.', smaller: 'Der neue Reifen hat einen kleineren Nenndurchmesser.' },
@@ -44,6 +48,7 @@ const COPY = {
     sizeTitle: 'Neue Größe prüfen', sizeDetail: 'Nennmaße mit vorausgefüllter Reifengröße öffnen.',
     pcdTitle: 'Lochkreis prüfen', pcdDetail: 'Lochgeometrie separat messen; die Reifengröße bestimmt den PCD nicht.',
     finalTitle: 'Realen Freigang messen', finalDetail: 'Geometrie allein bestätigt weder Passform noch Zulassung.',
+    setupTitle: 'Gesamtes Setup vergleichen', setupDetail: 'Beide Reifengrößen übernehmen; echte Felgenbreite und ET ergänzen. Der vollständige Arbeitsbereich ist derzeit auf Englisch.',
   },
   es: {
     diameter: { same: 'El diámetro nominal no cambia.', larger: 'El neumático propuesto tiene mayor diámetro nominal.', smaller: 'El neumático propuesto tiene menor diámetro nominal.' },
@@ -57,6 +62,7 @@ const COPY = {
     sizeTitle: 'Examinar la nueva medida', sizeDetail: 'Abrir sus dimensiones nominales con esta medida precargada.',
     pcdTitle: 'Comprobar el patrón de birlos', pcdDetail: 'Medir por separado; la medida del neumático no determina el PCD.',
     finalTitle: 'Medir la holgura real', finalDetail: 'La geometría sola no confirma ajuste ni homologación.',
+    setupTitle: 'Comparar la configuración completa', setupDetail: 'Llevar ambas medidas; añadir ancho y offset reales de llanta. El espacio de trabajo completo está disponible por ahora en inglés.',
   },
 } as const;
 
@@ -88,5 +94,8 @@ export function guidedTireDecision(
     finalTitle: copy.finalTitle,
     finalHref: localizedToolPath(locale, 'measure-my-car', 'tool'),
     finalDetail: copy.finalDetail,
+    setupTitle: copy.setupTitle,
+    setupHref: `/fitment-studio/?current=${encodeURIComponent(originalSize)}&new=${encodeURIComponent(size)}#compare`,
+    setupDetail: copy.setupDetail,
   });
 }

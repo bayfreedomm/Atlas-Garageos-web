@@ -389,12 +389,12 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     facts: [
       { title: 'Der Lochkreis wird als Lochzahl×PCD geschrieben', body: 'Ein „5x114,3"-Lochkreis bedeutet 5 Radbolzenlöcher auf einem Lochkreisdurchmesser von 114,3 mm.' },
       { title: 'Loch-zu-Loch messen, nicht Rand-zu-Rand', body: 'Der Abstand zwischen zwei benachbarten Bolzenmittelpunkten ist das, was die Geometrieformel benötigt, nicht die äußere Felgenkante.' },
-      { title: 'Ungerade Lochzahlen brauchen die Diagonalmethode', body: 'Bei 5-Loch-Felgen ist der Lochkreis keine gerade Messung über die Felge, weshalb dieser Rechner stattdessen die trigonometrische Beziehung nutzt.' },
+      { title: 'Benachbarte Mittelpunkte funktionieren auch bei 5 Löchern', body: 'Bei 5-Loch-Felgen gibt es keine direkt gegenüberliegenden Löcher. Dieser Rechner nutzt den Mittelpunktabstand zweier Nachbarlöcher und den Winkel dazwischen.' },
     ],
     commonMistake: 'Den Abstand zwischen zwei Löchern zu messen, die sich bei einer 5-Loch-Felge direkt gegenüberliegen — das ist nicht der Lochkreisdurchmesser.',
     warning: 'Ein berechneter PCD ist nur ein Ausgangswert. Bestätigen Sie Lochkreis, Nabenbohrung und Bolzengewinde immer anhand der Felgen- und Fahrzeugspezifikation vor dem Kauf.',
     faqs: [
-      { question: 'Wie messe ich den Lochkreis an einer 5-Loch-Felge?', answer: 'Messen Sie vom Mittelpunkt eines Bolzenlochs bis zum äußeren Rand des Lochs, das zwei Positionen entfernt liegt (nicht direkt gegenüber), und geben Sie diesen Abstand hier ein — der Rechner rechnet ihn über die 5-Loch-Geometrie in den echten Lochkreisdurchmesser um.' },
+      { question: 'Wie messe ich den Lochkreis an einer 5-Loch-Felge?', answer: 'Messen Sie den geraden Abstand von der Mitte eines Bolzenlochs zur Mitte eines direkt benachbarten Bolzenlochs. Geben Sie genau diesen Mittelpunktabstand ein; der Rechner nutzt den 5-Loch-Winkel für den Lochkreisdurchmesser. Keine Rand-zu-Rand- oder übersprungene Lochmessung eingeben.' },
       { question: 'Kann ich eine Felge mit anderem Lochkreis als meine Nabe montieren?', answer: 'Nicht sicher ohne Adapter, und Adapter bringen eigene Risiken mit sich. Der Lochkreis (Lochzahl und PCD) muss zur Nabe passen, sonst lässt sich die Felge nicht korrekt montieren.' },
       { question: 'Ist der Lochkreis dasselbe wie die Nabenbohrung?', answer: 'Nein — der Lochkreis beschreibt, wo die Bolzenlöcher sitzen, während die Nabenbohrung der Mittelloch-Durchmesser ist, der die Felge auf der Nabe zentriert. Beide müssen passen oder separat adaptiert werden.' },
     ],

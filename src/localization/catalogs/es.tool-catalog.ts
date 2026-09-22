@@ -363,12 +363,12 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
     facts: [
       { title: 'El patrón de birlos se escribe como birlos×PCD', body: 'Un patrón "5x114,3" significa 5 orificios de birlo dispuestos en un círculo de birlos de 114,3 mm de diámetro.' },
       { title: 'Mida de orificio a orificio, no de borde a borde', body: 'La distancia entre los centros de dos birlos adyacentes es lo que necesita la fórmula geométrica, no el borde exterior de la llanta.' },
-      { title: 'Los números impares de birlos necesitan el método diagonal', body: 'En llantas de 5 birlos, el círculo de birlos no es una medida directa a través de la llanta, por eso esta calculadora usa la relación trigonométrica en su lugar.' },
+      { title: 'Los centros adyacentes sirven también con 5 birlos', body: 'En una llanta de 5 birlos no hay orificios directamente opuestos. Esta calculadora usa la distancia entre centros vecinos y el ángulo que forman.' },
     ],
     commonMistake: 'Medir la distancia entre dos orificios de birlo que están directamente enfrentados en una llanta de 5 birlos, lo cual no es el diámetro del círculo de birlos.',
     warning: 'Un PCD calculado es solo una referencia inicial. Confirme siempre el patrón de birlos, el diámetro del buje y la rosca de los birlos con la especificación de la llanta y el vehículo antes de comprar.',
     faqs: [
-      { question: '¿Cómo mido el círculo de birlos en una llanta de 5 orificios?', answer: 'Mida desde el centro de un orificio de birlo hasta el borde exterior del orificio situado dos posiciones más allá (no el directamente opuesto), e introduzca esa distancia aquí — la calculadora la convierte al diámetro real del círculo de birlos usando la geometría de 5 orificios.' },
+      { question: '¿Cómo mido el círculo de birlos en una llanta de 5 orificios?', answer: 'Mida en línea recta desde el centro de un orificio hasta el centro de un orificio adyacente. Introduzca esa distancia entre centros; la calculadora usa el ángulo de 5 orificios para obtener el diámetro del círculo. No introduzca medidas entre bordes ni entre orificios separados por otro.' },
       { question: '¿Puedo montar una llanta con un patrón de birlos distinto al de mi buje?', answer: 'No de forma segura sin un adaptador, y los adaptadores conllevan sus propios riesgos. El patrón de birlos (número de orificios y PCD) debe coincidir con el del buje, o la llanta no se montará correctamente.' },
       { question: '¿Es el patrón de birlos lo mismo que el diámetro del buje?', answer: 'No — el patrón de birlos describe dónde se sitúan los orificios de birlo, mientras que el diámetro del buje es el orificio central que centra la llanta sobre el cubo. Ambos deben coincidir o adaptarse por separado.' },
     ],

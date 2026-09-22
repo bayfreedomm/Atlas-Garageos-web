@@ -413,7 +413,7 @@ function setGuidedTireDecision(form: HTMLFormElement, original: TireToolInput, p
   };
   setText('[data-guide-observation]', guide.observation);
   setText('[data-guide-reason]', guide.reason);
-  for (const key of ['primary', 'secondary', 'final'] as const) {
+  for (const key of ['primary', 'secondary', 'setup', 'final'] as const) {
     const anchor = panel.querySelector<HTMLAnchorElement>(`[data-guide-${key}]`);
     if (anchor) anchor.href = guide[`${key}Href`];
     setText(`[data-guide-${key}-title]`, guide[`${key}Title`]);
@@ -441,6 +441,25 @@ function prefillSpeedometerFromGuide(form: HTMLFormElement): void {
     set(`${prefix}aspectRatio`, tire.aspectRatio);
     set(`${prefix}rimDiameterInches`, tire.rimDiameterInches);
   }
+}
+
+function updateJourneyLink(selector: string, pathname: string, values: Readonly<Record<string, string>>): void {
+  const link = document.querySelector<HTMLAnchorElement>(selector);
+  if (!link) return;
+  const url = new URL(pathname, window.location.origin);
+  for (const [key, value] of Object.entries(values)) url.searchParams.set(key, value);
+  link.href = `${url.pathname}${url.search}${url.hash}`;
+}
+
+function tireToken(input: TireToolInput): string { return `${input.widthMm}-${input.aspectRatio}-${input.rimDiameterInches}`; }
+
+function syncOffsetJourney(form: HTMLFormElement): void {
+  updateJourneyLink('[data-decision="support-fitment-studio"]', '/fitment-studio/#compare', {
+    ow: String(numberValue(form, 'originalWidthInches')),
+    oe: String(numberValue(form, 'originalOffsetMm')),
+    nw: String(numberValue(form, 'newWidthInches')),
+    ne: String(numberValue(form, 'newOffsetMm')),
+  });
 }
 
 function setTireComparisonTechnicalVisual(
@@ -703,6 +722,7 @@ export function initializeToolCalculators(): void {
       const result = calculateTireSizeTool(input);
       if (!result.ok) { results.replaceChildren(); hideSummary(form); renderIssues(errors, result.issues); const visual = form.querySelector<HTMLElement>('[data-single-tire-visual]'); if (visual) visual.hidden = true; const nearSizes = form.querySelector<HTMLElement>('[data-near-sizes]'); if (nearSizes) nearSizes.hidden = true; return; }
       errors.hidden = true; errors.replaceChildren(); setSummary(form, tireCalculatorSummary(result.value)); setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); renderMetrics(results, tireCalculatorMetrics(result.value)); renderNearEquivalentSizes(form, input);
+      updateJourneyLink('[data-decision="next-tire-size-comparison"]', '/tools/tire-size-comparison/', { current: tireToken(input) });
     };
     const preview = () => {
       const input = { widthMm: numberValue(form, 'widthMm'), aspectRatio: numberValue(form, 'aspectRatio'), rimDiameterInches: numberValue(form, 'rimDiameterInches') };
@@ -745,6 +765,7 @@ export function initializeToolCalculators(): void {
         if (errors) { errors.hidden = true; errors.replaceChildren(); }
         setSummary(form, wheelOffsetSummary(result.value));
         setWheelOffsetPrimaryResult(form, result.value);
+        syncOffsetJourney(form);
         setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
         setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
         if (results) renderMetrics(results, wheelOffsetMetrics(result.value));
@@ -755,6 +776,7 @@ export function initializeToolCalculators(): void {
       if (result.ok) {
         setSummary(form, wheelOffsetSummary(result.value));
         setWheelOffsetPrimaryResult(form, result.value);
+        syncOffsetJourney(form);
         setWheelVisual(form, result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
         setWheelOffsetTechnicalVisual(form, numberValue(form, 'originalWidthInches'), numberValue(form, 'originalOffsetMm'), numberValue(form, 'newWidthInches'), numberValue(form, 'newOffsetMm'), result.value.innerPositionChangeMm, result.value.outerPokeChangeMm);
       }
@@ -768,7 +790,10 @@ export function initializeToolCalculators(): void {
       const unit = new FormData(form).get('unit') === 'mph' ? 'mph' : 'km/h';
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
       const result = calculateSpeedometerTool(original, proposed, numberValue(form, 'indicatedSpeed'), unit);
-      if (result.ok) { setSummary(form, speedometerSummary(result.value)); renderSpeedTable(form, original, proposed, unit); }
+      if (result.ok) {
+        setSummary(form, speedometerSummary(result.value)); renderSpeedTable(form, original, proposed, unit);
+        updateJourneyLink('[data-decision="support-tire-size-comparison"]', '/tools/tire-size-comparison/', { current: tireToken(original), new: tireToken(proposed) });
+      }
       else { const speedTable = form.querySelector<HTMLElement>('[data-speed-table]'); if (speedTable) speedTable.hidden = true; }
       return result.ok ? { ok: true as const, metrics: speedometerMetrics(result.value) } : result;
     });
