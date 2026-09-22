@@ -53,8 +53,8 @@ function treadHeight(angle: number, across: number, outerRadius: number): number
   for (const center of [-0.61, -0.205, 0.205, 0.61]) {
     grooves -= outerRadius * 0.014 * Math.exp(-Math.pow((across - center) / 0.052, 4));
   }
-  const blockWave = Math.sin(angle * 18 + across * 4.6) * Math.cos(angle * 9 - across * 8.2);
-  const blockDetail = outerRadius * 0.0032 * Math.max(-0.45, blockWave);
+  const blockWave = Math.sin(angle * 24 + across * 7.2) * Math.cos(angle * 12 - across * 10.6);
+  const blockDetail = outerRadius * 0.0021 * Math.max(-0.45, blockWave);
   const shoulderCut = outerRadius * 0.004 * Math.max(0, (Math.abs(across) - 0.78) / 0.22) * Math.abs(Math.sin(angle * 14));
   return crown + grooves + blockDetail - shoulderCut;
 }
@@ -104,16 +104,16 @@ function treadBumpTexture(): THREE.CanvasTexture {
   if (context) {
     context.fillStyle = '#949494';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.strokeStyle = '#3d3d3d';
-    context.lineWidth = 5;
+    context.strokeStyle = '#666';
+    context.lineWidth = 3;
     for (const y of [24, 49, 79, 104]) {
       context.beginPath();
       context.moveTo(0, y);
       context.lineTo(canvas.width, y);
       context.stroke();
     }
-    context.strokeStyle = '#d5d5d5';
-    context.lineWidth = 4;
+    context.strokeStyle = '#aeaeae';
+    context.lineWidth = 3;
     for (let x = -32; x < canvas.width + 32; x += 24) {
       context.beginPath();
       context.moveTo(x, 16);
@@ -249,7 +249,7 @@ export function createTireWheelProduct(product: TireWheelProduct3D): THREE.Group
   const treadTexture = treadBumpTexture();
   const tread = physicalMaterial(0x0b1013, { metalness: 0, roughness: 0.76, clearcoat: 0.03, clearcoatRoughness: 0.82, alpha });
   tread.bumpMap = treadTexture;
-  tread.bumpScale = product.outerRadius * 0.008;
+  tread.bumpScale = product.outerRadius * 0.0045;
 
   const bodyGeometry = new THREE.LatheGeometry(tireProfile(product), 128, 0, TAU);
   bodyGeometry.rotateX(Math.PI / 2);

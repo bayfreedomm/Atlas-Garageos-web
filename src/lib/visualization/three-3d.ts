@@ -132,6 +132,8 @@ export class Three3DRenderer {
   private lastPointer: { x: number; y: number } | null = null;
   private pinchDistance: number | null = null;
   private annotations: readonly Annotation3D[] = [];
+  private annotationObjects: THREE.Object3D[] = [];
+  private tireScene = false;
   private labels: HTMLElement[] = [];
   private raf = 0;
   private transitionStarted = 0;
@@ -246,6 +248,8 @@ export class Three3DRenderer {
     this.content.clear();
     this.fitRadius = scene.fitRadius ?? 1.5;
     this.annotations = scene.annotations ?? [];
+    this.annotationObjects = [];
+    this.tireScene = scene.products?.some((product) => product.kind === 'tire-wheel') ?? false;
 
     if (scene.products?.length) {
       for (const product of scene.products) {
@@ -268,7 +272,9 @@ export class Three3DRenderer {
       this.content.add(lineObject(source.points, source.color, source.alpha ?? 1, source.closed ?? false, source.dashed ?? false));
     }
     for (const annotation of this.annotations) {
-      this.content.add(lineObject([annotation.start, annotation.end], annotation.color, annotation.alpha ?? 1, false, annotation.dashed ?? false));
+      const guide = lineObject([annotation.start, annotation.end], annotation.color, annotation.alpha ?? 1, false, annotation.dashed ?? false);
+      this.content.add(guide);
+      this.annotationObjects.push(guide);
       for (const point of [annotation.start, annotation.end]) {
         const marker = new THREE.Mesh(
           new THREE.SphereGeometry(0.027, 12, 8),
@@ -277,6 +283,7 @@ export class Three3DRenderer {
         marker.position.copy(vector(point));
         marker.renderOrder = 9;
         this.content.add(marker);
+        this.annotationObjects.push(marker);
       }
     }
     for (const shadow of scene.shadows ?? []) {
@@ -337,7 +344,10 @@ export class Three3DRenderer {
   }
 
   private updateLabels(): void {
-    const visible = this.content.visible;
+    // Diameter/width lines are front-view engineering guides, not physical parts
+    // of the wheel. At oblique angles they no longer describe a projected span.
+    const visible = this.content.visible && (!this.tireScene || (Math.abs(this.view.yaw) < 1.05 && Math.abs(this.view.pitch) < 0.58));
+    for (const object of this.annotationObjects) object.visible = visible;
     const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
     let index = 0;
     for (const annotation of this.annotations) {
@@ -388,8 +398,8 @@ export class Three3DRenderer {
     this.camera.lookAt(0, 0, 0);
     this.camera.updateMatrixWorld();
     this.content.updateMatrixWorld();
-    this.renderer.render(this.world, this.camera);
     this.updateLabels();
+    this.renderer.render(this.world, this.camera);
   }
 
   destroy(): void {

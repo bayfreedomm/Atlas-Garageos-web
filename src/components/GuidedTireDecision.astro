@@ -1,0 +1,19 @@
+---
+import type { EntityLocale } from '../seo/entity-routes';
+interface Props { readonly locale: EntityLocale; }
+const { locale } = Astro.props;
+const copy = {
+  en: { eyebrow: 'Your next decision', heading: 'What should I check next?', intro: 'Atlas follows the change you just made. These are checks, not a fitment verdict.', next: 'Next check', detail: 'Inspect this size', final: 'Before fitment' },
+  de: { eyebrow: 'Nächste Entscheidung', heading: 'Was sollte ich als Nächstes prüfen?', intro: 'Atlas folgt Ihrer Änderung. Dies sind Prüfungen, keine Freigabe.', next: 'Nächste Prüfung', detail: 'Diese Größe prüfen', final: 'Vor der Montage' },
+  es: { eyebrow: 'Siguiente decisión', heading: '¿Qué debo comprobar ahora?', intro: 'Atlas sigue el cambio que acaba de hacer. Son comprobaciones, no una aprobación de ajuste.', next: 'Siguiente comprobación', detail: 'Examinar esta medida', final: 'Antes del montaje' },
+}[locale];
+---
+<section class="guided-tire" data-guided-tire data-locale={locale} aria-labelledby="guided-tire-heading">
+  <header><span>{copy.eyebrow}</span><h3 id="guided-tire-heading">{copy.heading}</h3><p>{copy.intro}</p></header>
+  <div class="guided-tire__observation" aria-live="polite"><strong data-guide-observation>—</strong><p data-guide-reason>—</p></div>
+  <div class="guided-tire__actions">
+    <a data-guide-primary href="#"><small>01 · {copy.next}</small><strong data-guide-primary-title>—</strong><span data-guide-primary-detail></span></a>
+    <a data-guide-secondary href="#"><small>02 · {copy.detail}</small><strong data-guide-secondary-title>—</strong><span data-guide-secondary-detail></span></a>
+    <a data-guide-final href="#"><small>03 · {copy.final}</small><strong data-guide-final-title>—</strong><span data-guide-final-detail></span></a>
+  </div>
+</section>

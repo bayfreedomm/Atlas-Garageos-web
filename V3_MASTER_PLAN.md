@@ -233,3 +233,10 @@ Next implementation pass:
 - [x] EN/DE/ES Offset and PCD calculators use a single 3D / Engineering 2D workspace adjacent to the result.
 - [x] Canvas geometry is deferred until fallback is needed; shared Three geometry disposal is deduplicated.
 - [ ] Physical-device pinch, forced context loss, other browser engines and deployed performance remain separate acceptance checks.
+
+## Package 5.9 tire realism and first guided decision — 2026-09-22
+- [x] Tire studio framing is tighter; procedural tread relief is less visibly repetitive.
+- [x] Front-view measurement guides are hidden at oblique angles where their projected span would mislead; numerical metrics remain visible below the canvas.
+- [x] EN/DE/ES tire comparison offers a result-driven next check: speedometer for diameter change, wheel width/ET for width-only change, or load/speed specification when nominal dimensions match.
+- [x] Proposed size carries into the localized tire-size calculator; physical clearance remains an explicit final check, never an inferred approval.
+- [ ] Actual phone pinch, forced context loss, WebKit/Firefox and deployed performance still require separate device/deployment acceptance.

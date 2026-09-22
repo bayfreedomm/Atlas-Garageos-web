@@ -35,6 +35,11 @@ export function tireCalculatorSummary(result: Parameters<typeof tireCalculatorMe
 
 export function tireComparisonSummary(result: ValidValue<typeof compareTireSizesTool>): string {
   const locale = getPageLocale();
+  if (Math.abs(result.diameterDifferenceMm) < 0.000001) return {
+    en: 'Both tires have the same nominal overall diameter, so nominal static ride height does not change.',
+    de: 'Beide Reifen haben denselben Nenngesamtdurchmesser; die nominale statische Fahrzeughöhe bleibt gleich.',
+    es: 'Ambos neumáticos tienen el mismo diámetro nominal total; la altura estática nominal no cambia.',
+  }[locale];
   const diameterAbs = formatNumber(Math.abs(result.diameterDifferenceMm));
   const rideAbs = formatNumber(Math.abs(result.rideHeightDifferenceMm));
   const taller = result.diameterDifferenceMm >= 0;

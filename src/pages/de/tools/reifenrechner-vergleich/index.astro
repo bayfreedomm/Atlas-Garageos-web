@@ -2,6 +2,7 @@
 import ToolPage from '../../../../components/ToolPage.astro';
 import TireInputGroup from '../../../../components/TireInputGroup.astro';
 import TireVisualStudio from '../../../../components/TireVisualStudio.astro';
+import GuidedTireDecision from '../../../../components/GuidedTireDecision.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-size-comparison');
@@ -32,6 +33,7 @@ const c = localizedTool('tire-size-comparison', 'de');
     </section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre Vergleichszusammenfassung erscheint hier.</p>
     <TireVisualStudio locale="de" />
+    <GuidedTireDecision locale="de" />
     <div class="tire-detail-heading" aria-hidden="true"><span>Details</span><small>Nominale Geometrie</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>

@@ -225,7 +225,7 @@ export function tireComparisonScene(model: TireComparison3DModel, palette: Visua
       { start: v(-1.12, -currentRadius, 0), end: v(-1.12, currentRadius, 0), color: palette.current, label: `${model.current.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: -12, labelOffsetY: -14 },
       { start: v(1.12, -proposedRadius, 0), end: v(1.12, proposedRadius, 0), color: palette.proposed, label: `${model.proposed.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: 12, labelOffsetY: -14 },
     );
-    return { meshes, products, lines, shadows, annotations, fitRadius: 1.36 };
+    return { meshes, products, lines, shadows, annotations, fitRadius: 1.58 };
   }
 
   const spacing = 1.28;
@@ -253,7 +253,7 @@ export function tireComparisonScene(model: TireComparison3DModel, palette: Visua
     { start: v(-spacing, -0.76, -model.current.widthMm * scale * 0.5), end: v(-spacing, -0.76, model.current.widthMm * scale * 0.5), color: palette.current, label: `${model.current.widthMm.toFixed(0)} mm ${label.width}`, labelOffsetY: 18 },
     { start: v(spacing, model.proposed.rimDiameterMm * scale * 0.5, 0.34), end: v(spacing, proposedRadius, 0.34), color: palette.proposed, label: `${model.proposed.sidewallMm.toFixed(1)} mm ${label.sidewall}`, labelOffsetX: 18 },
   );
-  return { meshes, products, lines, shadows, annotations, fitRadius: 2.48 };
+  return { meshes, products, lines, shadows, annotations, fitRadius: 2.3 };
 }
 
 function offsetWheelMeshes(radius: number, width: number, centerZ: number, faceColor: string, alpha: number): readonly Mesh3D[] {

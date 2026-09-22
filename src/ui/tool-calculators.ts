@@ -3,6 +3,7 @@ import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalc
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 import { getPageLocale } from './page-locale';
 import { computeTireCrossSection } from './tire-cross-section';
+import { guidedTireDecision } from './guided-tire-decision';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
 const tireValue = (form: HTMLFormElement, prefix: string): TireToolInput => ({ widthMm: numberValue(form, `${prefix}widthMm`), aspectRatio: numberValue(form, `${prefix}aspectRatio`), rimDiameterInches: numberValue(form, `${prefix}rimDiameterInches`) });
@@ -402,6 +403,46 @@ function setTireComparisonPrimaryResult(
   panel.dataset.direction = percent < 0 ? 'negative' : percent > 0 ? 'positive' : 'zero';
 }
 
+function setGuidedTireDecision(form: HTMLFormElement, original: TireToolInput, proposed: TireToolInput, diameterDifferenceMm: number): void {
+  const panel = form.querySelector<HTMLElement>('[data-guided-tire]');
+  if (!panel) return;
+  const guide = guidedTireDecision(getPageLocale(), original, proposed, diameterDifferenceMm);
+  const setText = (selector: string, value: string): void => {
+    const node = panel.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = value;
+  };
+  setText('[data-guide-observation]', guide.observation);
+  setText('[data-guide-reason]', guide.reason);
+  for (const key of ['primary', 'secondary', 'final'] as const) {
+    const anchor = panel.querySelector<HTMLAnchorElement>(`[data-guide-${key}]`);
+    if (anchor) anchor.href = guide[`${key}Href`];
+    setText(`[data-guide-${key}-title]`, guide[`${key}Title`]);
+    setText(`[data-guide-${key}-detail]`, guide[`${key}Detail`]);
+  }
+}
+
+function prefillSpeedometerFromGuide(form: HTMLFormElement): void {
+  const params = new URLSearchParams(window.location.search);
+  const parse = (token: string | null): TireToolInput | null => {
+    if (!token || !/^\d{2,3}-\d{2,3}-\d{2}$/.test(token)) return null;
+    const [widthMm, aspectRatio, rimDiameterInches] = token.split('-').map(Number);
+    if (widthMm === undefined || aspectRatio === undefined || rimDiameterInches === undefined) return null;
+    return { widthMm, aspectRatio, rimDiameterInches };
+  };
+  const original = parse(params.get('current'));
+  const proposed = parse(params.get('new'));
+  if (!original || !proposed || !compareTireSizesTool(original, proposed).ok) return;
+  const set = (name: string, value: number): void => {
+    const field = form.elements.namedItem(name) as HTMLInputElement | null;
+    if (field) field.value = String(value);
+  };
+  for (const [prefix, tire] of [['original-', original], ['new-', proposed]] as const) {
+    set(`${prefix}widthMm`, tire.widthMm);
+    set(`${prefix}aspectRatio`, tire.aspectRatio);
+    set(`${prefix}rimDiameterInches`, tire.rimDiameterInches);
+  }
+}
+
 function setTireComparisonTechnicalVisual(
   form: HTMLFormElement,
   original: TireToolInput,
@@ -681,6 +722,7 @@ export function initializeToolCalculators(): void {
         if (errors) { errors.hidden = true; errors.replaceChildren(); }
         setSummary(form, tireComparisonSummary(result.value));
         setTireComparisonPrimaryResult(form, result.value);
+        setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm);
         setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm);
         setTireComparisonTechnicalVisual(form, original, proposed, result.value);
         if (results) renderMetrics(results, tireComparisonMetrics(result.value));
@@ -689,7 +731,7 @@ export function initializeToolCalculators(): void {
     bindCalculator(form, () => {
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
       const result = compareTireSizesTool(original, proposed);
-      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
+      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
       return result.ok ? { ok: true as const, metrics: tireComparisonMetrics(result.value) } : result;
     });
     form.addEventListener('input', () => requestAnimationFrame(preview));
@@ -721,6 +763,7 @@ export function initializeToolCalculators(): void {
     form.addEventListener('input', () => requestAnimationFrame(preview));
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="speedometer"]').forEach((form) => {
+    prefillSpeedometerFromGuide(form);
     bindCalculator(form, () => {
       const unit = new FormData(form).get('unit') === 'mph' ? 'mph' : 'km/h';
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
