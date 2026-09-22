@@ -2,6 +2,7 @@
 import ToolPage from '../../../components/ToolPage.astro';
 import TireSizeTechnicalVisual from '../../../components/TireSizeTechnicalVisual.astro';
 import TireCodeExplainer from '../../../components/TireCodeExplainer.astro';
+import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
 import VehicleFitmentPicker from '../../../components/VehicleFitmentPicker.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('tire-size-calculator');
@@ -10,7 +11,7 @@ const definition = toolById('tire-size-calculator');
   <VehicleFitmentPicker slot="tool" target="tire-size" />
   <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
     <fieldset><legend>Tire size</legend><div class="tire-input-row"><label>Width<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Profile<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Rim<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
-    <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p><TireSizeTechnicalVisual /><dl class="tool-results" data-results aria-live="polite"></dl>
+    <button type="submit">Calculate tire dimensions</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Your result will appear here.</p><Parametric3DPanel mode="single" locale="en" /><TireSizeTechnicalVisual /><dl class="tool-results" data-results aria-live="polite"></dl>
     <div class="near-sizes" data-near-sizes hidden>
       <h3 data-near-sizes-heading></h3>
       <p class="near-sizes__note" data-near-sizes-note></p>

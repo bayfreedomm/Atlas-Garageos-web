@@ -486,6 +486,7 @@ export async function initializeFitmentPage(): Promise<void> {
       row.append(term, detail);
       return row;
     }));
+    form.dispatchEvent(new Event('fitment:updated'));
   }
 
   function renderGarage(state: GarageState): void {

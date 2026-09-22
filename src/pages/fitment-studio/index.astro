@@ -5,6 +5,7 @@ import Brand from '../../components/Brand.astro';
 import ThemeBoot from '../../components/ThemeBoot.astro';
 import NavigationDrawer from '../../components/NavigationDrawer.astro';
 import FitmentVisualizer from '../../components/FitmentVisualizer.astro';
+import Parametric3DPanel from '../../components/Parametric3DPanel.astro';
 import ToolIcon from '../../components/ToolIcon.astro';
 import Footer from '../../components/Footer.astro';
 import ThemeQuickToggle from '../../components/ThemeQuickToggle.astro';
@@ -111,6 +112,7 @@ const t = (key: Parameters<typeof translate>[1]) => translate('en', key);
         </form>
         <div id="errors" class="inline-errors" role="alert" aria-live="assertive" hidden></div>
         <p id="comparison-summary" class="result-summary" aria-live="polite"></p>
+        <Parametric3DPanel mode="fitment" locale="en" />
         <div class="comparison-layout" aria-labelledby="results-heading">
           <div id="results-heading"><FitmentVisualizer mode="full" title="Current and new geometry" /></div>
           <div class="share-toolbar" role="group" aria-label="Share this comparison">

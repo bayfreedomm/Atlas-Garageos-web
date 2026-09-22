@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('ev-charging-cost-calculator');
@@ -19,6 +20,7 @@ const c = localizedTool('ev-charging-cost-calculator', 'de');
     <button type="submit">Ladekosten berechnen</button>
     <section class="standard-answer ev-answer is-pending" data-ev-answer aria-live="polite"><div class="standard-answer__main"><span>Geschätzte Ladekosten</span><strong data-ev-cost>—</strong><p data-ev-context>Ihre Ladeschätzung erscheint hier.</p></div><div class="standard-answer__secondary"><span>Ideale Ladezeit</span><strong data-ev-time>—</strong><small data-ev-grid>Netzenergie erscheint hier.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre Ladeschätzung erscheint hier.</p>
+    <Parametric3DPanel mode="ev" locale="de" />
     <figure class="ev-technical-visual is-pending" data-ev-visual>
       <figcaption><span>AKKU → NETZENERGIE → KOSTEN + ZEIT</span><small>Ladefenster ist proportional; Zeit setzt konstante Leistung voraus</small></figcaption>
       <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Ladestand des Akkus">

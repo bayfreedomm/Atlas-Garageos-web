@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('ev-charging-cost-calculator');
 ---
@@ -17,6 +18,7 @@ const definition = toolById('ev-charging-cost-calculator');
     <button type="submit">Calculate charging cost</button>
     <section class="standard-answer ev-answer is-pending" data-ev-answer aria-live="polite"><div class="standard-answer__main"><span>Estimated charging cost</span><strong data-ev-cost>—</strong><p data-ev-context>Your charging estimate will appear here.</p></div><div class="standard-answer__secondary"><span>Ideal charging time</span><strong data-ev-time>—</strong><small data-ev-grid>Grid energy appears here.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Your charging estimate will appear here.</p>
+    <Parametric3DPanel mode="ev" locale="en" />
     <figure class="ev-technical-visual is-pending" data-ev-visual>
       <figcaption><span>BATTERY → GRID ENERGY → COST + TIME</span><small>Charge window is proportional; time assumes constant power</small></figcaption>
       <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Battery charge level">

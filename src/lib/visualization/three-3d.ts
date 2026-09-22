@@ -349,6 +349,12 @@ export class Three3DRenderer {
     const visible = this.content.visible && (!this.tireScene || (Math.abs(this.view.yaw) < 1.05 && Math.abs(this.view.pitch) < 0.58));
     for (const object of this.annotationObjects) object.visible = visible;
     const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
+    const hud = this.stage.querySelector<HTMLElement>('.parametric-3d__hud');
+    if (hud) {
+      const stageBounds = this.stage.getBoundingClientRect();
+      const hudBounds = hud.getBoundingClientRect();
+      occupied.push({ left: hudBounds.left - stageBounds.left - 7, right: hudBounds.right - stageBounds.left + 7, top: hudBounds.top - stageBounds.top - 7, bottom: hudBounds.bottom - stageBounds.top + 7 });
+    }
     let index = 0;
     for (const annotation of this.annotations) {
       if (!annotation.label) continue;

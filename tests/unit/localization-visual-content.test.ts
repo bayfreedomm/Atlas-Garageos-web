@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import tireVisual from '../../src/components/TireComparisonVisual.astro?raw';
 import offsetVisual from '../../src/components/WheelOffsetTechnicalVisual.astro?raw';
 import toolPage from '../../src/components/ToolPage.astro?raw';
+import parametricPanel from '../../src/components/Parametric3DPanel.astro?raw';
+import fitmentStudio from '../../src/pages/fitment-studio/index.astro?raw';
 import methodology from '../../src/pages/methodology/index.astro?raw';
 import { LOCALE_CODES, localeDefinitions, localizedToolPath } from '../../src/localization/locales';
 import { toolInsights } from '../../src/content/tool-insights';
@@ -59,5 +61,11 @@ describe('V3 visual and localization foundation', () => {
     const spanish = localizedTool('bolt-pattern-calculator', 'es');
     expect(german.faqs?.[0]?.answer).toContain('Mittelpunktabstand');
     expect(spanish.faqs?.[0]?.answer).toContain('distancia entre centros');
+  });
+
+  it('keeps a persistent in-scene measurement HUD and a switchable flagship 3D workspace', () => {
+    expect(parametricPanel).toContain('parametric-3d__hud');
+    expect(parametricPanel).toContain('data-p3d-fitment-view');
+    expect(fitmentStudio).toContain('<Parametric3DPanel mode="fitment" locale="en" />');
   });
 });

@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('gear-ratio-calculator');
@@ -12,6 +13,7 @@ const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
     <button type="submit">Übersetzung vergleichen</button>
     <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Effektive Achsübersetzung</span><strong data-gear-effective>—</strong><p data-gear-context>Ihr Übersetzungsvergleich erscheint hier.</p></div><div class="standard-answer__secondary"><span>Passende Übersetzung zum Originalgefühl</span><strong data-gear-matching>—</strong><small data-gear-rpm>Direktantrieb-Drehzahl erscheint hier.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre effektive Übersetzung erscheint hier.</p>
+    <Parametric3DPanel mode="gear" locale="de" />
     <figure class="gear-technical-visual is-pending" data-gear-visual aria-label="Beziehung zwischen Reifendurchmesser und effektiver Übersetzung"><figcaption><span>REIFENDURCHMESSER → EFFEKTIVE ÜBERSETZUNG</span><small>Schematische Kreise verwenden das eingegebene Durchmesserverhältnis</small></figcaption><div class="gear-wheel-pair" aria-hidden="true"><div><i data-gear-current-wheel></i><small>Aktuell <strong data-gear-current-diameter>—</strong></small></div><b>→</b><div><i data-gear-new-wheel></i><small>Neu <strong data-gear-new-diameter>—</strong></small></div></div><p data-gear-visual-meaning>Geben Sie beide Reifendurchmesser ein, um den Übersetzungseffekt zu vergleichen.</p></figure>
     <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Übersetzung und Direktantrieb-Berechnung</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
     <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">25–44 ZOLL REIFEN</p><h2 id="rpm-matrix-heading">Drehzahlkarte bei <span data-matrix-speed>65</span> mph</h2><p>Direktantrieb (1,00:1). Farbe zeigt relative Drehzahl nur innerhalb dieser Tabelle.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Reifen</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>Niedrigere relative Drehzahl</span><i aria-hidden="true"></i><span>Höhere relative Drehzahl</span></p></section>

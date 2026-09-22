@@ -249,3 +249,13 @@ Next implementation pass:
 - [x] PCD instructional text now consistently specifies adjacent lug center-to-center measurement, matching the existing canonical calculator.
 - [x] Package 6.0 adds no dependency and leaves canonical math, fuel history/data and Wrangler/Cloudflare configuration untouched.
 - [ ] Physical-device touch, forced context loss, WebKit/Firefox and deployed performance remain separate acceptance checks.
+
+## Package 6.1 visual expansion — 2026-09-23
+- [x] Tire Comparison, Wheel Offset and PCD keep a high-contrast in-scene numeric HUD visible at every camera angle. Front-view guide lines still hide at misleading oblique angles; their values do not disappear.
+- [x] Tire Size Calculator gets a live single-tire 3D scene; Speedometer gets a two-size 3D comparison with indicated/theoretical speed readout.
+- [x] Gear Ratio gets proportional tire-diameter geometry, Compression Ratio a bore/stroke/clearance-volume section, and EV Charging a proportional charge-window battery. Illustrative details and non-predictions are labelled explicitly.
+- [x] Fitment Studio gets a live 3D workspace switching between tire profiles and the fixed-hub wheel/ET scene, with the calculated tire and wheel values visible together.
+- [x] New scenes use the existing lazy Three.js renderer, Canvas fallback, touch/zoom/reduced-motion handling and bounded rendering. No calculation engine or dependency change.
+- [x] Guided-decision and related-tool links now have unmistakable button affordance, contrast, hover and keyboard-focus states.
+- [ ] Literal 3D scenes for every registered tool are not shipped: fuel-price data, unit converters and vehicle lookup do not have a defensible physical 3D model. Their existing task-specific data/technical visuals remain; no fake 3D meaning is implied.
+- [ ] Physical-device pinch, forced context loss, WebKit/Firefox and deployed performance remain separate acceptance checks.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pcdFromAdjacentHoleSpacingMm } from '../../src/data/bolt-pattern-geometry';
 import { buildPcd3DModel, buildTireComparison3DModel, buildWheelOffset3DModel } from '../../src/lib/visualization/parametric-3d-model';
-import { pcdScene, tireComparisonScene, wheelOffsetScene, type VisualizationPalette } from '../../src/lib/visualization/scene-builders';
+import { compressionChamberScene, evBatteryScene, gearDiameterScene, pcdScene, singleTireScene, tireComparisonScene, wheelOffsetScene, type VisualizationPalette } from '../../src/lib/visualization/scene-builders';
 import { createPcdProduct } from '../../src/lib/visualization/three-engineering-geometry';
 import * as THREE from 'three';
 
@@ -145,5 +145,33 @@ describe('Package 5 parametric 3D models', () => {
     expect(es.annotations?.[1]?.label).toContain('distancia');
     expect(de.annotations?.[1]?.start).toEqual(en.annotations?.[1]?.start);
     expect(es.annotations?.[1]?.end).toEqual(en.annotations?.[1]?.end);
+  });
+
+  it('builds the single-tire product from the validated tire geometry', () => {
+    const model = buildTireComparison3DModel({ widthMm: 225, aspectRatio: 45, rimDiameterInches: 18 }, { widthMm: 225, aspectRatio: 45, rimDiameterInches: 18 })!;
+    const scene = singleTireScene(model, palette, false);
+    expect(scene.products).toHaveLength(1);
+    closeTo(scene.products![0]!.rimRadius, model.current.rimDiameterMm / model.current.overallDiameterMm);
+    expect(scene.annotations?.[0]?.label).toContain('659.7');
+  });
+
+  it('keeps gear-view tire diameter proportions and a Canvas fallback', () => {
+    const native = gearDiameterScene(31, 35, palette, false);
+    const fallback = gearDiameterScene(31, 35, palette, true);
+    expect(native.products).toHaveLength(2);
+    closeTo(native.products![0]!.outerRadius / native.products![1]!.outerRadius, 31 / 35);
+    expect(native.meshes).toHaveLength(0);
+    expect(fallback.meshes.length).toBeGreaterThan(0);
+  });
+
+  it('maps bore/stroke and charge-window inputs into different physical scenes', () => {
+    const compression = compressionChamberScene(86, 90, 52, palette);
+    expect(compression.meshes.length).toBeGreaterThan(2);
+    expect(compression.annotations?.[0]?.label).toContain('90.0 mm');
+    const shortStroke = compressionChamberScene(86, 80, 52, palette);
+    expect(compression.meshes[0]?.vertices).not.toEqual(shortStroke.meshes[0]?.vertices);
+    const charging = evBatteryScene(20, 80, palette);
+    const shorterWindow = evBatteryScene(20, 60, palette);
+    expect(charging.meshes[3]?.vertices).not.toEqual(shorterWindow.meshes[3]?.vertices);
   });
 });

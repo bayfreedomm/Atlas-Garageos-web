@@ -2,7 +2,7 @@
 import { visualization3DLocale, visualization3DText, type Visualization3DLocale } from '../localization/visualization-3d';
 
 interface Props {
-  readonly mode: 'tire' | 'offset' | 'pcd';
+  readonly mode: 'tire' | 'single' | 'speed' | 'gear' | 'compression' | 'ev' | 'fitment' | 'offset' | 'pcd';
   readonly locale?: Visualization3DLocale | undefined;
   readonly lugCount?: number | undefined;
   readonly pcdMm?: number | undefined;
@@ -12,9 +12,9 @@ interface Props {
 const { mode, locale: requestedLocale = 'en', lugCount, pcdMm, centerBoreMm } = Astro.props;
 const locale = visualization3DLocale(requestedLocale);
 const t = visualization3DText[locale];
-const title = mode === 'tire' ? t.tireTitle : mode === 'offset' ? t.offsetTitle : t.pcdTitle;
-const intro = mode === 'tire' ? t.tireIntro : mode === 'offset' ? t.offsetIntro : t.pcdIntro;
-const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
+const title = mode === 'tire' ? t.tireTitle : mode === 'single' ? t.singleTitle : mode === 'speed' ? t.speedTitle : mode === 'gear' ? t.gearTitle : mode === 'compression' ? t.compressionTitle : mode === 'ev' ? t.evTitle : mode === 'fitment' ? t.fitmentTitle : mode === 'offset' ? t.offsetTitle : t.pcdTitle;
+const intro = mode === 'tire' ? t.tireIntro : mode === 'single' ? t.singleIntro : mode === 'speed' ? t.speedIntro : mode === 'gear' ? t.gearIntro : mode === 'compression' ? t.compressionIntro : mode === 'ev' ? t.evIntro : mode === 'fitment' ? t.fitmentIntro : mode === 'offset' ? t.offsetIntro : t.pcdIntro;
+const caution = mode === 'pcd' ? t.pcdOnly : mode === 'gear' ? t.gearOnly : mode === 'compression' ? t.compressionOnly : mode === 'ev' ? t.evOnly : t.geometryOnly;
 ---
 <section
   class:list={['parametric-3d', `parametric-3d--${mode}`]}
@@ -41,14 +41,27 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
       <button type="button" data-p3d-tire-view="overlay" aria-pressed="false">{t.overlay}</button>
     </div>
   )}
+  {mode === 'fitment' && (
+    <div class="parametric-3d__view-switch" aria-label={title}>
+      <button type="button" data-p3d-fitment-view="tires" aria-pressed="true">{t.tiresView}</button>
+      <button type="button" data-p3d-fitment-view="wheels" aria-pressed="false">{t.wheelsView}</button>
+    </div>
+  )}
 
   <div class="parametric-3d__stage">
     <canvas data-p3d-canvas width="960" height="600"></canvas>
     <div class="parametric-3d__annotations" data-p3d-annotations aria-hidden="true"></div>
+    <div class="parametric-3d__hud" aria-live="polite">
+      <small>{mode === 'speed' ? t.speedReadout : t.alwaysVisible}</small>
+      {mode === 'single' ? <div><span>{t.diameter}</span><strong data-p3d-value="hud-current">—</strong></div> : mode === 'speed' ? <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-speed">—</strong></div> : mode === 'gear' || mode === 'compression' || mode === 'ev' ? <div><span>{mode === 'gear' ? t.gearHud : mode === 'compression' ? t.compressionHud : t.evHud}</span><strong data-p3d-value="hud-special">—</strong></div> : mode === 'fitment' ? <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-fitment">—</strong></div> : mode === 'offset' ? <div><span>{t.innerDelta} / {t.outerDelta}</span><strong data-p3d-value="hud-offset">—</strong></div> : mode === 'pcd' ? <div><span>{t.pcd}</span><strong data-p3d-value="hud-pcd">—</strong></div> : <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-diameters">—</strong></div>}
+    </div>
     <div class="parametric-3d__loading" data-p3d-loading>{t.loading}</div>
     <div class="parametric-3d__fallback" data-p3d-fallback hidden>{t.unavailable}</div>
     <div class="parametric-3d__legend" aria-hidden="true">
-      {mode !== 'pcd' && <><span class="is-current"></span>{t.current}<span class="is-proposed"></span>{t.proposed}</>}
+      {(mode === 'tire' || mode === 'speed' || mode === 'gear' || mode === 'fitment' || mode === 'offset') && <><span class="is-current"></span>{t.current}<span class="is-proposed"></span>{t.proposed}</>}
+      {mode === 'ev' && <><span class="is-current"></span>{t.chargeFrom}<span class="is-proposed"></span>{t.chargeTo}</>}
+      {mode === 'single' && <><span class="is-current"></span>{t.diameter}</>}
+      {mode === 'compression' && <><span class="is-current"></span>{t.bore}<span class="is-proposed"></span>{t.stroke}</>}
       {mode === 'pcd' && <><span class="is-current"></span>{t.lugCount}<span class="is-accent"></span>{t.pcd}</>}
     </div>
   </div>
@@ -59,16 +72,16 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
     <button type="button" data-p3d-zoom-in aria-label={t.zoomIn}>+</button>
   </div>
 
-  {mode === 'tire' && (
+  {(mode === 'tire' || mode === 'speed' || mode === 'single') && (
     <dl class="parametric-3d__metrics">
       <div><dt>{t.current} · {t.diameter}</dt><dd data-p3d-value="current">—</dd></div>
-      <div><dt>{t.proposed} · {t.diameter}</dt><dd data-p3d-value="proposed">—</dd></div>
+      {mode !== 'single' && <div><dt>{t.proposed} · {t.diameter}</dt><dd data-p3d-value="proposed">—</dd></div>}
       <div><dt>{t.width}</dt><dd data-p3d-value="width">—</dd></div>
       <div><dt>{t.sidewall}</dt><dd data-p3d-value="sidewall">—</dd></div>
       <div><dt>{t.rim}</dt><dd data-p3d-value="rim">—</dd></div>
-      <div><dt>{t.diameterDelta}</dt><dd data-p3d-value="diameterDelta">—</dd></div>
-      <div><dt>{t.circumferenceDelta}</dt><dd data-p3d-value="circumferenceDelta">—</dd></div>
-      <div><dt>{t.speedometerDelta}</dt><dd data-p3d-value="speedometerDelta">—</dd></div>
+      {mode !== 'single' && <div><dt>{t.diameterDelta}</dt><dd data-p3d-value="diameterDelta">—</dd></div>}
+      {mode !== 'single' && <div><dt>{t.circumferenceDelta}</dt><dd data-p3d-value="circumferenceDelta">—</dd></div>}
+      {mode !== 'single' && <div><dt>{t.speedometerDelta}</dt><dd data-p3d-value="speedometerDelta">—</dd></div>}
     </dl>
   )}
 
@@ -90,6 +103,14 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
       <div><dt>{t.centerBore}</dt><dd data-p3d-value="centerBore">—</dd></div>
     </dl>
   )}
+
+  {(mode === 'gear' || mode === 'compression' || mode === 'ev') && (
+    <dl class="parametric-3d__metrics">
+      <div><dt>{mode === 'compression' ? t.bore : mode === 'ev' ? t.chargeFrom : t.current}</dt><dd data-p3d-value="special-current">—</dd></div>
+      <div><dt>{mode === 'compression' ? t.stroke : mode === 'ev' ? t.chargeTo : t.proposed}</dt><dd data-p3d-value="special-proposed">—</dd></div>
+    </dl>
+  )}
+  {mode === 'fitment' && <dl class="parametric-3d__metrics"><div><dt>{t.current} · {t.diameter}</dt><dd data-p3d-value="current">—</dd></div><div><dt>{t.proposed} · {t.diameter}</dt><dd data-p3d-value="proposed">—</dd></div><div><dt>{t.innerDelta}</dt><dd data-p3d-value="innerDelta">—</dd></div><div><dt>{t.outerDelta}</dt><dd data-p3d-value="outerDelta">—</dd></div></dl>}
 
   <p class="parametric-3d__caution">{caution}</p>
 </section>

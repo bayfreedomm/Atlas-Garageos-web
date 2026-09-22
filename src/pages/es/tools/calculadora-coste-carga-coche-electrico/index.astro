@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('ev-charging-cost-calculator');
@@ -19,6 +20,7 @@ const c = localizedTool('ev-charging-cost-calculator', 'es');
     <button type="submit">Calcular coste de carga</button>
     <section class="standard-answer ev-answer is-pending" data-ev-answer aria-live="polite"><div class="standard-answer__main"><span>Coste de carga estimado</span><strong data-ev-cost>—</strong><p data-ev-context>Su estimación de carga aparecerá aquí.</p></div><div class="standard-answer__secondary"><span>Tiempo de carga ideal</span><strong data-ev-time>—</strong><small data-ev-grid>La energía de red aparecerá aquí.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Su estimación de carga aparecerá aquí.</p>
+    <Parametric3DPanel mode="ev" locale="es" />
     <figure class="ev-technical-visual is-pending" data-ev-visual>
       <figcaption><span>BATERÍA → ENERGÍA DE RED → COSTE + TIEMPO</span><small>La ventana de carga es proporcional; el tiempo asume potencia constante</small></figcaption>
       <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Estado de carga de la batería">

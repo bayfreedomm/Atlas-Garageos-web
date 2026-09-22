@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('compression-ratio-calculator');
@@ -15,6 +16,7 @@ const c = localizedTool('compression-ratio-calculator', 'es');
       <label>Volumen adicional · cc<input name="otherVolume" type="number" value="4" step="any" inputmode="decimal" /></label>
     </div>
     <UtilityResultStandard locale="es" primaryLabel="Relación de compresión estática" pending="Introduzca el diámetro, la carrera y el volumen de la cámara." visualTitle="Volumen desplazado + volumen de holgura ÷ volumen de holgura" visualNote="Relación geométrica estática, no compresión dinámica" />
+    <Parametric3DPanel mode="compression" locale="es" />
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>
