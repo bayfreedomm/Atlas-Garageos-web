@@ -113,6 +113,10 @@ export function mountParametric3DPanel(panel: HTMLElement): void {
   setUnavailable(panel, false);
   let tireView: 'side-by-side' | 'overlay' = 'side-by-side';
 
+  if (mode === 'tire') renderer.configureView({ yaw: -0.88, pitch: 0.3, zoom: 1.02 }, true);
+  else if (mode === 'offset') renderer.configureView({ yaw: -0.56, pitch: 0.38, zoom: 1.02 }, true);
+  else renderer.configureView({ yaw: -0.42, pitch: 0.7, zoom: 1.08 }, true);
+
   const refreshTheme = (): void => {
     renderer.setTheme(css(panel, '--p3d-background', '#09151f'), css(panel, '--p3d-grid', '#294252'));
   };
