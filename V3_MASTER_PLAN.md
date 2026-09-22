@@ -211,3 +211,13 @@ Next implementation pass:
 - [x] The dependency-free Canvas renderer remains the automatic fallback when WebGL cannot initialize.
 - [x] Touch rotation, bounded zoom, DPR caps, reduced-motion behavior, teardown/disposal and 390px mobile layout were verified.
 - [x] Fuel data/history, Wrangler/Cloudflare config, routes and localization files remained byte-identical to the Package 5.1 source archive.
+
+## Package 5.6 premium geometry + rolling fuel PR checkpoint — 2026-09-22
+- [x] Tire sidewalls, shoulders, beads, circumferential grooves and bounded-count tread blocks now read as dimensional geometry rather than a smooth placeholder torus.
+- [x] Wheel scenes use layered barrels, lips, tapered spokes, hubs, center caps and recessed lug details; offset comparisons keep one visibly fixed hub-mounting plane.
+- [x] PCD scenes use a chamfered layered plate, deep center bore and recessed lug seats while preserving the canonical lug-circle and adjacent-spacing calculations.
+- [x] Procedural studio reflections, controlled physical materials, collision-aware HTML callouts and tuned default cameras improve legibility without external assets or new dependencies.
+- [x] WebGL context loss now switches to the existing Canvas renderer; event listeners, textures, geometries and materials are disposed on teardown.
+- [x] Scheduled fuel workflows rebuild the rolling branch from the current default branch, serialize both providers, publish with an explicit SHA-bound force-with-lease and reuse an existing open PR.
+- [x] Fuel workflow lifecycle regression coverage includes first run, repeated run, changed remote branch, closed/merged PR recreation and no-change behavior.
+- [x] Canonical tire/offset/PCD math, fuel JSON/history, routes, SEO, localization, Wrangler config and the dependency lockfile remain byte-identical to the Package 5.5 source archive.

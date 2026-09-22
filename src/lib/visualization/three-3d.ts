@@ -11,12 +11,37 @@ function vector(point: Vec3): THREE.Vector3 {
   return new THREE.Vector3(point.x, point.y, point.z);
 }
 
+function studioEnvironment(): THREE.DataTexture {
+  const width = 64;
+  const height = 32;
+  const data = new Uint8Array(width * height * 4);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const u = x / (width - 1);
+      const vertical = 1 - Math.abs(y / (height - 1) - 0.5) * 1.45;
+      const keyPanel = Math.exp(-Math.pow((u - 0.2) / 0.11, 2)) * 150;
+      const rimPanel = Math.exp(-Math.pow((u - 0.78) / 0.08, 2)) * 95;
+      const base = 24 + Math.max(0, vertical) * 42;
+      const index = (y * width + x) * 4;
+      data[index] = Math.min(255, base + keyPanel + rimPanel * 0.75);
+      data[index + 1] = Math.min(255, base + keyPanel + rimPanel * 0.46);
+      data[index + 2] = Math.min(255, base + keyPanel * 1.04 + rimPanel);
+      data[index + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function pbrMaterial(mesh: Mesh3D): THREE.MeshStandardMaterial {
   const source: Material3D = mesh.material ?? {};
   const alpha = mesh.alpha ?? 1;
   const metallic = clamp(source.metallic ?? 0.08, 0, 1);
   const shininess = clamp(source.shininess ?? 18, 1, 64);
-  const material = new THREE.MeshStandardMaterial({
+  const material = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(mesh.color),
     emissive: new THREE.Color(mesh.color),
     emissiveIntensity: metallic > 0.35 ? 0.3 : 0.1,
@@ -26,8 +51,10 @@ function pbrMaterial(mesh: Mesh3D): THREE.MeshStandardMaterial {
     opacity: alpha,
     depthWrite: alpha >= 0.72,
     side: THREE.DoubleSide,
+    clearcoat: metallic > 0.35 ? 0.28 : 0.02,
+    clearcoatRoughness: metallic > 0.35 ? 0.34 : 0.8,
   });
-  material.envMapIntensity = metallic > 0.35 ? 1.05 : 0.42;
+  material.envMapIntensity = metallic > 0.35 ? 1.35 : 0.28;
   return material;
 }
 
@@ -79,6 +106,8 @@ export class Three3DRenderer {
   private readonly annotationLayer: HTMLElement;
   private readonly resizeObserver: ResizeObserver;
   private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private readonly events = new AbortController();
+  private readonly environment = studioEnvironment();
   private view = { ...DEFAULT_VIEW };
   private defaultView = { ...DEFAULT_VIEW };
   private fitRadius = 1.5;
@@ -100,6 +129,7 @@ export class Three3DRenderer {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.camera.position.set(0, 0, 7);
+    this.world.environment = this.environment;
     this.world.add(this.content);
     this.addLights();
 
@@ -140,11 +170,12 @@ export class Three3DRenderer {
   }
 
   private bindControls(): void {
+    const signal = this.events.signal;
     this.canvas.addEventListener('pointerdown', (event) => {
       this.pointerId = event.pointerId;
       this.lastPointer = { x: event.clientX, y: event.clientY };
       this.canvas.setPointerCapture(event.pointerId);
-    });
+    }, { signal });
     this.canvas.addEventListener('pointermove', (event) => {
       if (event.pointerId !== this.pointerId || !this.lastPointer) return;
       const dx = event.clientX - this.lastPointer.x;
@@ -153,18 +184,22 @@ export class Three3DRenderer {
       this.view.yaw += dx * 0.008;
       this.view.pitch = clamp(this.view.pitch + dy * 0.006, -1.15, 1.15);
       this.requestRender();
-    });
+    }, { signal });
     const release = (event: PointerEvent): void => {
       if (event.pointerId !== this.pointerId) return;
       this.pointerId = null;
       this.lastPointer = null;
     };
-    this.canvas.addEventListener('pointerup', release);
-    this.canvas.addEventListener('pointercancel', release);
+    this.canvas.addEventListener('pointerup', release, { signal });
+    this.canvas.addEventListener('pointercancel', release, { signal });
     this.canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
       this.zoomBy(event.deltaY < 0 ? 1.08 : 0.92);
-    }, { passive: false });
+    }, { passive: false, signal });
+    this.canvas.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault();
+      this.stage.dispatchEvent(new CustomEvent('p3d:webgl-lost'));
+    }, { signal });
   }
 
   setTheme(background: string, grid: string): void {
@@ -194,6 +229,15 @@ export class Three3DRenderer {
     }
     for (const annotation of this.annotations) {
       this.content.add(lineObject([annotation.start, annotation.end], annotation.color, annotation.alpha ?? 1, false, annotation.dashed ?? false));
+      for (const point of [annotation.start, annotation.end]) {
+        const marker = new THREE.Mesh(
+          new THREE.SphereGeometry(0.027, 12, 8),
+          new THREE.MeshBasicMaterial({ color: annotation.color, transparent: true, opacity: annotation.alpha ?? 1 }),
+        );
+        marker.position.copy(vector(point));
+        marker.renderOrder = 9;
+        this.content.add(marker);
+      }
     }
     for (const shadow of scene.shadows ?? []) {
       const material = new THREE.MeshBasicMaterial({ color: shadow.color ?? '#000000', transparent: true, opacity: shadow.alpha ?? 0.18, depthWrite: false, side: THREE.DoubleSide });
@@ -254,6 +298,7 @@ export class Three3DRenderer {
 
   private updateLabels(): void {
     const visible = this.content.visible;
+    const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
     let index = 0;
     for (const annotation of this.annotations) {
       if (!annotation.label) continue;
@@ -265,8 +310,18 @@ export class Three3DRenderer {
       const onScreen = visible && midpoint.z > -1 && midpoint.z < 1 && Math.abs(midpoint.x) < 1.15 && Math.abs(midpoint.y) < 1.15;
       label.hidden = !onScreen;
       if (!onScreen) continue;
-      const x = (midpoint.x * 0.5 + 0.5) * this.width + (annotation.labelOffsetX ?? 0);
-      const y = (-midpoint.y * 0.5 + 0.5) * this.height + (annotation.labelOffsetY ?? 0);
+      const x = clamp((midpoint.x * 0.5 + 0.5) * this.width + (annotation.labelOffsetX ?? 0), 54, this.width - 54);
+      let y = clamp((-midpoint.y * 0.5 + 0.5) * this.height + (annotation.labelOffsetY ?? 0), 22, this.height - 22);
+      const halfWidth = Math.max(38, label.offsetWidth / 2);
+      const halfHeight = Math.max(12, label.offsetHeight / 2);
+      let bounds = { left: x - halfWidth, right: x + halfWidth, top: y - halfHeight, bottom: y + halfHeight };
+      for (const prior of occupied) {
+        const overlaps = bounds.left < prior.right && bounds.right > prior.left && bounds.top < prior.bottom && bounds.bottom > prior.top;
+        if (!overlaps) continue;
+        y = clamp(prior.bottom + halfHeight + 8, 22, this.height - 22);
+        bounds = { left: x - halfWidth, right: x + halfWidth, top: y - halfHeight, bottom: y + halfHeight };
+      }
+      occupied.push(bounds);
       label.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%)`;
     }
   }
@@ -302,9 +357,11 @@ export class Three3DRenderer {
     this.destroyed = true;
     cancelAnimationFrame(this.raf);
     this.resizeObserver.disconnect();
+    this.events.abort();
     disposeObject(this.content);
     for (const label of this.labels) label.remove();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
+    this.environment.dispose();
   }
 }

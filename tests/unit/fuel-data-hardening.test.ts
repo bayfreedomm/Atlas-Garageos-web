@@ -79,7 +79,9 @@ describe('fuel SEO and update delivery', () => {
       expect(workflow).toContain('pull-requests: write');
       expect(workflow).toContain('FUEL_BRANCH: automation/fuel-data');
       expect(workflow).toContain('gh pr create');
-      expect(workflow).toContain('git push --force-with-lease --set-upstream origin "$FUEL_BRANCH"');
+      expect(workflow).toContain('git push --force-with-lease="refs/heads/$FUEL_BRANCH:$EXPECTED_REMOTE_SHA"');
+      expect(workflow).toContain('--set-upstream origin "HEAD:refs/heads/$FUEL_BRANCH"');
+      expect(workflow).not.toMatch(/\bgit rebase\b/);
       expect(workflow).not.toMatch(/git push\s*$/m);
     }
   });

@@ -106,8 +106,9 @@ function pcdMetrics(panel: HTMLElement, model: Pcd3DModel): void {
 export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> {
   if (mounted.has(panel)) return;
   mounted.add(panel);
-  let canvas = panel.querySelector<HTMLCanvasElement>('canvas[data-p3d-canvas]');
-  if (!canvas) return;
+  const initialCanvas = panel.querySelector<HTMLCanvasElement>('canvas[data-p3d-canvas]');
+  if (!initialCanvas) return;
+  let canvas: HTMLCanvasElement = initialCanvas;
   const stage = canvas.closest<HTMLElement>('.parametric-3d__stage');
   if (!stage) return;
   const mode = (panel.dataset.mode ?? '') as Mode;
@@ -115,6 +116,7 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   const locale = visualization3DLocale(panel.dataset.locale);
   const text = visualization3DText[locale];
   const form = panel.closest<HTMLFormElement>('form');
+  const events = new AbortController();
 
   let renderer: ParametricRenderer;
   try {
@@ -140,9 +142,12 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   setUnavailable(panel, false);
   let tireView: 'side-by-side' | 'overlay' = 'side-by-side';
 
-  if (mode === 'tire') renderer.configureView({ yaw: -0.88, pitch: 0.3, zoom: 1.02 }, true);
-  else if (mode === 'offset') renderer.configureView({ yaw: -0.56, pitch: 0.38, zoom: 1.02 }, true);
-  else renderer.configureView({ yaw: -0.42, pitch: 0.7, zoom: 1.08 }, true);
+  const configureOpeningView = (): void => {
+    if (mode === 'tire') renderer.configureView({ yaw: -0.72, pitch: 0.22, zoom: 1.08 }, true);
+    else if (mode === 'offset') renderer.configureView({ yaw: -0.9, pitch: 0.26, zoom: 1.05 }, true);
+    else renderer.configureView({ yaw: -0.34, pitch: 0.48, zoom: 1.12 }, true);
+  };
+  configureOpeningView();
 
   const refreshTheme = (): void => {
     renderer.setTheme(css(panel, '--p3d-background', '#09151f'), css(panel, '--p3d-grid', '#294252'));
@@ -174,23 +179,41 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
     pcdMetrics(panel, model);
   };
 
-  panel.querySelector<HTMLButtonElement>('[data-p3d-reset]')?.addEventListener('click', () => renderer.reset());
-  panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-in]')?.addEventListener('click', () => renderer.zoomBy(1.14));
-  panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-out]')?.addEventListener('click', () => renderer.zoomBy(.88));
+  const signal = events.signal;
+  panel.querySelector<HTMLButtonElement>('[data-p3d-reset]')?.addEventListener('click', () => renderer.reset(), { signal });
+  panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-in]')?.addEventListener('click', () => renderer.zoomBy(1.14), { signal });
+  panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-out]')?.addEventListener('click', () => renderer.zoomBy(.88), { signal });
   panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => {
     button.addEventListener('click', () => {
       tireView = button.dataset.p3dTireView === 'overlay' ? 'overlay' : 'side-by-side';
       panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
       refresh();
-    });
+    }, { signal });
   });
 
   if (form) {
     const queuedRefresh = (): void => { requestAnimationFrame(refresh); };
-    form.addEventListener('input', queuedRefresh);
-    form.addEventListener('change', queuedRefresh);
-    form.addEventListener('submit', queuedRefresh);
+    form.addEventListener('input', queuedRefresh, { signal });
+    form.addEventListener('change', queuedRefresh, { signal });
+    form.addEventListener('submit', queuedRefresh, { signal });
   }
+
+  stage.addEventListener('p3d:webgl-lost', () => {
+    renderer.destroy();
+    const fallbackCanvas = canvas.cloneNode(false) as HTMLCanvasElement;
+    canvas.replaceWith(fallbackCanvas);
+    canvas = fallbackCanvas;
+    try {
+      renderer = new Canvas3DRenderer(canvas);
+      panel.dataset.renderer = 'canvas';
+      configureOpeningView();
+      refreshTheme();
+      refresh();
+      canvas.setAttribute('aria-label', `${mode === 'tire' ? text.tireTitle : mode === 'offset' ? text.offsetTitle : text.pcdTitle}. ${text.dragHint}`);
+    } catch {
+      setUnavailable(panel, true);
+    }
+  }, { once: true, signal });
 
   const themeObserver = new MutationObserver(() => { refreshTheme(); refresh(); });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -201,6 +224,7 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   const removalObserver = new MutationObserver(() => {
     if (document.contains(panel)) return;
     renderer.destroy();
+    events.abort();
     themeObserver.disconnect();
     removalObserver.disconnect();
   });
