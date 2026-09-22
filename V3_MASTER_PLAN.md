@@ -203,3 +203,11 @@ Next implementation pass:
 - [x] Wrangler is intentionally not pinned into the project dependency graph; Cloudflare invokes Wrangler through its configured `npx wrangler ...` deploy commands, avoiding minimum-release-age lockfile failures.
 - [x] Repository config supplies the Worker name, compatibility date and `./dist` assets contract for both production deploy and preview version-upload commands.
 - [x] Static Astro output, fuel workflows/data, product logic, entity counts and Package 1–4 features remain unchanged.
+
+## Package 5.2–5.5 WebGL checkpoint — 2026-09-22
+- [x] Tire comparison, wheel offset and PCD scenes render through a viewport-lazy Three.js/WebGL chunk while canonical calculation models remain unchanged.
+- [x] PBR rubber/metal treatments, studio lighting, contact shadows and HTML measurement callouts replace the Canvas presentation on capable devices.
+- [x] Side-by-side and true overlay tire views, fixed offset mounting plane and canonical lug-circle geometry remain live as calculator inputs change.
+- [x] The dependency-free Canvas renderer remains the automatic fallback when WebGL cannot initialize.
+- [x] Touch rotation, bounded zoom, DPR caps, reduced-motion behavior, teardown/disposal and 390px mobile layout were verified.
+- [x] Fuel data/history, Wrangler/Cloudflare config, routes and localization files remained byte-identical to the Package 5.1 source archive.

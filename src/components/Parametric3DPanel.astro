@@ -44,6 +44,7 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
 
   <div class="parametric-3d__stage">
     <canvas data-p3d-canvas width="960" height="600"></canvas>
+    <div class="parametric-3d__annotations" data-p3d-annotations aria-hidden="true"></div>
     <div class="parametric-3d__loading" data-p3d-loading>{t.loading}</div>
     <div class="parametric-3d__fallback" data-p3d-fallback hidden>{t.unavailable}</div>
     <div class="parametric-3d__legend" aria-hidden="true">
@@ -100,7 +101,7 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
     pending3D.add(panel);
     try {
       const module = await import('../ui/parametric-3d');
-      module.mountParametric3DPanel(panel);
+      await module.mountParametric3DPanel(panel);
     } finally {
       pending3D.delete(panel);
     }

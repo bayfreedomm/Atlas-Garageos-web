@@ -1,6 +1,7 @@
 import { pcdFromAdjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { buildPcd3DModel, buildTireComparison3DModel, buildWheelOffset3DModel, type Pcd3DModel, type TireComparison3DModel, type WheelOffset3DModel } from '../lib/visualization/parametric-3d-model';
 import { Canvas3DRenderer } from '../lib/visualization/canvas-3d';
+import type { Scene3D, View3D } from '../lib/visualization/canvas-3d';
 import { pcdScene, tireComparisonScene, wheelOffsetScene, type VisualizationPalette } from '../lib/visualization/scene-builders';
 import { visualization3DLocale, visualization3DText } from '../localization/visualization-3d';
 
@@ -8,6 +9,14 @@ const mounted = new WeakSet<HTMLElement>();
 const MM_PER_INCH = 25.4;
 
 type Mode = 'tire' | 'offset' | 'pcd';
+interface ParametricRenderer {
+  setTheme(background: string, grid: string): void;
+  setScene(scene: Scene3D): void;
+  configureView(view: View3D, applyCurrent?: boolean): void;
+  reset(): void;
+  zoomBy(factor: number): void;
+  destroy(): void;
+}
 
 function numberValue(form: HTMLFormElement, name: string): number { return Number(new FormData(form).get(name)); }
 function signed(value: number, digits = 1): string { return `${value > 0 ? '+' : ''}${value.toFixed(digits)}`; }
@@ -94,20 +103,38 @@ function pcdMetrics(panel: HTMLElement, model: Pcd3DModel): void {
   setMetric(panel, 'centerBore', model.centerBoreMm ? `${model.centerBoreMm.toFixed(1)} mm` : '—');
 }
 
-export function mountParametric3DPanel(panel: HTMLElement): void {
+export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> {
   if (mounted.has(panel)) return;
   mounted.add(panel);
-  const canvas = panel.querySelector<HTMLCanvasElement>('canvas[data-p3d-canvas]');
+  let canvas = panel.querySelector<HTMLCanvasElement>('canvas[data-p3d-canvas]');
   if (!canvas) return;
+  const stage = canvas.closest<HTMLElement>('.parametric-3d__stage');
+  if (!stage) return;
   const mode = (panel.dataset.mode ?? '') as Mode;
   if (mode !== 'tire' && mode !== 'offset' && mode !== 'pcd') return;
   const locale = visualization3DLocale(panel.dataset.locale);
   const text = visualization3DText[locale];
   const form = panel.closest<HTMLFormElement>('form');
 
-  let renderer: Canvas3DRenderer;
-  try { renderer = new Canvas3DRenderer(canvas); }
-  catch { setUnavailable(panel, true); return; }
+  let renderer: ParametricRenderer;
+  try {
+    const { Three3DRenderer } = await import('../lib/visualization/three-3d');
+    renderer = new Three3DRenderer(canvas, stage);
+    panel.dataset.renderer = 'webgl';
+  } catch {
+    // A fresh canvas guarantees the 2D fallback can acquire its own context even
+    // when a browser created, then rejected, a WebGL context on the first one.
+    const fallbackCanvas = canvas.cloneNode(false) as HTMLCanvasElement;
+    canvas.replaceWith(fallbackCanvas);
+    canvas = fallbackCanvas;
+    try {
+      renderer = new Canvas3DRenderer(canvas);
+      panel.dataset.renderer = 'canvas';
+    } catch {
+      setUnavailable(panel, true);
+      return;
+    }
+  }
 
   panel.classList.add('is-ready');
   setUnavailable(panel, false);
