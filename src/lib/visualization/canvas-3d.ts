@@ -549,7 +549,6 @@ export class Canvas3DRenderer {
         ctx.font = `${700 * this.dpr / this.dpr} 12px ui-monospace, SFMono-Regular, Menlo, monospace`;
         const metrics = ctx.measureText(annotation.label);
         const padX = 7 * this.dpr;
-        const padY = 5 * this.dpr;
         const width = metrics.width + padX * 2;
         const height = 18 * this.dpr;
         ctx.fillStyle = 'rgb(6 12 18 / 0.76)';
