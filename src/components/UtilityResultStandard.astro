@@ -1,7 +1,7 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
-interface Props { primaryLabel: string; pending: string; visualTitle: string; visualNote: string; locale?: ContentLocale | undefined; }
-const { primaryLabel, pending, visualTitle, visualNote, locale } = Astro.props;
+interface Props { primaryLabel: string; pending: string; visualTitle: string; visualNote: string; locale?: ContentLocale | undefined; hideVisual?: boolean | undefined; deferDetails?: boolean | undefined; }
+const { primaryLabel, pending, visualTitle, visualNote, locale, hideVisual = false, deferDetails = false } = Astro.props;
 const L = {
   en: { supporting: 'Supporting result', updates: 'Updates with your input.', input: 'Input', result: 'Result', details: 'Details', calculated: 'Calculated values' },
   de: { supporting: 'Weiteres Ergebnis', updates: 'Aktualisiert sich mit Ihrer Eingabe.', input: 'Eingabe', result: 'Ergebnis', details: 'Details', calculated: 'Berechnete Werte' },
@@ -13,10 +13,12 @@ const L = {
   <div class="standard-answer__secondary"><span data-standard-secondary-label>{L.supporting}</span><strong data-standard-secondary>—</strong><small data-standard-secondary-note>{L.updates}</small></div>
 </section>
 <p class="result-summary is-pending" data-result-summary aria-live="polite">{pending}</p>
-<figure class="standard-visual is-pending" data-standard-visual aria-label={visualTitle}>
+{!hideVisual && <figure class="standard-visual is-pending" data-standard-visual aria-label={visualTitle}>
   <figcaption><span>{visualTitle}</span><small>{visualNote}</small></figcaption>
   <div class="standard-visual__equation"><div><small data-standard-visual-left-label>{L.input}</small><strong data-standard-visual-left>—</strong></div><i aria-hidden="true">→</i><div><small data-standard-visual-right-label>{L.result}</small><strong data-standard-visual-right>—</strong></div></div>
-</figure>
-<div class="fuel-detail-heading" aria-hidden="true"><span>{L.details}</span><small>{L.calculated}</small></div>
-<dl class="tool-results" data-results aria-live="polite"></dl>
-<div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+</figure>}
+{!deferDetails && <>
+  <div class="fuel-detail-heading" aria-hidden="true"><span>{L.details}</span><small>{L.calculated}</small></div>
+  <dl class="tool-results" data-results aria-live="polite"></dl>
+  <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+</>}

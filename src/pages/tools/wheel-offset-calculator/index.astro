@@ -1,7 +1,7 @@
 ---
 import ToolPage from '../../../components/ToolPage.astro';
 import WheelOffsetTechnicalVisual from '../../../components/WheelOffsetTechnicalVisual.astro';
-import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
+import EngineeringVisualStudio from '../../../components/EngineeringVisualStudio.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('wheel-offset-calculator');
 ---
@@ -30,8 +30,7 @@ const definition = toolById('wheel-offset-calculator');
 
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Your position summary will appear here.</p>
 
-    <WheelOffsetTechnicalVisual />
-    <Parametric3DPanel mode="offset" locale="en" />
+    <EngineeringVisualStudio mode="offset" locale="en"><WheelOffsetTechnicalVisual /></EngineeringVisualStudio>
 
     <div class="wheel-detail-heading" aria-hidden="true"><span>Details</span><small>Static wheel geometry</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>

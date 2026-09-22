@@ -113,7 +113,7 @@ const caution = mode === 'pcd' ? t.pcdOnly : t.geometryOnly;
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
       void load3D(panel);
-    }, { rootMargin: '360px 0px' });
+    }, { rootMargin: '0px 0px 80px' });
     observer.observe(panel);
   });
 </script>

@@ -1,0 +1,14 @@
+---
+import type { Visualization3DLocale } from '../localization/visualization-3d';
+interface Props { readonly locale: Visualization3DLocale; }
+const { locale } = Astro.props;
+const copy = {
+  en: { title: 'Adjacent holes → bolt circle', note: 'Trigonometric relationship, not a straight measurement', input: 'Input', result: 'Result' },
+  de: { title: 'Nachbarlöcher → Lochkreis', note: 'Trigonometrischer Zusammenhang, keine gerade Messung', input: 'Eingabe', result: 'Ergebnis' },
+  es: { title: 'Orificios adyacentes → círculo de birlos', note: 'Relación trigonométrica, no una medida en línea recta', input: 'Entrada', result: 'Resultado' },
+}[locale];
+---
+<figure class="standard-visual is-pending" data-standard-visual aria-label={copy.title}>
+  <figcaption><span>{copy.title}</span><small>{copy.note}</small></figcaption>
+  <div class="standard-visual__equation"><div><small data-standard-visual-left-label>{copy.input}</small><strong data-standard-visual-left>—</strong></div><i aria-hidden="true">→</i><div><small data-standard-visual-right-label>{copy.result}</small><strong data-standard-visual-right>—</strong></div></div>
+</figure>

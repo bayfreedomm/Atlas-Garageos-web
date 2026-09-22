@@ -1,5 +1,12 @@
-import { annulusCylinder, box, circleLine, cylinder, plane, revolveProfile, type Annotation3D, type Line3D, type Mesh3D, type Scene3D, type Shadow3D, type Vec3 } from './canvas-3d';
+import { annulusCylinder, box, circleLine, cylinder, plane, revolveProfile, type Annotation3D, type Line3D, type Mesh3D, type Product3D, type Scene3D, type Shadow3D, type TireWheelProduct3D, type Vec3 } from './canvas-3d';
 import type { Pcd3DModel, TireComparison3DModel, Tire3DGeometry, WheelOffset3DModel } from './parametric-3d-model';
+import type { Visualization3DLocale } from '../../localization/visualization-3d';
+
+const sceneLabels = {
+  en: { width: 'width', sidewall: 'sidewall', inner: 'inner', outer: 'outer', hub: 'Hub plane · fixed', spacing: 'spacing', bore: 'bore' },
+  de: { width: 'Breite', sidewall: 'Flanke', inner: 'innen', outer: 'außen', hub: 'Nabenfläche · fest', spacing: 'Abstand', bore: 'Bohrung' },
+  es: { width: 'ancho', sidewall: 'flanco', inner: 'interior', outer: 'exterior', hub: 'Plano del buje · fijo', spacing: 'distancia', bore: 'centro' },
+} as const;
 
 export interface VisualizationPalette {
   readonly current: string;
@@ -190,17 +197,25 @@ function tireAssembly(geometry: Tire3DGeometry, color: string, center: Vec3, sca
   return meshes;
 }
 
-export function tireComparisonScene(model: TireComparison3DModel, palette: VisualizationPalette, view: 'side-by-side' | 'overlay'): Scene3D {
+export function tireComparisonScene(model: TireComparison3DModel, palette: VisualizationPalette, view: 'side-by-side' | 'overlay', fallbackMeshes = true, locale: Visualization3DLocale = 'en'): Scene3D<TireWheelProduct3D> {
+  const label = sceneLabels[locale];
   const maxRadiusMm = Math.max(model.current.overallDiameterMm, model.proposed.overallDiameterMm) / 2;
   const scale = 1 / Math.max(1, maxRadiusMm);
   const meshes: Mesh3D[] = [];
   const lines: Line3D[] = [];
   const shadows: Shadow3D[] = [];
   const annotations: Annotation3D[] = [];
+  const products: TireWheelProduct3D[] = [];
 
   if (view === 'overlay') {
-    meshes.push(...tireAssembly(model.current, '#273640', v(0, 0, -0.12), scale, 0.7));
-    meshes.push(...tireAssembly(model.proposed, '#364450', v(0, 0, 0.12), scale, 0.58));
+    if (fallbackMeshes) {
+      meshes.push(...tireAssembly(model.current, '#273640', v(0, 0, -0.12), scale, 0.7));
+      meshes.push(...tireAssembly(model.proposed, '#364450', v(0, 0, 0.12), scale, 0.58));
+    }
+    products.push(
+      { kind: 'tire-wheel', center: v(0, 0, -0.12), outerRadius: (model.current.overallDiameterMm / 2) * scale, rimRadius: (model.current.rimDiameterMm / 2) * scale, width: model.current.widthMm * scale, role: 'current', alpha: 0.42 },
+      { kind: 'tire-wheel', center: v(0, 0, 0.12), outerRadius: (model.proposed.overallDiameterMm / 2) * scale, rimRadius: (model.proposed.rimDiameterMm / 2) * scale, width: model.proposed.widthMm * scale, role: 'proposed', alpha: 0.9 },
+    );
     lines.push(circleLine((model.current.overallDiameterMm / 2) * scale, palette.current, 0.34, 72));
     lines.push(circleLine((model.proposed.overallDiameterMm / 2) * scale, palette.proposed, 0.4, 72));
     shadows.push({ center: v(0, -1.06, 0), radiusX: 1.02, radiusZ: 0.7, alpha: 0.22 });
@@ -210,12 +225,18 @@ export function tireComparisonScene(model: TireComparison3DModel, palette: Visua
       { start: v(-1.12, -currentRadius, 0), end: v(-1.12, currentRadius, 0), color: palette.current, label: `${model.current.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: -12, labelOffsetY: -14 },
       { start: v(1.12, -proposedRadius, 0), end: v(1.12, proposedRadius, 0), color: palette.proposed, label: `${model.proposed.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: 12, labelOffsetY: -14 },
     );
-    return { meshes, lines, shadows, annotations, fitRadius: 1.36 };
+    return { meshes, products, lines, shadows, annotations, fitRadius: 1.36 };
   }
 
   const spacing = 1.28;
-  meshes.push(...tireAssembly(model.current, '#2b3943', v(-spacing, 0, 0), scale));
-  meshes.push(...tireAssembly(model.proposed, '#33414b', v(spacing, 0, 0), scale));
+  if (fallbackMeshes) {
+    meshes.push(...tireAssembly(model.current, '#2b3943', v(-spacing, 0, 0), scale));
+    meshes.push(...tireAssembly(model.proposed, '#33414b', v(spacing, 0, 0), scale));
+  }
+  products.push(
+    { kind: 'tire-wheel', center: v(-spacing, 0, 0), outerRadius: (model.current.overallDiameterMm / 2) * scale, rimRadius: (model.current.rimDiameterMm / 2) * scale, width: model.current.widthMm * scale, role: 'current' },
+    { kind: 'tire-wheel', center: v(spacing, 0, 0), outerRadius: (model.proposed.overallDiameterMm / 2) * scale, rimRadius: (model.proposed.rimDiameterMm / 2) * scale, width: model.proposed.widthMm * scale, role: 'proposed' },
+  );
   lines.push(
     { points: [v(-2.58, -1.12, -0.64), v(2.58, -1.12, -0.64)], color: palette.guide, width: 1, alpha: 0.62 },
     { points: [v(0, -1.1, -0.76), v(0, 1.02, -0.76)], color: palette.guide, width: 1, alpha: 0.18, dashed: true },
@@ -229,10 +250,10 @@ export function tireComparisonScene(model: TireComparison3DModel, palette: Visua
   annotations.push(
     { start: v(-spacing - 1.04, -currentRadius, 0), end: v(-spacing - 1.04, currentRadius, 0), color: palette.current, label: `${model.current.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: -12 },
     { start: v(spacing + 1.04, -proposedRadius, 0), end: v(spacing + 1.04, proposedRadius, 0), color: palette.proposed, label: `${model.proposed.overallDiameterMm.toFixed(1)} mm`, labelOffsetX: 12 },
-    { start: v(-spacing, -0.76, -model.current.widthMm * scale * 0.5), end: v(-spacing, -0.76, model.current.widthMm * scale * 0.5), color: palette.current, label: `${model.current.widthMm.toFixed(0)} mm width`, labelOffsetY: 18 },
-    { start: v(spacing, model.proposed.rimDiameterMm * scale * 0.5, 0.34), end: v(spacing, proposedRadius, 0.34), color: palette.proposed, label: `${model.proposed.sidewallMm.toFixed(1)} mm sidewall`, labelOffsetX: 18 },
+    { start: v(-spacing, -0.76, -model.current.widthMm * scale * 0.5), end: v(-spacing, -0.76, model.current.widthMm * scale * 0.5), color: palette.current, label: `${model.current.widthMm.toFixed(0)} mm ${label.width}`, labelOffsetY: 18 },
+    { start: v(spacing, model.proposed.rimDiameterMm * scale * 0.5, 0.34), end: v(spacing, proposedRadius, 0.34), color: palette.proposed, label: `${model.proposed.sidewallMm.toFixed(1)} mm ${label.sidewall}`, labelOffsetX: 18 },
   );
-  return { meshes, lines, shadows, annotations, fitRadius: 2.48 };
+  return { meshes, products, lines, shadows, annotations, fitRadius: 2.48 };
 }
 
 function offsetWheelMeshes(radius: number, width: number, centerZ: number, faceColor: string, alpha: number): readonly Mesh3D[] {
@@ -249,21 +270,25 @@ function offsetWheelMeshes(radius: number, width: number, centerZ: number, faceC
   return meshes;
 }
 
-export function wheelOffsetScene(model: WheelOffset3DModel, palette: VisualizationPalette): Scene3D {
-  const mmScale = 1 / 112;
-  const radius = 1.08;
+export function wheelOffsetScene(model: WheelOffset3DModel, palette: VisualizationPalette, fallbackMeshes = true, locale: Visualization3DLocale = 'en'): Scene3D {
+  const label = sceneLabels[locale];
+  // Diameter is illustrative because this calculator accepts only width and ET.
+  // Axial dimensions and their differences remain proportional to input mm.
+  const mmScale = 1 / 180;
+  const radius = 1.28;
   const currentDepth = model.originalWidthMm * mmScale;
   const newDepth = model.newWidthMm * mmScale;
   const currentZ = model.originalCenterFromHubMm * mmScale;
   const newZ = model.newCenterFromHubMm * mmScale;
+  const products: Product3D[] = [{ kind: 'wheel-offset', currentWidth: currentDepth, proposedWidth: newDepth, currentCenterZ: currentZ, proposedCenterZ: newZ, radius }];
 
-  const meshes: Mesh3D[] = [
+  const meshes: Mesh3D[] = fallbackMeshes ? [
     plane(2.75, 2.75, palette.hub, 0, 0.085, GUIDE_MATERIAL),
     annulusCylinder(0.29, 0.075, 0.24, '#b8c7d0', v(0, 0, 0.1), 1, HUB_MATERIAL),
     cylinder(0.075, 0.52, '#667a87', v(0, 0, 0), 1, HUB_MATERIAL),
     ...offsetWheelMeshes(radius, currentDepth, currentZ, '#65b8f4', 0.46),
     ...offsetWheelMeshes(radius * 1.01, newDepth, newZ, '#f0a25d', 0.88),
-  ];
+  ] : [];
 
   const lines: Line3D[] = [
     circleLine(radius * 1.04, palette.guide, 0.018, 72),
@@ -277,35 +302,39 @@ export function wheelOffsetScene(model: WheelOffset3DModel, palette: Visualizati
     { center: v(0, -1.18, newZ), radiusX: 1.08, radiusZ: 0.68, alpha: 0.14 },
   ];
   const annotations: Annotation3D[] = [
-    { start: v(-1.42, 0, currentZ), end: v(-1.42, 0, newZ), color: palette.current, label: `${model.innerPositionChangeMm > 0 ? '+' : ''}${model.innerPositionChangeMm.toFixed(1)} mm inner`, labelOffsetX: -12, labelOffsetY: -18 },
-    { start: v(1.42, 0, currentZ), end: v(1.42, 0, newZ), color: palette.proposed, label: `${model.outerPokeChangeMm > 0 ? '+' : ''}${model.outerPokeChangeMm.toFixed(1)} mm outer`, labelOffsetX: 12, labelOffsetY: 18 },
-    { start: v(-0.54, 1.36, 0), end: v(0.54, 1.36, 0), color: palette.accent, label: 'Hub plane · fixed', labelOffsetY: -14, dashed: true },
+    { start: v(-1.42, 0, currentZ), end: v(-1.42, 0, newZ), color: palette.current, label: `${model.innerPositionChangeMm > 0 ? '+' : ''}${model.innerPositionChangeMm.toFixed(1)} mm ${label.inner}`, labelOffsetX: -12, labelOffsetY: -18 },
+    { start: v(1.42, 0, currentZ), end: v(1.42, 0, newZ), color: palette.proposed, label: `${model.outerPokeChangeMm > 0 ? '+' : ''}${model.outerPokeChangeMm.toFixed(1)} mm ${label.outer}`, labelOffsetX: 12, labelOffsetY: 18 },
+    { start: v(-0.54, 1.36, 0), end: v(0.54, 1.36, 0), color: palette.accent, label: label.hub, labelOffsetY: -14, dashed: true },
   ];
-  return { meshes, lines, shadows, annotations, fitRadius: 1.72 };
+  return { meshes, products, lines, shadows, annotations, fitRadius: 1.72 };
 }
 
-export function pcdScene(model: Pcd3DModel, palette: VisualizationPalette): Scene3D {
+export function pcdScene(model: Pcd3DModel, palette: VisualizationPalette, fallbackMeshes = true, locale: Visualization3DLocale = 'en'): Scene3D {
+  const label = sceneLabels[locale];
   const scale = 1 / Math.max(72, model.pcdRadiusMm + 26);
   const pcdRadius = model.pcdRadiusMm * scale;
   const hubOuter = Math.min(1.18, pcdRadius + 0.32);
   const plateOuter = Math.min(1.28, hubOuter + 0.14);
   const boreRadius = model.centerBoreMm ? Math.max(0.16, (model.centerBoreMm / 2) * scale) : Math.max(0.2, pcdRadius * 0.34);
   const holeRadius = Math.max(0.075, Math.min(0.11, 0.24 / Math.sqrt(model.lugCount)));
-  const meshes: Mesh3D[] = [
+  const products: Product3D[] = [{ kind: 'pcd-plate', outerRadius: plateOuter, boreRadius, pcdRadius, holeRadius, lugPositions: model.lugPositionsMm.map((point) => ({ x: point.x * scale, y: point.y * scale })) }];
+  const meshes: Mesh3D[] = fallbackMeshes ? [
     annulusCylinder(plateOuter * 0.985, boreRadius * 0.82, 0.24, '#768894', v(0, 0, -0.03), 1, METAL_MATERIAL),
     annulusCylinder(plateOuter, plateOuter * 0.91, 0.16, '#c2d0d8', v(0, 0, 0.095), 1, METAL_MATERIAL),
     annulusCylinder(plateOuter * 0.91, hubOuter * 0.82, 0.08, '#91a3ae', v(0, 0, 0.13), 1, METAL_MATERIAL),
     annulusCylinder(hubOuter * 0.84, boreRadius, 0.19, '#596c78', v(0, 0, 0.09), 1, HUB_MATERIAL),
     annulusCylinder(boreRadius * 1.16, boreRadius * 0.83, 0.27, '#d0dbe1', v(0, 0, 0.12), 1, METAL_MATERIAL),
     annulusCylinder(boreRadius * 0.83, boreRadius * 0.69, 0.34, '#26343d', v(0, 0, 0.085), 1, GUIDE_MATERIAL),
-  ];
+  ] : [];
 
   for (const point of model.lugPositionsMm) {
     const x = point.x * scale;
     const y = point.y * scale;
-    meshes.push(annulusCylinder(holeRadius * 1.5, holeRadius * 0.9, 0.115, '#d2dce1', v(x, y, 0.18), 1, METAL_MATERIAL));
-    meshes.push(annulusCylinder(holeRadius * 0.93, holeRadius * 0.62, 0.25, '#617580', v(x, y, 0.105), 1, HUB_MATERIAL));
-    meshes.push(cylinder(holeRadius * 0.61, 0.31, '#18242c', v(x, y, 0.065), 1, GUIDE_MATERIAL));
+    if (fallbackMeshes) {
+      meshes.push(annulusCylinder(holeRadius * 1.5, holeRadius * 0.9, 0.115, '#d2dce1', v(x, y, 0.18), 1, METAL_MATERIAL));
+      meshes.push(annulusCylinder(holeRadius * 0.93, holeRadius * 0.62, 0.25, '#617580', v(x, y, 0.105), 1, HUB_MATERIAL));
+      meshes.push(cylinder(holeRadius * 0.61, 0.31, '#18242c', v(x, y, 0.065), 1, GUIDE_MATERIAL));
+    }
   }
 
   const first = model.lugPositionsMm[0]!;
@@ -319,10 +348,10 @@ export function pcdScene(model: Pcd3DModel, palette: VisualizationPalette): Scen
   const shadows: Shadow3D[] = [{ center: v(0, -1.02, 0), radiusX: 1.05, radiusZ: 0.62, alpha: 0.16 }];
   const annotations: Annotation3D[] = [
     { start: v(-pcdRadius, 0, 0.22), end: v(pcdRadius, 0, 0.22), color: palette.accent, label: `${model.pcdMm.toFixed(model.pcdMm % 1 ? 1 : 0)} mm PCD`, labelOffsetY: -18 },
-    { start: v(first.x * scale, first.y * scale, 0.24), end: v(second.x * scale, second.y * scale, 0.24), color: palette.warning, label: `${model.adjacentSpacingMm.toFixed(2)} mm spacing`, labelOffsetY: 18 },
+    { start: v(first.x * scale, first.y * scale, 0.24), end: v(second.x * scale, second.y * scale, 0.24), color: palette.warning, label: `${model.adjacentSpacingMm.toFixed(2)} mm ${label.spacing}`, labelOffsetY: 18 },
   ];
   if (model.centerBoreMm) {
-    annotations.push({ start: v(-boreRadius, 0, 0.31), end: v(boreRadius, 0, 0.31), color: palette.guide, label: `${model.centerBoreMm.toFixed(1)} mm bore`, labelOffsetY: 18 });
+    annotations.push({ start: v(-boreRadius, 0, 0.31), end: v(boreRadius, 0, 0.31), color: palette.guide, label: `${model.centerBoreMm.toFixed(1)} mm ${label.bore}`, labelOffsetY: 18 });
   }
-  return { meshes, lines, shadows, annotations, fitRadius: 1.34 };
+  return { meshes, products, lines, shadows, annotations, fitRadius: 1.34 };
 }

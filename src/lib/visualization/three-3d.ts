@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import type { Annotation3D, Material3D, Mesh3D, Scene3D, Vec3, View3D } from './canvas-3d';
+import { createTireWheelProduct } from './three-product-geometry';
+import { createOffsetProduct, createPcdProduct } from './three-engineering-geometry';
 
 const DEFAULT_VIEW: View3D = { yaw: -0.58, pitch: 0.34, zoom: 1 };
 
@@ -43,8 +45,8 @@ function pbrMaterial(mesh: Mesh3D): THREE.MeshStandardMaterial {
   const shininess = clamp(source.shininess ?? 18, 1, 64);
   const material = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(mesh.color),
-    emissive: new THREE.Color(mesh.color),
-    emissiveIntensity: metallic > 0.35 ? 0.3 : 0.1,
+    emissive: new THREE.Color(0x000000),
+    emissiveIntensity: 0,
     metalness: metallic,
     roughness: clamp(0.94 - shininess / 88 - metallic * 0.12, 0.18, 0.9),
     transparent: alpha < 0.995,
@@ -90,12 +92,25 @@ function lineObject(points: readonly Vec3[], color: string, alpha: number, close
 }
 
 function disposeObject(object: THREE.Object3D): void {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materialsToDispose = new Set<THREE.Material>();
   object.traverse((child) => {
     if (!(child instanceof THREE.Mesh || child instanceof THREE.Line)) return;
-    child.geometry.dispose();
+    geometries.add(child.geometry);
     const materials = Array.isArray(child.material) ? child.material : [child.material];
-    for (const material of materials) material.dispose();
+    for (const material of materials) materialsToDispose.add(material);
   });
+  for (const geometry of geometries) geometry.dispose();
+  for (const material of materialsToDispose) {
+    if (material instanceof THREE.MeshStandardMaterial) {
+      material.map?.dispose();
+      material.normalMap?.dispose();
+      material.bumpMap?.dispose();
+      material.roughnessMap?.dispose();
+      material.metalnessMap?.dispose();
+    }
+    material.dispose();
+  }
 }
 
 export class Three3DRenderer {
@@ -113,8 +128,9 @@ export class Three3DRenderer {
   private fitRadius = 1.5;
   private width = 1;
   private height = 1;
-  private pointerId: number | null = null;
+  private readonly pointers = new Map<number, { x: number; y: number }>();
   private lastPointer: { x: number; y: number } | null = null;
+  private pinchDistance: number | null = null;
   private annotations: readonly Annotation3D[] = [];
   private labels: HTMLElement[] = [];
   private raf = 0;
@@ -161,7 +177,7 @@ export class Three3DRenderer {
     const fill = new THREE.DirectionalLight(0x65bfff, 1.9);
     fill.position.set(5, 1.2, 4);
     this.world.add(fill);
-    const rim = new THREE.DirectionalLight(0xffb46a, 2.4);
+    const rim = new THREE.DirectionalLight(0xc6e1f2, 1.75);
     rim.position.set(1.5, 3.2, -5);
     this.world.add(rim);
     const front = new THREE.PointLight(0xeaf6ff, 18, 14, 1.35);
@@ -172,12 +188,27 @@ export class Three3DRenderer {
   private bindControls(): void {
     const signal = this.events.signal;
     this.canvas.addEventListener('pointerdown', (event) => {
-      this.pointerId = event.pointerId;
-      this.lastPointer = { x: event.clientX, y: event.clientY };
+      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       this.canvas.setPointerCapture(event.pointerId);
+      if (this.pointers.size === 1) this.lastPointer = { x: event.clientX, y: event.clientY };
+      if (this.pointers.size === 2) {
+        const [first, second] = [...this.pointers.values()];
+        if (first && second) this.pinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
+        this.lastPointer = null;
+      }
     }, { signal });
     this.canvas.addEventListener('pointermove', (event) => {
-      if (event.pointerId !== this.pointerId || !this.lastPointer) return;
+      if (!this.pointers.has(event.pointerId)) return;
+      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (this.pointers.size >= 2) {
+        const [first, second] = [...this.pointers.values()];
+        if (!first || !second) return;
+        const distance = Math.hypot(second.x - first.x, second.y - first.y);
+        if (this.pinchDistance && this.pinchDistance > 0) this.zoomBy(distance / this.pinchDistance);
+        this.pinchDistance = distance;
+        return;
+      }
+      if (!this.lastPointer) this.lastPointer = { x: event.clientX, y: event.clientY };
       const dx = event.clientX - this.lastPointer.x;
       const dy = event.clientY - this.lastPointer.y;
       this.lastPointer = { x: event.clientX, y: event.clientY };
@@ -186,9 +217,10 @@ export class Three3DRenderer {
       this.requestRender();
     }, { signal });
     const release = (event: PointerEvent): void => {
-      if (event.pointerId !== this.pointerId) return;
-      this.pointerId = null;
-      this.lastPointer = null;
+      this.pointers.delete(event.pointerId);
+      this.pinchDistance = null;
+      const remaining = [...this.pointers.values()][0];
+      this.lastPointer = remaining ? { ...remaining } : null;
     };
     this.canvas.addEventListener('pointerup', release, { signal });
     this.canvas.addEventListener('pointercancel', release, { signal });
@@ -215,14 +247,22 @@ export class Three3DRenderer {
     this.fitRadius = scene.fitRadius ?? 1.5;
     this.annotations = scene.annotations ?? [];
 
-    for (const source of scene.meshes) {
-      if (source.vertices.length === 0 || source.faces.length === 0) continue;
-      const mesh = new THREE.Mesh(geometryFromMesh(source), pbrMaterial(source));
-      const position = source.position ?? { x: 0, y: 0, z: 0 };
-      mesh.position.set(position.x, position.y, position.z);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      this.content.add(mesh);
+    if (scene.products?.length) {
+      for (const product of scene.products) {
+        if (product.kind === 'tire-wheel') this.content.add(createTireWheelProduct(product));
+        else if (product.kind === 'wheel-offset') this.content.add(createOffsetProduct(product));
+        else if (product.kind === 'pcd-plate') this.content.add(createPcdProduct(product));
+      }
+    } else {
+      for (const source of scene.meshes) {
+        if (source.vertices.length === 0 || source.faces.length === 0) continue;
+        const mesh = new THREE.Mesh(geometryFromMesh(source), pbrMaterial(source));
+        const position = source.position ?? { x: 0, y: 0, z: 0 };
+        mesh.position.set(position.x, position.y, position.z);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.content.add(mesh);
+      }
     }
     for (const source of scene.lines ?? []) {
       this.content.add(lineObject(source.points, source.color, source.alpha ?? 1, source.closed ?? false, source.dashed ?? false));

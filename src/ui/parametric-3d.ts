@@ -143,7 +143,7 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   let tireView: 'side-by-side' | 'overlay' = 'side-by-side';
 
   const configureOpeningView = (): void => {
-    if (mode === 'tire') renderer.configureView({ yaw: -0.72, pitch: 0.22, zoom: 1.08 }, true);
+    if (mode === 'tire') renderer.configureView({ yaw: -0.72, pitch: 0.22, zoom: 1.18 }, true);
     else if (mode === 'offset') renderer.configureView({ yaw: -0.9, pitch: 0.26, zoom: 1.05 }, true);
     else renderer.configureView({ yaw: -0.34, pitch: 0.48, zoom: 1.12 }, true);
   };
@@ -159,7 +159,7 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       const model = currentTireModel(form);
       if (!model) { setUnavailable(panel, true); return; }
       setUnavailable(panel, false);
-      renderer.setScene(tireComparisonScene(model, colors, tireView));
+      renderer.setScene(tireComparisonScene(model, colors, tireView, panel.dataset.renderer === 'canvas', locale));
       tireMetrics(panel, model);
       return;
     }
@@ -168,14 +168,14 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       const model = currentOffsetModel(form);
       if (!model) { setUnavailable(panel, true); return; }
       setUnavailable(panel, false);
-      renderer.setScene(wheelOffsetScene(model, colors));
+      renderer.setScene(wheelOffsetScene(model, colors, panel.dataset.renderer === 'canvas', locale));
       offsetMetrics(panel, model);
       return;
     }
     const model = currentPcdModel(panel, form);
     if (!model) { setUnavailable(panel, true); return; }
     setUnavailable(panel, false);
-    renderer.setScene(pcdScene(model, colors));
+    renderer.setScene(pcdScene(model, colors, panel.dataset.renderer === 'canvas', locale));
     pcdMetrics(panel, model);
   };
 

@@ -221,3 +221,15 @@ Next implementation pass:
 - [x] Scheduled fuel workflows rebuild the rolling branch from the current default branch, serialize both providers, publish with an explicit SHA-bound force-with-lease and reuse an existing open PR.
 - [x] Fuel workflow lifecycle regression coverage includes first run, repeated run, changed remote branch, closed/merged PR recreation and no-change behavior.
 - [x] Canonical tire/offset/PCD math, fuel JSON/history, routes, SEO, localization, Wrangler config and the dependency lockfile remain byte-identical to the Package 5.5 source archive.
+
+## Package 5.7 tire visual proof — 2026-09-22
+- [x] Tire Comparison has one result-adjacent Visual Studio with 3D and engineering 2D tabs on EN/DE/ES pages.
+- [x] Native smooth tire and restrained ten-spoke wheel geometry passed live visual review, typecheck, 213 tests and the 230-page build.
+- [ ] Offset and PCD native product geometry, shared visual workspace and final cross-device 3D acceptance remain for the next package.
+
+## Package 5.8 Offset and PCD visual implementation — 2026-09-22
+- [x] Offset geometry now renders native wheel bodies at canonical width and ET positions relative to one fixed mounting plane.
+- [x] PCD geometry now has actual center and lug through-holes derived from canonical positions.
+- [x] EN/DE/ES Offset and PCD calculators use a single 3D / Engineering 2D workspace adjacent to the result.
+- [x] Canvas geometry is deferred until fallback is needed; shared Three geometry disposal is deduplicated.
+- [ ] Physical-device pinch, forced context loss, other browser engines and deployed performance remain separate acceptance checks.

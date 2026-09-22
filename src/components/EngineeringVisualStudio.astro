@@ -1,0 +1,35 @@
+---
+import Parametric3DPanel from './Parametric3DPanel.astro';
+import type { Visualization3DLocale } from '../localization/visualization-3d';
+
+interface Props { readonly mode: 'offset' | 'pcd'; readonly locale: Visualization3DLocale; }
+const { mode, locale } = Astro.props;
+const copy = {
+  en: { badge: 'Visual studio', title: 'See the geometry from every angle', intro: 'Rotate the dimensional 3D model, then check the engineering drawing for a precise reading.', studio: '3D Studio', drawing: 'Engineering 2D' },
+  de: { badge: 'Visual Studio', title: 'Geometrie aus jedem Blickwinkel', intro: 'Drehen Sie das maßhaltige 3D-Modell und prüfen Sie die technische Zeichnung für die genauen Maße.', studio: '3D Studio', drawing: 'Technische 2D-Ansicht' },
+  es: { badge: 'Estudio visual', title: 'Geometría desde todos los ángulos', intro: 'Gire el modelo 3D dimensional y consulte el dibujo técnico para leer las medidas con precisión.', studio: 'Estudio 3D', drawing: 'Ingeniería 2D' },
+}[locale];
+---
+<section class="tire-visual-studio" data-engineering-visual-studio aria-label={copy.title}>
+  <header class="tire-visual-studio__header">
+    <div><span>{copy.badge}</span><h3>{copy.title}</h3><p>{copy.intro}</p></div>
+    <div class="tire-visual-studio__tabs" role="tablist" aria-label={copy.badge}>
+      <button type="button" role="tab" aria-selected="true" data-visual-tab="3d">{copy.studio}</button>
+      <button type="button" role="tab" aria-selected="false" data-visual-tab="2d">{copy.drawing}</button>
+    </div>
+  </header>
+  <div role="tabpanel" data-visual-panel="3d"><Parametric3DPanel {mode} {locale} /></div>
+  <div role="tabpanel" data-visual-panel="2d" hidden><slot /></div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-engineering-visual-studio]').forEach((studio) => {
+    const buttons = [...studio.querySelectorAll<HTMLButtonElement>('[data-visual-tab]')];
+    const panels = [...studio.querySelectorAll<HTMLElement>('[data-visual-panel]')];
+    for (const button of buttons) button.addEventListener('click', () => {
+      const selected = button.dataset.visualTab;
+      for (const candidate of buttons) candidate.setAttribute('aria-selected', String(candidate === button));
+      for (const panel of panels) panel.hidden = panel.dataset.visualPanel !== selected;
+    });
+  });
+</script>

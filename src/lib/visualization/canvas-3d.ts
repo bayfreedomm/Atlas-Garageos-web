@@ -42,9 +42,36 @@ export interface Shadow3D {
   readonly color?: string;
   readonly alpha?: number;
 }
+export interface TireWheelProduct3D {
+  readonly kind: 'tire-wheel';
+  readonly center: Vec3;
+  readonly outerRadius: number;
+  readonly rimRadius: number;
+  readonly width: number;
+  readonly role: 'current' | 'proposed';
+  readonly alpha?: number;
+}
+export interface OffsetProduct3D {
+  readonly kind: 'wheel-offset';
+  readonly currentWidth: number;
+  readonly proposedWidth: number;
+  readonly currentCenterZ: number;
+  readonly proposedCenterZ: number;
+  readonly radius: number;
+}
+export interface PcdProduct3D {
+  readonly kind: 'pcd-plate';
+  readonly outerRadius: number;
+  readonly boreRadius: number;
+  readonly pcdRadius: number;
+  readonly lugPositions: readonly Readonly<{ x: number; y: number }>[];
+  readonly holeRadius: number;
+}
+export type Product3D = TireWheelProduct3D | OffsetProduct3D | PcdProduct3D;
 export interface View3D { readonly yaw: number; readonly pitch: number; readonly zoom: number; }
-export interface Scene3D {
+export interface Scene3D<TProduct extends Product3D = Product3D> {
   readonly meshes: readonly Mesh3D[];
+  readonly products?: readonly TProduct[];
   readonly lines?: readonly Line3D[];
   readonly annotations?: readonly Annotation3D[];
   readonly shadows?: readonly Shadow3D[];

@@ -1,12 +1,22 @@
+---
+import type { Visualization3DLocale } from '../localization/visualization-3d';
+interface Props { readonly locale?: Visualization3DLocale | undefined; }
+const { locale = 'en' } = Astro.props;
+const t = {
+  en: { badge: 'Live wheel geometry', title: 'See where the wheel actually moves', intro: 'The hub mounting face stays fixed. Blue is the original wheel; orange is the new wheel. The drawing changes as width and ET change.', section: 'Wheel-well cutaway', proportional: 'PROPORTIONAL POSITION', cross: 'Wheel cross-section relative to hub, suspension and fender', diagram: 'Original and new wheel position overlaid relative to hub, suspension and fender', suspension: 'SUSPENSION', fender: 'FENDER', hub: 'HUB MOUNTING FACE · FIXED', current: 'CURRENT', proposed: 'NEW', explanation: 'Wheel offset explanation', changed: 'What changed', framework: 'NUMBER → SHAPE → MEANING', top: 'Top view showing current and new outer wheel positions', original: 'Original', inner: 'Inner edge', outer: 'Outer edge', read: 'Read the drawing like a cutaway', note: 'The mounting face does not move. Width and ET move the wheel body around that fixed plane. This is wheel geometry, not a brake/tire/fender fitment verdict.' },
+  de: { badge: 'Live-Felgengeometrie', title: 'So verschiebt sich die Felge', intro: 'Die Nabenanlagefläche bleibt fest. Blau zeigt das ursprüngliche Rad, Orange das neue. Breite und ET ändern die Zeichnung.', section: 'Radhaus-Schnittansicht', proportional: 'PROPORTIONALE POSITION', cross: 'Felgenschnitt relativ zu Nabe, Fahrwerk und Kotflügel', diagram: 'Alte und neue Felgenposition relativ zu Nabe, Fahrwerk und Kotflügel', suspension: 'FAHRWERK', fender: 'KOTFLÜGEL', hub: 'NABENANLAGEFLÄCHE · FEST', current: 'AKTUELL', proposed: 'NEU', explanation: 'Erklärung des Felgenversatzes', changed: 'Was sich ändert', framework: 'ZAHL → FORM → BEDEUTUNG', top: 'Draufsicht auf alte und neue äußere Felgenposition', original: 'Bisher', inner: 'Innenkante', outer: 'Außenkante', read: 'Schnittansicht richtig lesen', note: 'Die Anlagefläche bleibt fest. Breite und ET verschieben den Felgenkörper relativ dazu. Die Geometrie bestätigt keinen Bremsen-, Reifen- oder Kotflügelfreigang.' },
+  es: { badge: 'Geometría de llanta en vivo', title: 'Mira cómo se desplaza la llanta', intro: 'La cara de montaje permanece fija. Azul es la llanta original; naranja, la nueva. El dibujo cambia con el ancho y el ET.', section: 'Sección del paso de rueda', proportional: 'POSICIÓN PROPORCIONAL', cross: 'Sección de la llanta respecto al buje, suspensión y guardabarros', diagram: 'Posiciones original y nueva de la llanta respecto al buje, suspensión y guardabarros', suspension: 'SUSPENSIÓN', fender: 'GUARDABARROS', hub: 'CARA DE MONTAJE · FIJA', current: 'ACTUAL', proposed: 'NUEVA', explanation: 'Explicación del offset', changed: 'Qué cambió', framework: 'NÚMERO → FORMA → SIGNIFICADO', top: 'Vista superior de las posiciones exteriores actual y nueva', original: 'Original', inner: 'Borde interior', outer: 'Borde exterior', read: 'Cómo leer la sección', note: 'La cara de montaje no se mueve. El ancho y el ET desplazan la llanta alrededor de ese plano fijo. La geometría no confirma espacio libre con frenos, neumáticos ni guardabarros.' },
+}[locale];
+---
 <figure class="offset-tech-visual" data-offset-tech-visual aria-labelledby="offset-tech-title">
   <figcaption>
-    <div><span class="visual-kicker">Live wheel geometry</span><strong id="offset-tech-title">See where the wheel actually moves</strong></div>
-    <p>The hub mounting face stays fixed. Blue is the original wheel; orange is the new wheel. The drawing changes as width and ET change.</p>
+    <div><span class="visual-kicker">{t.badge}</span><strong id="offset-tech-title">{t.title}</strong></div>
+    <p>{t.intro}</p>
   </figcaption>
   <div class="offset-tech-grid">
-    <section class="offset-tech-card offset-tech-card--section" aria-label="Wheel cross-section relative to hub, suspension and fender">
-      <header><strong>Wheel-well cutaway</strong><span>PROPORTIONAL POSITION</span></header>
-      <svg viewBox="0 0 420 250" role="img" aria-label="Original and new wheel position overlaid relative to hub, suspension and fender">
+    <section class="offset-tech-card offset-tech-card--section" aria-label={t.cross}>
+      <header><strong>{t.section}</strong><span>{t.proportional}</span></header>
+      <svg viewBox="0 0 420 250" role="img" aria-label={t.diagram}>
         <defs>
           <linearGradient id="wheelCurrentFill" x1="0" x2="1"><stop offset="0" stop-color="#223746"/><stop offset=".5" stop-color="#42647a"/><stop offset="1" stop-color="#1e2d36"/></linearGradient>
           <linearGradient id="metalFill" x1="0" x2="1"><stop offset="0" stop-color="#6c7c86"/><stop offset=".5" stop-color="#c3cdd2"/><stop offset="1" stop-color="#52616b"/></linearGradient>
@@ -17,10 +27,10 @@
         <rect class="offset-brake-disc" x="202" y="68" width="16" height="118" rx="5" fill="url(#metalFill)"/>
         <rect class="offset-brake-hat" x="205" y="91" width="10" height="72" rx="4"/>
         <path class="offset-caliper" d="M188 93h17v67h-17c-11-18-11-49 0-67Z"/>
-        <text class="offset-boundary-label" x="34" y="25">SUSPENSION</text>
-        <text class="offset-boundary-label" x="386" y="25" text-anchor="end">FENDER</text>
+        <text class="offset-boundary-label" x="34" y="25">{t.suspension}</text>
+        <text class="offset-boundary-label" x="386" y="25" text-anchor="end">{t.fender}</text>
         <path class="offset-hub-plane" d="M210 31v168"/>
-        <text class="offset-hub-label" x="210" y="239" text-anchor="middle">HUB MOUNTING FACE · FIXED</text>
+        <text class="offset-hub-label" x="210" y="239" text-anchor="middle">{t.hub}</text>
 
         <g class="offset-wheel offset-wheel--current" data-current-offset-wheel>
           <rect data-current-offset-body x="102" y="88" width="183" height="74" rx="18" fill="url(#wheelCurrentFill)"/>
@@ -31,7 +41,7 @@
           <path data-new-centerline d="M188 76v98" />
         </g>
         <circle class="offset-fixed-hub" cx="210" cy="125" r="8"/>
-        <g class="offset-overlay-legend"><circle cx="116" cy="52" r="5" class="tech-dot-current"/><text x="127" y="56">CURRENT</text><circle cx="220" cy="52" r="5" class="tech-dot-new"/><text x="231" y="56">NEW</text></g>
+        <g class="offset-overlay-legend"><circle cx="116" cy="52" r="5" class="tech-dot-current"/><text x="127" y="56">{t.current}</text><circle cx="220" cy="52" r="5" class="tech-dot-new"/><text x="231" y="56">{t.proposed}</text></g>
 
         <g class="offset-arrow offset-arrow--inner"><path data-inner-arrow d="M102 210H99"/><path data-inner-head-left d="M102 206l-7 4 7 4"/><path data-inner-head-right d="M99 206l7 4-7 4"/><text data-inner-delta x="100.5" y="201" text-anchor="middle">1.4 mm</text></g>
         <g class="offset-arrow offset-arrow--outer"><path data-outer-arrow d="M285 210H293"/><path data-outer-head-left d="M285 206l-7 4 7 4"/><path data-outer-head-right d="M293 206l7 4-7 4"/><text data-outer-delta x="289" y="201" text-anchor="middle">11.4 mm</text></g>
@@ -39,9 +49,9 @@
       <div class="offset-position-summary"><span data-inner-meaning>Inner edge moves farther inward.</span><span data-outer-meaning>Outer edge moves farther toward the fender.</span></div>
     </section>
 
-    <section class="offset-tech-card offset-tech-card--numbers" aria-label="Wheel offset explanation">
-      <header><strong>What changed</strong><span>NUMBER → SHAPE → MEANING</span></header>
-      <svg class="offset-mini-stance" viewBox="0 0 300 128" role="img" aria-label="Top view showing current and new outer wheel positions">
+    <section class="offset-tech-card offset-tech-card--numbers" aria-label={t.explanation}>
+      <header><strong>{t.changed}</strong><span>{t.framework}</span></header>
+      <svg class="offset-mini-stance" viewBox="0 0 300 128" role="img" aria-label={t.top}>
         <path class="offset-mini-body" d="M78 20h144l36 29v42l-36 17H78L42 91V49Z"/>
         <path class="offset-mini-center" d="M150 13v102"/>
         <rect class="offset-mini-wheel offset-mini-wheel--current" data-current-mini-wheel x="202" y="31" width="30" height="68" rx="8"/>
@@ -50,12 +60,12 @@
         <text data-mini-outer-text x="239" y="124" text-anchor="middle">+11.4 mm</text>
       </svg>
       <div class="offset-tech-values">
-        <div><span>Original</span><strong data-original-wheel-spec>8J · ET40</strong></div>
-        <div><span>New</span><strong data-new-wheel-spec>8.5J · ET35</strong></div>
-        <div><span>Inner edge</span><strong data-inner-value>+1.35 mm</strong><small data-inner-copy>farther inward</small></div>
-        <div><span>Outer edge</span><strong data-outer-value>+11.35 mm</strong><small data-outer-copy>farther outward</small></div>
+        <div><span>{t.original}</span><strong data-original-wheel-spec>8J · ET40</strong></div>
+        <div><span>{t.proposed}</span><strong data-new-wheel-spec>8.5J · ET35</strong></div>
+        <div><span>{t.inner}</span><strong data-inner-value>+1.35 mm</strong><small data-inner-copy>farther inward</small></div>
+        <div><span>{t.outer}</span><strong data-outer-value>+11.35 mm</strong><small data-outer-copy>farther outward</small></div>
       </div>
-      <aside class="offset-tech-note"><strong>Read the drawing like a cutaway</strong><p>The mounting face does not move. Width and ET move the wheel body around that fixed plane. This is wheel geometry, not a brake/tire/fender fitment verdict.</p></aside>
+      <aside class="offset-tech-note"><strong>{t.read}</strong><p>{t.note}</p></aside>
     </section>
   </div>
 </figure>

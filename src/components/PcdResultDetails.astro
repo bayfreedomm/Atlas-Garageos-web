@@ -1,0 +1,13 @@
+---
+import type { Visualization3DLocale } from '../localization/visualization-3d';
+interface Props { readonly locale: Visualization3DLocale; }
+const { locale } = Astro.props;
+const copy = {
+  en: { details: 'Details', calculated: 'Calculated values' },
+  de: { details: 'Details', calculated: 'Berechnete Werte' },
+  es: { details: 'Detalles', calculated: 'Valores calculados' },
+}[locale];
+---
+<div class="fuel-detail-heading" aria-hidden="true"><span>{copy.details}</span><small>{copy.calculated}</small></div>
+<dl class="tool-results" data-results aria-live="polite"></dl>
+<div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
