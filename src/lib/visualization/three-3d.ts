@@ -1,10 +1,16 @@
 import * as THREE from 'three';
+import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import type { Annotation3D, Material3D, Mesh3D, Scene3D, Vec3, View3D } from './canvas-3d';
 import { createTireWheelProduct } from './three-product-geometry';
 import { createOffsetProduct, createPcdProduct } from './three-engineering-geometry';
 import { createToolStudioProduct } from './three-tool-geometry';
 
 const DEFAULT_VIEW: View3D = { yaw: -0.58, pitch: 0.34, zoom: 1 };
+/** Contact shadow planes are drawn this much wider than the Shadow3D radii so the penumbra can fade out past the old hard edge. */
+const SHADOW_SPREAD = 1.32;
+let rectAreaLightsReady = false;
+const KEY_SOFTBOX_POSITION: readonly [number, number, number] = [-3.2, 3.6, 4.2];
+const FILL_SOFTBOX_POSITION: readonly [number, number, number] = [4.6, 0.9, 3.6];
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -14,28 +20,155 @@ function vector(point: Vec3): THREE.Vector3 {
   return new THREE.Vector3(point.x, point.y, point.z);
 }
 
+interface Softbox {
+  /** Direction from the subject toward the panel centre (world space). */
+  readonly direction: readonly [number, number, number];
+  /** Half extents of the panel on a unit-distance projection plane. */
+  readonly halfWidth: number;
+  readonly halfHeight: number;
+  /** Linear HDR radiance per channel (values above 1 are intentional). */
+  readonly radiance: readonly [number, number, number];
+  /** Edge transition in projected units: small values give crisp panel borders. */
+  readonly feather: number;
+}
+
+function smoothstep(edge0: number, edge1: number, value: number): number {
+  const t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Procedural HDR studio: a 512x256 equirectangular half-float map with four
+ * hard-edged softboxes (warm key, cool fill, narrow rim strip, overhead
+ * scrim), dark walls and a reflective floor that brightens toward a crisp
+ * horizon line. Each panel is a real rectangle in 3D, so polished metal shows
+ * straight-edged window reflections instead of a blurred glow. No network,
+ * no image files: everything is computed here once per renderer.
+ */
 function studioEnvironment(): THREE.DataTexture {
-  const width = 64;
-  const height = 32;
-  const data = new Uint8Array(width * height * 4);
+  const width = 512;
+  const height = 256;
+  const panels: readonly Softbox[] = [
+    // Key: warm (~5000 K) box up-left in front. Same direction and angular size
+    // as the key RectAreaLight (4.2 x 3.0 at ~6.4 units), so the reflection in
+    // the env map and the analytic highlight coincide as one clean rectangle.
+    { direction: KEY_SOFTBOX_POSITION, halfWidth: 0.33, halfHeight: 0.235, radiance: [1.9, 1.76, 1.56], feather: 0.01 },
+    // Fill: cool (~7500 K) panel low on the right, matching the fill RectAreaLight.
+    { direction: FILL_SOFTBOX_POSITION, halfWidth: 0.27, halfHeight: 0.2, radiance: [0.72, 0.82, 1.0], feather: 0.014 },
+    // Rim: tall narrow strip behind the subject for a thin edge highlight.
+    { direction: [0.3, 0.46, -0.84], halfWidth: 0.07, halfHeight: 0.62, radiance: [2.1, 2.2, 2.35], feather: 0.008 },
+    // Overhead scrim: broad neutral ceiling panel, reads as the long top band on rims.
+    { direction: [0, 1, 0.12], halfWidth: 0.62, halfHeight: 0.26, radiance: [1.18, 1.18, 1.2], feather: 0.02 },
+  ];
+  // Precompute an orthonormal frame per panel (right = up x normal).
+  const frames = panels.map((panel) => {
+    const normal = new THREE.Vector3(...panel.direction).normalize();
+    const worldUp = Math.abs(normal.y) > 0.9 ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0);
+    const right = new THREE.Vector3().crossVectors(worldUp, normal).normalize();
+    const up = new THREE.Vector3().crossVectors(normal, right).normalize();
+    return { panel, normal, right, up };
+  });
+  const data = new Uint16Array(width * height * 4);
+  const direction = new THREE.Vector3();
   for (let y = 0; y < height; y += 1) {
+    // DataTexture row 0 is v = 0, which three's equirect lookup maps to straight down.
+    const elevation = ((y + 0.5) / height - 0.5) * Math.PI;
+    const sinElevation = Math.sin(elevation);
+    const cosElevation = Math.cos(elevation);
     for (let x = 0; x < width; x += 1) {
-      const u = x / (width - 1);
-      const vertical = 1 - Math.abs(y / (height - 1) - 0.5) * 1.45;
-      const keyPanel = Math.exp(-Math.pow((u - 0.2) / 0.11, 2)) * 150;
-      const rimPanel = Math.exp(-Math.pow((u - 0.78) / 0.08, 2)) * 95;
-      const base = 24 + Math.max(0, vertical) * 42;
+      // Inverse of three's equirectUv(): u = atan(z, x) / 2PI + 0.5.
+      const azimuth = ((x + 0.5) / width - 0.5) * Math.PI * 2;
+      direction.set(Math.cos(azimuth) * cosElevation, sinElevation, Math.sin(azimuth) * cosElevation);
+      let r: number;
+      let g: number;
+      let b: number;
+      if (sinElevation >= 0) {
+        // Dark studio walls: slightly lighter near the horizon, near-black ceiling.
+        const wall = 0.028 + 0.05 * Math.pow(1 - sinElevation, 3);
+        r = wall;
+        g = wall * 1.03;
+        b = wall * 1.08;
+      } else {
+        // Glossy floor: darkest straight down, brightening toward the horizon
+        // like a polished studio floor seen at grazing angles.
+        const depth = -sinElevation;
+        const floor = 0.012 + 0.2 * Math.pow(1 - depth, 5);
+        r = floor * 1.02;
+        g = floor;
+        b = floor * 0.98;
+      }
+      // Crisp horizon line where the floor meets the cyclorama.
+      const horizon = Math.exp(-Math.pow(elevation / 0.018, 2)) * 0.34;
+      r += horizon;
+      g += horizon;
+      b += horizon * 1.04;
+      for (const { panel, normal, right, up } of frames) {
+        const facing = direction.dot(normal);
+        if (facing <= 0.05) continue;
+        // Project the ray onto the panel plane at unit distance: a true rectangle.
+        const a = direction.dot(right) / facing;
+        const c = direction.dot(up) / facing;
+        const edgeX = 1 - smoothstep(panel.halfWidth - panel.feather, panel.halfWidth + panel.feather, Math.abs(a));
+        const edgeY = 1 - smoothstep(panel.halfHeight - panel.feather, panel.halfHeight + panel.feather, Math.abs(c));
+        const coverage = edgeX * edgeY;
+        if (coverage <= 0) continue;
+        // Real diffusers are slightly hotter in the middle than at the frame.
+        const hotspot = 1 - 0.28 * (Math.pow(a / panel.halfWidth, 2) + Math.pow(c / panel.halfHeight, 2)) * 0.5;
+        const strength = coverage * hotspot;
+        r += panel.radiance[0] * strength;
+        g += panel.radiance[1] * strength;
+        b += panel.radiance[2] * strength;
+      }
       const index = (y * width + x) * 4;
-      data[index] = Math.min(255, base + keyPanel + rimPanel * 0.75);
-      data[index + 1] = Math.min(255, base + keyPanel + rimPanel * 0.46);
-      data[index + 2] = Math.min(255, base + keyPanel * 1.04 + rimPanel);
-      data[index + 3] = 255;
+      data[index] = THREE.DataUtils.toHalfFloat(r);
+      data[index + 1] = THREE.DataUtils.toHalfFloat(g);
+      data[index + 2] = THREE.DataUtils.toHalfFloat(b);
+      data[index + 3] = THREE.DataUtils.toHalfFloat(1);
     }
   }
-  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
-  texture.colorSpace = THREE.SRGBColorSpace;
+  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat, THREE.HalfFloatType);
+  texture.colorSpace = THREE.LinearSRGBColorSpace;
   texture.mapping = THREE.EquirectangularReflectionMapping;
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
   texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Soft contact shadow: white RGB with a radial alpha falloff (dense contact
+ * core, wide penumbra fading to exactly zero at the edge). The shadow colour
+ * and strength come from the material, so one texture serves every Shadow3D.
+ */
+function contactShadowTexture(): THREE.CanvasTexture {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+  if (context) {
+    const image = context.createImageData(size, size);
+    const half = size / 2;
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        const r = Math.hypot(x + 0.5 - half, y + 0.5 - half) / half;
+        const penumbra = 1 - smoothstep(0.42, 1, r);
+        const core = Math.exp(-Math.pow(r / 0.3, 2));
+        // Ordered dither (+-0.5 LSB) hides 8-bit banding in the faint outer ring.
+        const dither = (((x * 7 + y * 13) % 16) / 16 - 0.5) / 255;
+        const alpha = clamp(penumbra * 0.8 + core * 0.2 + (r < 1 ? dither : 0), 0, 1);
+        const index = (y * size + x) * 4;
+        image.data[index] = 255;
+        image.data[index + 1] = 255;
+        image.data[index + 2] = 255;
+        image.data[index + 3] = Math.round(alpha * 255);
+      }
+    }
+    context.putImageData(image, 0, 0);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
@@ -57,7 +190,8 @@ function pbrMaterial(mesh: Mesh3D): THREE.MeshStandardMaterial {
     clearcoat: metallic > 0.35 ? 0.28 : 0.02,
     clearcoatRoughness: metallic > 0.35 ? 0.34 : 0.8,
   });
-  material.envMapIntensity = metallic > 0.35 ? 1.35 : 0.28;
+  // Calibrated for the HDR softbox environment (see studioEnvironment).
+  material.envMapIntensity = metallic > 0.35 ? 1.05 : 0.3;
   return material;
 }
 
@@ -109,6 +243,7 @@ function disposeObject(object: THREE.Object3D): void {
       material.bumpMap?.dispose();
       material.roughnessMap?.dispose();
       material.metalnessMap?.dispose();
+      material.aoMap?.dispose();
     }
     material.dispose();
   }
@@ -124,6 +259,7 @@ export class Three3DRenderer {
   private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private readonly events = new AbortController();
   private readonly environment: THREE.Texture;
+  private readonly shadowTexture: THREE.CanvasTexture;
   private view = { ...DEFAULT_VIEW };
   private defaultView = { ...DEFAULT_VIEW };
   private fitRadius = 1.5;
@@ -145,7 +281,9 @@ export class Three3DRenderer {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.12;
+    // The softbox rig is less flat than the old ambient-heavy setup; a slightly
+    // lower exposure keeps ACES from clipping the key reflection on polished lips.
+    this.renderer.toneMappingExposure = 1.04;
     this.renderer.shadowMap.enabled = true;
     // r186 removed the old PCFSoftShadowMap path; high-resolution PCF with a
     // tuned key light gives the same clean product shadow without a runtime
@@ -157,6 +295,7 @@ export class Three3DRenderer {
     this.environment = pmrem.fromEquirectangular(rawEnvironment).texture;
     rawEnvironment.dispose();
     pmrem.dispose();
+    this.shadowTexture = contactShadowTexture();
     this.camera.position.set(0, 0, 7);
     this.world.environment = this.environment;
     this.world.add(this.content);
@@ -174,29 +313,52 @@ export class Three3DRenderer {
   }
 
   private addLights(): void {
-    this.world.add(new THREE.AmbientLight(0xffffff, 0.62));
-    this.world.add(new THREE.HemisphereLight(0xdceeff, 0x10202a, 1.05));
-    const key = new THREE.DirectionalLight(0xffffff, 3.25);
-    key.position.set(-3.8, 5.4, 6.5);
-    key.castShadow = true;
-    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
-    key.shadow.mapSize.set(lowPower ? 1024 : 1536, lowPower ? 1024 : 1536);
-    key.shadow.camera.near = 0.5;
-    key.shadow.camera.far = 18;
-    key.shadow.camera.left = -4;
-    key.shadow.camera.right = 4;
-    key.shadow.camera.top = 4;
-    key.shadow.camera.bottom = -4;
+    // Studio rig: two large rectangular softboxes (key + fill) that match the
+    // panels baked into the environment map, a low hemisphere bounce instead of
+    // flat ambient, a dim rim for edge separation and one shadow caster.
+    if (!rectAreaLightsReady) {
+      RectAreaLightUniformsLib.init();
+      rectAreaLightsReady = true;
+    }
+    this.world.add(new THREE.HemisphereLight(0xe6f0fa, 0x161b20, 0.5));
+
+    // Key softbox, warm, up-left in front. RectAreaLight intensity is luminance,
+    // so irradiance ~= L * area / d^2 = 5.8 * 12.6 / 41 ~= 1.8 on the subject.
+    // A big panel at low luminance is what makes the light soft.
+    const key = new THREE.RectAreaLight(0xfff1e0, 5.8, 4.2, 3.0);
+    key.position.set(...KEY_SOFTBOX_POSITION);
+    key.lookAt(0, 0, 0);
     this.world.add(key);
-    const fill = new THREE.DirectionalLight(0x65bfff, 1.15);
-    fill.position.set(5, 1.2, 4);
+
+    // Fill softbox, cool, low right; roughly 1:3 fill-to-key ratio.
+    const fill = new THREE.RectAreaLight(0xd4e4ff, 3.2, 3.2, 2.4);
+    fill.position.set(...FILL_SOFTBOX_POSITION);
+    fill.lookAt(0, 0, 0);
     this.world.add(fill);
-    const rim = new THREE.DirectionalLight(0xc6e1f2, 2.35);
+
+    // Thin rim from behind: edge highlight only, well below the old 2.35.
+    const rim = new THREE.DirectionalLight(0xd6e8f5, 1.2);
     rim.position.set(1.5, 3.2, -5);
     this.world.add(rim);
-    const front = new THREE.PointLight(0xeaf6ff, 8, 14, 1.6);
-    front.position.set(0, 0.8, 5.5);
-    this.world.add(front);
+
+    // RectAreaLight cannot cast shadows, so a modest directional light sits at
+    // the key softbox position purely to keep contact/self shadows (spokes on
+    // the rotor, hub on the barrel). A wide PCF radius matches the soft source.
+    const keyShadow = new THREE.DirectionalLight(0xfff1e0, 0.85);
+    keyShadow.position.set(...KEY_SOFTBOX_POSITION);
+    keyShadow.castShadow = true;
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
+    keyShadow.shadow.mapSize.set(lowPower ? 1024 : 1536, lowPower ? 1024 : 1536);
+    keyShadow.shadow.camera.near = 0.5;
+    keyShadow.shadow.camera.far = 18;
+    keyShadow.shadow.camera.left = -4;
+    keyShadow.shadow.camera.right = 4;
+    keyShadow.shadow.camera.top = 4;
+    keyShadow.shadow.camera.bottom = -4;
+    keyShadow.shadow.bias = -0.0004;
+    keyShadow.shadow.normalBias = 0.018;
+    keyShadow.shadow.radius = 3;
+    this.world.add(keyShadow);
   }
 
   private bindControls(): void {
@@ -303,11 +465,23 @@ export class Three3DRenderer {
       }
     }
     for (const shadow of scene.shadows ?? []) {
-      const material = new THREE.MeshBasicMaterial({ color: shadow.color ?? '#000000', transparent: true, opacity: shadow.alpha ?? 0.18, depthWrite: false, side: THREE.DoubleSide });
-      const plane = new THREE.Mesh(new THREE.CircleGeometry(1, 64), material);
+      // Radial-gradient contact shadow: the plane is wider than the old disc and
+      // the texture alpha fades to zero, so the centre reads as dense contact
+      // while the edge dissolves (at the old radius it is ~40% of the centre,
+      // like the blurred Canvas2D fallback). The centre is slightly denser than
+      // the old flat opacity so the object still feels grounded.
+      const material = new THREE.MeshBasicMaterial({
+        color: shadow.color ?? '#000000',
+        map: this.shadowTexture,
+        transparent: true,
+        opacity: Math.min(1, (shadow.alpha ?? 0.18) * 1.35),
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
       plane.position.set(shadow.center.x, shadow.center.y, shadow.center.z);
       plane.rotation.x = -Math.PI / 2;
-      plane.scale.set(shadow.radiusX, shadow.radiusZ, 1);
+      plane.scale.set(shadow.radiusX * SHADOW_SPREAD, shadow.radiusZ * SHADOW_SPREAD, 1);
       plane.renderOrder = -1;
       this.content.add(plane);
     }
@@ -454,5 +628,6 @@ export class Three3DRenderer {
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.environment.dispose();
+    this.shadowTexture.dispose();
   }
 }

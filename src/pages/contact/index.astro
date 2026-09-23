@@ -1,0 +1,76 @@
+---
+import SiteLayout from '../../components/SiteLayout.astro';
+
+const SUPPORT_EMAIL = 'atlas.supportdesk@gmail.com';
+
+const alternates = [
+  { hreflang: 'en', href: 'https://atlasgarageos.com/contact/' },
+  { hreflang: 'de', href: 'https://atlasgarageos.com/de/contact/' },
+  { hreflang: 'es', href: 'https://atlasgarageos.com/es/contact/' },
+  { hreflang: 'x-default', href: 'https://atlasgarageos.com/contact/' },
+];
+
+const subjectOptions = [
+  { value: 'general', label: 'General question' },
+  { value: 'correction', label: 'Report a data or fitment error' },
+  { value: 'bug', label: 'Technical issue / bug report' },
+  { value: 'partnership', label: 'Business & partnerships' },
+  { value: 'press', label: 'Press' },
+  { value: 'other', label: 'Other' },
+];
+---
+<SiteLayout
+  title="Contact"
+  description="Reach the Atlas GarageOS team — general questions, data corrections, technical issues, or partnerships."
+  pathname="/contact/"
+  active="tools"
+  alternates={alternates}
+  breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Contact', href: '/contact/' }]}
+>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Contact</span></nav>
+  <header class="directory-identity">
+    <h1>Contact Atlas GarageOS</h1>
+    <p>Have a question, found an inaccurate fitment entry, or want to talk business? Tell us and we'll get back to you.</p>
+  </header>
+
+  <section class="contact-page" data-contact-page aria-labelledby="contact-form-title">
+    <form class="contact-form" data-contact-form novalidate>
+      <h2 class="contact-form__title" id="contact-form-title">Send us a message</h2>
+
+      <label class="contact-field">
+        <span>Full name</span>
+        <input type="text" name="name" data-contact-name required autocomplete="name" placeholder="Jane Doe" />
+      </label>
+
+      <label class="contact-field">
+        <span>Your email</span>
+        <input type="email" name="email" data-contact-email required autocomplete="email" placeholder="you@example.com" />
+      </label>
+
+      <label class="contact-field">
+        <span>Subject</span>
+        <select name="subject" data-contact-subject required>
+          {subjectOptions.map((option) => <option value={option.value}>{option.label}</option>)}
+        </select>
+      </label>
+
+      <label class="contact-field contact-field--wide">
+        <span>Message</span>
+        <textarea name="message" data-contact-message required maxlength="1500" rows={6} placeholder="Tell us what's going on..."></textarea>
+      </label>
+
+      <button type="submit" class="contact-form__submit">Send message</button>
+      <p class="contact-form__note" data-contact-note hidden>Opening your email app with the message ready to send…</p>
+    </form>
+
+    <aside class="contact-direct" aria-label="Direct email">
+      <p class="contact-direct__label">Or write to us directly</p>
+      <div class="contact-direct__row">
+        <a class="contact-direct__email" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+        <button type="button" class="contact-direct__copy" data-contact-copy data-default-label="Copy" data-copied-label="Copied">Copy</button>
+      </div>
+      <p class="contact-direct__note">We read every message and typically reply within a few business days. For a fitment or data correction, mentioning the specific make, model, and generation helps us fix it faster.</p>
+    </aside>
+  </section>
+</SiteLayout>
+<script>import { initializeContactForm } from '../../ui/contact-form'; initializeContactForm();</script>

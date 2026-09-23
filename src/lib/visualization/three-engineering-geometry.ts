@@ -8,7 +8,9 @@ function metal(color: number, opacity = 1, roughness = 0.32): THREE.MeshPhysical
   return new THREE.MeshPhysicalMaterial({
     color, metalness: 0.86, roughness, clearcoat: 0.1,
     transparent: opacity < 1, opacity, depthWrite: opacity > 0.7,
-    side: THREE.DoubleSide, envMapIntensity: 1.1,
+    side: THREE.DoubleSide,
+    // Calibrated for the HDR softbox environment in three-3d.ts (panels peak ~2.4 linear).
+    envMapIntensity: 1.0,
   });
 }
 

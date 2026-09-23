@@ -29,6 +29,7 @@ export interface UiStrings {
   readonly footerMethodology: string;
   readonly footerPrivacy: string;
   readonly footerFuelPrices: string;
+  readonly footerContact: string;
   readonly footerCopy: string;
   readonly langLabel: string;
   readonly langSwitchAria: string;
@@ -66,6 +67,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerMethodology: 'Genauigkeit & Methodik',
     footerPrivacy: 'Datenschutz',
     footerFuelPrices: 'Kraftstoffpreise heute',
+    footerContact: 'Kontakt',
     footerCopy: '© {year} Atlas GarageOS. Alle Berechnungen sind Schätzungen — prüfen Sie sicherheitsrelevante Werte immer im Handbuch Ihres Fahrzeugs.',
     langLabel: 'Sprache',
     langSwitchAria: 'Sprache wechseln',
@@ -101,6 +103,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     footerMethodology: 'Precisión y metodología',
     footerPrivacy: 'Política de privacidad',
     footerFuelPrices: 'Precio de la gasolina hoy',
+    footerContact: 'Contacto',
     footerCopy: '© {year} Atlas GarageOS. Todos los cálculos son estimaciones — verifique cualquier dato crítico de seguridad con el manual de su vehículo.',
     langLabel: 'Idioma',
     langSwitchAria: 'Cambiar idioma',
@@ -148,6 +151,24 @@ export interface PlatformCatalog {
   readonly toolsHub: PlatformPageCopy & { readonly h1: string; readonly lead: string; readonly fitmentRowTitle: string; readonly fitmentRowCopy: string };
   readonly methodology: PlatformPageCopy & { readonly eyebrow: string; readonly h1: string; readonly lead: string; readonly sections: readonly { readonly heading: string; readonly body: string }[]; readonly sourcesEyebrow: string; readonly sourcesHeading: string; readonly sourcesLead: string };
   readonly privacy: PlatformPageCopy & { readonly h1: string; readonly updated: string; readonly sections: readonly { readonly heading: string; readonly body: string }[] };
+  readonly contact: PlatformPageCopy & {
+    readonly h1: string;
+    readonly lead: string;
+    readonly formTitle: string;
+    readonly nameLabel: string;
+    readonly namePlaceholder: string;
+    readonly emailLabel: string;
+    readonly emailPlaceholder: string;
+    readonly subjectLabel: string;
+    readonly subjectOptions: readonly { readonly value: string; readonly label: string }[];
+    readonly messageLabel: string;
+    readonly messagePlaceholder: string;
+    readonly submitLabel: string;
+    readonly openingNote: string;
+    readonly directLabel: string;
+    readonly copyLabel: string;
+    readonly copiedLabel: string;
+  };
 }
 
 export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> = Object.freeze({
@@ -218,6 +239,33 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
         { heading: 'Allgemeine Zielgruppe', body: 'Atlas GarageOS ist ein Kfz-Werkzeug für ein allgemeines Publikum und richtet sich nicht an Kinder unter 13 Jahren.' },
       ],
     },
+    contact: {
+      title: 'Kontakt',
+      description: 'Erreichen Sie das Atlas-GarageOS-Team — allgemeine Fragen, Datenkorrekturen, technische Probleme oder Kooperationen.',
+      h1: 'Kontaktieren Sie Atlas GarageOS',
+      lead: 'Haben Sie eine Frage, einen fehlerhaften Daten- oder Passform-Eintrag gefunden oder möchten geschäftlich sprechen? Schreiben Sie uns — wir melden uns.',
+      formTitle: 'Nachricht senden',
+      nameLabel: 'Vollständiger Name',
+      namePlaceholder: 'Max Mustermann',
+      emailLabel: 'Ihre E-Mail-Adresse',
+      emailPlaceholder: 'sie@beispiel.de',
+      subjectLabel: 'Betreff',
+      subjectOptions: [
+        { value: 'general', label: 'Allgemeine Frage' },
+        { value: 'correction', label: 'Fehlerhaften Daten- oder Passform-Eintrag melden' },
+        { value: 'bug', label: 'Technisches Problem / Fehlerbericht' },
+        { value: 'partnership', label: 'Geschäft & Kooperationen' },
+        { value: 'press', label: 'Presse' },
+        { value: 'other', label: 'Sonstiges' },
+      ],
+      messageLabel: 'Nachricht',
+      messagePlaceholder: 'Beschreiben Sie Ihr Anliegen...',
+      submitLabel: 'Nachricht senden',
+      openingNote: 'Dadurch öffnet sich Ihr E-Mail-Programm mit der fertigen Nachricht.',
+      directLabel: 'Oder schreiben Sie uns direkt:',
+      copyLabel: 'Kopieren',
+      copiedLabel: 'Kopiert',
+    },
   },
   es: {
     home: {
@@ -285,6 +333,33 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
         { heading: 'Cookies y publicidad', body: 'Atlas GarageOS actualmente no usa cookies publicitarias ni vende datos personales. Este aviso se actualizará antes de introducir publicidad o tecnología de seguimiento adicional.' },
         { heading: 'Público general', body: 'Atlas GarageOS es una utilidad de automoción para público general y no está dirigida a menores de 13 años.' },
       ],
+    },
+    contact: {
+      title: 'Contacto',
+      description: 'Contacta con el equipo de Atlas GarageOS — preguntas generales, correcciones de datos, problemas técnicos o colaboraciones.',
+      h1: 'Contacta con Atlas GarageOS',
+      lead: '¿Tienes una pregunta, encontraste un dato o ajuste incorrecto, o quieres hablar de negocios? Escríbenos y te responderemos.',
+      formTitle: 'Envíanos un mensaje',
+      nameLabel: 'Nombre completo',
+      namePlaceholder: 'Juan Pérez',
+      emailLabel: 'Tu correo electrónico',
+      emailPlaceholder: 'tu@ejemplo.com',
+      subjectLabel: 'Asunto',
+      subjectOptions: [
+        { value: 'general', label: 'Pregunta general' },
+        { value: 'correction', label: 'Reportar un dato o ajuste incorrecto' },
+        { value: 'bug', label: 'Problema técnico / error' },
+        { value: 'partnership', label: 'Negocios y colaboraciones' },
+        { value: 'press', label: 'Prensa' },
+        { value: 'other', label: 'Otro' },
+      ],
+      messageLabel: 'Mensaje',
+      messagePlaceholder: 'Cuéntanos qué sucede...',
+      submitLabel: 'Enviar mensaje',
+      openingNote: 'Esto abrirá tu aplicación de correo con el mensaje listo para enviar.',
+      directLabel: 'O escríbenos directamente:',
+      copyLabel: 'Copiar',
+      copiedLabel: 'Copiado',
     },
   },
 });

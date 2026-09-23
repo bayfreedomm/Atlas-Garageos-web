@@ -12,6 +12,7 @@ export const platformPageRegistry = Object.freeze([
   { id: 'tools-hub', pathname: '/tools/', title: 'Automotive Tools', description: 'Explore fast automotive tools for fuel costs, road trips, tires, wheels, pressure, power, torque, and fitment.' },
   { id: 'methodology', pathname: '/methodology/', title: 'Accuracy & Methodology', description: 'How Atlas GarageOS calculators work, which formulas and assumptions they use, and where calculated results stop.' },
   { id: 'privacy-policy', pathname: '/privacy-policy/', title: 'Privacy Policy', description: 'How Atlas GarageOS handles calculator inputs and locally saved vehicle data.' },
+  { id: 'contact', pathname: '/contact/', title: 'Contact', description: 'Reach the Atlas GarageOS team — general questions, data corrections, technical issues, or partnerships.' },
 ] as const);
 
 export interface ToolDefinition {

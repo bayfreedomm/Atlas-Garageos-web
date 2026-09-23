@@ -5,7 +5,7 @@ import { tireSizeCatalog } from '../data/tire-size-catalog';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 
-const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/'] as const;
+const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
 function localizedRoutes(): readonly string[] {
   const locales = ['de', 'es'] as const;

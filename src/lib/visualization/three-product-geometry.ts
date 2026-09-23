@@ -17,7 +17,8 @@ function physicalMaterial(
     opacity: options.alpha,
     depthWrite: options.alpha > 0.7,
     side: THREE.DoubleSide,
-    envMapIntensity: options.metalness > 0.5 ? 1.2 : 0.45,
+    // Calibrated for the HDR softbox environment in three-3d.ts.
+    envMapIntensity: options.metalness > 0.5 ? 1.0 : 0.45,
   });
 }
 
@@ -96,78 +97,328 @@ function treadGeometry(product: TireWheelProduct3D): THREE.BufferGeometry {
   return geometry;
 }
 
-function treadBumpTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 128;
-  const context = canvas.getContext('2d');
-  if (context) {
-    context.fillStyle = '#949494';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.strokeStyle = '#666';
-    context.lineWidth = 3;
-    for (const y of [24, 49, 79, 104]) {
-      context.beginPath();
-      context.moveTo(0, y);
-      context.lineTo(canvas.width, y);
-      context.stroke();
-    }
-    context.strokeStyle = '#aeaeae';
-    context.lineWidth = 3;
-    for (let x = -32; x < canvas.width + 32; x += 24) {
-      context.beginPath();
-      context.moveTo(x, 16);
-      context.lineTo(x + 22, 53);
-      context.lineTo(x + 5, 68);
-      context.lineTo(x + 28, 112);
-      context.stroke();
-    }
-    context.strokeStyle = '#666';
-    context.lineWidth = 2;
-    for (let x = -32; x < canvas.width + 32; x += 24) {
-      context.beginPath();
-      context.moveTo(x + 14, 8);
-      context.lineTo(x + 30, 34);
-      context.moveTo(x + 2, 92);
-      context.lineTo(x + 20, 122);
-      context.stroke();
-    }
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.repeat.set(1, 1);
-  texture.anisotropy = 4;
-  return texture;
+interface SurfaceMaps {
+  readonly normal: THREE.CanvasTexture;
+  readonly occlusion: THREE.CanvasTexture;
 }
 
-function sidewallBumpTexture(): THREE.CanvasTexture {
+function hash2(x: number, y: number): number {
+  const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+/** Tileable value noise: lattice coordinates wrap at `period` cells. */
+function tileNoise(x: number, y: number, period: number): number {
+  const x0 = Math.floor(x);
+  const y0 = Math.floor(y);
+  const fx = x - x0;
+  const fy = y - y0;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const wrap = (value: number) => ((value % period) + period) % period;
+  const a = hash2(wrap(x0), wrap(y0));
+  const b = hash2(wrap(x0 + 1), wrap(y0));
+  const c = hash2(wrap(x0), wrap(y0 + 1));
+  const d = hash2(wrap(x0 + 1), wrap(y0 + 1));
+  return (a + (b - a) * sx) + ((c + (d - c) * sx) - (a + (b - a) * sx)) * sy;
+}
+
+/** Reads the red channel of a greyscale canvas as heights in 0..1. */
+function readHeights(context: CanvasRenderingContext2D, width: number, height: number): Float32Array {
+  const pixels = context.getImageData(0, 0, width, height).data;
+  const heights = new Float32Array(width * height);
+  for (let index = 0; index < heights.length; index += 1) heights[index] = pixels[index * 4]! / 255;
+  return heights;
+}
+
+/**
+ * Separable box blur. It rounds the hard canvas edges into short bevels so the
+ * derived normals describe chamfered block walls instead of 1px aliasing.
+ * X always wraps (the maps repeat around the tyre); Y wraps only if asked.
+ */
+function blurHeights(source: Float32Array, width: number, height: number, radius: number, wrapY: boolean): Float32Array {
+  const temp = new Float32Array(source.length);
+  const out = new Float32Array(source.length);
+  const span = radius * 2 + 1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let sum = 0;
+      for (let k = -radius; k <= radius; k += 1) sum += source[y * width + ((x + k + width) % width)]!;
+      temp[y * width + x] = sum / span;
+    }
+  }
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let sum = 0;
+      for (let k = -radius; k <= radius; k += 1) {
+        const row = wrapY ? (y + k + height) % height : Math.max(0, Math.min(height - 1, y + k));
+        sum += temp[row * width + x]!;
+      }
+      out[y * width + x] = sum / span;
+    }
+  }
+  return out;
+}
+
+/**
+ * Height -> tangent-space normal map with a 3x3 Sobel operator.
+ *   gx = dh/dx (canvas right = +u), gy = dh/dy (canvas down = -v, CanvasTexture flips Y)
+ *   n  = normalize(-gx * strength, +gy * strength, 1), encoded as n * 0.5 + 0.5
+ * This is the OpenGL (+Y up) convention three.js expects for normalMap.
+ */
+function normalMapFromHeights(heights: Float32Array, width: number, height: number, strength: number, wrapY: boolean): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = width;
+  canvas.height = height;
   const context = canvas.getContext('2d');
   if (context) {
-    const image = context.createImageData(canvas.width, canvas.height);
-    for (let y = 0; y < canvas.height; y += 1) {
-      for (let x = 0; x < canvas.width; x += 1) {
-        const radial = Math.sin(Math.hypot(x - 128, y - 128) * 0.42) * 5;
-        const grain = Math.sin(x * 2.7 + y * 1.9) * 2 + Math.sin(x * 0.37 - y * 0.22) * 2;
-        const value = Math.max(90, Math.min(170, Math.round(128 + radial + grain)));
-        const index = (y * canvas.width + x) * 4;
-        image.data[index] = value;
-        image.data[index + 1] = value;
-        image.data[index + 2] = value;
+    const image = context.createImageData(width, height);
+    const sample = (x: number, y: number): number => {
+      const column = (x + width) % width;
+      const row = wrapY ? (y + height) % height : Math.max(0, Math.min(height - 1, y));
+      return heights[row * width + column]!;
+    };
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const gx = (sample(x + 1, y - 1) + 2 * sample(x + 1, y) + sample(x + 1, y + 1))
+          - (sample(x - 1, y - 1) + 2 * sample(x - 1, y) + sample(x - 1, y + 1));
+        const gy = (sample(x - 1, y + 1) + 2 * sample(x, y + 1) + sample(x + 1, y + 1))
+          - (sample(x - 1, y - 1) + 2 * sample(x, y - 1) + sample(x + 1, y - 1));
+        let nx = -gx * strength;
+        let ny = gy * strength;
+        let nz = 1;
+        const length = Math.hypot(nx, ny, nz);
+        nx /= length;
+        ny /= length;
+        nz /= length;
+        const index = (y * width + x) * 4;
+        image.data[index] = Math.round((nx * 0.5 + 0.5) * 255);
+        image.data[index + 1] = Math.round((ny * 0.5 + 0.5) * 255);
+        image.data[index + 2] = Math.round((nz * 0.5 + 0.5) * 255);
         image.data[index + 3] = 255;
       }
     }
     context.putImageData(image, 0, 0);
   }
   const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(2.4, 2.4);
-  texture.anisotropy = 4;
+  // Normal data is not colour: keep it linear (NoColorSpace is the default,
+  // set explicitly so a future default change cannot gamma-decode it).
+  texture.colorSpace = THREE.NoColorSpace;
+  texture.anisotropy = 8;
   return texture;
+}
+
+/** Cavity occlusion: groove floors receive less environment light than block tops. */
+function occlusionFromHeights(heights: Float32Array, width: number, height: number, floor: number): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+  if (context) {
+    const image = context.createImageData(width, height);
+    for (let index = 0; index < heights.length; index += 1) {
+      const value = Math.round((floor + (1 - floor) * Math.pow(heights[index]!, 0.6)) * 255);
+      image.data[index * 4] = value;
+      image.data[index * 4 + 1] = value;
+      image.data[index * 4 + 2] = value;
+      image.data[index * 4 + 3] = 255;
+    }
+    context.putImageData(image, 0, 0);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.NoColorSpace;
+  return texture;
+}
+
+/** Tread UV: u runs around the circumference, v across the tread (0..1). */
+const TREAD_TILE_REPEAT = 8;
+const TREAD_PITCHES_PER_TILE = 8;
+
+/**
+ * Directional (V / chevron) touring tread height map, 1024 x 256 per tile:
+ * four circumferential main grooves aligned with treadHeight()'s geometric
+ * grooves, a continuous centre rib with chevron sipes, V-angled lateral
+ * grooves splitting the intermediate ribs into blocks, and deep shoulder
+ * blocks with transverse slots and wear-bar sipes. White = rubber surface,
+ * black = groove floor.
+ */
+function treadHeightMap(): { heights: Float32Array; width: number; height: number } {
+  const width = 1024;
+  const height = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+  if (!context) return { heights: new Float32Array(width * height).fill(1), width, height };
+  const pitch = width / TREAD_PITCHES_PER_TILE;
+  // Groove centres in canvas y (top to bottom), from treadHeight(): across =
+  // 0.61, 0.205, -0.205, -0.61. Canvas row 0 is v = 1 after CanvasTexture's flipY.
+  const grooveY = [0.61, 0.205, -0.205, -0.61].map((across) => ((1 - across) / 2) * height);
+  const grooveHalf = height * 0.028;
+  const centre = height / 2;
+
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, width, height);
+  context.lineCap = 'butt';
+  context.lineJoin = 'miter';
+  // Draw each pitch at x and x +- width so strokes crossing the seam tile cleanly.
+  const eachPitch = (draw: (x: number, index: number) => void) => {
+    for (let index = -1; index <= TREAD_PITCHES_PER_TILE; index += 1) {
+      for (const offset of [-width, 0, width]) draw(index * pitch + offset, index);
+    }
+  };
+
+  // Shoulder blocks: transverse slots with a slight angle, flared toward the edge.
+  context.fillStyle = '#141414';
+  eachPitch((x) => {
+    for (const side of [-1, 1]) {
+      const inner = side < 0 ? grooveY[0]! - grooveHalf : grooveY[3]! + grooveHalf;
+      const outer = side < 0 ? -2 : height + 2;
+      context.beginPath();
+      context.moveTo(x + pitch * 0.46, inner);
+      context.lineTo(x + pitch * 0.58, inner);
+      context.lineTo(x + pitch * 0.66, outer);
+      context.lineTo(x + pitch * 0.4, outer);
+      context.closePath();
+      context.fill();
+    }
+  });
+  // Shoulder sipes: thin notches that stop short of the main groove.
+  context.strokeStyle = '#3a3a3a';
+  context.lineWidth = 2.2;
+  eachPitch((x) => {
+    for (const side of [-1, 1]) {
+      const start = side < 0 ? grooveY[0]! - grooveHalf * 3.2 : grooveY[3]! + grooveHalf * 3.2;
+      const end = side < 0 ? 6 : height - 6;
+      context.beginPath();
+      context.moveTo(x + pitch * 0.02, start);
+      context.lineTo(x + pitch * 0.12, (start + end) / 2);
+      context.lineTo(x + pitch * 0.06, end);
+      context.stroke();
+    }
+  });
+
+  // Intermediate ribs: V-angled lateral grooves (mirrored each side of centre)
+  // produce the chevron that reads as a directional performance tread.
+  context.strokeStyle = '#161616';
+  context.lineWidth = pitch * 0.12;
+  eachPitch((x) => {
+    // From the inner groove outward on both halves, so the two sides mirror.
+    for (const [from, to] of [[grooveY[1]!, grooveY[0]!], [grooveY[2]!, grooveY[3]!]] as const) {
+      context.beginPath();
+      context.moveTo(x + pitch * 0.1, from);
+      context.lineTo(x + pitch * 0.62, to);
+      context.stroke();
+    }
+  });
+  // Zig-zag sipes inside each intermediate block.
+  context.strokeStyle = '#444';
+  context.lineWidth = 2;
+  eachPitch((x) => {
+    for (const [from, to] of [[grooveY[1]!, grooveY[0]!], [grooveY[2]!, grooveY[3]!]] as const) {
+      const steps = 5;
+      context.beginPath();
+      for (let step = 0; step <= steps; step += 1) {
+        const t = 0.12 + (step / steps) * 0.76;
+        const yy = from + (to - from) * t;
+        const xx = x + pitch * (0.6 + 0.52 * t) + (step % 2 === 0 ? -3 : 3);
+        if (step === 0) context.moveTo(xx, yy);
+        else context.lineTo(xx, yy);
+      }
+      context.stroke();
+    }
+  });
+
+  // Centre rib: continuous for straight-line stability, with chevron sipes.
+  context.strokeStyle = '#4a4a4a';
+  context.lineWidth = 2.4;
+  eachPitch((x) => {
+    context.beginPath();
+    context.moveTo(x + pitch * 0.25, grooveY[1]! + grooveHalf * 1.6);
+    context.lineTo(x + pitch * 0.55, centre);
+    context.lineTo(x + pitch * 0.25, grooveY[2]! - grooveHalf * 1.6);
+    context.stroke();
+  });
+
+  // Main circumferential grooves last so they cut cleanly through everything.
+  context.fillStyle = '#000';
+  for (const y of grooveY) context.fillRect(0, y - grooveHalf, width, grooveHalf * 2);
+  // Tread-wear indicator bars on the groove floor (slightly raised) every other pitch.
+  context.fillStyle = '#2c2c2c';
+  for (let index = 0; index < TREAD_PITCHES_PER_TILE; index += 2) {
+    for (const y of grooveY) context.fillRect(index * pitch + pitch * 0.8, y - grooveHalf, pitch * 0.08, grooveHalf * 2);
+  }
+
+  const raw = readHeights(context, width, height);
+  // Micro texture on the contact surface (fine moulding grain, wraps in x).
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = y * width + x;
+      const surface = raw[index]!;
+      const grain = (tileNoise(x / 8, y / 8, width / 8) - 0.5) * 0.035;
+      raw[index] = surface + grain * surface;
+    }
+  }
+  return { heights: blurHeights(raw, width, height, 1, false), width, height };
+}
+
+function treadSurfaceMaps(): SurfaceMaps {
+  const { heights, width, height } = treadHeightMap();
+  const normal = normalMapFromHeights(heights, width, height, 1.8, false);
+  const occlusion = occlusionFromHeights(heights, width, height, 0.32);
+  for (const texture of [normal, occlusion]) {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.repeat.set(TREAD_TILE_REPEAT, 1);
+  }
+  return { normal, occlusion };
+}
+
+/**
+ * Sidewall height map, 512 x 512, tiling in both directions. In lathe UVs u
+ * runs around the tyre and v along the profile, so rows are concentric rings:
+ * fine moulded micro-ribs, a knurled serration band, low-frequency moulding
+ * undulation and grain noise.
+ */
+function sidewallSurfaceMaps(): SurfaceMaps {
+  const size = 512;
+  const heights = new Float32Array(size * size);
+  for (let y = 0; y < size; y += 1) {
+    const v = y / size;
+    // 24 micro-ribs per tile with a rounded (not sinusoidal-thin) profile.
+    const rib = Math.pow(Math.abs(Math.sin(v * Math.PI * 24)), 0.6);
+    // A knurled band in the lower third of the tile.
+    const band = smoothBand(v, 0.66, 0.78);
+    for (let x = 0; x < size; x += 1) {
+      const u = x / size;
+      const serration = Math.abs(Math.sin(u * Math.PI * 96 + v * 18));
+      const grain = tileNoise(x / 4, y / 4, size / 4) * 0.55 + tileNoise(x / 16, y / 16, size / 16) * 0.45;
+      const undulation = tileNoise(x / 64, y / 64, size / 64);
+      const value = 0.5
+        + (1 - band) * rib * 0.16
+        + band * serration * 0.32
+        + (grain - 0.5) * 0.12
+        + (undulation - 0.5) * 0.1;
+      heights[y * size + x] = value;
+    }
+  }
+  const smoothed = blurHeights(heights, size, size, 1, true);
+  const normal = normalMapFromHeights(smoothed, size, size, 1.6, true);
+  const occlusion = occlusionFromHeights(smoothed, size, size, 0.72);
+  for (const texture of [normal, occlusion]) {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    // Integer repeat around u avoids a visible seam where the lathe closes.
+    texture.repeat.set(10, 2);
+  }
+  return { normal, occlusion };
+}
+
+function smoothBand(value: number, start: number, end: number): number {
+  const edge = 0.012;
+  const rise = Math.max(0, Math.min(1, (value - start + edge) / (edge * 2)));
+  const fall = Math.max(0, Math.min(1, (end + edge - value) / (edge * 2)));
+  return Math.min(rise, fall);
 }
 
 function cylinder(radius: number, depth: number, material: THREE.Material, z: number, segments = 96): THREE.Mesh {
@@ -208,10 +459,10 @@ function wheelAssembly(product: TireWheelProduct3D): THREE.Group {
   const rim = product.rimRadius;
   const width = product.width;
   const frontZ = width * 0.285;
-  const silver = physicalMaterial(0xb6c0c7, { metalness: 0.92, roughness: 0.29, clearcoat: 0.2, clearcoatRoughness: 0.32, alpha });
+  const silver = physicalMaterial(0xb6c0c7, { metalness: 0.92, roughness: 0.24, clearcoat: 0.2, clearcoatRoughness: 0.32, alpha });
   const shadowSilver = physicalMaterial(0x98a7b0, { metalness: 0.9, roughness: 0.34, clearcoat: 0.12, clearcoatRoughness: 0.38, alpha });
   const darkMetal = physicalMaterial(0x27323a, { metalness: 0.82, roughness: 0.36, alpha });
-  const machined = physicalMaterial(0xd7dde1, { metalness: 0.96, roughness: 0.22, clearcoat: 0.18, clearcoatRoughness: 0.28, alpha });
+  const machined = physicalMaterial(0xd7dde1, { metalness: 0.96, roughness: 0.16, clearcoat: 0.18, clearcoatRoughness: 0.28, alpha });
   const recess = physicalMaterial(0x0d1419, { metalness: 0.35, roughness: 0.56, alpha });
   const accent = physicalMaterial(product.role === 'current' ? 0x2f9eff : 0xff8b38, { metalness: 0.52, roughness: 0.34, alpha: Math.min(1, alpha * 0.92) });
 
@@ -299,12 +550,24 @@ export function createTireWheelProduct(product: TireWheelProduct3D): THREE.Group
   const group = new THREE.Group();
   const alpha = product.alpha ?? 1;
   const rubber = physicalMaterial(0x11171b, { metalness: 0.01, roughness: 0.7, clearcoat: 0.06, clearcoatRoughness: 0.72, alpha });
-  rubber.bumpMap = sidewallBumpTexture();
-  rubber.bumpScale = product.outerRadius * 0.0018;
-  const treadTexture = treadBumpTexture();
+  const sidewallMaps = sidewallSurfaceMaps();
+  rubber.normalMap = sidewallMaps.normal;
+  rubber.normalScale.set(0.55, 0.55);
+  rubber.aoMap = sidewallMaps.occlusion;
+  rubber.aoMapIntensity = 0.6;
+  // Rubber has a soft, dusty grazing-angle sheen rather than a sharp coat.
+  rubber.sheen = 0.35;
+  rubber.sheenRoughness = 0.78;
+  rubber.sheenColor = new THREE.Color(0x2b3237);
+  const treadMaps = treadSurfaceMaps();
   const tread = physicalMaterial(0x0b1013, { metalness: 0, roughness: 0.76, clearcoat: 0.03, clearcoatRoughness: 0.82, alpha });
-  tread.bumpMap = treadTexture;
-  tread.bumpScale = product.outerRadius * 0.0045;
+  tread.normalMap = treadMaps.normal;
+  tread.normalScale.set(1, 1);
+  tread.aoMap = treadMaps.occlusion;
+  tread.aoMapIntensity = 0.9;
+  tread.sheen = 0.25;
+  tread.sheenRoughness = 0.85;
+  tread.sheenColor = new THREE.Color(0x262c30);
 
   const bodyGeometry = new THREE.LatheGeometry(tireProfile(product), 128, 0, TAU);
   bodyGeometry.rotateX(Math.PI / 2);
