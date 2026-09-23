@@ -304,6 +304,7 @@ export function compressionChamberScene(boreMm: number, strokeMm: number, cleara
   const clearanceHeight = Math.min(0.8, clearanceCc * 1000 / (Math.PI * (boreMm / 2) ** 2) / boreMm * 1.3);
   const chamberCenter = -0.42 + strokeHeight / 2 + clearanceHeight / 2;
   return {
+    studio: { kind: 'tool-studio', id: 'compression-ratio-calculator', current: palette.current, proposed: palette.proposed, accent: palette.accent, metal: palette.metal, hub: palette.hub, primary: Math.max(0, Math.min(1, strokeMm / Math.max(1, boreMm) / 2)), secondary: Math.max(0, Math.min(1, clearanceHeight)), count: boreMm },
     meshes: [
       annulusCylinder(boreRadius + 0.12, boreRadius, strokeHeight + clearanceHeight + 0.16, palette.metal, v(0, 0, 0), 0.38, METAL_MATERIAL),
       cylinder(boreRadius * 0.94, 0.18, palette.hub, v(0, 0, -0.42), 1, METAL_MATERIAL),
@@ -332,7 +333,7 @@ export function evBatteryScene(startPercent: number, endPercent: number, palette
     const center = -1.16 + 2.32 * (section.from + section.to) / 200;
     cells.push(box(width, 0.78, 0.5, section.color, v(center, 0, 0.03), 1, 0, GUIDE_MATERIAL));
   }
-  return { meshes: cells, annotations: [
+  return { meshes: cells, studio: { kind: 'tool-studio', id: 'ev-charging-calculator', current: palette.current, proposed: palette.proposed, accent: palette.accent, metal: palette.metal, hub: palette.hub, primary: Math.max(0, Math.min(1, startPercent / 100)), secondary: Math.max(0, Math.min(1, endPercent / 100)) }, annotations: [
     { start: v(-1.19, -0.8, 0.28), end: v(-1.19 + 2.38 * startPercent / 100, -0.8, 0.28), color: palette.current, label: `${startPercent.toFixed(0)}%` },
     { start: v(-1.19 + 2.38 * startPercent / 100, 0.8, 0.28), end: v(-1.19 + 2.38 * endPercent / 100, 0.8, 0.28), color: palette.proposed, label: `${endPercent.toFixed(0)}%` },
   ], fitRadius: 1.5 };

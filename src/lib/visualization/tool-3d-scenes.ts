@@ -95,7 +95,7 @@ function clearanceScene(palette: VisualizationPalette, variant: 'measure' | 'map
 export interface Tool3DResult { readonly scene: Scene3D; readonly readout: string; readonly detail: string; }
 
 /** Explanatory geometry only. Canonical numerical results remain in the calculator UI. */
-export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en', fallbackMeshes = true): Tool3DResult {
+function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en', fallbackMeshes = true): Tool3DResult {
   const input = (key: string, fallback: number) => n(values, key, fallback);
   if (id === 'fitment-map' || id === 'measure-my-car') return { scene: clearanceScene(palette, id === 'fitment-map' ? 'map' : 'measure', locale, fallbackMeshes), readout: id === 'fitment-map' ? local(locale, 'WIDTH × ET', 'BREITE × ET', 'ANCHO × ET') : local(locale, 'INNER ↔ OUTER', 'INNEN ↔ AUSSEN', 'INTERIOR ↔ EXTERIOR'), detail: local(locale, 'Static geometry · measure on your vehicle', 'Statische Geometrie · am Fahrzeug messen', 'Geometría estática · mida en su vehículo') };
 
@@ -123,7 +123,7 @@ export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<str
   if (id === 'road-trip-cost-calculator') {
     const distance = input('distance', 250);
     const isReturn = values.tripType === 'round';
-    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)}${isReturn ? ' × 2' : ''}`, detail: isReturn ? local(locale, 'Return route', 'Hin- und Rückfahrt', 'Viaje de ida y vuelta') : local(locale, 'One-way route', 'Einfache Fahrt', 'Viaje de ida') };
+    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}${isReturn ? ' × 2' : ''}`, detail: isReturn ? local(locale, 'Return route', 'Hin- und Rückfahrt', 'Viaje de ida y vuelta') : local(locale, 'One-way route', 'Einfache Fahrt', 'Viaje de ida') };
   }
   if (id === 'mpg-l100km-converter') {
     const value = input('value', 30);
@@ -204,4 +204,48 @@ export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<str
   const lugCount = selected?.lugCount ?? 0;
   const holes = Array.from({ length: lugCount }, (_, i) => { const a = i * Math.PI * 2 / lugCount; return cylinder(.095, .23, dark, v(.9 + Math.cos(a) * .53, Math.sin(a) * .53, .12), 1, satin); });
   return { scene: { meshes: [...wheel(v(-.8, 0, 0), .8, palette), annulusCylinder(.78, .27, .18, palette.metal, v(.9, 0, 0), 1, metal), ...holes], shadows: floor(1.7), fitRadius: 1.75 }, readout: selected ? `${selected.make} ${selected.model} · ${selected.boltPattern}` : local(locale, 'Select a sourced vehicle', 'Fahrzeug mit Quelle wählen', 'Elija un vehículo documentado'), detail: selected ? local(locale, 'Sourced reference · confirm exact trim', 'Referenz mit Quellen · genaue Ausstattung prüfen', 'Referencia documentada · confirme la versión exacta') : local(locale, 'No bolt pattern shown until a documented vehicle is selected', 'Lochkreis erst nach Auswahl eines dokumentierten Fahrzeugs', 'El patrón de pernos aparece tras elegir un vehículo documentado') };
+}
+
+/** The native studio is authored per tool; the original bounded meshes stay as Canvas fallback. */
+export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en', fallbackMeshes = true): Tool3DResult {
+  const result = sceneForToolFallback(id, values, palette, locale, fallbackMeshes);
+  if (['fitment-map', 'measure-my-car', 'tire-load-speed-rating', 'tire-date-code-decoder'].includes(id)) return result;
+  const input = (key: string, fallback: number) => Math.max(0, n(values, key, fallback));
+  const selected = id === 'vehicle-fitment-finder' ? vehicleById(values.model ?? '') : undefined;
+  const primary = (() => {
+    switch (id) {
+      case 'psi-bar-converter': {
+        const value = input('value', 32);
+        const psi = values.unit === 'bar' ? value * 100000 / PASCALS_PER_PSI : values.unit === 'kpa' ? value * 1000 / PASCALS_PER_PSI : value;
+        return clamp(psi / 100, 0, 1);
+      }
+      case 'fuel-cost-calculator': {
+        const calculated = calculateFuelCostTool({ system: values.system === 'imperial' ? 'imperial' : 'metric', distance: input('distance', 100), economy: Math.max(.1, input('economy', 7)), price: input('price', 0) });
+        return calculated.ok ? clamp(calculated.value.fuelRequired / (values.system === 'imperial' ? 16 : 60), .02, 1) : .02;
+      }
+      case 'road-trip-cost-calculator': return clamp(input('distance', 250) / (values.system === 'imperial' ? 800 : 1200), .04, 1);
+      case 'mpg-l100km-converter': return clamp(input('value', 30) / (values.unit === 'L/100km' ? 20 : 75), .04, 1);
+      case 'hp-kw-converter': return clamp((values.unit === 'kw' ? input('value', 180) : input('value', 180) * WATTS_PER_MECHANICAL_HP / 1000) / 450, .04, 1);
+      case 'nm-lb-ft-converter': return clamp((values.unit === 'lb-ft' ? input('value', 300) * NEWTON_METERS_PER_POUND_FOOT : input('value', 300)) / 1000, .04, 1);
+      case 'power-to-weight-calculator': return clamp(input('power', 180) / Math.max(1, input('weight', 1350)) * 3, .04, 1);
+      case 'towing-capacity-calculator': {
+        const gcwr = input('gcwr', 17000);
+        return clamp((gcwr - input('curbWeight', 5500) - input('loadWeight', 500)) / Math.max(1, gcwr), .04, 1);
+      }
+      case 'quarter-mile-calculator': return clamp(input('power', 300) / Math.max(1, input('weight', 3400)) * 5, .04, 1);
+      case 'vehicle-fitment-finder': return selected ? clamp(selected.lugCount / 8, .04, 1) : .04;
+      default: return .35;
+    }
+  })();
+  const secondary = id === 'road-trip-cost-calculator' ? clamp(input('extraCost', 0) / 250, 0, 1)
+    : id === 'towing-capacity-calculator' ? clamp((input('curbWeight', 5500) + input('loadWeight', 500)) / Math.max(1, input('gcwr', 17000)), 0, 1)
+      : 0;
+  return {
+    ...result,
+    scene: {
+      ...result.scene,
+      studio: { kind: 'tool-studio', id, current: palette.current, proposed: palette.proposed, accent: palette.accent, metal: palette.metal, hub: palette.hub, primary, secondary, count: selected?.lugCount ?? 0, returnTrip: values.tripType === 'round' },
+      fitRadius: 1.08,
+    },
+  };
 }

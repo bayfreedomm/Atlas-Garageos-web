@@ -68,10 +68,25 @@ export interface PcdProduct3D {
   readonly holeRadius: number;
 }
 export type Product3D = TireWheelProduct3D | OffsetProduct3D | PcdProduct3D;
+/** Optional native WebGL instrument. Canvas continues to draw the scene's meshes. */
+export interface ToolStudio3D {
+  readonly kind: 'tool-studio';
+  readonly id: string;
+  readonly current: string;
+  readonly proposed: string;
+  readonly accent: string;
+  readonly metal: string;
+  readonly hub: string;
+  readonly primary: number;
+  readonly secondary?: number;
+  readonly count?: number;
+  readonly returnTrip?: boolean;
+}
 export interface View3D { readonly yaw: number; readonly pitch: number; readonly zoom: number; }
 export interface Scene3D<TProduct extends Product3D = Product3D> {
   readonly meshes: readonly Mesh3D[];
   readonly products?: readonly TProduct[];
+  readonly studio?: ToolStudio3D;
   readonly lines?: readonly Line3D[];
   readonly annotations?: readonly Annotation3D[];
   readonly shadows?: readonly Shadow3D[];

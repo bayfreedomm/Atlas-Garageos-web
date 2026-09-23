@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Annotation3D, Material3D, Mesh3D, Scene3D, Vec3, View3D } from './canvas-3d';
 import { createTireWheelProduct } from './three-product-geometry';
 import { createOffsetProduct, createPcdProduct } from './three-engineering-geometry';
+import { createToolStudioProduct } from './three-tool-geometry';
 
 const DEFAULT_VIEW: View3D = { yaw: -0.58, pitch: 0.34, zoom: 1 };
 
@@ -134,6 +135,7 @@ export class Three3DRenderer {
   private annotations: readonly Annotation3D[] = [];
   private annotationObjects: THREE.Object3D[] = [];
   private tireScene = false;
+  private toolStudioScene = false;
   private labels: HTMLElement[] = [];
   private raf = 0;
   private transitionStarted = 0;
@@ -247,17 +249,21 @@ export class Three3DRenderer {
     disposeObject(this.content);
     this.content.clear();
     this.fitRadius = scene.fitRadius ?? 1.5;
-    this.annotations = scene.annotations ?? [];
+    this.annotations = scene.studio ? [] : (scene.annotations ?? []);
     this.annotationObjects = [];
     this.tireScene = scene.products?.some((product) => product.kind === 'tire-wheel') ?? false;
+    this.toolStudioScene = Boolean(scene.studio);
 
-    if (scene.products?.length) {
+    if (scene.studio) {
+      this.content.add(createToolStudioProduct(scene.studio));
+    } else if (scene.products?.length) {
       for (const product of scene.products) {
         if (product.kind === 'tire-wheel') this.content.add(createTireWheelProduct(product));
         else if (product.kind === 'wheel-offset') this.content.add(createOffsetProduct(product));
         else if (product.kind === 'pcd-plate') this.content.add(createPcdProduct(product));
       }
-    } else {
+    }
+    if (!scene.studio) {
       for (const source of scene.meshes) {
         if (source.vertices.length === 0 || source.faces.length === 0) continue;
         const mesh = new THREE.Mesh(geometryFromMesh(source), pbrMaterial(source));
@@ -268,7 +274,7 @@ export class Three3DRenderer {
         this.content.add(mesh);
       }
     }
-    for (const source of scene.lines ?? []) {
+    for (const source of scene.studio ? [] : (scene.lines ?? [])) {
       this.content.add(lineObject(source.points, source.color, source.alpha ?? 1, source.closed ?? false, source.dashed ?? false));
     }
     for (const annotation of this.annotations) {
@@ -392,7 +398,7 @@ export class Three3DRenderer {
     this.content.rotation.set(this.view.pitch, this.view.yaw, 0);
     const fovRadians = THREE.MathUtils.degToRad(this.camera.fov);
     const fitHeightDistance = this.fitRadius / Math.tan(fovRadians / 2);
-    const fitWidthDistance = fitHeightDistance / Math.max(0.62, this.camera.aspect);
+    const fitWidthDistance = fitHeightDistance / Math.max(0.62, this.camera.aspect) * (this.toolStudioScene && this.width < 640 ? 1.28 : 1);
     this.camera.position.z = Math.max(fitHeightDistance, fitWidthDistance) / this.view.zoom + 0.9;
     if (this.transitionStarted > 0) {
       const progress = clamp((time - this.transitionStarted) / 190, 0, 1);

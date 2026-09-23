@@ -3,6 +3,7 @@ import { additional3DToolIds } from '../../src/localization/tool-3d-catalog';
 import { visualization3DText } from '../../src/localization/visualization-3d';
 import { tool3DText } from '../../src/localization/tool-3d-catalog';
 import { sceneForTool } from '../../src/lib/visualization/tool-3d-scenes';
+import { compressionChamberScene, evBatteryScene } from '../../src/lib/visualization/scene-builders';
 import { toolRegistry } from '../../src/seo/tool-registry';
 
 const palette = { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' };
@@ -55,5 +56,36 @@ describe('3D coverage for the complete tool directory', () => {
     expect(fourLugs - noSelection).toBe(4);
     expect(fiveLugs - noSelection).toBe(5);
     expect(sceneForTool('vehicle-fitment-finder', {}, palette).detail).toContain('No bolt pattern');
+  });
+
+  it('uses dedicated native WebGL products while retaining Canvas fallback geometry', () => {
+    const tireProducts = new Set(['fitment-map', 'measure-my-car', 'tire-load-speed-rating', 'tire-date-code-decoder']);
+    for (const id of additional3DToolIds) {
+      const scene = sceneForTool(id, {}, palette).scene;
+      expect(scene.meshes.length).toBeGreaterThan(0);
+      if (tireProducts.has(id)) {
+        expect(scene.products?.[0]?.kind).toBe('tire-wheel');
+        expect(scene.studio).toBeUndefined();
+      } else {
+        expect(scene.studio?.id).toBe(id);
+        expect(scene.studio?.primary).toBeGreaterThanOrEqual(0);
+        expect(scene.studio?.primary).toBeLessThanOrEqual(1);
+      }
+    }
+    expect(sceneForTool('psi-bar-converter', { value: '20', unit: 'psi' }, palette).scene.studio?.primary)
+      .not.toBe(sceneForTool('psi-bar-converter', { value: '80', unit: 'psi' }, palette).scene.studio?.primary);
+    expect(sceneForTool('vehicle-fitment-finder', { model: 'peugeot-208' }, palette).scene.studio?.count).toBe(4);
+  });
+
+  it('drives the native engine and battery sections from validated calculator inputs', () => {
+    const compression = compressionChamberScene(86, 86, 52, palette);
+    const changedBore = compressionChamberScene(100, 86, 52, palette);
+    expect(compression.studio?.count).toBe(86);
+    expect(changedBore.studio?.count).toBe(100);
+    expect(compression.studio?.primary).not.toBe(changedBore.studio?.primary);
+    const battery = evBatteryScene(20, 80, palette);
+    expect(battery.studio?.primary).toBe(.2);
+    expect(battery.studio?.secondary).toBe(.8);
+    expect(battery.meshes.length).toBeGreaterThan(1);
   });
 });

@@ -279,3 +279,11 @@ Next implementation pass:
 - [x] On narrow screens, the tire comparison opens in overlay mode and the persistent numeric HUD moves below the 3D canvas so it no longer covers the product. Side-by-side remains available, and the numeric values persist when the model rotates.
 - [x] No canonical calculation, fuel data/history, Wrangler/Cloudflare config, route, or dependency changes were made in this visual pass.
 - [ ] Physical pinch, WebKit/Firefox, forced context loss and deployed performance remain separate launch gates.
+
+## Package 6.4 native instrument geometry pass — 2026-09-23
+- [x] Ten formerly primitive/symbolic 3D tool scenes now use purpose-built native Three.js geometry: pressure gauge, fuel metering rig, route/timing decks, MPG relationship, turbine output, torque arm, power-to-weight rig, hitch/load cells and sourced vehicle bolt plate.
+- [x] Compression and EV charging now render native cylinder and modular battery sections. Bore/stroke and charge-window inputs alter visible geometry; canonical calculations remain in their existing engines.
+- [x] Tire load/date/clearance tools keep the established native tire product, while mixed native-product scenes now also render their explanatory clearance meshes. The other high-quality tire, offset and PCD products remain intact.
+- [x] The original bounded geometry remains a dependency-free Canvas fallback. New Three geometry stays in the existing lazy WebGL chunk, uses the same camera/touch/reduced-motion/disposal safeguards and adds no dependency.
+- [x] Desktop and 390px mobile views were visually checked in dark/light theme; a pressure input change updated both the calculator and WebGL gauge, and a sourced four-lug vehicle rendered four physical openings.
+- [ ] This is an engineered explanatory 3D language, not photoreal full-vehicle rendering or a vehicle-specific safety/fitment verdict. Physical-device pinch, other browser engines, forced context loss and deployed performance remain separate acceptance checks.
