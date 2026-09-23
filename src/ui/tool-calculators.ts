@@ -713,6 +713,22 @@ function setWheelOffsetTechnicalVisual(
   }
 }
 
+/**
+ * requestAnimationFrame does not dedupe: calling it twice before the next paint schedules two
+ * separate callbacks. An `input` listener that does `requestAnimationFrame(preview)` on every
+ * event queues one full preview recompute per keystroke (and per field an autofill fills in the
+ * same tick), not one for the whole burst. This wraps a callback so at most one frame is ever
+ * pending at a time — the same fix already applied to the 3D panels' `input` handlers.
+ */
+function coalesceToNextFrame(callback: () => void): () => void {
+  let pending = false;
+  return () => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; callback(); });
+  };
+}
+
 export function initializeToolCalculators(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach((form) => {
     const results = form.querySelector<HTMLDListElement>('[data-results]')!;
@@ -729,7 +745,7 @@ export function initializeToolCalculators(): void {
       const result = calculateTireSizeTool(input);
       if (result.ok) { setTireVisual(form, input, result.value.overallDiameterMm); setSingleTireTechnicalVisual(form, input, result.value); }
     };
-    form.addEventListener('input', () => requestAnimationFrame(preview));
+    form.addEventListener('input', coalesceToNextFrame(preview));
     form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); }); calculate();
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-comparison"]').forEach((form) => {
@@ -754,7 +770,7 @@ export function initializeToolCalculators(): void {
       if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
       return result.ok ? { ok: true as const, metrics: tireComparisonMetrics(result.value) } : result;
     });
-    form.addEventListener('input', () => requestAnimationFrame(preview));
+    form.addEventListener('input', coalesceToNextFrame(preview));
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach((form) => {
     const preview = (): void => {
@@ -782,7 +798,7 @@ export function initializeToolCalculators(): void {
       }
       return result.ok ? { ok: true as const, metrics: wheelOffsetMetrics(result.value) } : result;
     });
-    form.addEventListener('input', () => requestAnimationFrame(preview));
+    form.addEventListener('input', coalesceToNextFrame(preview));
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="speedometer"]').forEach((form) => {
     prefillSpeedometerFromGuide(form);

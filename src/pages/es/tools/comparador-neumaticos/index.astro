@@ -10,6 +10,7 @@ const c = localizedTool('tire-size-comparison', 'es');
 ---
 <ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifenrechner-vergleich/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/comparador-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }]}>
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="es" hidden></div>
     <div class="calculator-columns">
       <TireInputGroup locale="es" prefix="original-" title="Neumático original" width={225} aspect={45} rim={18} />
       <TireInputGroup locale="es" prefix="new-" title="Neumático nuevo" width={235} aspect={40} rim={19} />
@@ -39,4 +40,4 @@ const c = localizedTool('tire-size-comparison', 'es');
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>
-<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeShareableToolState(); initializeToolCalculators();</script>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

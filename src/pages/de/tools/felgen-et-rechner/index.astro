@@ -9,6 +9,7 @@ const c = localizedTool('wheel-offset-calculator', 'de');
 ---
 <ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/de/tools/freigang-messen/" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }]}>
   <form slot="tool" class="calculator-form" data-calculator="wheel-offset" novalidate>
+    <div class="garage-quick-load" data-garage-quick-load data-gql-target="wheel-offset" data-gql-locale="de" hidden></div>
     <div class="calculator-columns">
       <fieldset class="calculator-group"><legend>Ursprüngliche Felge</legend><div class="grid"><label>Breite · J<input name="originalWidthInches" type="number" value="8" step="0.5" inputmode="decimal" /></label><label>Einpresstiefe · ET<input name="originalOffsetMm" type="number" value="40" inputmode="numeric" /></label></div></fieldset>
       <fieldset class="calculator-group"><legend>Neue Felge</legend><div class="grid"><label>Breite · J<input name="newWidthInches" type="number" value="8.5" step="0.5" inputmode="decimal" /></label><label>Einpresstiefe · ET<input name="newOffsetMm" type="number" value="35" inputmode="numeric" /></label></div></fieldset>
@@ -34,4 +35,4 @@ const c = localizedTool('wheel-offset-calculator', 'de');
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>
-<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeShareableToolState(); initializeToolCalculators();</script>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

@@ -27,10 +27,29 @@ const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { 
 </section>
 <script>
   const pending = new WeakSet<HTMLElement>();
+  // The panel is usually above the fold on these tool pages, so the
+  // IntersectionObserver below fires almost immediately on page load — it
+  // doesn't buy any real laziness. Without a yield, building the renderer
+  // (PBR materials, procedural environment map, normal/AO textures) runs as
+  // one long synchronous task that blocks the very first paint, which is
+  // what made the whole page feel like it "stutters" on open. Yielding once
+  // via requestAnimationFrame + requestIdleCallback lets the browser paint
+  // the surrounding page first; the heavy work still happens, just a frame
+  // later, when it's no longer competing with first paint.
+  const yieldToBrowser = () => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      if ('requestIdleCallback' in window) requestIdleCallback(() => resolve(), { timeout: 200 });
+      else setTimeout(resolve, 0);
+    });
+  });
   const load = async (panel: HTMLElement) => {
     if (pending.has(panel) || panel.classList.contains('is-ready')) return;
     pending.add(panel);
-    try { const module = await import('../ui/tool-3d'); await module.mountTool3D(panel); }
+    try {
+      await yieldToBrowser();
+      const module = await import('../ui/tool-3d');
+      await module.mountTool3D(panel);
+    }
     finally { pending.delete(panel); }
   };
   document.querySelectorAll<HTMLElement>('[data-tool-3d]').forEach((panel) => {

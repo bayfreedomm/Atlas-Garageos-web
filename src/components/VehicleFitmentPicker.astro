@@ -12,7 +12,7 @@ const { target } = Astro.props;
     <label class="vehicle-fitment-picker__field"><span>Year</span><select data-vfp-year disabled><option value="">Any year</option></select></label>
     <label class="vehicle-fitment-picker__field"><span>Model</span><select data-vfp-model disabled><option value="">Choose a make first</option></select></label>
   </div>
-  <div class="vehicle-fitment-picker__result" data-vfp-result hidden>
+  <div class="vehicle-fitment-picker__result" data-vfp-result hidden role="status" aria-live="polite">
     <div class="vehicle-fitment-picker__result-text">
       <strong data-vfp-result-value></strong>
       <small data-vfp-result-note></small>

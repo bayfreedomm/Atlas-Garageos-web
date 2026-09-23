@@ -71,7 +71,14 @@ export async function mountTool3D(panel: HTMLElement): Promise<void> {
     if (readout) readout.textContent = locale !== 'en' && (id === 'fitment-map' || id === 'measure-my-car') ? tool3DText(locale, id).title : result.readout;
     if (detail) detail.textContent = locale === 'en' ? result.detail : tool3DText(locale, id).title;
   };
-  const queued = () => { requestAnimationFrame(refresh); };
+  // See the matching comment in parametric-3d.ts: requestAnimationFrame does not dedupe, so
+  // without tracking the pending frame, typing a multi-digit value queues one full scene
+  // rebuild per keystroke instead of one for the whole burst.
+  let pendingFrame: number | null = null;
+  const queued = () => {
+    if (pendingFrame !== null) return;
+    pendingFrame = requestAnimationFrame(() => { pendingFrame = null; refresh(); });
+  };
   panel.querySelector('[data-tool-3d-reset]')?.addEventListener('click', () => { renderer.reset(); setCameraSelection('studio'); }, { signal: events.signal });
   panel.querySelector('[data-tool-3d-zoom-in]')?.addEventListener('click', () => renderer.zoomBy(1.14), { signal: events.signal });
   panel.querySelector('[data-tool-3d-zoom-out]')?.addEventListener('click', () => renderer.zoomBy(.88), { signal: events.signal });

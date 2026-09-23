@@ -170,6 +170,23 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 @media (max-width: 34rem) { .vehicle-fitment-picker__row { grid-template-columns:1fr 1fr; } .vehicle-fitment-picker__row .vehicle-fitment-picker__field:last-child { grid-column:1/-1; } }
 @media (max-width: 22rem) { .vehicle-fitment-picker__row { grid-template-columns:1fr; } .vehicle-fitment-picker__row .vehicle-fitment-picker__field:last-child { grid-column:auto; } }
 
+/* "Load from My Garage" quick-select (garage-quick-load.ts): same card language as
+   .vehicle-fitment-picker above, since both sit in the same spot on a calculator page and should
+   read as one family of "prefill this form" widgets rather than two different visual styles.
+   Hidden by default in markup; garage-quick-load.ts reveals it only once it knows whether the
+   visitor has saved setups, and fills it with either the picker row or the empty-state hint. */
+.garage-quick-load { display:grid; gap:.6rem; margin:0 0 1.1rem; padding:1rem 1.05rem; border:1px solid var(--color-line); border-radius:1.1rem; background:linear-gradient(160deg,var(--color-surface-subtle),var(--color-surface)); box-shadow:0 10px 26px rgb(20 45 70 / 6%); }
+.garage-quick-load__label { margin:0; color:var(--color-brand); font-size:.68rem; font-weight:850; text-transform:uppercase; letter-spacing:.06em; }
+.garage-quick-load__row { display:grid; grid-template-columns:1fr auto; gap:.6rem; align-items:center; }
+.garage-quick-load__select { height:2.5rem; padding:0 .6rem; border:1px solid var(--color-line); border-radius:.7rem; background:var(--color-surface); color:var(--color-ink); font-size:.85rem; font-weight:650; min-width:0; }
+.garage-quick-load__select:focus-visible { outline:2px solid var(--color-brand); outline-offset:1px; }
+.garage-quick-load__apply { flex:none; height:2.5rem; padding:0 1.05rem; border:0; border-radius:.7rem; background:var(--color-brand); color:#fff; font-size:.78rem; font-weight:800; letter-spacing:.01em; cursor:pointer; box-shadow:0 6px 16px color-mix(in srgb, var(--color-brand) 45%, transparent); white-space:nowrap; }
+.garage-quick-load__apply:hover { background:var(--color-brand-hover); }
+.garage-quick-load__hint { margin:0; color:var(--color-ink-muted); font-size:.78rem; line-height:1.4; }
+:root[data-theme="dark"] .garage-quick-load { background:linear-gradient(160deg,#16212c,#131b23); border-color:#29404f; }
+:root[data-theme="dark"] .garage-quick-load__select { background:#0d202d; border-color:#29404f; color:#f3f7fa; }
+@media (max-width: 22rem) { .garage-quick-load__row { grid-template-columns:1fr; } }
+
 .theme-quick-toggle { display:grid; place-items:center; width:2.75rem; height:2.75rem; padding:0; border:1px solid var(--color-line); border-radius:.85rem; background:var(--color-surface); color:var(--color-ink); box-shadow:none; cursor:pointer; }
 .theme-quick-toggle svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .theme-quick-toggle__moon { display:none; }
@@ -622,6 +639,11 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="light"] .insight-alert--warning{background:var(--semantic-danger-bg)!important;border-color:var(--semantic-danger-border)!important;color:var(--color-ink)!important}
 :root[data-theme="light"] .insight-alert--warning strong,:root[data-theme="light"] .insight-alert--warning>span{color:var(--semantic-danger-text)!important}:root[data-theme="light"] .insight-alert--warning p{color:#553d3b!important}
 :root[data-theme="light"] .tool-results dt,:root[data-theme="light"] .related-card small,:root[data-theme="light"] .quick-fact p,:root[data-theme="light"] .tool-explanation p,:root[data-theme="light"] .fuel-detail-heading small{color:var(--semantic-helper-text)!important}
+/* .source-badge's --color-ink-muted-on-surface-strong pairing measures ~4.1:1 in light mode,
+   under the 4.5:1 AA minimum for its 12px uppercase label text. Scoped override rather than
+   touching the shared --color-ink-muted token, which many other, already-compliant pairings
+   also use. */
+:root[data-theme="light"] .source-badge{color:#4a5765!important}
 .tool-machine .calculator-form>button:not(.secondary){border-color:#075fb8!important;background:linear-gradient(180deg,#0a67d8,#075fb8)!important;color:#fff!important;text-shadow:none!important}
 :root[data-theme="light"] .tool-machine .calculator-form>button:not(.secondary),:root[data-theme="dark"] .tool-machine .calculator-form>button:not(.secondary){color:#fff!important}
 

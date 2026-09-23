@@ -10,6 +10,7 @@ export interface UiStrings {
   readonly navHome: string;
   readonly navTools: string;
   readonly navFitment: string;
+  readonly navGarage: string;
   readonly breadcrumbHome: string;
   readonly breadcrumbTools: string;
   readonly allToolsBack: string;
@@ -38,6 +39,7 @@ export interface UiStrings {
   readonly allToolsTitle: string;
   readonly allToolsHelper: string;
   readonly fitmentHelper: string;
+  readonly garageHelper: string;
   readonly toolsByJob: string;
   readonly displayLabel: string;
 }
@@ -48,6 +50,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     navHome: 'Start',
     navTools: 'Werkzeuge',
     navFitment: 'Felgen- & Reifenvergleich',
+    navGarage: 'Meine Garage',
     breadcrumbHome: 'Start',
     breadcrumbTools: 'Werkzeuge',
     allToolsBack: '← Alle Werkzeuge',
@@ -76,6 +79,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     allToolsTitle: 'Alle Kfz-Werkzeuge',
     allToolsHelper: 'Alle Rechner und Umrechner durchsuchen',
     fitmentHelper: 'Zwei Setups visuell vergleichen',
+    garageHelper: 'Ihre Fahrzeuge und gespeicherten Setups',
     toolsByJob: 'WERKZEUGE NACH AUFGABE',
     displayLabel: 'ANZEIGE',
   },
@@ -84,6 +88,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     navHome: 'Inicio',
     navTools: 'Herramientas',
     navFitment: 'Comparador de Llantas y Neumáticos',
+    navGarage: 'Mi Garaje',
     breadcrumbHome: 'Inicio',
     breadcrumbTools: 'Herramientas',
     allToolsBack: '← Todas las herramientas',
@@ -112,6 +117,7 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
     allToolsTitle: 'Todas las herramientas para automóviles',
     allToolsHelper: 'Explore todas las calculadoras y conversores',
     fitmentHelper: 'Compare dos configuraciones visualmente',
+    garageHelper: 'Sus vehículos y configuraciones guardadas',
     toolsByJob: 'HERRAMIENTAS POR TAREA',
     displayLabel: 'PANTALLA',
   },

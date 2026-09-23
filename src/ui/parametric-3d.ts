@@ -22,7 +22,17 @@ interface ParametricRenderer {
 }
 
 function numberValue(form: HTMLFormElement, name: string): number { return Number(new FormData(form).get(name)); }
-function signed(value: number, digits = 1): string { return `${value > 0 ? '+' : ''}${value.toFixed(digits)}`; }
+/**
+ * The inline result summary next to these panels (tool-calculators.ts) already renders decimals
+ * with a German/Spanish comma via `.replace('.', ',')`, but this 3D HUD used plain `.toFixed()`
+ * everywhere, so the same DE/ES page showed a comma in one place and a period a few pixels away
+ * in the other. `fmt`/`signed` below route every number in this file through `Intl.NumberFormat`
+ * for the panel's own locale so both halves of the page agree.
+ */
+function fmt(value: number, digits: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+}
+function signed(value: number, digits: number, locale: string): string { return `${value > 0 ? '+' : ''}${fmt(value, digits, locale)}`; }
 function css(panel: HTMLElement, name: string, fallback: string): string {
   const value = getComputedStyle(panel).getPropertyValue(name).trim();
   return value || fallback;
@@ -82,34 +92,34 @@ function currentPcdModel(panel: HTMLElement, form: HTMLFormElement | null): Pcd3
   return buildPcd3DModel(lugCount, pcdMm, centerBoreMm);
 }
 
-function tireMetrics(panel: HTMLElement, model: TireComparison3DModel, single = false): void {
-  setMetric(panel, 'current', `${model.current.overallDiameterMm.toFixed(1)} mm`);
-  setMetric(panel, 'hud-current', `${model.current.overallDiameterMm.toFixed(1)} mm`);
-  setMetric(panel, 'hud-diameters', `${model.current.overallDiameterMm.toFixed(1)} → ${model.proposed.overallDiameterMm.toFixed(1)} mm`);
-  setMetric(panel, 'hud-width', single ? `${model.current.widthMm.toFixed(0)} mm` : `${model.current.widthMm.toFixed(0)} → ${model.proposed.widthMm.toFixed(0)} mm`);
-  setMetric(panel, 'hud-profile', single ? `${model.current.sidewallMm.toFixed(1)} mm · ${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} in` : `${model.current.sidewallMm.toFixed(1)} → ${model.proposed.sidewallMm.toFixed(1)} mm · ${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} → ${(model.proposed.rimDiameterMm / MM_PER_INCH).toFixed(1)} in`);
-  setMetric(panel, 'proposed', `${model.proposed.overallDiameterMm.toFixed(1)} mm`);
-  setMetric(panel, 'width', single ? `${model.current.widthMm.toFixed(0)} mm` : `${model.current.widthMm.toFixed(0)} → ${model.proposed.widthMm.toFixed(0)} mm`);
-  setMetric(panel, 'sidewall', single ? `${model.current.sidewallMm.toFixed(1)} mm` : `${model.current.sidewallMm.toFixed(1)} → ${model.proposed.sidewallMm.toFixed(1)} mm`);
-  setMetric(panel, 'rim', single ? `${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} in` : `${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} → ${(model.proposed.rimDiameterMm / MM_PER_INCH).toFixed(1)} in`);
-  setMetric(panel, 'diameterDelta', `${signed(model.diameterDifferenceMm)} mm`);
-  setMetric(panel, 'circumferenceDelta', `${signed(model.circumferenceDifferenceMm)} mm`);
-  setMetric(panel, 'speedometerDelta', `${signed(model.speedometerDifferencePercent, 2)}%`);
+function tireMetrics(panel: HTMLElement, model: TireComparison3DModel, locale: string, single = false): void {
+  setMetric(panel, 'current', `${fmt(model.current.overallDiameterMm, 1, locale)} mm`);
+  setMetric(panel, 'hud-current', `${fmt(model.current.overallDiameterMm, 1, locale)} mm`);
+  setMetric(panel, 'hud-diameters', `${fmt(model.current.overallDiameterMm, 1, locale)} → ${fmt(model.proposed.overallDiameterMm, 1, locale)} mm`);
+  setMetric(panel, 'hud-width', single ? `${fmt(model.current.widthMm, 0, locale)} mm` : `${fmt(model.current.widthMm, 0, locale)} → ${fmt(model.proposed.widthMm, 0, locale)} mm`);
+  setMetric(panel, 'hud-profile', single ? `${fmt(model.current.sidewallMm, 1, locale)} mm · ${fmt(model.current.rimDiameterMm / MM_PER_INCH, 1, locale)} in` : `${fmt(model.current.sidewallMm, 1, locale)} → ${fmt(model.proposed.sidewallMm, 1, locale)} mm · ${fmt(model.current.rimDiameterMm / MM_PER_INCH, 1, locale)} → ${fmt(model.proposed.rimDiameterMm / MM_PER_INCH, 1, locale)} in`);
+  setMetric(panel, 'proposed', `${fmt(model.proposed.overallDiameterMm, 1, locale)} mm`);
+  setMetric(panel, 'width', single ? `${fmt(model.current.widthMm, 0, locale)} mm` : `${fmt(model.current.widthMm, 0, locale)} → ${fmt(model.proposed.widthMm, 0, locale)} mm`);
+  setMetric(panel, 'sidewall', single ? `${fmt(model.current.sidewallMm, 1, locale)} mm` : `${fmt(model.current.sidewallMm, 1, locale)} → ${fmt(model.proposed.sidewallMm, 1, locale)} mm`);
+  setMetric(panel, 'rim', single ? `${fmt(model.current.rimDiameterMm / MM_PER_INCH, 1, locale)} in` : `${fmt(model.current.rimDiameterMm / MM_PER_INCH, 1, locale)} → ${fmt(model.proposed.rimDiameterMm / MM_PER_INCH, 1, locale)} in`);
+  setMetric(panel, 'diameterDelta', `${signed(model.diameterDifferenceMm, 1, locale)} mm`);
+  setMetric(panel, 'circumferenceDelta', `${signed(model.circumferenceDifferenceMm, 1, locale)} mm`);
+  setMetric(panel, 'speedometerDelta', `${signed(model.speedometerDifferencePercent, 2, locale)}%`);
 }
-function offsetMetrics(panel: HTMLElement, model: WheelOffset3DModel): void {
-  setMetric(panel, 'hud-offset', `${signed(model.innerPositionChangeMm, 1)} / ${signed(model.outerPokeChangeMm, 1)} mm`);
+function offsetMetrics(panel: HTMLElement, model: WheelOffset3DModel, locale: string): void {
+  setMetric(panel, 'hud-offset', `${signed(model.innerPositionChangeMm, 1, locale)} / ${signed(model.outerPokeChangeMm, 1, locale)} mm`);
   setMetric(panel, 'currentOffset', `ET${model.originalOffsetMm}`);
   setMetric(panel, 'newOffset', `ET${model.newOffsetMm}`);
-  setMetric(panel, 'width', `${(model.originalWidthMm / MM_PER_INCH).toFixed(1)}J → ${(model.newWidthMm / MM_PER_INCH).toFixed(1)}J`);
-  setMetric(panel, 'innerDelta', `${signed(model.innerPositionChangeMm, 2)} mm`);
-  setMetric(panel, 'outerDelta', `${signed(model.outerPokeChangeMm, 2)} mm`);
+  setMetric(panel, 'width', `${fmt(model.originalWidthMm / MM_PER_INCH, 1, locale)}J → ${fmt(model.newWidthMm / MM_PER_INCH, 1, locale)}J`);
+  setMetric(panel, 'innerDelta', `${signed(model.innerPositionChangeMm, 2, locale)} mm`);
+  setMetric(panel, 'outerDelta', `${signed(model.outerPokeChangeMm, 2, locale)} mm`);
 }
-function pcdMetrics(panel: HTMLElement, model: Pcd3DModel): void {
-  setMetric(panel, 'hud-pcd', `${model.lugCount} × ${model.pcdMm.toFixed(1)} mm`);
-  setMetric(panel, 'pcd', `${model.pcdMm.toFixed(model.pcdMm % 1 ? 1 : 0)} mm`);
+function pcdMetrics(panel: HTMLElement, model: Pcd3DModel, locale: string): void {
+  setMetric(panel, 'hud-pcd', `${model.lugCount} × ${fmt(model.pcdMm, 1, locale)} mm`);
+  setMetric(panel, 'pcd', `${fmt(model.pcdMm, model.pcdMm % 1 ? 1 : 0, locale)} mm`);
   setMetric(panel, 'lugCount', String(model.lugCount));
-  setMetric(panel, 'holeSpacing', `${model.adjacentSpacingMm.toFixed(2)} mm`);
-  setMetric(panel, 'centerBore', model.centerBoreMm ? `${model.centerBoreMm.toFixed(1)} mm` : '—');
+  setMetric(panel, 'holeSpacing', `${fmt(model.adjacentSpacingMm, 2, locale)} mm`);
+  setMetric(panel, 'centerBore', model.centerBoreMm ? `${fmt(model.centerBoreMm, 1, locale)} mm` : '—');
 }
 
 export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> {
@@ -149,7 +159,9 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
 
   panel.classList.add('is-ready');
   setUnavailable(panel, false);
-  let tireView: 'side-by-side' | 'overlay' = mode === 'tire' && window.matchMedia('(max-width: 34rem)').matches ? 'overlay' : 'side-by-side';
+  const narrowTireLayout = window.matchMedia('(max-width: 34rem)');
+  let tireView: 'side-by-side' | 'overlay' = mode === 'tire' && narrowTireLayout.matches ? 'overlay' : 'side-by-side';
+  let tireViewChosenByUser = false;
   if (mode === 'tire') panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.p3dTireView === tireView)));
   let fitmentView: 'tires' | 'wheels' = 'tires';
 
@@ -189,10 +201,10 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       if (!tire || !wheel) { setUnavailable(panel, true); return; }
       setUnavailable(panel, false);
       renderer.setScene(fitmentView === 'tires' ? tireComparisonScene(tire, colors, 'side-by-side', panel.dataset.renderer === 'canvas', locale) : wheelOffsetScene(wheel, colors, panel.dataset.renderer === 'canvas', locale));
-      tireMetrics(panel, tire);
-      offsetMetrics(panel, wheel);
+      tireMetrics(panel, tire, locale);
+      offsetMetrics(panel, wheel, locale);
       setMetric(panel, 'hud-fitment', fitmentView === 'tires'
-        ? `${tire.current.overallDiameterMm.toFixed(1)} → ${tire.proposed.overallDiameterMm.toFixed(1)} mm`
+        ? `${fmt(tire.current.overallDiameterMm, 1, locale)} → ${fmt(tire.proposed.overallDiameterMm, 1, locale)} mm`
         : `ET${wheel.originalOffsetMm} → ET${wheel.newOffsetMm}`);
       return;
     }
@@ -204,9 +216,9 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
         if (![current, proposed].every((value) => Number.isFinite(value) && value >= 15 && value <= 60)) { setUnavailable(panel, true); return; }
         setUnavailable(panel, false);
         renderer.setScene(gearDiameterScene(current, proposed, colors, panel.dataset.renderer === 'canvas'));
-        setMetric(panel, 'hud-special', `${current.toFixed(1)} → ${proposed.toFixed(1)} in`);
-        setMetric(panel, 'special-current', `${current.toFixed(1)} in`);
-        setMetric(panel, 'special-proposed', `${proposed.toFixed(1)} in`);
+        setMetric(panel, 'hud-special', `${fmt(current, 1, locale)} → ${fmt(proposed, 1, locale)} in`);
+        setMetric(panel, 'special-current', `${fmt(current, 1, locale)} in`);
+        setMetric(panel, 'special-proposed', `${fmt(proposed, 1, locale)} in`);
       } else if (mode === 'compression') {
         const bore = numberValue(form, 'bore');
         const stroke = numberValue(form, 'stroke');
@@ -214,18 +226,18 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
         if (![bore, stroke, clearance].every((value) => Number.isFinite(value) && value > 0) || bore > 300 || stroke > 300 || clearance > 500) { setUnavailable(panel, true); return; }
         setUnavailable(panel, false);
         renderer.setScene(compressionChamberScene(bore, stroke, clearance, colors, locale));
-        setMetric(panel, 'hud-special', `${bore.toFixed(1)} × ${stroke.toFixed(1)} mm`);
-        setMetric(panel, 'special-current', `${bore.toFixed(1)} mm`);
-        setMetric(panel, 'special-proposed', `${stroke.toFixed(1)} mm`);
+        setMetric(panel, 'hud-special', `${fmt(bore, 1, locale)} × ${fmt(stroke, 1, locale)} mm`);
+        setMetric(panel, 'special-current', `${fmt(bore, 1, locale)} mm`);
+        setMetric(panel, 'special-proposed', `${fmt(stroke, 1, locale)} mm`);
       } else {
         const start = numberValue(form, 'startPercent');
         const end = numberValue(form, 'endPercent');
         if (![start, end].every((value) => Number.isFinite(value) && value >= 0 && value <= 100) || end <= start) { setUnavailable(panel, true); return; }
         setUnavailable(panel, false);
         renderer.setScene(evBatteryScene(start, end, colors));
-        setMetric(panel, 'hud-special', `${start.toFixed(0)} → ${end.toFixed(0)}%`);
-        setMetric(panel, 'special-current', `${start.toFixed(0)}%`);
-        setMetric(panel, 'special-proposed', `${end.toFixed(0)}%`);
+        setMetric(panel, 'hud-special', `${fmt(start, 0, locale)} → ${fmt(end, 0, locale)}%`);
+        setMetric(panel, 'special-current', `${fmt(start, 0, locale)}%`);
+        setMetric(panel, 'special-proposed', `${fmt(end, 0, locale)}%`);
       }
       return;
     }
@@ -240,12 +252,12 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       if (!model) { setUnavailable(panel, true); return; }
       setUnavailable(panel, false);
       renderer.setScene(mode === 'single' ? singleTireScene(model, colors, panel.dataset.renderer === 'canvas', locale) : tireComparisonScene(model, colors, tireView, panel.dataset.renderer === 'canvas', locale));
-      tireMetrics(panel, model, mode === 'single');
+      tireMetrics(panel, model, locale, mode === 'single');
       if (mode === 'speed') {
         const indicated = numberValue(form, 'indicatedSpeed');
         const unit = String(new FormData(form).get('unit') ?? 'km/h');
         setMetric(panel, 'hud-speed', Number.isFinite(indicated) && indicated >= 0
-          ? `${indicated.toFixed(1)} → ${(indicated * model.proposed.circumferenceMm / model.current.circumferenceMm).toFixed(1)} ${unit}`
+          ? `${fmt(indicated, 1, locale)} → ${fmt(indicated * model.proposed.circumferenceMm / model.current.circumferenceMm, 1, locale)} ${unit}`
           : '—');
       }
       return;
@@ -256,14 +268,14 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       if (!model) { setUnavailable(panel, true); return; }
       setUnavailable(panel, false);
       renderer.setScene(wheelOffsetScene(model, colors, panel.dataset.renderer === 'canvas', locale));
-      offsetMetrics(panel, model);
+      offsetMetrics(panel, model, locale);
       return;
     }
     const model = currentPcdModel(panel, form);
     if (!model) { setUnavailable(panel, true); return; }
     setUnavailable(panel, false);
     renderer.setScene(pcdScene(model, colors, panel.dataset.renderer === 'canvas', locale));
-    pcdMetrics(panel, model);
+    pcdMetrics(panel, model, locale);
   };
 
   const signal = events.signal;
@@ -282,11 +294,23 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   stage.addEventListener('pointerdown', (event) => { if (event.target instanceof HTMLCanvasElement) setCameraSelection(null); }, { signal });
   panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => {
     button.addEventListener('click', () => {
+      tireViewChosenByUser = true;
       tireView = button.dataset.p3dTireView === 'overlay' ? 'overlay' : 'side-by-side';
       panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
       refresh();
     }, { signal });
   });
+  if (mode === 'tire') {
+    // The overlay/side-by-side default is picked from the viewport width at mount time.
+    // Without this, resizing the window (or rotating a phone) past that breakpoint left the
+    // layout stuck on whichever one loaded first, until the visitor noticed the manual toggle.
+    narrowTireLayout.addEventListener('change', (event) => {
+      if (tireViewChosenByUser) return;
+      tireView = event.matches ? 'overlay' : 'side-by-side';
+      panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.p3dTireView === tireView)));
+      refresh();
+    }, { signal });
+  }
   panel.querySelectorAll<HTMLButtonElement>('[data-p3d-fitment-view]').forEach((button) => {
     button.addEventListener('click', () => {
       fitmentView = button.dataset.p3dFitmentView === 'wheels' ? 'wheels' : 'tires';
@@ -296,7 +320,20 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   });
 
   if (form) {
-    const queuedRefresh = (): void => { requestAnimationFrame(refresh); };
+    // `refresh()` disposes and rebuilds the whole Three.js scene (materials, normal/AO
+    // textures included) — not cheap. Typing a value like "225" fires three `input` events
+    // faster than a frame apart is guaranteed, and requestAnimationFrame does not dedupe:
+    // three separate calls before the next paint queue three separate full rebuilds in that
+    // one frame. That's what made these forms feel like they stutter while typing. Track the
+    // pending frame and only ever have one rebuild in flight.
+    let pendingFrame: number | null = null;
+    const queuedRefresh = (): void => {
+      if (pendingFrame !== null) return;
+      pendingFrame = requestAnimationFrame(() => {
+        pendingFrame = null;
+        refresh();
+      });
+    };
     form.addEventListener('input', queuedRefresh, { signal });
     form.addEventListener('change', queuedRefresh, { signal });
     form.addEventListener('submit', queuedRefresh, { signal });

@@ -25,8 +25,18 @@ const layoutDescription = descriptionOverride ?? definition.description;
 const layoutPathname = locale ? localizedToolPath(locale, definition.id, definition.kind) : undefined;
 const hasAdditional3D = (additional3DToolIds as readonly string[]).includes(definition.id);
 const hasEmbeddedStudio = ['tire-size-calculator', 'speedometer-error-calculator', 'gear-ratio-calculator', 'compression-ratio-calculator', 'ev-charging-cost-calculator'].includes(definition.id);
+// Without this, SiteLayout's own default breadcrumb trail (Home -> Tools, both English-only
+// paths) is used for every locale, so the BreadcrumbList JSON-LD on every DE/ES tool page
+// claimed the English homepage/tools-hub as its ancestors even though the page's own visible
+// breadcrumb (backHref, above) and content are correctly localized.
+const homeHref = locale ? `/${locale}/` : '/';
+const breadcrumbs = [
+  { name: t?.navHome ?? 'Home', href: homeHref },
+  { name: t?.allToolsBack ? t.allToolsBack.replace(/^\W+/, '') : 'Tools', href: backHref },
+  { name: displayTitle, href: layoutPathname ?? backHref },
+];
 ---
-<SiteLayout definition={definition} title={layoutTitle} description={layoutDescription} pathname={layoutPathname} active="tools" locale={locale} alternates={alternates}>
+<SiteLayout definition={definition} title={layoutTitle} description={layoutDescription} pathname={layoutPathname} active="tools" locale={locale} alternates={alternates} breadcrumbs={breadcrumbs}>
   <nav class="breadcrumbs tool-breadcrumbs" aria-label="Breadcrumb"><a href={backHref}>{t?.allToolsBack ?? '← All tools'}</a><span class="sr-only" aria-current="page">{displayTitle}</span></nav>
 
   <article class:list={['tool-machine', `tool-machine--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, `tool-machine--${definition.id}`]} data-tool-id={definition.id}>

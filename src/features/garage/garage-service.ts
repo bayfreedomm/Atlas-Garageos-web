@@ -18,10 +18,27 @@ export interface SaveSetupCommand {
 }
 
 export class GarageService {
+  // Every mutator below does load() -> mutate a local copy -> persist(), with no version check.
+  // Two mutators firing in quick succession (e.g. "Save current" then "Save proposed", a
+  // completely normal way to use the fitment-studio comparison workspace) can interleave: the
+  // second call's load() reads the state from before the first call's persist() finished
+  // writing, so its write silently overwrites the first save. This queue serializes every
+  // mutating call through this GarageService instance so a load()+persist() pair always
+  // completes before the next one starts, which is enough to fix the same-page/same-tab race
+  // that's actually reachable from the UI (a different browser tab writing concurrently is a
+  // separate, much rarer problem this does not attempt to solve).
+  private queue: Promise<unknown> = Promise.resolve();
+
   public constructor(
     private readonly repository: GarageRepository,
     private readonly dependencies: GarageServiceDependencies,
   ) {}
+
+  private enqueue<T>(operation: () => Promise<T>): Promise<T> {
+    const result = this.queue.then(operation, operation);
+    this.queue = result.then(() => undefined, () => undefined);
+    return result;
+  }
 
   public load(): Promise<GarageLoadResult> {
     return this.repository.load();
@@ -36,7 +53,11 @@ export class GarageService {
     }
   }
 
-  public async selectVehicle(vehicleId: string): Promise<ValidationResult<GarageState>> {
+  public selectVehicle(vehicleId: string): Promise<ValidationResult<GarageState>> {
+    return this.enqueue(() => this.selectVehicleUnsynchronized(vehicleId));
+  }
+
+  private async selectVehicleUnsynchronized(vehicleId: string): Promise<ValidationResult<GarageState>> {
     const loaded = await this.repository.load();
     if (!loaded.state.vehicles.some((vehicle) => vehicle.id === vehicleId)) {
       return invalid({ code: 'invalid-reference', field: 'vehicleId', message: 'Selected vehicle does not exist in My Garage.', received: vehicleId });
@@ -46,7 +67,11 @@ export class GarageService {
     return this.persist(next.value);
   }
 
-  public async saveSetup(command: SaveSetupCommand): Promise<ValidationResult<GarageState>> {
+  public saveSetup(command: SaveSetupCommand): Promise<ValidationResult<GarageState>> {
+    return this.enqueue(() => this.saveSetupUnsynchronized(command));
+  }
+
+  private async saveSetupUnsynchronized(command: SaveSetupCommand): Promise<ValidationResult<GarageState>> {
     const setup = createSetupFromInput(command.setup);
     if (!setup.ok) return setup;
     const loaded = await this.repository.load();
@@ -85,7 +110,11 @@ export class GarageService {
     return this.saveSetup({ name, vehicleNickname, setup: shared.proposed });
   }
 
-  public async deleteSetup(id: string): Promise<ValidationResult<GarageState>> {
+  public deleteSetup(id: string): Promise<ValidationResult<GarageState>> {
+    return this.enqueue(() => this.deleteSetupUnsynchronized(id));
+  }
+
+  private async deleteSetupUnsynchronized(id: string): Promise<ValidationResult<GarageState>> {
     const state = (await this.repository.load()).state;
     const next = createGarageState({
       vehicles: state.vehicles,
@@ -97,7 +126,19 @@ export class GarageService {
     return this.persist(next.value);
   }
 
-  public async saveClearanceProfile(command: {
+  public saveClearanceProfile(command: {
+    readonly vehicleNickname: string;
+    readonly baselineSetup: SetupInput;
+    readonly baselineSetupId?: string | null;
+    readonly measuredInnerClearanceMm: number;
+    readonly measuredOuterClearanceMm: number;
+    readonly minimumDesiredInnerClearanceMm: number | null;
+    readonly minimumDesiredOuterClearanceMm: number | null;
+  }): Promise<ValidationResult<GarageState>> {
+    return this.enqueue(() => this.saveClearanceProfileUnsynchronized(command));
+  }
+
+  private async saveClearanceProfileUnsynchronized(command: {
     readonly vehicleNickname: string;
     readonly baselineSetup: SetupInput;
     readonly baselineSetupId?: string | null;

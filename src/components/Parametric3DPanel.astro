@@ -149,10 +149,23 @@ const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { 
 
 <script>
   const pending3D = new WeakSet<HTMLElement>();
+  // See the matching comment in Tool3DPanel.astro: this panel is usually
+  // already in view when the IntersectionObserver below attaches, so it fires
+  // almost immediately and the renderer's heavy synchronous setup (PBR
+  // materials, procedural environment map, normal/AO textures) ends up
+  // blocking the page's first paint. One yield lets the rest of the page
+  // paint first.
+  const yieldToBrowser = () => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      if ('requestIdleCallback' in window) requestIdleCallback(() => resolve(), { timeout: 200 });
+      else setTimeout(resolve, 0);
+    });
+  });
   const load3D = async (panel: HTMLElement) => {
     if (pending3D.has(panel) || panel.classList.contains('is-ready')) return;
     pending3D.add(panel);
     try {
+      await yieldToBrowser();
       const module = await import('../ui/parametric-3d');
       await module.mountParametric3DPanel(panel);
     } finally {

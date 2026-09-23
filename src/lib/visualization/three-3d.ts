@@ -542,8 +542,13 @@ export class Three3DRenderer {
 
   private updateLabels(): void {
     // Diameter/width lines are front-view engineering guides, not physical parts
-    // of the wheel. At oblique angles they no longer describe a projected span.
-    const visible = this.content.visible && (!this.tireScene || (Math.abs(this.view.yaw) < 1.05 && Math.abs(this.view.pitch) < 0.58));
+    // of the wheel. Previously this also hard-hid every label once the user
+    // dragged the tire scene past a fixed yaw/pitch threshold, which made the
+    // whole measurement HUD vanish — and stay gone — after a completely normal
+    // amount of rotating. The per-annotation projected-span/depth checks below
+    // already fade a guide out correctly as its line becomes edge-on, so that's
+    // the only gate needed; it no longer depends on `this.tireScene`.
+    const visible = this.content.visible;
     const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
     const hud = this.stage.querySelector<HTMLElement>('.parametric-3d__hud');
     if (hud) {

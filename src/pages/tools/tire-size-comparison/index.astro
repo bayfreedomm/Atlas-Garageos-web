@@ -8,6 +8,7 @@ const definition = toolById('tire-size-comparison');
 ---
 <ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifenrechner-vergleich/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/comparador-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }]} visual={false} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Compare wheel & tire geometry">
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="en" hidden></div>
     <div class="calculator-columns">
       <TireInputGroup prefix="original-" title="Original tire" width={225} aspect={45} rim={18} />
       <TireInputGroup prefix="new-" title="New tire" width={235} aspect={40} rim={19} />
@@ -42,4 +43,4 @@ const definition = toolById('tire-size-comparison');
   </form>
   <div slot="explanation"><h2>What changes between the sizes</h2><p>Positive diameter and circumference differences mean the new tire is larger. Ride-height difference is half of the diameter change. The speedometer percentage shows the theoretical change at the same wheel rotation rate.</p><p>No percentage is treated as an automatic compatibility or safety limit.</p></div>
 </ToolPage>
-<script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; initializeShareableToolState(); initializeToolCalculators();</script>
+<script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>
