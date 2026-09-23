@@ -309,3 +309,11 @@ Next implementation pass:
 - [x] Low-power devices now use a 1024px PCF shadow map while desktop/high-power devices keep 1536px; this prevents the physically lit pass from turning into a mobile GPU tax.
 - [x] Final typecheck, 240-test regression suite and 230-page static build pass with no type diagnostics. The only build note remains the existing non-fatal lazy Three.js chunk warning.
 - [ ] Real-device WebKit/Firefox, forced context loss and deployed Cloudflare visual/performance checks remain outside this environment.
+
+## Package 6.8 visual-studio usability and physical-detail pass — 2026-09-23
+- [x] All 22 tool studios share localized front/profile/studio camera presets and an accessible expanded inspection view; existing 3D/engineering-2D tabs remain.
+- [x] Measurement values live in a persistent rail below the 3D canvas so the product remains visible through rotation and camera changes. Projection guides hide only when their span is misleadingly collapsed.
+- [x] Tire comparison framing is closer; sidewall microtexture affects the actual tire body, and native wheel scenes gain a vented brake disc and caliper. Offset and instrument materials use restrained metal/rubber finishes.
+- [x] Canvas fallback gains bounded two-finger pinch and a low-power DPR cap. The Three renderer sizes from the canvas bounds, preserving round wheels when the measurement rail changes the stage aspect.
+- [x] No dependency, canonical math, fuel JSON/history, route, localization catalog, or Wrangler/Cloudflare config change.
+- [ ] Physical mobile touch, WebKit/Firefox, forced context loss, accessibility assistive-technology review and deployed GPU/performance checks remain launch gates. Schematic tool scenes are still explanatory, not photoreal physical replicas.

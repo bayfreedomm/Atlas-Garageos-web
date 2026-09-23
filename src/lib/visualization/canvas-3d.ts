@@ -334,8 +334,9 @@ export class Canvas3DRenderer {
   private height = 1;
   private dpr = 1;
   private resizeObserver: ResizeObserver | null = null;
-  private pointerId: number | null = null;
+  private readonly pointers = new Map<number, { x: number; y: number }>();
   private lastPointer: { x: number; y: number } | null = null;
+  private pinchDistance: number | null = null;
   private raf = 0;
   private destroyed = false;
   private background = '#0a141d';
@@ -401,12 +402,27 @@ export class Canvas3DRenderer {
   }
 
   private readonly onPointerDown = (event: PointerEvent): void => {
-    this.pointerId = event.pointerId;
-    this.lastPointer = { x: event.clientX, y: event.clientY };
+    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     this.canvas.setPointerCapture(event.pointerId);
+    if (this.pointers.size === 1) this.lastPointer = { x: event.clientX, y: event.clientY };
+    if (this.pointers.size === 2) {
+      const [first, second] = [...this.pointers.values()];
+      if (first && second) this.pinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
+      this.lastPointer = null;
+    }
   };
   private readonly onPointerMove = (event: PointerEvent): void => {
-    if (this.pointerId !== event.pointerId || !this.lastPointer) return;
+    if (!this.pointers.has(event.pointerId)) return;
+    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (this.pointers.size >= 2) {
+      const [first, second] = [...this.pointers.values()];
+      if (!first || !second) return;
+      const distance = Math.hypot(second.x - first.x, second.y - first.y);
+      if (this.pinchDistance && this.pinchDistance > 0) this.zoomBy(distance / this.pinchDistance);
+      this.pinchDistance = distance;
+      return;
+    }
+    if (!this.lastPointer) this.lastPointer = { x: event.clientX, y: event.clientY };
     const dx = event.clientX - this.lastPointer.x;
     const dy = event.clientY - this.lastPointer.y;
     this.lastPointer = { x: event.clientX, y: event.clientY };
@@ -415,10 +431,10 @@ export class Canvas3DRenderer {
     this.requestRender();
   };
   private readonly onPointerUp = (event: PointerEvent): void => {
-    if (this.pointerId === event.pointerId) {
-      this.pointerId = null;
-      this.lastPointer = null;
-    }
+    this.pointers.delete(event.pointerId);
+    this.pinchDistance = null;
+    const remaining = [...this.pointers.values()][0];
+    this.lastPointer = remaining ? { ...remaining } : null;
   };
   private readonly onWheel = (event: WheelEvent): void => {
     event.preventDefault();
@@ -435,7 +451,8 @@ export class Canvas3DRenderer {
 
   private resize(): void {
     const rect = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
+    const dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75);
     const width = Math.max(1, Math.round(rect.width * dpr));
     const height = Math.max(1, Math.round(rect.height * dpr));
     if (width === this.canvas.width && height === this.canvas.height) return;

@@ -4,6 +4,8 @@ import { Canvas3DRenderer } from '../lib/visualization/canvas-3d';
 import type { Scene3D, View3D } from '../lib/visualization/canvas-3d';
 import { compressionChamberScene, evBatteryScene, gearDiameterScene, pcdScene, singleTireScene, tireComparisonScene, wheelOffsetScene, type VisualizationPalette } from '../lib/visualization/scene-builders';
 import { visualization3DLocale, visualization3DText } from '../localization/visualization-3d';
+import { studioCameraView, type StudioCamera } from '../lib/visualization/studio-camera';
+import { mountStudioFocus } from './studio-focus';
 
 const mounted = new WeakSet<HTMLElement>();
 const MM_PER_INCH = 25.4;
@@ -13,6 +15,7 @@ interface ParametricRenderer {
   setTheme(background: string, grid: string): void;
   setScene(scene: Scene3D): void;
   configureView(view: View3D, applyCurrent?: boolean): void;
+  setView(yaw: number, pitch: number, zoom?: number): void;
   reset(): void;
   zoomBy(factor: number): void;
   destroy(): void;
@@ -150,15 +153,23 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   if (mode === 'tire') panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.p3dTireView === tireView)));
   let fitmentView: 'tires' | 'wheels' = 'tires';
 
-  const configureOpeningView = (): void => {
-    if (mode === 'tire' || mode === 'speed' || mode === 'fitment') renderer.configureView({ yaw: -0.72, pitch: 0.22, zoom: 1.18 }, true);
-    else if (mode === 'single') renderer.configureView({ yaw: -0.5, pitch: 0.18, zoom: 1.12 }, true);
-    else if (mode === 'gear') renderer.configureView({ yaw: -0.42, pitch: 0.19, zoom: 1.08 }, true);
-    else if (mode === 'compression' || mode === 'ev') renderer.configureView({ yaw: -0.48, pitch: 0.3, zoom: 1.12 }, true);
-    else if (mode === 'offset') renderer.configureView({ yaw: -0.9, pitch: 0.26, zoom: 1.05 }, true);
-    else renderer.configureView({ yaw: -0.34, pitch: 0.48, zoom: 1.12 }, true);
-  };
+  const openingView: View3D = mode === 'tire' || mode === 'speed' || mode === 'fitment'
+    ? { yaw: -0.72, pitch: 0.22, zoom: 1.18 }
+    : mode === 'single' ? { yaw: -0.5, pitch: 0.18, zoom: 1.12 }
+      : mode === 'gear' ? { yaw: -0.42, pitch: 0.19, zoom: 1.08 }
+        : mode === 'compression' || mode === 'ev' ? { yaw: -0.48, pitch: 0.3, zoom: 1.12 }
+          : mode === 'offset' ? { yaw: -0.9, pitch: 0.26, zoom: 1.05 }
+            : { yaw: -0.34, pitch: 0.48, zoom: 1.12 };
+  const configureOpeningView = (): void => renderer.configureView(openingView, true);
   configureOpeningView();
+
+  let selectedCamera: StudioCamera | null = 'studio';
+  const setCameraSelection = (preset: StudioCamera | null): void => {
+    selectedCamera = preset;
+    panel.querySelectorAll<HTMLButtonElement>('[data-p3d-camera]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.p3dCamera === preset));
+    });
+  };
 
   const refreshTheme = (): void => {
     renderer.setTheme(css(panel, '--p3d-background', '#09151f'), css(panel, '--p3d-grid', '#294252'));
@@ -256,9 +267,19 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   };
 
   const signal = events.signal;
-  panel.querySelector<HTMLButtonElement>('[data-p3d-reset]')?.addEventListener('click', () => renderer.reset(), { signal });
+  const closeFocus = mountStudioFocus(panel, panel.querySelector<HTMLButtonElement>('[data-p3d-focus]'), signal);
+  panel.querySelector<HTMLButtonElement>('[data-p3d-reset]')?.addEventListener('click', () => { renderer.reset(); setCameraSelection('studio'); }, { signal });
   panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-in]')?.addEventListener('click', () => renderer.zoomBy(1.14), { signal });
   panel.querySelector<HTMLButtonElement>('[data-p3d-zoom-out]')?.addEventListener('click', () => renderer.zoomBy(.88), { signal });
+  panel.querySelectorAll<HTMLButtonElement>('[data-p3d-camera]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const preset = button.dataset.p3dCamera as StudioCamera;
+      const view = studioCameraView(openingView, preset);
+      renderer.setView(view.yaw, view.pitch, view.zoom);
+      setCameraSelection(preset);
+    }, { signal });
+  });
+  stage.addEventListener('pointerdown', (event) => { if (event.target instanceof HTMLCanvasElement) setCameraSelection(null); }, { signal });
   panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => {
     button.addEventListener('click', () => {
       tireView = button.dataset.p3dTireView === 'overlay' ? 'overlay' : 'side-by-side';
@@ -291,6 +312,10 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
       renderer = new Canvas3DRenderer(canvas);
       panel.dataset.renderer = 'canvas';
       configureOpeningView();
+      if (selectedCamera && selectedCamera !== 'studio') {
+        const view = studioCameraView(openingView, selectedCamera);
+        renderer.setView(view.yaw, view.pitch, view.zoom);
+      }
       refreshTheme();
       refresh();
       canvas.setAttribute('aria-label', `${mode === 'tire' ? text.tireTitle : mode === 'single' ? text.singleTitle : mode === 'speed' ? text.speedTitle : mode === 'gear' ? text.gearTitle : mode === 'compression' ? text.compressionTitle : mode === 'ev' ? text.evTitle : mode === 'fitment' ? text.fitmentTitle : mode === 'offset' ? text.offsetTitle : text.pcdTitle}. ${text.dragHint}`);
@@ -308,6 +333,7 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
   const removalObserver = new MutationObserver(() => {
     if (document.contains(panel)) return;
     renderer.destroy();
+    closeFocus();
     events.abort();
     themeObserver.disconnect();
     removalObserver.disconnect();

@@ -253,7 +253,7 @@ export function tireComparisonScene(model: TireComparison3DModel, palette: Visua
     { start: v(-spacing, -0.76, -model.current.widthMm * scale * 0.5), end: v(-spacing, -0.76, model.current.widthMm * scale * 0.5), color: palette.current, label: `${model.current.widthMm.toFixed(0)} mm ${label.width}`, labelOffsetY: 18 },
     { start: v(spacing, model.proposed.rimDiameterMm * scale * 0.5, 0.34), end: v(spacing, proposedRadius, 0.34), color: palette.proposed, label: `${model.proposed.sidewallMm.toFixed(1)} mm ${label.sidewall}`, labelOffsetX: 18 },
   );
-  return { meshes, products, lines, shadows, annotations, fitRadius: 2.3 };
+  return { meshes, products, lines, shadows, annotations, fitRadius: 2.02 };
 }
 
 /** A single validated tire profile, independent of the comparison composition. */

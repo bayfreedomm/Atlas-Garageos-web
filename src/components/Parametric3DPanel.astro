@@ -1,6 +1,7 @@
 ---
 import { visualization3DLocale, visualization3DText, type Visualization3DLocale } from '../localization/visualization-3d';
 import ParametricEngineering2D from './ParametricEngineering2D.astro';
+import { studioCameraText } from '../lib/visualization/studio-camera';
 
 interface Props {
   readonly mode: 'tire' | 'single' | 'speed' | 'gear' | 'compression' | 'ev' | 'fitment' | 'offset' | 'pcd';
@@ -22,6 +23,8 @@ const viewText = {
   de: { label: 'Ansichtsmodus', studio: '3D-Studio', drawing: 'Technische 2D-Ansicht', badge: 'VISUELLES STUDIO' },
   es: { label: 'Modo de visualización', studio: 'Estudio 3D', drawing: 'Ingeniería 2D', badge: 'ESTUDIO VISUAL' },
 }[locale];
+const cameraText = studioCameraText[locale];
+const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { open: 'Studio vergrößern', close: 'Studio schließen' }, es: { open: 'Ampliar estudio', close: 'Cerrar estudio' } }[locale];
 ---
 <div class:list={[{ 'tire-visual-studio parametric-visual-studio': dual }]} data-parametric-visual-studio={dual ? '' : undefined}>
   {dual && <header class="tire-visual-studio__header"><div><span>{viewText.badge}</span><h3>{title}</h3><p>{intro}</p></div>
@@ -84,6 +87,12 @@ const viewText = {
     </div>
   </div>
 
+  <div class="parametric-3d__camera" role="group" aria-label={viewText.label}>
+    <button type="button" data-p3d-camera="studio" aria-pressed="true">{cameraText.studio}</button>
+    <button type="button" data-p3d-camera="front" aria-pressed="false">{cameraText.front}</button>
+    <button type="button" data-p3d-camera="profile" aria-pressed="false">{cameraText.profile}</button>
+    <button type="button" class="parametric-3d__focus" data-p3d-focus data-focus-open={focusText.open} data-focus-close={focusText.close} aria-expanded="false">{focusText.open}</button>
+  </div>
   <div class="parametric-3d__controls" aria-label={t.dragHint}>
     <button type="button" data-p3d-zoom-out aria-label={t.zoomOut}>−</button>
     <button type="button" data-p3d-reset>{t.reset}</button>

@@ -342,13 +342,20 @@ export class Three3DRenderer {
     this.requestRender();
   }
 
+  setView(yaw: number, pitch: number, zoom = this.view.zoom): void {
+    this.view = { yaw, pitch: clamp(pitch, -1.15, 1.15), zoom: clamp(zoom, 0.68, 1.85) };
+    this.requestRender();
+  }
+
   zoomBy(factor: number): void {
     this.view.zoom = clamp(this.view.zoom * factor, 0.68, 1.85);
     this.requestRender();
   }
 
   private resize(): void {
-    const rect = this.stage.getBoundingClientRect();
+    // The measurement rail is in normal flow below the canvas. Camera aspect
+    // and drawing buffer must follow the canvas, not the taller stage wrapper.
+    const rect = this.canvas.getBoundingClientRect();
     this.width = Math.max(1, Math.floor(rect.width));
     this.height = Math.max(1, Math.floor(rect.height));
     const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
@@ -363,7 +370,6 @@ export class Three3DRenderer {
     // Diameter/width lines are front-view engineering guides, not physical parts
     // of the wheel. At oblique angles they no longer describe a projected span.
     const visible = this.content.visible && (!this.tireScene || (Math.abs(this.view.yaw) < 1.05 && Math.abs(this.view.pitch) < 0.58));
-    for (const object of this.annotationObjects) object.visible = visible;
     const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
     const hud = this.stage.querySelector<HTMLElement>('.parametric-3d__hud');
     if (hud) {
@@ -371,15 +377,28 @@ export class Three3DRenderer {
       const hudBounds = hud.getBoundingClientRect();
       occupied.push({ left: hudBounds.left - stageBounds.left - 7, right: hudBounds.right - stageBounds.left + 7, top: hudBounds.top - stageBounds.top - 7, bottom: hudBounds.bottom - stageBounds.top + 7 });
     }
-    let index = 0;
-    for (const annotation of this.annotations) {
+    let labelIndex = 0;
+    for (let annotationIndex = 0; annotationIndex < this.annotations.length; annotationIndex += 1) {
+      const annotation = this.annotations[annotationIndex]!;
+      const start = vector(annotation.start);
+      const end = vector(annotation.end);
+      this.content.localToWorld(start);
+      this.content.localToWorld(end);
+      start.project(this.camera);
+      end.project(this.camera);
+      const span = Math.hypot((end.x - start.x) * this.width / 2, (end.y - start.y) * this.height / 2);
+      const guideVisible = visible && span >= 24 && start.z > -1 && start.z < 1 && end.z > -1 && end.z < 1;
+      for (let part = 0; part < 3; part += 1) {
+        const object = this.annotationObjects[annotationIndex * 3 + part];
+        if (object) object.visible = guideVisible;
+      }
       if (!annotation.label) continue;
-      const label = this.labels[index++];
+      const label = this.labels[labelIndex++];
       if (!label) continue;
       const midpoint = vector(annotation.start).add(vector(annotation.end)).multiplyScalar(0.5);
       this.content.localToWorld(midpoint);
       midpoint.project(this.camera);
-      const onScreen = visible && midpoint.z > -1 && midpoint.z < 1 && Math.abs(midpoint.x) < 1.15 && Math.abs(midpoint.y) < 1.15;
+      const onScreen = guideVisible && midpoint.z > -1 && midpoint.z < 1 && Math.abs(midpoint.x) < 1.15 && Math.abs(midpoint.y) < 1.15;
       label.hidden = !onScreen;
       if (!onScreen) continue;
       const x = clamp((midpoint.x * 0.5 + 0.5) * this.width + (annotation.labelOffsetX ?? 0), 54, this.width - 54);

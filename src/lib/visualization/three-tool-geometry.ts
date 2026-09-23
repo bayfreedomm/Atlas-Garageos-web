@@ -7,13 +7,13 @@ export function createToolStudioProduct(spec: ToolStudio3D): THREE.Group {
   const clamp = (value: number) => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
   const p = clamp(spec.primary);
   const q = clamp(spec.secondary ?? 0);
-  const dark = material('#142432', .42, .48);
-  const graphite = material('#263b4b', .58, .4);
-  const titanium = material(spec.metal, .82, .2);
-  const bright = material('#d6e2e9', .7, .22);
-  const blue = material(spec.current, .36, .34, .035);
-  const orange = material(spec.proposed, .38, .32, .04);
-  const cyan = material(spec.accent, .28, .33, .035);
+  const dark = material('#19262f', .42, .64);
+  const graphite = material('#30414d', .64, .54);
+  const titanium = material(spec.metal, .84, .34);
+  const bright = material('#c5d0d6', .76, .36);
+  const blue = material(new THREE.Color(spec.current).lerp(new THREE.Color('#587588'), .32).getStyle(), .55, .5);
+  const orange = material(new THREE.Color(spec.proposed).lerp(new THREE.Color('#947767'), .32).getStyle(), .55, .5);
+  const cyan = material(new THREE.Color(spec.accent).lerp(new THREE.Color('#78919e'), .4).getStyle(), .58, .48);
   const glass = new THREE.MeshPhysicalMaterial({ color: '#9ac8df', metalness: 0, roughness: .12, transmission: .68, transparent: true, opacity: .34, thickness: .16, depthWrite: false, side: THREE.DoubleSide });
   const add = (geometry: THREE.BufferGeometry, mat: THREE.Material, x = 0, y = 0, z = 0, parent: THREE.Group = group): THREE.Mesh => {
     const mesh = new THREE.Mesh(geometry, mat);
@@ -126,10 +126,12 @@ export function createToolStudioProduct(spec: ToolStudio3D): THREE.Group {
       for (const side of [-1, 1]) beam(new THREE.Vector3(-1.34, -.15 + side * .27, .27), new THREE.Vector3(1.34, -.15 + side * .27, .27), .014, titanium);
       for (let i = 0; i < 13; i += 1) block(.075, .009, .012, race && i < 4 ? orange : bright, -1.19 + i * .198, -.15, .25, .002);
       const markerX = -1.16 + 2.32 * (conversion ? 1 - p : p);
-      block(.21, .22, .15, orange, markerX, -.15, .38, .025);
+      block(.2, .17, .13, titanium, markerX, -.15, .38, .025);
+      block(.1, .105, .012, orange, markerX, -.15, .459, .012);
       for (const x of [-1.2, 1.2]) {
         beam(new THREE.Vector3(x, .12, .15), new THREE.Vector3(x, .82, .15), .022, titanium);
-        block(.29, .09, .09, x < 0 ? blue : orange, x, .83, .15, .02);
+        block(.29, .09, .09, titanium, x, .83, .15, .02);
+        block(.15, .018, .012, x < 0 ? blue : orange, x, .86, .206, .005);
       }
       if (spec.returnTrip) {
         line([new THREE.Vector3(1.16, -.54, .31), new THREE.Vector3(-1.16, -.54, .31)], orange, .017);
@@ -293,8 +295,8 @@ export function createToolStudioProduct(spec: ToolStudio3D): THREE.Group {
   return group;
 }
 
-function material(color: string, metalness: number, roughness: number, emissiveIntensity = 0): THREE.MeshPhysicalMaterial {
-  return new THREE.MeshPhysicalMaterial({ color, metalness, roughness, clearcoat: metalness > .55 ? .27 : .05, clearcoatRoughness: .28, emissive: color, emissiveIntensity });
+function material(color: string, metalness: number, roughness: number): THREE.MeshPhysicalMaterial {
+  return new THREE.MeshPhysicalMaterial({ color, metalness, roughness, clearcoat: metalness > .55 ? .08 : 0, clearcoatRoughness: .48, envMapIntensity: .92 });
 }
 
 function roundedRect(width: number, height: number, radius: number): THREE.Shape {

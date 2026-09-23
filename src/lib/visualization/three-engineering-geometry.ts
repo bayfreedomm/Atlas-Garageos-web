@@ -6,9 +6,9 @@ const TAU = Math.PI * 2;
 
 function metal(color: number, opacity = 1, roughness = 0.32): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
-    color, metalness: 0.86, roughness, clearcoat: 0.16,
+    color, metalness: 0.86, roughness, clearcoat: 0.1,
     transparent: opacity < 1, opacity, depthWrite: opacity > 0.7,
-    side: THREE.DoubleSide, envMapIntensity: 1.25,
+    side: THREE.DoubleSide, envMapIntensity: 1.1,
   });
 }
 
@@ -37,10 +37,10 @@ function annularShape(outer: number, inner: number): THREE.Shape {
 
 function wheelShell(radius: number, width: number, centerZ: number, proposed: boolean): THREE.Group {
   const group = new THREE.Group();
-  const visible = proposed ? metal(0x546673, 0.92, 0.48) : metal(0x4895c5, 0.17, 0.5);
-  const edge = proposed ? metal(0xd6dfe4, 1, 0.25) : metal(0x5bbcff, 0.78, 0.29);
-  const dark = metal(0x293a45, proposed ? 0.96 : 0.22, 0.48);
-  const accent = metal(proposed ? 0xe59658 : 0x4bb1f7, proposed ? 0.9 : 0.65);
+  const visible = proposed ? metal(0x34414a, 0.93, 0.53) : metal(0x879aa5, 0.1, 0.56);
+  const edge = proposed ? metal(0xb9c4ca, 1, 0.32) : metal(0x4ca9e5, 0.68, 0.38);
+  const dark = metal(0x25313a, proposed ? 0.97 : 0.13, 0.55);
+  const accent = metal(proposed ? 0xd89155 : 0x438ec0, proposed ? 0.78 : 0.55, 0.43);
   const half = width / 2;
 
   // An open barrel makes both axial edges legible. The center is the canonical
@@ -53,7 +53,7 @@ function wheelShell(radius: number, width: number, centerZ: number, proposed: bo
   for (const side of [-1, 1]) {
     const z = centerZ + side * half;
     group.add(ring(radius * 0.965, radius * 0.022, edge, z));
-    group.add(ring(radius * 0.805, radius * 0.016, accent, z + side * width * 0.008));
+    group.add(ring(radius * 0.805, radius * 0.01, accent, z + side * width * 0.008));
   }
 
   const faceZ = centerZ + width * 0.385;

@@ -233,6 +233,30 @@ function wheelAssembly(product: TireWheelProduct3D): THREE.Group {
 
   const rotor = cylinder(rim * 0.61, width * 0.026, darkMetal, frontZ - width * 0.085);
   group.add(rotor);
+  // A recessed, vented brake disc gives the open ten-spoke wheel a credible
+  // second layer. It is illustrative hardware, not a vehicle-specific spec.
+  const rotorTrack = new THREE.Mesh(new THREE.TorusGeometry(rim * 0.51, rim * 0.078, 12, 112), shadowSilver);
+  rotorTrack.position.z = frontZ - width * 0.063;
+  group.add(rotorTrack);
+  const ventGeometry = new THREE.CylinderGeometry(rim * 0.014, rim * 0.014, width * 0.004, 10);
+  ventGeometry.rotateX(Math.PI / 2);
+  const vents = new THREE.InstancedMesh(ventGeometry, recess, 30);
+  const ventMatrix = new THREE.Matrix4();
+  for (let index = 0; index < 30; index += 1) {
+    const angle = (index / 30) * TAU;
+    ventMatrix.makeTranslation(Math.cos(angle) * rim * 0.52, Math.sin(angle) * rim * 0.52, frontZ - width * 0.052);
+    vents.setMatrixAt(index, ventMatrix);
+  }
+  vents.instanceMatrix.needsUpdate = true;
+  group.add(vents);
+  const caliper = new THREE.Mesh(new THREE.BoxGeometry(rim * 0.17, rim * 0.32, width * 0.11), darkMetal);
+  caliper.position.set(rim * 0.53, rim * 0.1, frontZ - width * 0.064);
+  caliper.rotation.z = -0.18;
+  group.add(caliper);
+  const caliperEdge = new THREE.Mesh(new THREE.BoxGeometry(rim * 0.025, rim * 0.25, width * 0.115), silver);
+  caliperEdge.position.set(rim * 0.62, rim * 0.1, frontZ - width * 0.062);
+  caliperEdge.rotation.z = -0.18;
+  group.add(caliperEdge);
   const rotorHat = cylinder(rim * 0.28, width * 0.055, machined, frontZ - width * 0.06);
   group.add(rotorHat);
 
@@ -275,6 +299,8 @@ export function createTireWheelProduct(product: TireWheelProduct3D): THREE.Group
   const group = new THREE.Group();
   const alpha = product.alpha ?? 1;
   const rubber = physicalMaterial(0x11171b, { metalness: 0.01, roughness: 0.7, clearcoat: 0.06, clearcoatRoughness: 0.72, alpha });
+  rubber.bumpMap = sidewallBumpTexture();
+  rubber.bumpScale = product.outerRadius * 0.0018;
   const treadTexture = treadBumpTexture();
   const tread = physicalMaterial(0x0b1013, { metalness: 0, roughness: 0.76, clearcoat: 0.03, clearcoatRoughness: 0.82, alpha });
   tread.bumpMap = treadTexture;
@@ -287,8 +313,6 @@ export function createTireWheelProduct(product: TireWheelProduct3D): THREE.Group
   group.add(new THREE.Mesh(treadGeometry(product), tread));
 
   const sidewallMaterial = physicalMaterial(0x1a2227, { metalness: 0.01, roughness: 0.76, alpha });
-  sidewallMaterial.bumpMap = sidewallBumpTexture();
-  sidewallMaterial.bumpScale = 0.0032;
   for (const z of [-product.width * 0.452, product.width * 0.452]) {
     const bead = new THREE.Mesh(new THREE.TorusGeometry(product.rimRadius * 1.028, product.rimRadius * 0.012, 8, 112), sidewallMaterial);
     bead.position.z = z;
