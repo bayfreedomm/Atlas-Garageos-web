@@ -141,6 +141,35 @@ function treadBumpTexture(): THREE.CanvasTexture {
   return texture;
 }
 
+function sidewallBumpTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const context = canvas.getContext('2d');
+  if (context) {
+    const image = context.createImageData(canvas.width, canvas.height);
+    for (let y = 0; y < canvas.height; y += 1) {
+      for (let x = 0; x < canvas.width; x += 1) {
+        const radial = Math.sin(Math.hypot(x - 128, y - 128) * 0.42) * 5;
+        const grain = Math.sin(x * 2.7 + y * 1.9) * 2 + Math.sin(x * 0.37 - y * 0.22) * 2;
+        const value = Math.max(90, Math.min(170, Math.round(128 + radial + grain)));
+        const index = (y * canvas.width + x) * 4;
+        image.data[index] = value;
+        image.data[index + 1] = value;
+        image.data[index + 2] = value;
+        image.data[index + 3] = 255;
+      }
+    }
+    context.putImageData(image, 0, 0);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(2.4, 2.4);
+  texture.anisotropy = 4;
+  return texture;
+}
+
 function cylinder(radius: number, depth: number, material: THREE.Material, z: number, segments = 96): THREE.Mesh {
   const geometry = new THREE.CylinderGeometry(radius, radius, depth, segments, 1, false);
   geometry.rotateX(Math.PI / 2);
@@ -258,6 +287,8 @@ export function createTireWheelProduct(product: TireWheelProduct3D): THREE.Group
   group.add(new THREE.Mesh(treadGeometry(product), tread));
 
   const sidewallMaterial = physicalMaterial(0x1a2227, { metalness: 0.01, roughness: 0.76, alpha });
+  sidewallMaterial.bumpMap = sidewallBumpTexture();
+  sidewallMaterial.bumpScale = 0.0032;
   for (const z of [-product.width * 0.452, product.width * 0.452]) {
     const bead = new THREE.Mesh(new THREE.TorusGeometry(product.rimRadius * 1.028, product.rimRadius * 0.012, 8, 112), sidewallMaterial);
     bead.position.z = z;

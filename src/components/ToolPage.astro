@@ -48,4 +48,4 @@ const hasEmbeddedStudio = ['tire-size-calculator', 'speedometer-error-calculator
   {studioCta && <a class="studio-cta studio-cta--row" href={studioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
   {definition.id !== 'tire-size-comparison' && <section class="tool-decision-area" aria-label={t?.relatedTools ?? 'Related tools'}><DecisionGraph model={nextDecision} locale={journeyLocale} id="tool-next-decision" /></section>}
 </SiteLayout>
-<script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; initializeToolVisualMotion();</script>
+<script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; import { initializeShareableToolState } from '../ui/shareable-tool-state'; initializeToolVisualMotion(); window.setTimeout(initializeShareableToolState, 0);</script>

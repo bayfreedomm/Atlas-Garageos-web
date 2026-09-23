@@ -11,9 +11,9 @@ export function createToolStudioProduct(spec: ToolStudio3D): THREE.Group {
   const graphite = material('#263b4b', .58, .4);
   const titanium = material(spec.metal, .82, .2);
   const bright = material('#d6e2e9', .7, .22);
-  const blue = material(spec.current, .36, .34, .1);
-  const orange = material(spec.proposed, .38, .32, .12);
-  const cyan = material(spec.accent, .28, .33, .1);
+  const blue = material(spec.current, .36, .34, .035);
+  const orange = material(spec.proposed, .38, .32, .04);
+  const cyan = material(spec.accent, .28, .33, .035);
   const glass = new THREE.MeshPhysicalMaterial({ color: '#9ac8df', metalness: 0, roughness: .12, transmission: .68, transparent: true, opacity: .34, thickness: .16, depthWrite: false, side: THREE.DoubleSide });
   const add = (geometry: THREE.BufferGeometry, mat: THREE.Material, x = 0, y = 0, z = 0, parent: THREE.Group = group): THREE.Mesh => {
     const mesh = new THREE.Mesh(geometry, mat);

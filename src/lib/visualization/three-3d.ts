@@ -123,7 +123,7 @@ export class Three3DRenderer {
   private readonly resizeObserver: ResizeObserver;
   private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private readonly events = new AbortController();
-  private readonly environment = studioEnvironment();
+  private readonly environment: THREE.Texture;
   private view = { ...DEFAULT_VIEW };
   private defaultView = { ...DEFAULT_VIEW };
   private fitRadius = 1.5;
@@ -145,9 +145,18 @@ export class Three3DRenderer {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.28;
+    this.renderer.toneMappingExposure = 1.12;
     this.renderer.shadowMap.enabled = true;
+    // r186 removed the old PCFSoftShadowMap path; high-resolution PCF with a
+    // tuned key light gives the same clean product shadow without a runtime
+    // deprecation warning.
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    const rawEnvironment = studioEnvironment();
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    pmrem.compileEquirectangularShader();
+    this.environment = pmrem.fromEquirectangular(rawEnvironment).texture;
+    rawEnvironment.dispose();
+    pmrem.dispose();
     this.camera.position.set(0, 0, 7);
     this.world.environment = this.environment;
     this.world.add(this.content);
@@ -165,12 +174,13 @@ export class Three3DRenderer {
   }
 
   private addLights(): void {
-    this.world.add(new THREE.AmbientLight(0xffffff, 1.15));
-    this.world.add(new THREE.HemisphereLight(0xdceeff, 0x10202a, 1.55));
-    const key = new THREE.DirectionalLight(0xffffff, 4.2);
+    this.world.add(new THREE.AmbientLight(0xffffff, 0.62));
+    this.world.add(new THREE.HemisphereLight(0xdceeff, 0x10202a, 1.05));
+    const key = new THREE.DirectionalLight(0xffffff, 3.25);
     key.position.set(-3.8, 5.4, 6.5);
     key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
+    key.shadow.mapSize.set(lowPower ? 1024 : 1536, lowPower ? 1024 : 1536);
     key.shadow.camera.near = 0.5;
     key.shadow.camera.far = 18;
     key.shadow.camera.left = -4;
@@ -178,13 +188,13 @@ export class Three3DRenderer {
     key.shadow.camera.top = 4;
     key.shadow.camera.bottom = -4;
     this.world.add(key);
-    const fill = new THREE.DirectionalLight(0x65bfff, 1.9);
+    const fill = new THREE.DirectionalLight(0x65bfff, 1.15);
     fill.position.set(5, 1.2, 4);
     this.world.add(fill);
-    const rim = new THREE.DirectionalLight(0xc6e1f2, 1.75);
+    const rim = new THREE.DirectionalLight(0xc6e1f2, 2.35);
     rim.position.set(1.5, 3.2, -5);
     this.world.add(rim);
-    const front = new THREE.PointLight(0xeaf6ff, 18, 14, 1.35);
+    const front = new THREE.PointLight(0xeaf6ff, 8, 14, 1.6);
     front.position.set(0, 0.8, 5.5);
     this.world.add(front);
   }

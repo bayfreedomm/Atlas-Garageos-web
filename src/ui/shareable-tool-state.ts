@@ -1,10 +1,15 @@
 import { getPageLocale } from './page-locale';
 
 const SHARE_LABELS = {
-  en: { copied: 'Link copied', prompt: 'Copy this link' },
-  de: { copied: 'Link kopiert', prompt: 'Diesen Link kopieren' },
-  es: { copied: 'Enlace copiado', prompt: 'Copiar este enlace' },
+  en: { copied: 'Link copied', prompt: 'Copy this link', share: 'Copy share link' },
+  de: { copied: 'Link kopiert', prompt: 'Diesen Link kopieren', share: 'Link zum Teilen kopieren' },
+  es: { copied: 'Enlace copiado', prompt: 'Copiar este enlace', share: 'Copiar enlace para compartir' },
 } as const;
+
+type ShareLocale = keyof typeof SHARE_LABELS;
+type ShareState = Record<string, string>;
+
+const INITIALIZED = 'shareStateInitialized';
 
 const value = (form: HTMLFormElement, name: string): string => (form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '';
 const setValue = (form: HTMLFormElement, name: string, next: string): void => {
@@ -36,6 +41,105 @@ async function copy(button: HTMLButtonElement, url: string): Promise<void> {
   } catch {
     window.prompt(labels.prompt, url);
   }
+}
+
+function toolKey(form: HTMLFormElement): string {
+  return form.dataset.calculator ?? form.dataset.utilityCalculator ?? 'tool';
+}
+
+function namedControls(form: HTMLFormElement): readonly (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[] {
+  return Array.from(form.elements).filter((element): element is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement => {
+    return (element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement)
+      && element.name.trim() !== '';
+  });
+}
+
+function readState(form: HTMLFormElement): ShareState {
+  const state: ShareState = {};
+  namedControls(form).forEach((control) => {
+    if (control instanceof HTMLInputElement && (control.type === 'submit' || control.type === 'button' || control.type === 'reset')) return;
+    if (control instanceof HTMLInputElement && (control.type === 'checkbox' || control.type === 'radio')) {
+      if (control.checked) state[control.name] = control.value || '1';
+      return;
+    }
+    state[control.name] = control.value;
+  });
+  return state;
+}
+
+function stateUrl(form: HTMLFormElement): string {
+  const params = new URLSearchParams();
+  params.set('tool', toolKey(form));
+  params.set('state', JSON.stringify(readState(form)));
+  return currentUrlWith(params);
+}
+
+function restoreState(form: HTMLFormElement): boolean {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tool') !== toolKey(form)) return false;
+  const raw = params.get('state');
+  if (!raw || raw.length > 5000) return false;
+  let state: ShareState;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return false;
+    state = Object.fromEntries(Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
+  } catch { return false; }
+  const controls = namedControls(form);
+  const apply = (): boolean => {
+    let changed = false;
+    controls.forEach((control) => {
+    const incoming = state[control.name];
+    if (incoming === undefined) return;
+    if (control instanceof HTMLInputElement && (control.type === 'submit' || control.type === 'button' || control.type === 'reset')) return;
+    if (control instanceof HTMLInputElement && (control.type === 'checkbox' || control.type === 'radio')) {
+      control.checked = incoming === (control.value || '1');
+    } else {
+      control.value = incoming;
+    }
+      changed = true;
+    });
+    return changed;
+  };
+  const restored = apply();
+  if (!restored) return false;
+  // Selects such as vehicle make/model are dependent. Replaying their native
+  // events in DOM order lets the first selection populate the second before we
+  // apply its shared value a second time.
+  controls.forEach((control) => {
+    control.dispatchEvent(new Event('input', { bubbles: true }));
+    control.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  apply();
+  controls.filter((control) => control instanceof HTMLSelectElement).forEach((control) => control.dispatchEvent(new Event('change', { bubbles: true })));
+  if (form.querySelector<HTMLButtonElement>('button[type="submit"]')) {
+    window.setTimeout(() => form.requestSubmit(), 0);
+  }
+  return true;
+}
+
+function addGenericShareButton(form: HTMLFormElement): void {
+  if (form.querySelector('[data-share-result]')) return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary share-result-button';
+  button.dataset.shareResult = '';
+  button.textContent = SHARE_LABELS[getPageLocale() as ShareLocale].share;
+  const actions = form.querySelector<HTMLElement>('.form-actions');
+  if (actions) actions.append(button);
+  else {
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (submit) submit.insertAdjacentElement('afterend', button);
+    else form.append(button);
+  }
+  button.addEventListener('click', () => void copy(button, stateUrl(form)));
+}
+
+function initializeGenericShare(form: HTMLFormElement): void {
+  addGenericShareButton(form);
+  // Let the page's calculator initializer bind first; restoring in the next task
+  // means every calculator renders the shared result rather than just its inputs.
+  window.setTimeout(() => { restoreState(form); }, 0);
 }
 
 function initializeTireComparison(form: HTMLFormElement): void {
@@ -102,8 +206,16 @@ function initializeBoltPatternPrefill(form: HTMLFormElement): void {
 }
 
 export function initializeShareableToolState(): void {
-  document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-comparison"]').forEach(initializeTireComparison);
-  document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach(initializeWheelOffset);
-  document.querySelectorAll<HTMLFormElement>('[data-calculator="tire-size"]').forEach(initializeTireSizePrefill);
-  document.querySelectorAll<HTMLFormElement>('[data-calculator="bolt-pattern"]').forEach(initializeBoltPatternPrefill);
+  document.querySelectorAll<HTMLFormElement>('[data-calculator], [data-utility-calculator]').forEach((form) => {
+    if (form.dataset[INITIALIZED] === 'true') return;
+    form.dataset[INITIALIZED] = 'true';
+    const calculator = form.dataset.calculator;
+    if (calculator === 'tire-comparison') initializeTireComparison(form);
+    else if (calculator === 'wheel-offset') initializeWheelOffset(form);
+    else {
+      if (calculator === 'tire-size') initializeTireSizePrefill(form);
+      if (calculator === 'bolt-pattern') initializeBoltPatternPrefill(form);
+      initializeGenericShare(form);
+    }
+  });
 }

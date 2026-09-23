@@ -287,3 +287,25 @@ Next implementation pass:
 - [x] The original bounded geometry remains a dependency-free Canvas fallback. New Three geometry stays in the existing lazy WebGL chunk, uses the same camera/touch/reduced-motion/disposal safeguards and adds no dependency.
 - [x] Desktop and 390px mobile views were visually checked in dark/light theme; a pressure input change updated both the calculator and WebGL gauge, and a sourced four-lug vehicle rendered four physical openings.
 - [ ] This is an engineered explanatory 3D language, not photoreal full-vehicle rendering or a vehicle-specific safety/fitment verdict. Physical-device pinch, other browser engines, forced context loss and deployed performance remain separate acceptance checks.
+
+## Package 6.5 shareable decision state — 2026-09-23
+- [x] Every published calculator form now has a localized “Copy share link” action through the shared ToolPage layer; existing tire-comparison and wheel-offset links keep their canonical compact parameter formats.
+- [x] Utility calculators, performance/engine calculators, EV, towing, tire reference tools and vehicle lookup serialize their named inputs into a bounded, tool-scoped URL state without sending data to a server.
+- [x] Opening a shared URL restores inputs and replays input/change/submit behavior so calculated summaries, technical visuals and native WebGL studios return to the same decision state. Dependent vehicle make/model selects replay in order.
+- [x] The feature is additive: canonical formulas, fuel data/history, routes, SEO/localization, Wrangler/Cloudflare and existing Fitment Studio hash sharing remain unchanged.
+- [x] No dependency or infrastructure change. Typecheck, 240 tests and the 230-page production build pass.
+- [ ] Share/embed widgets, account-backed My Garage history, analytics/Search Console/IndexNow and deployed multi-browser/device acceptance remain separate roadmap blocks.
+
+## Package 6.6 physically lit product-render pass — 2026-09-23
+- [x] Three.js now uses a PMREM-filtered studio environment so physical materials receive controlled product-render reflections instead of flat ambient color.
+- [x] Key/fill/rim/front lighting is rebalanced for readable bevel highlights, and high-resolution PCF shadows preserve contact depth without the removed/deprecated soft-shadow path.
+- [x] Tire sidewalls receive deterministic micro-surface bump detail; existing procedural tread relief, machined wheel layers and canonical geometry remain intact.
+- [x] Native instrument accents are restrained so blue/orange measurement states read as anodized indicators rather than emissive toy plastic.
+- [x] No dependency, canonical math, fuel data/history, route, localization or Wrangler/Cloudflare changes.
+- [ ] Visual review on physical devices, WebKit/Firefox, forced context loss and deployed Cloudflare remain launch acceptance checks.
+
+## Package 6.7 cross-audit and performance correction — 2026-09-23
+- [x] Re-audited the complete 22-tool 3D coverage contract, localized EN/DE/ES scene copy, native-vs-Canvas fallback pairing, 229 generated HTML artifacts, 66 localized tool routes, and source debug markers.
+- [x] Low-power devices now use a 1024px PCF shadow map while desktop/high-power devices keep 1536px; this prevents the physically lit pass from turning into a mobile GPU tax.
+- [x] Final typecheck, 240-test regression suite and 230-page static build pass with no type diagnostics. The only build note remains the existing non-fatal lazy Three.js chunk warning.
+- [ ] Real-device WebKit/Firefox, forced context loss and deployed Cloudflare visual/performance checks remain outside this environment.
