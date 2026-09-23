@@ -64,6 +64,9 @@ jobs:
         # Tankerkönig, no change to its status/timestamps, and no history point for it.
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        # Keep a valid country's verified snapshot publishable even when the other
+        # provider fails. The final health gate below still marks the run failed.
+        continue-on-error: true
         run: node scripts/update-fuel-prices.mjs --providers=es,us
 
       - name: Publish update through rolling pull request
@@ -94,3 +97,7 @@ jobs:
           else
             echo "Updated rolling fuel PR #$pr_number."
           fi
+
+      - name: Verify both scheduled providers refreshed
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const d=JSON.parse(fs.readFileSync('src/data/fuel-prices.json','utf8')); const bad=['es','us'].filter(id=>d[id]?.status!=='fresh'); if(bad.length){console.error('Not fresh:',bad.join(', ')); process.exitCode=1}else console.log('Spain and US both fresh')"

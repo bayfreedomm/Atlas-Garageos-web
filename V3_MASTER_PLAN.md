@@ -259,3 +259,13 @@ Next implementation pass:
 - [x] Guided-decision and related-tool links now have unmistakable button affordance, contrast, hover and keyboard-focus states.
 - [ ] Literal 3D scenes for every registered tool are not shipped: fuel-price data, unit converters and vehicle lookup do not have a defensible physical 3D model. Their existing task-specific data/technical visuals remain; no fake 3D meaning is implied.
 - [ ] Physical-device pinch, forced context loss, WebKit/Firefox and deployed performance remain separate acceptance checks.
+
+## Package 6.2 complete tool-scene and fuel reliability pass — 2026-09-23
+- [x] All 22 published tool routes now have a tool-specific 3D explanation: the eight existing mechanical scenes remain, and 14 new schematic scenes cover fitment, measurement, fuel/trips, unit relationships, power, torque, tire codes, towing, quarter-mile and vehicle lookup. Fitment Studio retains its separate combined 3D workspace.
+- [x] New scenes are explicitly explanatory, not physical fitment, safety or vehicle-specific approval. Fuel and other numerically meaningful readouts take validated canonical calculator output or core unit constants where applicable; other props illustrate the relationship without inventing results.
+- [x] Tire/speed/fitment HUDs retain diameter, width and sidewall/rim data while oblique 3D callout guides hide. Guided-decision cards retain clear click/focus affordances.
+- [x] Three.js remains viewport-lazy, with Canvas fallback, WebGL-loss recovery, bounded zoom/touch handling and theme/disposal behavior. No dependency, canonical formula, Wrangler or route changes.
+- [x] Spain's official national fetch has a realistic 75-second timeout; a verified snapshot and one genuine history point were obtained. The US EIA keyless fallback parses only regular and diesel from its official weekly public table, with strict week/number validation; a verified weekly snapshot and one genuine history point were obtained. The keyed EIA path still provides four grades when available.
+- [x] Scheduled fuel jobs preserve the rolling-PR publication model, now mark partial provider failures as failures after publishing any successful country snapshot. The site accurately states that scheduled fetches reach production only after PR review/merge/deployment.
+- [x] Offline frozen install, 235 tests, typecheck and 230-page production build passed. Representative desktop/mobile WebGL and live data/browser behavior were checked locally.
+- [ ] Physical pinch, other browser engines, forced context loss, live GitHub Actions/rolling PR and deployed Cloudflare behavior were not directly verified in this package.

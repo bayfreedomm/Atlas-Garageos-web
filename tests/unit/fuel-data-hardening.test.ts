@@ -7,7 +7,8 @@ import esMarketPage from '../../src/pages/es/precio-gasolina-hoy/index.astro?raw
 import { entityAlternates } from '../../src/seo/entity-routes';
 // The production updater stays directly executable by Node in Actions; its exported pure
 // seams are intentionally imported here so status/history behavior is tested without I/O.
-import { mergeWithStatus, PROVIDERS, updateHistoryData } from '../../scripts/update-fuel-prices.mjs';
+import { mergeWithStatus, parseEiaPublicWeeklyTable, PROVIDERS, updateHistoryData } from '../../scripts/update-fuel-prices.mjs';
+import updaterSource from '../../scripts/update-fuel-prices.mjs?raw';
 
 const source = 'Test source';
 const sourceUrl = 'https://example.com/fuel';
@@ -61,6 +62,18 @@ describe('fuel snapshot trust states', () => {
 });
 
 describe('fuel SEO and update delivery', () => {
+  it('uses only published regular and diesel figures from the official public weekly tables', () => {
+    const table = (name: string, value: string) => `<table><caption>${name}*(dollars per gallon)</caption><thead><tr><th>09/14/26</th><th>09/21/26</th></tr></thead><tbody><tr><td><a>U.S.</a></td><td>4.319</td><td>${value}</td></tr></tbody></table>`;
+    const html = table('U.S. Regular Gasoline Prices', '4.478') + table('U.S. On-Highway Diesel Fuel Prices', '6.529');
+    expect(parseEiaPublicWeeklyTable(html)).toEqual({ regular: 4.478, diesel: 6.529, weekOf: '2026-09-21' });
+    expect(() => parseEiaPublicWeeklyTable(html.replace('09/21/26</th></tr></thead><tbody><tr><td><a>U.S.</a></td><td>4.319</td><td>6.529', '09/28/26</th></tr></thead><tbody><tr><td><a>U.S.</a></td><td>4.319</td><td>6.529'))).toThrow('different weeks');
+  });
+  it('allows the large official Spain response time and reports partial refresh failures', () => {
+    expect(updaterSource).toContain('ES_FETCH_TIMEOUT_MS = 75_000');
+    expect(updaterSource).toContain("output[id].status !== 'fresh'");
+    expect(scheduledWorkflow).toContain('continue-on-error: true');
+    expect(scheduledWorkflow).toContain('Verify both scheduled providers refreshed');
+  });
   it('keeps each market canonical to itself without cross-market hreflang', () => {
     for (const [page, pathname] of [
       [usMarketPage, '/gas-prices-today/'],

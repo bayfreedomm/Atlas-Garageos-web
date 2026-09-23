@@ -83,6 +83,8 @@ function tireMetrics(panel: HTMLElement, model: TireComparison3DModel, single = 
   setMetric(panel, 'current', `${model.current.overallDiameterMm.toFixed(1)} mm`);
   setMetric(panel, 'hud-current', `${model.current.overallDiameterMm.toFixed(1)} mm`);
   setMetric(panel, 'hud-diameters', `${model.current.overallDiameterMm.toFixed(1)} → ${model.proposed.overallDiameterMm.toFixed(1)} mm`);
+  setMetric(panel, 'hud-width', single ? `${model.current.widthMm.toFixed(0)} mm` : `${model.current.widthMm.toFixed(0)} → ${model.proposed.widthMm.toFixed(0)} mm`);
+  setMetric(panel, 'hud-profile', single ? `${model.current.sidewallMm.toFixed(1)} mm · ${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} in` : `${model.current.sidewallMm.toFixed(1)} → ${model.proposed.sidewallMm.toFixed(1)} mm · ${(model.current.rimDiameterMm / MM_PER_INCH).toFixed(1)} → ${(model.proposed.rimDiameterMm / MM_PER_INCH).toFixed(1)} in`);
   setMetric(panel, 'proposed', `${model.proposed.overallDiameterMm.toFixed(1)} mm`);
   setMetric(panel, 'width', single ? `${model.current.widthMm.toFixed(0)} mm` : `${model.current.widthMm.toFixed(0)} → ${model.proposed.widthMm.toFixed(0)} mm`);
   setMetric(panel, 'sidewall', single ? `${model.current.sidewallMm.toFixed(1)} mm` : `${model.current.sidewallMm.toFixed(1)} → ${model.proposed.sidewallMm.toFixed(1)} mm`);

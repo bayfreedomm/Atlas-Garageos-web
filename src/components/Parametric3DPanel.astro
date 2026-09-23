@@ -54,6 +54,8 @@ const caution = mode === 'pcd' ? t.pcdOnly : mode === 'gear' ? t.gearOnly : mode
     <div class="parametric-3d__hud" aria-live="polite">
       <small>{mode === 'speed' ? t.speedReadout : t.alwaysVisible}</small>
       {mode === 'single' ? <div><span>{t.diameter}</span><strong data-p3d-value="hud-current">—</strong></div> : mode === 'speed' ? <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-speed">—</strong></div> : mode === 'gear' || mode === 'compression' || mode === 'ev' ? <div><span>{mode === 'gear' ? t.gearHud : mode === 'compression' ? t.compressionHud : t.evHud}</span><strong data-p3d-value="hud-special">—</strong></div> : mode === 'fitment' ? <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-fitment">—</strong></div> : mode === 'offset' ? <div><span>{t.innerDelta} / {t.outerDelta}</span><strong data-p3d-value="hud-offset">—</strong></div> : mode === 'pcd' ? <div><span>{t.pcd}</span><strong data-p3d-value="hud-pcd">—</strong></div> : <div><span>{t.current} → {t.proposed}</span><strong data-p3d-value="hud-diameters">—</strong></div>}
+      {(mode === 'tire' || mode === 'single' || mode === 'speed' || mode === 'fitment') && <div><span>{t.width}</span><strong data-p3d-value="hud-width">—</strong></div>}
+      {(mode === 'tire' || mode === 'single' || mode === 'speed') && <div><span>{t.sidewall} · {t.rim}</span><strong data-p3d-value="hud-profile">—</strong></div>}
     </div>
     <div class="parametric-3d__loading" data-p3d-loading>{t.loading}</div>
     <div class="parametric-3d__fallback" data-p3d-fallback hidden>{t.unavailable}</div>

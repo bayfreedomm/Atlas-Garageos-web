@@ -15,7 +15,7 @@ import { summarizeSeries, type RangeOption, type SnapshotMetric } from '../../ui
 const fuelPrices = asFuelPrices(rawFuelPrices);
 const fuelPriceHistory = asFuelPriceHistory(rawFuelPriceHistory);
 const data = fuelPrices.us;
-const title = 'Gas Prices Today in the US — Regular, Midgrade, Premium & Diesel';
+const title = 'Gas Prices Today in the US — Regular Gasoline & Diesel';
 const description = 'US national average gas and diesel prices from the EIA weekly retail survey, with market metrics, price history and a direct hand-off into the fuel and road-trip cost calculators.';
 const pathname = '/gas-prices-today/';
 // These market dashboards are different datasets, not translations. Keep navigation in
@@ -74,7 +74,7 @@ const faqs = [
   },
   {
     q: 'Why is this a weekly average, not a daily one?',
-    a: "The EIA publishes its Weekly Retail Gasoline and Diesel Prices survey once a week, so a US national average genuinely cannot update daily without inventing numbers between real data points. We refresh from the EIA automatically and show the most recent published week honestly, rather than faking daily movement.",
+    a: "The EIA publishes its Weekly Retail Gasoline and Diesel Prices survey once a week, so a US national average genuinely cannot update daily without inventing numbers between real data points. A scheduled job fetches the latest published week; new data reaches this static site when the update pull request is merged and deployed.",
   },
   {
     q: "Why isn't this a live ticker like oil futures?",
@@ -98,7 +98,7 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
   '@context': 'https://schema.org',
   '@type': 'Dataset',
   name: 'US Gas Prices (weekly national average)',
-  description: 'Weekly national average price for regular, midgrade and premium gasoline and diesel in the US from the EIA.',
+  description: 'Weekly national average price for regular gasoline and diesel in the US from the EIA. Other grades appear only when the keyed series are available.',
   license: 'https://www.usa.gov/government-works',
   temporalCoverage: data.weekOf,
   url: 'https://atlasgarageos.com/gas-prices-today/',
@@ -129,7 +129,7 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
       { label: 'Reporting period', value: weekLabel ? `Week of ${weekLabel}` : 'None yet' },
       { label: 'Last verified', value: lastSuccessLabel ?? 'Never' },
       { label: 'Source frequency', value: 'Weekly (EIA publishes once a week)' },
-      { label: 'Refresh', value: 'Automatic, scheduled' },
+      { label: 'Refresh', value: 'Scheduled fetch; published after update review' },
     ]}
   />
 

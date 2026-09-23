@@ -69,7 +69,7 @@ const faqs = [
   },
   {
     q: '¿Con qué frecuencia se actualizan los precios?',
-    a: 'De forma automática mediante una consulta programada varias veces al día, no en cada visita, para no sobrecargar la fuente oficial. Si una consulta falla, mostramos honestamente el último valor confirmado en lugar de inventar una cifra.',
+    a: 'Una tarea programada consulta la fuente oficial varias veces al día, no en cada visita. Los datos nuevos se publican en este sitio estático tras revisar y desplegar la propuesta de actualización. Si la consulta falla, mostramos el último valor confirmado en lugar de inventar una cifra.',
   },
   {
     q: '¿Por qué el mercado alemán muestra una muestra y no una media nacional?',
@@ -120,7 +120,7 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
       { label: 'Dato de', value: dateLabel ? `${dateLabel}, ${timeLabel}` : 'Sin datos' },
       { label: 'Última verificación', value: dateLabel ?? 'Nunca' },
       { label: 'Frecuencia de la fuente', value: 'Diaria (consulta programada varias veces al día)' },
-      { label: 'Actualización', value: 'Automática y programada' },
+      { label: 'Actualización', value: 'Consulta programada; publicación tras revisión' },
     ]}
   />
 
@@ -129,9 +129,9 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
     ariaLabel="Panel de precios de combustible actual para España"
     cadence="live"
     status={data.status}
-    cadenceLabel={data.status === 'pending' ? 'DATOS PENDIENTES' : 'ACTUALIZADO VARIAS VECES AL DÍA'}
+    cadenceLabel={data.status === 'pending' ? 'DATOS PENDIENTES' : 'ÚLTIMO DATO VERIFICADO'}
     updatedLabel={dateLabel ? `${dateLabel}, ${timeLabel}` : 'Sin datos verificados'}
-    sourceLabel={data.source}
+    sourceLabel="Ministerio para la Transición Ecológica · datos oficiales"
     pendingMessage="Todavía no hemos completado una consulta verificada. Aquí no se muestra ningún precio hasta que sea real."
     staleLabel={dateLabel ? `Confirmado por última vez el ${dateLabel}` : 'Último valor conocido'}
     rows={data.products.map((p) => ({ label: p.label, value: p.value.toFixed(2).replace('.', ','), unit: '€/L' }))}
@@ -162,7 +162,7 @@ const datasetJsonLd = data.status !== 'pending' ? serializeJsonLd({
     <section class="methodology-sources" aria-labelledby="fuel-source-heading">
       <p class="eyebrow">Fuente</p>
       <h2 id="fuel-source-heading">¿De dónde salen estos datos?</h2>
-      <p>{data.source}. {fuelPrices.disclaimer}</p>
+      <p>Ministerio para la Transición Ecológica: datos oficiales de estaciones de toda España. Los precios mostrados son medias de referencia, no una cotización en tiempo real de una gasolinera concreta.</p>
       <p>España sí dispone de un conjunto de datos nacional oficial, así que estas cifras se describen como media nacional. El mercado alemán, en cambio, es una muestra supervisada de estaciones de ciudades seleccionadas y se identifica como tal.</p>
       <div class="methodology-source-links"><a href={data.sourceUrl} rel="external noopener">Ver fuente <span>↗</span></a></div>
     </section>

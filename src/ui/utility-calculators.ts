@@ -216,6 +216,14 @@ function resetFuelPrimary(form: HTMLFormElement): void {
     if (copy) copy.textContent = t.checkInputsTrip;
     if (rate) rate.textContent = t.costPerDistanceAppears;
   }
+  const visual = form.querySelector<HTMLElement>('[data-fuel-technical-visual]');
+  if (visual) {
+    for (const selector of ['[data-fuel-visual-distance]', '[data-fuel-visual-fuel]', '[data-fuel-visual-cost]', '[data-fuel-visual-caption]', '[data-fuel-visual-rate]']) {
+      const node = visual.querySelector<HTMLElement>(selector);
+      if (node) node.textContent = '—';
+    }
+    visual.querySelector<SVGPathElement>('[data-fuel-fill]')?.setAttribute('d', 'M513 134h43v0h-43z');
+  }
 }
 
 type RoadTripResult = Extract<ReturnType<typeof calculateRoadTripCostTool>, { readonly ok: true }>['value'];

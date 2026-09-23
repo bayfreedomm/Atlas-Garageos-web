@@ -67,7 +67,8 @@
  * - United States: EIA (U.S. Energy Information Administration) Open Data v2, official,
  *   free instant self-serve API key (no manual approval wait, unlike Tankerkoenig).
  *   https://www.eia.gov/opendata/
- *   Requires the EIA_API_KEY environment variable (a GitHub Actions secret in CI).
+ *   Prefers EIA_API_KEY for four grades. Without a working key, the official public
+ *   weekly table supplies regular gasoline and diesel only, with explicit provenance.
  *   NOTE: EIA's retail gasoline/diesel series are published WEEKLY, not daily — the US
  *   number on the site is honestly labelled "weekly average", not "daily" like DE/ES.
  *
@@ -91,6 +92,9 @@ const HISTORY_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-price-histo
 const HISTORY_MAX_POINTS = 90;
 
 const FETCH_TIMEOUT_MS = 15_000;
+// The official nationwide Spain response contains more than 11,000 stations and takes
+// longer than the small EIA response. A 15-second deadline produced false pending states.
+const ES_FETCH_TIMEOUT_MS = 75_000;
 const US_GALLON_TO_LITRE = 3.785411784;
 
 const DISCLAIMER = 'Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.';
@@ -145,9 +149,9 @@ function average(numbers) {
   return { value: Math.round((sum / valid.length) * 1000) / 1000, sampleSize: valid.length };
 }
 
-async function fetchWithTimeout(url, init = {}) {
+async function fetchWithTimeout(url, init = {}, timeoutMs = FETCH_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...init, signal: controller.signal });
   } finally {
@@ -176,7 +180,7 @@ async function fetchSpainAverage() {
   const { source, sourceUrl } = PROVIDERS.es;
   const lastAttemptAt = new Date().toISOString();
   try {
-    const res = await fetchWithTimeout(sourceUrl, { headers: { Accept: 'application/json' } });
+    const res = await fetchWithTimeout(sourceUrl, { headers: { Accept: 'application/json' } }, ES_FETCH_TIMEOUT_MS);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const body = await res.json();
     const stations = body?.ListaEESSPrecio;
@@ -314,12 +318,51 @@ async function fetchEiaSeriesLatest(seriesId, apiKey) {
   return { value, period: latest.period };
 }
 
+/** The EIA's public weekly table is a keyless, official fallback. It exposes only
+ * regular gasoline and on-highway diesel, so never manufacture midgrade/premium. */
+export function parseEiaPublicWeeklyTable(html) {
+  const tables = [...html.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/gi)].map((match) => match[0]);
+  const parseTable = (caption) => {
+    const table = tables.find((item) => new RegExp(`<caption>\\s*${caption}`, 'i').test(item));
+    if (!table) throw new Error(`EIA public table missing: ${caption}`);
+    const heading = table.match(/<thead\b[^>]*>[\s\S]*?<\/thead>/i)?.[0] ?? '';
+    const dates = [...heading.matchAll(/<th\b[^>]*>\s*(\d{2})\/(\d{2})\/(\d{2})\s*<\/th>/gi)];
+    if (dates.length < 1) throw new Error(`EIA public table has no report date: ${caption}`);
+    const row = table.match(/<tbody\b[^>]*>[\s\S]*?<tr\b[^>]*>[\s\S]*?<\/tr>/i)?.[0] ?? '';
+    if (!/U\.S\.<\/a>/i.test(row)) throw new Error(`EIA public table has no U.S. row: ${caption}`);
+    const prices = [...row.matchAll(/<td\b[^>]*>\s*(\d+\.\d{3})\s*<\/td>/gi)].map((match) => Number(match[1]));
+    if (prices.length < dates.length) throw new Error(`EIA public table has no matching prices: ${caption}`);
+    const [, month, day, year] = dates.at(-1);
+    const period = `20${year}-${month}-${day}`;
+    const value = prices[dates.length - 1];
+    if (!Number.isFinite(value) || value <= 0 || value > 20) throw new Error(`Invalid EIA public price: ${caption}`);
+    return { period, value };
+  };
+  const regular = parseTable('U\\.S\\. Regular Gasoline Prices');
+  const diesel = parseTable('U\\.S\\. On-Highway Diesel Fuel Prices');
+  if (regular.period !== diesel.period) throw new Error('EIA public tables report different weeks');
+  return { regular: regular.value, diesel: diesel.value, weekOf: regular.period };
+}
+
+async function fetchUsPublicWeekly(lastAttemptAt) {
+  const { source, sourceUrl } = PROVIDERS.us;
+  const response = await fetchWithTimeout(sourceUrl, { headers: { Accept: 'text/html' } });
+  if (!response.ok) throw new Error(`HTTP ${response.status} for EIA public weekly page`);
+  const { regular, diesel, weekOf } = parseEiaPublicWeeklyTable(await response.text());
+  const products = [
+    { id: 'regular', label: 'Regular', valuePerGallon: regular, valuePerLitre: Math.round(regular / US_GALLON_TO_LITRE * 1000) / 1000 },
+    { id: 'diesel', label: 'Diesel', valuePerGallon: diesel, valuePerLitre: Math.round(diesel / US_GALLON_TO_LITRE * 1000) / 1000 },
+  ];
+  return { ok: true, products, weekOf, source: `${source} — public weekly table (regular and diesel)`, sourceUrl, lastAttemptAt };
+}
+
 async function fetchUsAverage() {
   const { source, sourceUrl } = PROVIDERS.us;
   const lastAttemptAt = new Date().toISOString();
   const apiKey = process.env.EIA_API_KEY;
   if (!apiKey) {
-    return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: 'EIA_API_KEY is not set' };
+    try { return await fetchUsPublicWeekly(lastAttemptAt); }
+    catch (err) { return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: String(err?.message ?? err) }; }
   }
   try {
     const entries = Object.entries(EIA_SERIES);
@@ -336,7 +379,8 @@ async function fetchUsAverage() {
     });
     return { ok: true, products, weekOf, source, sourceUrl, lastAttemptAt };
   } catch (err) {
-    return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: String(err?.message ?? err) };
+    try { return await fetchUsPublicWeekly(lastAttemptAt); }
+    catch (fallbackError) { return { ok: false, products: [], weekOf: null, source, sourceUrl, lastAttemptAt, note: `EIA API: ${String(err?.message ?? err)}; public page: ${String(fallbackError?.message ?? fallbackError)}` }; }
   }
 }
 
@@ -498,8 +542,9 @@ async function main() {
   console.log('Wrote', OUTPUT_PATH);
   console.log(JSON.stringify(output, null, 2));
 
-  if (![...ran].some((id) => output[id].status === 'fresh')) {
-    console.error('Every source selected for this run failed — keeping previous values intact.');
+  const failed = [...ran].filter((id) => output[id].status !== 'fresh');
+  if (failed.length > 0) {
+    console.error(`Selected provider(s) not fresh: ${failed.join(', ')}. Published data must not be mistaken for a full refresh.`);
     process.exitCode = 1;
   }
 }

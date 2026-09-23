@@ -1156,6 +1156,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .parametric-3d__hud div{display:grid;gap:.17rem}.parametric-3d__hud span{color:#b8d0e1;font-size:.68rem;font-weight:700}.parametric-3d__hud strong{font:900 clamp(.78rem,2vw,1.02rem) var(--font-mono);overflow-wrap:anywhere}
 .parametric-3d--single .parametric-3d__hud{border-color:rgb(111 188 255 / 65%)}
 .parametric-3d--pcd .parametric-3d__hud{border-color:rgb(126 214 255 / 65%)}
+.tool-3d-expansion{margin:1.2rem 0 0;min-width:0}.tool-3d-expansion .parametric-3d__stage{background:radial-gradient(circle at 48% 32%,color-mix(in srgb,var(--p3d-grid) 22%,var(--p3d-background)),var(--p3d-background) 68%)}.tool-3d-expansion .parametric-3d__stage canvas{height:clamp(19rem,55vw,29rem)}.tool-3d-expansion .parametric-3d__hud{max-width:min(18rem,62%)}
 @media(max-width:34rem){.parametric-3d__hud{top:.5rem;right:.5rem;padding:.48rem .6rem;min-width:0;max-width:54%}.parametric-3d__hud small{font-size:.5rem}.parametric-3d__hud span{font-size:.58rem}.parametric-3d__callout{max-width:36vw;white-space:normal}}
 
 /* Action cards should read unmistakably as controls, not muted information. */
