@@ -1,11 +1,11 @@
 ---
 import { tool3DText, type Additional3DToolId, type Tool3DLocale } from '../localization/tool-3d-catalog';
-interface Props { id: Additional3DToolId; locale: Tool3DLocale; }
-const { id, locale } = Astro.props;
+interface Props { id: Additional3DToolId; locale: Tool3DLocale; studio?: boolean; }
+const { id, locale, studio = false } = Astro.props;
 const t = tool3DText(locale, id);
 ---
 <section class="parametric-3d tool-3d-expansion" data-tool-3d={id} data-tool-3d-locale={locale} aria-label={t.title}>
-  <header class="parametric-3d__head"><div><span>{t.badge}</span><h3>{t.title}</h3><p>{t.intro}</p></div><p class="parametric-3d__hint">{t.hint}</p></header>
+  {!studio && <header class="parametric-3d__head"><div><span>{t.badge}</span><h3>{t.title}</h3><p>{t.intro}</p></div><p class="parametric-3d__hint">{t.hint}</p></header>}
   <div class="parametric-3d__stage">
     <canvas data-tool-3d-canvas width="960" height="600"></canvas>
     <div class="parametric-3d__annotations" data-p3d-annotations aria-hidden="true"></div>

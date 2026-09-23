@@ -146,7 +146,8 @@ export async function mountParametric3DPanel(panel: HTMLElement): Promise<void> 
 
   panel.classList.add('is-ready');
   setUnavailable(panel, false);
-  let tireView: 'side-by-side' | 'overlay' = 'side-by-side';
+  let tireView: 'side-by-side' | 'overlay' = mode === 'tire' && window.matchMedia('(max-width: 34rem)').matches ? 'overlay' : 'side-by-side';
+  if (mode === 'tire') panel.querySelectorAll<HTMLButtonElement>('[data-p3d-tire-view]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.p3dTireView === tireView)));
   let fitmentView: 'tires' | 'wheels' = 'tires';
 
   const configureOpeningView = (): void => {

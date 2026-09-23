@@ -1,5 +1,6 @@
 ---
 import { visualization3DLocale, visualization3DText, type Visualization3DLocale } from '../localization/visualization-3d';
+import ParametricEngineering2D from './ParametricEngineering2D.astro';
 
 interface Props {
   readonly mode: 'tire' | 'single' | 'speed' | 'gear' | 'compression' | 'ev' | 'fitment' | 'offset' | 'pcd';
@@ -15,7 +16,22 @@ const t = visualization3DText[locale];
 const title = mode === 'tire' ? t.tireTitle : mode === 'single' ? t.singleTitle : mode === 'speed' ? t.speedTitle : mode === 'gear' ? t.gearTitle : mode === 'compression' ? t.compressionTitle : mode === 'ev' ? t.evTitle : mode === 'fitment' ? t.fitmentTitle : mode === 'offset' ? t.offsetTitle : t.pcdTitle;
 const intro = mode === 'tire' ? t.tireIntro : mode === 'single' ? t.singleIntro : mode === 'speed' ? t.speedIntro : mode === 'gear' ? t.gearIntro : mode === 'compression' ? t.compressionIntro : mode === 'ev' ? t.evIntro : mode === 'fitment' ? t.fitmentIntro : mode === 'offset' ? t.offsetIntro : t.pcdIntro;
 const caution = mode === 'pcd' ? t.pcdOnly : mode === 'gear' ? t.gearOnly : mode === 'compression' ? t.compressionOnly : mode === 'ev' ? t.evOnly : t.geometryOnly;
+const dual = mode === 'single' || mode === 'speed' || mode === 'gear' || mode === 'compression' || mode === 'ev' || mode === 'fitment';
+const viewText = {
+  en: { label: 'Visual mode', studio: '3D Studio', drawing: 'Engineering 2D', badge: 'VISUAL STUDIO' },
+  de: { label: 'Ansichtsmodus', studio: '3D-Studio', drawing: 'Technische 2D-Ansicht', badge: 'VISUELLES STUDIO' },
+  es: { label: 'Modo de visualización', studio: 'Estudio 3D', drawing: 'Ingeniería 2D', badge: 'ESTUDIO VISUAL' },
+}[locale];
 ---
+<div class:list={[{ 'tire-visual-studio parametric-visual-studio': dual }]} data-parametric-visual-studio={dual ? '' : undefined}>
+  {dual && <header class="tire-visual-studio__header"><div><span>{viewText.badge}</span><h3>{title}</h3><p>{intro}</p></div>
+    <div class="tire-visual-studio__tabs" role="tablist" aria-label={viewText.label}>
+      <button type="button" role="tab" id={`p3d-tab-${mode}`} aria-controls={`p3d-panel-${mode}`} aria-selected="true" data-visual-tab="3d">{viewText.studio}</button>
+      <button type="button" role="tab" id={`p2d-tab-${mode}`} aria-controls={`p2d-panel-${mode}`} aria-selected="false" tabindex="-1" data-visual-tab="2d">{viewText.drawing}</button>
+    </div>
+  </header>}
+  <div role={dual ? 'tabpanel' : undefined} id={dual ? `p3d-panel-${mode}` : undefined} aria-labelledby={dual ? `p3d-tab-${mode}` : undefined} data-visual-panel={dual ? '3d' : undefined}>
+{dual && <p class="parametric-visual-studio__hint">{t.dragHint}</p>}
 <section
   class:list={['parametric-3d', `parametric-3d--${mode}`]}
   data-parametric-3d
@@ -116,6 +132,11 @@ const caution = mode === 'pcd' ? t.pcdOnly : mode === 'gear' ? t.gearOnly : mode
 
   <p class="parametric-3d__caution">{caution}</p>
 </section>
+  </div>
+{dual && <div role="tabpanel" id={`p2d-panel-${mode}`} aria-labelledby={`p2d-tab-${mode}`} data-visual-panel="2d" hidden>
+  {mode === 'single' || mode === 'gear' || mode === 'ev' ? <div data-legacy-visual-target={mode}></div> : <ParametricEngineering2D mode={mode} locale={locale} />}
+</div>}
+</div>
 
 <script>
   const pending3D = new WeakSet<HTMLElement>();
@@ -138,5 +159,48 @@ const caution = mode === 'pcd' ? t.pcdOnly : mode === 'gear' ? t.gearOnly : mode
       void load3D(panel);
     }, { rootMargin: '0px 0px 80px' });
     observer.observe(panel);
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-parametric-visual-studio]').forEach((studio) => {
+    const tabs = [...studio.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...studio.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const legacyTarget = studio.querySelector<HTMLElement>('[data-legacy-visual-target]');
+    const legacySelector = legacyTarget?.dataset.legacyVisualTarget === 'single' ? '.single-tire-visual' : legacyTarget?.dataset.legacyVisualTarget === 'gear' ? '.gear-technical-visual' : '.ev-technical-visual';
+    const legacyVisual = legacyTarget ? studio.closest('form')?.querySelector<HTMLElement>(legacySelector) : null;
+    if (legacyVisual && legacyTarget) legacyTarget.append(legacyVisual);
+    const plate = studio.querySelector<HTMLElement>('[data-parametric-engineering-2d]');
+    if (plate) {
+      const source = studio.querySelector<HTMLElement>('[data-p3d-value="hud-speed"], [data-p3d-value="hud-special"], [data-p3d-value="hud-fitment"]');
+      const reading = plate.querySelector<HTMLElement>('[data-parametric-engineering-reading]');
+      const updateReading = () => {
+        if (source && reading) reading.textContent = source.textContent?.trim() || '—';
+        if (plate.dataset.parametricEngineering2d !== 'speed') return;
+        const current = Number.parseFloat(studio.querySelector('[data-p3d-value="current"]')?.textContent ?? '');
+        const proposed = Number.parseFloat(studio.querySelector('[data-p3d-value="proposed"]')?.textContent ?? '');
+        if (!(current > 0 && proposed > 0)) return;
+        const max = Math.max(current, proposed);
+        studio.querySelector('[data-p2d-speed-original]')?.setAttribute('r', String(Math.round(100 * current / max)));
+        studio.querySelector('[data-p2d-speed-new]')?.setAttribute('r', String(Math.round(100 * proposed / max)));
+      };
+      const observer = new MutationObserver(updateReading);
+      const hud = studio.querySelector('.parametric-3d__hud');
+      if (hud) observer.observe(hud, { subtree: true, characterData: true, childList: true });
+      const metrics = studio.querySelector('.parametric-3d__metrics');
+      if (metrics) observer.observe(metrics, { subtree: true, characterData: true, childList: true });
+      updateReading();
+    }
+    const choose = (index: number, focus = false) => {
+      tabs.forEach((tab, i) => { tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });
+      panels.forEach((panel, i) => { panel.hidden = i !== index; });
+      if (focus) tabs[index]?.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => choose(i));
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        choose(event.key === 'Home' ? 0 : event.key === 'End' ? 1 : (i + (event.key === 'ArrowRight' ? 1 : -1) + 2) % 2, true);
+      });
+    });
   });
 </script>

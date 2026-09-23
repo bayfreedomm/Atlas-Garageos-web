@@ -178,7 +178,7 @@ function syncFuelPrimary(form: HTMLFormElement, result: { readonly system: UnitS
   if (rateNode) rateNode.textContent = rate;
   panel.classList.remove('is-pending');
 
-  const visual = form.querySelector<HTMLElement>('[data-fuel-technical-visual]');
+  const visual = form.closest('.tool-machine')?.querySelector<HTMLElement>('[data-fuel-technical-visual]');
   if (!visual) return;
   const distanceNode = visual.querySelector<SVGTextElement>('[data-fuel-visual-distance]');
   const visualFuelNode = visual.querySelector<SVGTextElement>('[data-fuel-visual-fuel]');
@@ -216,7 +216,7 @@ function resetFuelPrimary(form: HTMLFormElement): void {
     if (copy) copy.textContent = t.checkInputsTrip;
     if (rate) rate.textContent = t.costPerDistanceAppears;
   }
-  const visual = form.querySelector<HTMLElement>('[data-fuel-technical-visual]');
+  const visual = form.closest('.tool-machine')?.querySelector<HTMLElement>('[data-fuel-technical-visual]');
   if (visual) {
     for (const selector of ['[data-fuel-visual-distance]', '[data-fuel-visual-fuel]', '[data-fuel-visual-cost]', '[data-fuel-visual-caption]', '[data-fuel-visual-rate]']) {
       const node = visual.querySelector<HTMLElement>(selector);
@@ -230,8 +230,9 @@ type RoadTripResult = Extract<ReturnType<typeof calculateRoadTripCostTool>, { re
 
 function syncRoadTripPrimary(form: HTMLFormElement, result: RoadTripResult, currency: string): void {
   const t = UTILITY_TEXT[getPageLocale()];
+  const root = form.closest('.tool-machine') ?? form;
   const panel = form.querySelector<HTMLElement>('[data-trip-primary]');
-  const visual = form.querySelector<HTMLElement>('[data-trip-visual]');
+  const visual = root.querySelector<HTMLElement>('[data-trip-visual]');
   if (!panel || !visual) return;
   const money = (amount: number): string => `${currency} ${formatNumber(amount, 2)}`;
   const unit = result.system === 'metric' ? 'km' : 'mi';
@@ -240,7 +241,7 @@ function syncRoadTripPrimary(form: HTMLFormElement, result: RoadTripResult, curr
   const fuel = `${formatNumber(result.fuelRequired)} ${fuelUnit}`;
   const direction = result.roundTrip ? t.roundTrip : t.oneWay;
   const set = (selector: string, content: string): void => {
-    const node = form.querySelector<HTMLElement>(selector);
+    const node = root.querySelector<HTMLElement>(selector);
     if (node) node.textContent = content;
   };
   set('[data-trip-total]', money(result.totalTripCost));
@@ -273,24 +274,25 @@ function syncRoadTripPrimary(form: HTMLFormElement, result: RoadTripResult, curr
 
 function resetRoadTripPrimary(form: HTMLFormElement): void {
   const t = UTILITY_TEXT[getPageLocale()];
+  const root = form.closest('.tool-machine') ?? form;
   form.querySelector('[data-trip-primary]')?.classList.add('is-pending');
-  form.querySelector('[data-trip-visual]')?.classList.add('is-pending');
+  root.querySelector('[data-trip-visual]')?.classList.add('is-pending');
   for (const selector of ['[data-trip-total]', '[data-trip-fuel]', '[data-trip-direction]', '[data-trip-person]', '[data-trip-visual-distance]', '[data-trip-visual-fuel]', '[data-trip-visual-total]', '[data-trip-visual-fuel-cost]', '[data-trip-visual-extras]']) {
-    const node = form.querySelector<HTMLElement>(selector);
+    const node = root.querySelector<HTMLElement>(selector);
     if (node) node.textContent = '—';
   }
   const context = form.querySelector<HTMLElement>('[data-trip-context]');
   if (context) context.textContent = t.checkInputsTripReset;
   for (const [selector, content] of [['[data-trip-fuel-cost]', t.fuelCostAppears], ['[data-trip-distance]', t.distanceAppears], ['[data-trip-end]', t.destination]] as const) {
-    const node = form.querySelector<HTMLElement>(selector);
+    const node = root.querySelector<HTMLElement>(selector);
     if (node) node.textContent = content;
   }
-  const returnLeg = form.querySelector<HTMLElement>('[data-trip-return]');
+  const returnLeg = root.querySelector<HTMLElement>('[data-trip-return]');
   if (returnLeg) returnLeg.hidden = true;
   const person = form.querySelector<HTMLElement>('[data-trip-person-wrap]');
   if (person) person.hidden = true;
   for (const selector of ['[data-trip-fuel-bar]', '[data-trip-extra-bar]']) {
-    const bar = form.querySelector<HTMLElement>(selector);
+    const bar = root.querySelector<HTMLElement>(selector);
     if (bar) bar.style.width = '0%';
   }
 }

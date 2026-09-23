@@ -269,3 +269,13 @@ Next implementation pass:
 - [x] Scheduled fuel jobs preserve the rolling-PR publication model, now mark partial provider failures as failures after publishing any successful country snapshot. The site accurately states that scheduled fetches reach production only after PR review/merge/deployment.
 - [x] Offline frozen install, 235 tests, typecheck and 230-page production build passed. Representative desktop/mobile WebGL and live data/browser behavior were checked locally.
 - [ ] Physical pinch, other browser engines, forced context loss, live GitHub Actions/rolling PR and deployed Cloudflare behavior were not directly verified in this package.
+
+## Package 6.3 unified visual-studio pass — 2026-09-23
+- [x] All 22 published calculator tools expose one 3D Studio / Engineering 2D workspace. The 14 newer scene tools receive a shared tabbed studio; five previously standalone mechanical scenes gain tabs; Tire Comparison, Wheel Offset and PCD retain their established studios.
+- [x] Existing tire-size, gearing and EV technical diagrams remain live but now sit inside their 2D tabs. Fuel and road-trip technical breakdowns likewise move into the 2D tab without dropping their live values.
+- [x] Speedometer, compression and Fitment Studio receive dedicated engineering section drawings. The 14 newer tools receive topic-specific dark blueprint drawings instead of their old generic pseudo-3D side cards.
+- [x] Tire code, tire date and clearance scenes reuse the established native tire product. Toy-like vehicle modules were removed from fuel, route, power-to-weight and towing 3D scenes in favor of technical equipment/measurement geometry.
+- [x] Vehicle lookup shows lug holes only for a selected documented record and uses that record's actual lug count. Explanatory text and 2D headings are localized in EN/DE/ES.
+- [x] On narrow screens, the tire comparison opens in overlay mode and the persistent numeric HUD moves below the 3D canvas so it no longer covers the product. Side-by-side remains available, and the numeric values persist when the model rotates.
+- [x] No canonical calculation, fuel data/history, Wrangler/Cloudflare config, route, or dependency changes were made in this visual pass.
+- [ ] Physical pinch, WebKit/Firefox, forced context loss and deployed performance remain separate launch gates.

@@ -1,0 +1,75 @@
+---
+import { tool3DText, type Additional3DToolId, type Tool3DLocale } from '../localization/tool-3d-catalog';
+interface Props { id: Additional3DToolId; locale: Tool3DLocale; }
+const { id, locale } = Astro.props;
+const t = tool3DText(locale, id);
+const group =
+  id === 'fitment-map' || id === 'measure-my-car' ? 'clearance' :
+  id === 'fuel-cost-calculator' || id === 'road-trip-cost-calculator' || id === 'mpg-l100km-converter' ? 'journey' :
+  id === 'psi-bar-converter' ? 'pressure' :
+  id === 'hp-kw-converter' || id === 'nm-lb-ft-converter' || id === 'power-to-weight-calculator' ? 'power' :
+  id === 'tire-load-speed-rating' || id === 'tire-date-code-decoder' || id === 'vehicle-fitment-finder' ? 'tire' :
+  id === 'towing-capacity-calculator' ? 'towing' : 'track';
+const labels = {
+  en: { drawing: 'ENGINEERING SECTION', input: 'INPUT', output: 'READING', reference: 'Reference geometry · not a fitment verdict' },
+  de: { drawing: 'TECHNISCHE ANSICHT', input: 'EINGABE', output: 'ANZEIGE', reference: 'Referenzgeometrie · keine Freigabe' },
+  es: { drawing: 'SECCIÓN TÉCNICA', input: 'ENTRADA', output: 'LECTURA', reference: 'Geometría de referencia · no certifica el ajuste' },
+}[locale];
+---
+<div class:list={['tool-engineering-plate', `tool-engineering-plate--${group}`]} data-tool-engineering-2d={id}>
+  <div class="tool-engineering-plate__top"><span>{labels.drawing} / {t.title.toUpperCase()}</span><span>ATLAS · 02</span></div>
+  <div class="tool-engineering-plate__drawing">
+    <svg viewBox="0 0 760 340" role="img" aria-label={t.title} preserveAspectRatio="xMidYMid meet">
+      <defs><pattern id={`grid-${id}`} width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" class="bp-grid" /></pattern><marker id={`arrow-${id}`} viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M10 0 0 5l10 5Z" class="bp-arrow" /></marker></defs>
+      <rect x="0" y="0" width="760" height="340" fill={`url(#grid-${id})`} />
+      <path class="bp-center" d="M380 12v316M18 170h724" />
+      {group === 'clearance' && <g>
+        <path class="bp-solid" d="M246 86h268v168H246zM314 100h132v140H314z" />
+        <path class="bp-accent" d="M270 104h220v132H270zM380 78v184" />
+        <path class="bp-boundary" d="M204 68v204M556 68v204" />
+        <path class="bp-dimension" d="M204 294h92M464 294h92" marker-start={`url(#arrow-${id})`} marker-end={`url(#arrow-${id})`} />
+        {id === 'fitment-map' && <path class="bp-secondary" d="M90 72h66v66H90zM102 72v66m12-66v66m12-66v66m12-66v66M90 84h66m-66 12h66m-66 12h66m-66 12h66" />}
+      </g>}
+      {group === 'journey' && <g>
+        <path class="bp-solid" d="M92 182h576M92 196h576" />
+        <circle class="bp-accent" cx="108" cy="189" r="15"/><circle class="bp-accent" cx="652" cy="189" r="15"/>
+        <path class="bp-dimension" d="M128 106h504" marker-start={`url(#arrow-${id})`} marker-end={`url(#arrow-${id})`} />
+        <path class="bp-secondary" d="M226 172v34m104-34v34m104-34v34m104-34v34" />
+        {id === 'fuel-cost-calculator' && <path class="bp-solid" d="M298 232h164v55H298zM310 244h140v31H310z" />}
+        {id === 'road-trip-cost-calculator' && <path class="bp-accent" d="M128 222c135 77 385 77 504 0" />}
+        {id === 'mpg-l100km-converter' && <path class="bp-accent" d="M282 238h196v44H282zM348 238v44M414 238v44" />}
+      </g>}
+      {group === 'pressure' && <g>
+        <circle class="bp-solid" cx="380" cy="170" r="112"/><circle class="bp-secondary" cx="380" cy="170" r="86"/>
+        <path class="bp-accent" d="M380 170l73-64"/><circle class="bp-solid" cx="380" cy="170" r="9"/>
+        <path class="bp-dimension" d="M268 296h224" marker-start={`url(#arrow-${id})`} marker-end={`url(#arrow-${id})`} />
+      </g>}
+      {group === 'power' && <g>
+        <circle class="bp-solid" cx="304" cy="170" r="78"/><circle class="bp-secondary" cx="304" cy="170" r="38"/>
+        <path class="bp-solid" d="M382 155h196v30H382zM566 124v92" />
+        <path class="bp-accent" d="M384 244h178" marker-end={`url(#arrow-${id})`} />
+        {id === 'nm-lb-ft-converter' && <path class="bp-accent" d="M304 170l93-94M375 62a114 114 0 0 1 31 33" />}
+        {id === 'hp-kw-converter' && <path class="bp-secondary" d="M234 100l140 140M234 240l140-140" />}
+        {id === 'power-to-weight-calculator' && <path class="bp-secondary" d="M448 96v113m-62 0h124m-98 0-26 50h52l-26-50m72 0-26 50h52l-26-50" />}
+      </g>}
+      {group === 'tire' && <g>
+        <circle class="bp-solid" cx="352" cy="170" r="125"/><circle class="bp-solid" cx="352" cy="170" r="72"/>
+        <circle class="bp-secondary" cx="352" cy="170" r="109"/><circle class="bp-secondary" cx="352" cy="170" r="50"/>
+        <path class="bp-accent" d="M418 55l84-35M502 20h136M420 280l82 35h136" />
+        {id === 'vehicle-fitment-finder' && <g><circle class="bp-solid" cx="564" cy="170" r="72"/><circle class="bp-secondary" cx="564" cy="170" r="27"/><path class="bp-accent" d="M564 104v132m-66-66h132m-113-47 94 94m0-94-94 94" /></g>}
+      </g>}
+      {group === 'towing' && <g>
+        <path class="bp-solid" d="M80 135h305v95H80zM415 148h262v82H415z" />
+        <circle class="bp-solid" cx="180" cy="246" r="26"/><circle class="bp-solid" cx="304" cy="246" r="26"/><circle class="bp-solid" cx="552" cy="246" r="26"/>
+        <path class="bp-accent" d="M385 202h30M86 110h585" marker-end={`url(#arrow-${id})`} />
+      </g>}
+      {group === 'track' && <g>
+        <path class="bp-solid" d="M84 120h592M84 172h592M84 224h592" />
+        <path class="bp-secondary" d="M130 88v164M630 88v164" />
+        <path class="bp-accent" d="M144 172h472" marker-end={`url(#arrow-${id})`} />
+        <path class="bp-dimension" d="M130 283h500" marker-start={`url(#arrow-${id})`} marker-end={`url(#arrow-${id})`} />
+      </g>}
+    </svg>
+  </div>
+  <div class="tool-engineering-plate__bottom"><div><small>{labels.input} → {labels.output}</small><strong data-tool-engineering-reading>—</strong></div><p>{labels.reference}</p></div>
+</div>

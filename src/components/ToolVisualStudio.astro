@@ -1,0 +1,72 @@
+---
+import Tool3DPanel from './Tool3DPanel.astro';
+import ToolEngineering2D from './ToolEngineering2D.astro';
+import type { ToolDefinition } from '../seo/tool-registry';
+import { tool3DText, type Additional3DToolId, type Tool3DLocale } from '../localization/tool-3d-catalog';
+
+interface Props { definition: ToolDefinition; locale: Tool3DLocale; }
+const { definition, locale } = Astro.props;
+const id = definition.id as Additional3DToolId;
+const t = tool3DText(locale, id);
+const tabs = {
+  en: { studio: '3D Studio', drawing: 'Engineering 2D', label: 'Visual mode', badge: 'VISUAL STUDIO' },
+  de: { studio: '3D-Studio', drawing: 'Technische 2D-Ansicht', label: 'Ansichtsmodus', badge: 'VISUELLES STUDIO' },
+  es: { studio: 'Estudio 3D', drawing: 'Ingeniería 2D', label: 'Modo de visualización', badge: 'ESTUDIO VISUAL' },
+}[locale];
+---
+<section class="tire-visual-studio tool-visual-studio" data-tool-visual-studio data-tool-studio-locale={locale} aria-label={t.title}>
+  <header class="tire-visual-studio__header">
+    <div><span>{tabs.badge}</span><h3>{t.title}</h3><p>{t.intro}</p></div>
+    <div class="tire-visual-studio__tabs" role="tablist" aria-label={tabs.label}>
+      <button type="button" role="tab" aria-selected="true" aria-controls={`tool-studio-3d-${id}`} id={`tool-tab-3d-${id}`} data-visual-tab="3d">{tabs.studio}</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls={`tool-studio-2d-${id}`} id={`tool-tab-2d-${id}`} tabindex="-1" data-visual-tab="2d">{tabs.drawing}</button>
+    </div>
+  </header>
+  <div role="tabpanel" id={`tool-studio-3d-${id}`} aria-labelledby={`tool-tab-3d-${id}`} data-visual-panel="3d"><Tool3DPanel {id} {locale} studio /></div>
+  <div role="tabpanel" id={`tool-studio-2d-${id}`} aria-labelledby={`tool-tab-2d-${id}`} data-visual-panel="2d" hidden><ToolEngineering2D {id} {locale} /></div>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tool-visual-studio]').forEach((studio) => {
+    const tabs = [...studio.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...studio.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const plate = studio.querySelector<HTMLElement>('[data-tool-engineering-2d]');
+    const form = studio.closest('.tool-machine')?.querySelector<HTMLFormElement>('.tool-workspace form');
+    const id = plate?.getAttribute('data-tool-engineering-2d');
+    const legacySelector = id === 'fuel-cost-calculator' ? '[data-fuel-technical-visual]' : id === 'road-trip-cost-calculator' ? '[data-trip-visual]' : null;
+    const legacy = legacySelector ? form?.querySelector<HTMLElement>(legacySelector) : null;
+    if (legacy && panels[1]) panels[1].append(legacy);
+    let updateVersion = 0;
+    const update2D = async () => {
+      if (!plate || !form || panels[1]?.hidden) return;
+      const version = ++updateVersion;
+      const id = plate.getAttribute('data-tool-engineering-2d');
+      const locale = studio.getAttribute('data-tool-studio-locale');
+      if (!id) return;
+      const values: Record<string, string> = {};
+      for (const [key, value] of new FormData(form)) if (typeof value === 'string') values[key] = value;
+      const [{ sceneForTool }, { tool3DText }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog')]);
+      if (version !== updateVersion) return;
+      const language = locale === 'de' || locale === 'es' ? locale : 'en';
+      const tool = id as import('../localization/tool-3d-catalog').Additional3DToolId;
+      const result = sceneForTool(tool, values, { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' }, language, false);
+      const reading = plate.querySelector<HTMLElement>('[data-tool-engineering-reading]');
+      if (reading) reading.textContent = language !== 'en' && (tool === 'fitment-map' || tool === 'measure-my-car') ? tool3DText(language, tool).title : result.readout;
+    };
+    const choose = (index: number, focus = false) => {
+      tabs.forEach((tab, i) => { tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });
+      panels.forEach((panel, i) => { panel.hidden = i !== index; });
+      if (focus) tabs[index]?.focus();
+      if (index === 1) void update2D();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => choose(i));
+      tab.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft' && event.key !== 'Home' && event.key !== 'End') return;
+        event.preventDefault();
+        choose(event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (i + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length, true);
+      });
+    });
+    form?.addEventListener('input', () => { void update2D(); });
+    form?.addEventListener('change', () => { void update2D(); });
+  });
+</script>

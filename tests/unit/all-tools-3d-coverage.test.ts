@@ -41,7 +41,19 @@ describe('3D coverage for the complete tool directory', () => {
     expect(pressure('20')).not.toBe(pressure('80'));
     const fuel = (distance: string) => sceneForTool('fuel-cost-calculator', { distance, economy: '7', price: '1.9', system: 'metric' }, palette).readout;
     expect(fuel('100')).not.toBe(fuel('600'));
-    const towing = (gcwr: string) => sceneForTool('towing-capacity-calculator', { gcwr, curbWeight: '5000', loadWeight: '500' }, palette).scene.meshes.length;
-    expect(towing('15000')).toBeGreaterThan(0);
+    const towing = (gcwr: string) => {
+      const vertices = sceneForTool('towing-capacity-calculator', { gcwr, curbWeight: '5000', loadWeight: '500' }, palette).scene.meshes[4]?.vertices ?? [];
+      return Math.max(...vertices.map((point) => point.x)) - Math.min(...vertices.map((point) => point.x));
+    };
+    expect(towing('15000')).not.toBe(towing('25000'));
+  });
+
+  it('shows only documented lug counts in vehicle lookup geometry', () => {
+    const noSelection = sceneForTool('vehicle-fitment-finder', {}, palette).scene.meshes.length;
+    const fourLugs = sceneForTool('vehicle-fitment-finder', { model: 'peugeot-208' }, palette).scene.meshes.length;
+    const fiveLugs = sceneForTool('vehicle-fitment-finder', { model: 'vw-golf' }, palette).scene.meshes.length;
+    expect(fourLugs - noSelection).toBe(4);
+    expect(fiveLugs - noSelection).toBe(5);
+    expect(sceneForTool('vehicle-fitment-finder', {}, palette).detail).toContain('No bolt pattern');
   });
 });

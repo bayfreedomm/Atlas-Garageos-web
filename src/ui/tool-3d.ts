@@ -53,7 +53,7 @@ export async function mountTool3D(panel: HTMLElement): Promise<void> {
   const refresh = () => {
     const values: Record<string, string> = {};
     if (form) for (const [key, value] of new FormData(form)) if (typeof value === 'string') values[key] = value;
-    const result = sceneForTool(id, values, palette(panel), locale);
+    const result = sceneForTool(id, values, palette(panel), locale, panel.dataset.renderer === 'canvas');
     renderer.setScene(result.scene);
     const readout = panel.querySelector<HTMLElement>('[data-tool-3d-readout]');
     const detail = panel.querySelector<HTMLElement>('[data-tool-3d-detail]');

@@ -1,8 +1,11 @@
 import { annulusCylinder, box, circleLine, cylinder, type Annotation3D, type Line3D, type Mesh3D, type Scene3D, type TireWheelProduct3D, type Vec3 } from './canvas-3d';
 import type { VisualizationPalette } from './scene-builders';
+import { singleTireScene } from './scene-builders';
+import { buildTireComparison3DModel } from './parametric-3d-model';
 import type { Additional3DToolId, Tool3DLocale } from '../../localization/tool-3d-catalog';
 import { calculateFuelCostTool } from '../../features/tools/utility-tools';
 import { NEWTON_METERS_PER_POUND_FOOT, PASCALS_PER_PSI, WATTS_PER_MECHANICAL_HP } from '../../core/units/automotive';
+import { vehicleById } from '../../data/vehicle-fitment';
 
 const v = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
 const metal = { ambient: .42, diffuse: .68, specular: .4, shininess: 32, metallic: .72 };
@@ -14,7 +17,21 @@ const n = (values: Readonly<Record<string, string>>, key: string, fallback: numb
   return Number.isFinite(value) ? value : fallback;
 };
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+const local = (locale: Tool3DLocale, en: string, de: string, es: string) => ({ en, de, es })[locale];
 const annotation = (start: Vec3, end: Vec3, label: string, color: string): Annotation3D => ({ start, end, label, color });
+const referenceTire = (() => {
+  const model = buildTireComparison3DModel(
+    { widthMm: 225, aspectRatio: 45, rimDiameterInches: 18 },
+    { widthMm: 225, aspectRatio: 45, rimDiameterInches: 18 },
+  );
+  if (!model) throw new Error('Validated visual reference tire is unavailable');
+  return model;
+})();
+
+function productTire(palette: VisualizationPalette, locale: Tool3DLocale, fallbackMeshes: boolean): Scene3D<TireWheelProduct3D> {
+  const source = singleTireScene(referenceTire, palette, fallbackMeshes, locale);
+  return { ...source, annotations: [], fitRadius: 1.55 };
+}
 
 function wheel(center: Vec3, radius: number, palette: VisualizationPalette): Mesh3D[] {
   const meshes: Mesh3D[] = [
@@ -31,23 +48,6 @@ function wheel(center: Vec3, radius: number, palette: VisualizationPalette): Mes
   return meshes;
 }
 
-/** An exposed axle / mass module, deliberately not a vehicle-specific car model. */
-function vehicleModule(x: number, palette: VisualizationPalette): Mesh3D[] {
-  return [
-    box(1.82, .07, .08, '#9eb5c3', v(x, -.25, -.34), 1, 0, metal),
-    box(1.82, .07, .08, '#9eb5c3', v(x, -.25, .34), 1, 0, metal),
-    box(.08, .07, .7, '#718b9b', v(x - .61, -.25, 0), 1, 0, metal),
-    box(.08, .07, .7, '#718b9b', v(x + .61, -.25, 0), 1, 0, metal),
-    box(.79, .34, .5, palette.current, v(x, -.02, 0), 1, 0, metal),
-    box(.83, .045, .54, '#b7cbd6', v(x, .17, 0), 1, 0, metal),
-    box(.22, .09, .7, palette.hub, v(x, -.3, 0), 1, 0, metal),
-    annulusCylinder(.29, .18, .18, '#25343e', v(x - .62, -.49, .45), 1, satin),
-    annulusCylinder(.29, .18, .18, '#25343e', v(x + .62, -.49, .45), 1, satin),
-    cylinder(.17, .2, '#b6cbd6', v(x - .62, -.49, .48), 1, metal),
-    cylinder(.17, .2, '#b6cbd6', v(x + .62, -.49, .48), 1, metal),
-  ];
-}
-
 function gauge(level: number, palette: VisualizationPalette): Scene3D {
   const a = Math.PI * (.8 - 1.6 * clamp(level, 0, 1));
   return {
@@ -58,18 +58,24 @@ function gauge(level: number, palette: VisualizationPalette): Scene3D {
 }
 
 function pathScene(distance: number, isReturn: boolean, palette: VisualizationPalette, extras = 0): Scene3D {
-  const length = 2.75;
-  const meshes: Mesh3D[] = [box(length, .05, 1.05, '#31485a', v(0, -.87, 0), 1, 0, satin), ...vehicleModule(-.92, palette)];
-  const lines: Line3D[] = [{ points: [v(-1.3, -.83, .52), v(1.3, -.83, .52)], color: palette.guide, width: 2, dashed: true }];
-  if (isReturn) lines.push({ points: [v(1.3, -.83, -.54), v(-1.3, -.83, -.54)], color: palette.proposed, width: 2, dashed: true });
-  meshes.push(box(.14, .48, .14, palette.current, v(-1.28, -.63, -.53), 1, 0, metal), box(.14, .48, .14, palette.proposed, v(1.28, -.63, -.53), 1, 0, metal));
-  if (extras > 0) meshes.push(box(.5, clamp(extras / 60, .12, .8), .45, palette.proposed, v(.88, -.45, -.7), 1, 0, metal));
-  return { meshes, lines, annotations: [annotation(v(-1.26, .54, .38), v(1.26, .54, .38), `${distance.toFixed(0)} ${isReturn ? '× 2' : ''}`, palette.accent)], shadows: floor(1.65), fitRadius: 1.9 };
+  const meshes: Mesh3D[] = [
+    box(2.95, .12, 1.02, '#243b4a', v(0, -.78, 0), 1, 0, satin),
+    box(2.95, .035, .06, '#a2bac9', v(0, -.69, -.42), 1, 0, metal),
+    box(2.95, .035, .06, '#a2bac9', v(0, -.69, .42), 1, 0, metal),
+    cylinder(.15, .25, palette.current, v(-1.24, -.5, 0), 1, metal),
+    cylinder(.15, .25, palette.proposed, v(1.24, -.5, 0), 1, metal),
+  ];
+  for (let i = 0; i < 15; i += 1) meshes.push(box(.012, .018, i % 5 === 0 ? .43 : .21, i % 5 === 0 ? palette.accent : palette.guide, v(-1.12 + i * .16, -.69, .03), .85, 0, metal));
+  const lines: Line3D[] = [{ points: [v(-1.24, -.5, 0), v(1.24, -.5, 0)], color: palette.current, width: 3 }];
+  if (isReturn) lines.push({ points: [v(1.24, -.45, -.27), v(-1.24, -.45, -.27)], color: palette.proposed, width: 2, dashed: true });
+  if (extras > 0) meshes.push(box(.38, clamp(extras / 80, .1, .55), .38, palette.proposed, v(.88, -.4, -.69), 1, 0, metal));
+  return { meshes, lines, annotations: [annotation(v(-1.24, .28, .3), v(1.24, .28, .3), `${distance.toFixed(0)} ${isReturn ? '× 2' : ''}`, palette.accent)], shadows: floor(1.65), fitRadius: 1.8 };
 }
 
-function clearanceScene(palette: VisualizationPalette, variant: 'measure' | 'map', locale: Tool3DLocale): Scene3D<TireWheelProduct3D> {
+function clearanceScene(palette: VisualizationPalette, variant: 'measure' | 'map', locale: Tool3DLocale, fallbackMeshes: boolean): Scene3D<TireWheelProduct3D> {
+  const tire = productTire(palette, locale, fallbackMeshes);
   const meshes: Mesh3D[] = [
-    ...wheel(v(0, 0, 0), .86, palette),
+    ...tire.meshes,
     box(.12, 2, 1.05, palette.hub, v(-1.13, 0, 0), .8, 0, satin),
     box(.12, 2, 1.05, palette.proposed, v(1.13, 0, 0), .55, 0, satin),
   ];
@@ -83,15 +89,15 @@ function clearanceScene(palette: VisualizationPalette, variant: 'measure' | 'map
       meshes.push(box(1.9, .018, .018, palette.guide, v(0, -1.02, i * .24), .65, 0, satin));
     }
   }
-  return { meshes, annotations, shadows: floor(), fitRadius: 1.55 };
+  return { meshes, products: tire.products ?? [], annotations, shadows: floor(), fitRadius: 1.55 };
 }
 
 export interface Tool3DResult { readonly scene: Scene3D; readonly readout: string; readonly detail: string; }
 
 /** Explanatory geometry only. Canonical numerical results remain in the calculator UI. */
-export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en'): Tool3DResult {
+export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en', fallbackMeshes = true): Tool3DResult {
   const input = (key: string, fallback: number) => n(values, key, fallback);
-  if (id === 'fitment-map' || id === 'measure-my-car') return { scene: clearanceScene(palette, id === 'fitment-map' ? 'map' : 'measure', locale), readout: id === 'fitment-map' ? 'WIDTH × ET' : 'INNER ↔ OUTER', detail: 'Static geometry · measure on your vehicle' };
+  if (id === 'fitment-map' || id === 'measure-my-car') return { scene: clearanceScene(palette, id === 'fitment-map' ? 'map' : 'measure', locale, fallbackMeshes), readout: id === 'fitment-map' ? local(locale, 'WIDTH × ET', 'BREITE × ET', 'ANCHO × ET') : local(locale, 'INNER ↔ OUTER', 'INNEN ↔ AUSSEN', 'INTERIOR ↔ EXTERIOR'), detail: local(locale, 'Static geometry · measure on your vehicle', 'Statische Geometrie · am Fahrzeug messen', 'Geometría estática · mida en su vehículo') };
 
   if (id === 'fuel-cost-calculator') {
     const distance = Math.max(0, input('distance', 100));
@@ -101,31 +107,33 @@ export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<str
     const fuelRequired = calculated.ok ? calculated.value.fuelRequired : 0;
     const level = clamp(fuelRequired / (values.system === 'imperial' ? 16 : 60), 0, 1);
     const tank: Mesh3D[] = [
-      ...vehicleModule(-1.05, palette),
-      cylinder(.76, .54, '#193246', v(.91, -.05, 0), 1, metal),
-      annulusCylinder(.77, .68, .58, '#aac0ce', v(.91, -.05, 0), 1, metal),
-      cylinder(.12, .62, palette.hub, v(.91, -.05, .31), 1, metal),
-      box(.8, .1, .55, '#668294', v(.91, -.84, 0), 1, 0, metal),
+      box(2.7, .1, .76, '#274454', v(0, -.91, 0), 1, 0, satin),
+      box(2.5, .035, .05, '#b4c8d4', v(0, -.83, .34), 1, 0, metal),
+      cylinder(.68, .58, '#193246', v(.69, -.04, 0), 1, metal),
+      annulusCylinder(.69, .6, .61, '#aac0ce', v(.69, -.04, 0), 1, metal),
+      cylinder(.12, .64, palette.hub, v(.69, -.04, .33), 1, metal),
+      cylinder(.31, .25, '#6e8798', v(-.91, -.3, .1), 1, metal),
+      annulusCylinder(.33, .26, .28, palette.current, v(-.91, -.3, .1), 1, metal),
     ];
     for (let i = 0; i < 8; i += 1) {
-      tank.push(box(.11, .14, .07, i / 8 < level ? palette.proposed : '#395366', v(.42 + i * .14, -.61, .37), 1, 0, satin));
+      tank.push(box(.12, .12, .055, i / 8 < level ? palette.proposed : '#395366', v(.19 + i * .145, -.64, .39), 1, 0, satin));
     }
-    return { scene: { meshes: tank, lines: [{ points: [v(-.15, -.42, .12), v(-.15, .5, .12), v(.05, .72, .12), v(.49, .72, .12)], color: palette.proposed, width: 3 }], shadows: floor(1.8), fitRadius: 1.8 }, readout: calculated.ok ? `${fuelRequired.toFixed(1)} ${values.system === 'imperial' ? 'US gal' : 'L'}` : '—', detail: 'Fuel required from canonical calculation' };
+    return { scene: { meshes: tank, lines: [{ points: [v(-.55, -.3, .28), v(-.38, -.3, .28), v(-.38, .64, .28), v(.69, .64, .28)], color: palette.proposed, width: 3 }], annotations: [annotation(v(-1.2, .92, .25), v(1.2, .92, .25), `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}`, palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: calculated.ok ? `${fuelRequired.toFixed(1)} ${values.system === 'imperial' ? 'US gal' : 'L'}` : '—', detail: local(locale, 'Fuel required from canonical calculation', 'Kraftstoffbedarf aus der maßgeblichen Berechnung', 'Combustible necesario según el cálculo principal') };
   }
   if (id === 'road-trip-cost-calculator') {
     const distance = input('distance', 250);
     const isReturn = values.tripType === 'round';
-    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)}${isReturn ? ' × 2' : ''}`, detail: isReturn ? 'Return route' : 'One-way route' };
+    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)}${isReturn ? ' × 2' : ''}`, detail: isReturn ? local(locale, 'Return route', 'Hin- und Rückfahrt', 'Viaje de ida y vuelta') : local(locale, 'One-way route', 'Einfache Fahrt', 'Viaje de ida') };
   }
   if (id === 'mpg-l100km-converter') {
     const value = input('value', 30);
     const scene = pathScene(clamp(value * 4, 10, 400), false, palette);
-    return { scene: { ...scene, meshes: [...scene.meshes, box(.62, .62, .62, palette.proposed, v(1.06, -.42, -.78), 1, 0, metal)] }, readout: `${value.toFixed(1)} ${values.unit ?? 'US mpg'}`, detail: 'Distance and fuel volume · unit relationship' };
+    return { scene: { ...scene, meshes: [...scene.meshes, box(.62, .62, .62, palette.proposed, v(1.06, -.42, -.78), 1, 0, metal)] }, readout: `${value.toFixed(1)} ${values.unit ?? 'US mpg'}`, detail: local(locale, 'Distance and fuel volume · unit relationship', 'Strecke und Kraftstoffmenge · Einheitenbeziehung', 'Distancia y combustible · relación entre unidades') };
   }
   if (id === 'psi-bar-converter') {
     const value = input('value', 32);
     const psi = values.unit === 'bar' ? value * 100000 / PASCALS_PER_PSI : values.unit === 'kpa' ? value * 1000 / PASCALS_PER_PSI : value;
-    return { scene: gauge(psi / 100, palette), readout: `${value.toFixed(1)} ${values.unit ?? 'psi'}`, detail: 'Illustrative gauge · not a pressure recommendation' };
+    return { scene: gauge(psi / 100, palette), readout: `${value.toFixed(1)} ${values.unit ?? 'psi'}`, detail: local(locale, 'Illustrative gauge · not a pressure recommendation', 'Schematische Anzeige · keine Druckempfehlung', 'Indicador ilustrativo · no recomienda una presión') };
   }
   if (id === 'hp-kw-converter') {
     const value = input('value', 180);
@@ -136,39 +144,64 @@ export function sceneForTool(id: Additional3DToolId, values: Readonly<Record<str
       meshes.push(box(.54, .12, .22, palette.current, v(-.14 + Math.cos(a) * .53, Math.sin(a) * .53, .28), 1, a, metal));
     }
     meshes.push(box(clamp(powerKw / 150, .12, 1.5), .17, .3, palette.proposed, v(.2, -1, .25), 1, 0, metal));
-    return { scene: { meshes, shadows: floor(), fitRadius: 1.42 }, readout: `${value.toFixed(1)} ${values.unit ?? 'hp'}`, detail: 'Mechanical output · unit conversion' };
+    return { scene: { meshes, shadows: floor(), fitRadius: 1.42 }, readout: `${value.toFixed(1)} ${values.unit ?? 'hp'}`, detail: local(locale, 'Mechanical output · unit conversion', 'Mechanische Leistung · Einheitenumrechnung', 'Potencia mecánica · conversión de unidades') };
   }
   if (id === 'nm-lb-ft-converter') {
     const value = input('value', 300);
     const moment = values.unit === 'lb-ft' ? value * NEWTON_METERS_PER_POUND_FOOT : value;
     const angle = .2 + clamp(moment / 800, 0, 1) * .9;
-    return { scene: { meshes: [cylinder(.38, .56, palette.hub, v(0, 0, 0), 1, metal), box(1.8, .17, .23, palette.metal, v(.76 * Math.cos(angle), .76 * Math.sin(angle), .33), 1, angle, metal), cylinder(.14, .37, palette.proposed, v(1.55 * Math.cos(angle), 1.55 * Math.sin(angle), .32), 1, metal)], lines: [circleLine(.72, palette.proposed, .36, 54)], fitRadius: 1.6 }, readout: `${value.toFixed(1)} ${values.unit ?? 'Nm'}`, detail: 'One moment about the same axle' };
+    return { scene: { meshes: [cylinder(.38, .56, palette.hub, v(0, 0, 0), 1, metal), box(1.8, .17, .23, palette.metal, v(.76 * Math.cos(angle), .76 * Math.sin(angle), .33), 1, angle, metal), cylinder(.14, .37, palette.proposed, v(1.55 * Math.cos(angle), 1.55 * Math.sin(angle), .32), 1, metal)], lines: [circleLine(.72, palette.proposed, .36, 54)], fitRadius: 1.6 }, readout: `${value.toFixed(1)} ${values.unit ?? 'Nm'}`, detail: local(locale, 'One moment about the same axle', 'Ein Drehmoment an derselben Achse', 'Un par de fuerza sobre el mismo eje') };
   }
   if (id === 'power-to-weight-calculator') {
     const power = input('power', 180), mass = input('weight', 1350);
-    return { scene: { meshes: [...vehicleModule(0, palette), box(.55, clamp(mass / 1800, .24, 1), .52, palette.proposed, v(1.1, -.75 + clamp(mass / 1800, .24, 1) / 2, 0), 1, 0, metal), cylinder(clamp(power / 600, .18, .65), .23, palette.accent, v(-1.15, -.45, .14), 1, metal)], shadows: floor(1.8), fitRadius: 1.8 }, readout: `${power.toFixed(0)} / ${mass.toFixed(0)}`, detail: 'Power ÷ mass · entered units' };
+    const massHeight = clamp(mass / 1800, .24, 1);
+    const meshes: Mesh3D[] = [
+      box(2.7, .09, .72, '#304b5b', v(0, -.93, 0), 1, 0, satin),
+      box(2.3, .07, .08, '#a7bfcd', v(0, -.16, 0), 1, 0, metal),
+      cylinder(.55, .26, palette.current, v(-.83, .14, .18), 1, metal),
+      annulusCylinder(.57, .3, .3, '#a7c1ce', v(-.83, .14, .18), 1, metal),
+      cylinder(.16, .35, palette.hub, v(-.83, .14, .39), 1, metal),
+      box(.65, massHeight, .58, palette.proposed, v(.84, -.78 + massHeight / 2, 0), 1, 0, metal),
+    ];
+    for (let i = 0; i < 8; i += 1) {
+      const angle = i * Math.PI / 4;
+      meshes.push(box(.42, .055, .09, '#c6d5de', v(-.83 + Math.cos(angle) * .34, .14 + Math.sin(angle) * .34, .36), 1, angle, metal));
+    }
+    return { scene: { meshes, annotations: [annotation(v(-1.28, .9, .3), v(1.28, .9, .3), local(locale, 'POWER ÷ MASS', 'LEISTUNG ÷ MASSE', 'POTENCIA ÷ MASA'), palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: `${power.toFixed(0)} / ${mass.toFixed(0)}`, detail: local(locale, 'Power ÷ mass · entered units', 'Leistung ÷ Masse · eingegebene Einheiten', 'Potencia ÷ masa · unidades introducidas') };
   }
   if (id === 'tire-load-speed-rating') {
     const load = values.loadIndex ?? '91';
     const rating = values.speedRating ?? 'V';
-    return { scene: { meshes: wheel(v(0, 0, 0), 1, palette).concat(box(.62, .23, .14, palette.proposed, v(0, -.64, .44), 1, 0, metal)), annotations: [annotation(v(-.8, 1.15, .24), v(.8, 1.15, .24), `${load}${rating}`, palette.accent)], shadows: floor(), fitRadius: 1.5 }, readout: `${load}${rating}`, detail: 'Standards lookup · verify vehicle requirements' };
+    const tire = productTire(palette, locale, fallbackMeshes);
+    return { scene: { ...tire, meshes: [...tire.meshes, box(.62, .09, .14, palette.proposed, v(0, -.66, .44), 1, 0, metal)], annotations: [annotation(v(-.8, 1.15, .24), v(.8, 1.15, .24), `${load}${rating}`, palette.accent)] }, readout: `${load}${rating}`, detail: local(locale, 'Standards lookup · verify vehicle requirements', 'Normtabelle · Fahrzeuganforderungen prüfen', 'Tabla de normas · verifique los requisitos del vehículo') };
   }
   if (id === 'tire-date-code-decoder') {
     const code = (values.code ?? '2219').replace(/[^0-9]/g, '').slice(0, 4);
-    return { scene: { meshes: wheel(v(0, 0, 0), 1, palette).concat(box(.84, .22, .1, palette.proposed, v(0, -.72, .43), 1, 0, metal)), annotations: [annotation(v(-.65, 1.12, .26), v(.65, 1.12, .26), `DOT ${code || 'WWYY'}`, palette.accent)], shadows: floor(), fitRadius: 1.5 }, readout: `DOT ${code || 'WWYY'}`, detail: 'Last four digits · week / year' };
+    const tire = productTire(palette, locale, fallbackMeshes);
+    return { scene: { ...tire, meshes: [...tire.meshes, box(.84, .09, .1, palette.proposed, v(0, -.72, .43), 1, 0, metal)], annotations: [annotation(v(-.65, 1.12, .26), v(.65, 1.12, .26), `DOT ${code || 'WWYY'}`, palette.accent)] }, readout: `DOT ${code || 'WWYY'}`, detail: local(locale, 'Last four digits · week / year', 'Letzte vier Ziffern · Woche / Jahr', 'Últimos cuatro dígitos · semana / año') };
   }
   if (id === 'towing-capacity-calculator') {
     const gcwr = Math.max(0, input('gcwr', 17000));
     const vehicle = Math.max(0, input('curbWeight', 5500) + input('loadWeight', 500));
     const ratio = clamp((gcwr - vehicle) / Math.max(1, gcwr), .08, .8);
-    const meshes = [...vehicleModule(-.85, palette), box(.87 + ratio, .55, .68, palette.proposed, v(.83, -.2, 0), 1, 0, metal), cylinder(.22, .17, dark, v(.87, -.63, .42), 1, satin), cylinder(.22, .17, dark, v(1.43, -.63, .42), 1, satin)];
-    return { scene: { meshes, lines: [{ points: [v(-.01, -.46, 0), v(.38, -.46, 0)], color: palette.accent, width: 3 }], annotations: [annotation(v(-1.45, .72, 0), v(1.5, .72, 0), 'GCWR', palette.accent)], shadows: floor(1.8), fitRadius: 1.88 }, readout: `${gcwr.toFixed(0)} − ${vehicle.toFixed(0)}`, detail: 'GCWR − loaded vehicle · entered units' };
+    const meshes: Mesh3D[] = [
+      box(2.9, .09, .86, '#294455', v(0, -.88, 0), 1, 0, satin),
+      box(1.22, .11, .58, '#9fb7c5', v(-.75, -.55, 0), 1, 0, metal),
+      box(1.22, .11, .58, '#9fb7c5', v(.76, -.55, 0), 1, 0, metal),
+      box(.52, .28, .48, palette.current, v(-.74, -.33, 0), 1, 0, metal),
+      box(.52 + ratio, .28, .48, palette.proposed, v(.77, -.33, 0), 1, 0, metal),
+      cylinder(.12, .4, palette.accent, v(.02, -.53, 0), 1, metal),
+      annulusCylinder(.18, .11, .22, '#b9cbd5', v(.02, -.53, .22), 1, metal),
+    ];
+    return { scene: { meshes, lines: [{ points: [v(-.59, -.15, .25), v(.59, -.15, .25)], color: palette.accent, width: 3 }], annotations: [annotation(v(-1.38, .72, 0), v(1.4, .72, 0), 'GCWR', palette.accent)], shadows: floor(1.8), fitRadius: 1.88 }, readout: `${gcwr.toFixed(0)} − ${vehicle.toFixed(0)}`, detail: local(locale, 'GCWR − loaded vehicle · entered units', 'Zulässiges Zuggesamtgewicht − beladenes Fahrzeug · Eingabeeinheiten', 'Peso bruto combinado − vehículo cargado · unidades introducidas') };
   }
   if (id === 'quarter-mile-calculator') {
     const weight = input('weight', 3400), power = input('power', 300);
     const scene = pathScene(.25, false, palette);
-    return { scene: { ...scene, annotations: [annotation(v(-1.3, .62, .1), v(1.3, .62, .1), '¼ MI · 402.3 M', palette.accent)] }, readout: `${weight.toFixed(0)} / ${power.toFixed(0)}`, detail: 'Weight / power · illustrative course' };
+    return { scene: { ...scene, annotations: [annotation(v(-1.3, .62, .1), v(1.3, .62, .1), '¼ mi · 402.3 m', palette.accent)] }, readout: `${weight.toFixed(0)} / ${power.toFixed(0)}`, detail: local(locale, 'Weight / power · illustrative course', 'Gewicht / Leistung · schematische Strecke', 'Peso / potencia · recorrido ilustrativo') };
   }
-  const make = values.make || '—', model = values.model || '—';
-  return { scene: { meshes: [...wheel(v(-.8, 0, 0), .8, palette), annulusCylinder(.78, .27, .18, palette.metal, v(.9, 0, 0), 1, metal), ...Array.from({ length: 5 }, (_, i) => { const a = i * Math.PI * 2 / 5; return cylinder(.095, .23, dark, v(.9 + Math.cos(a) * .53, Math.sin(a) * .53, .12), 1, satin); })], shadows: floor(1.7), fitRadius: 1.75 }, readout: `${make} · ${model}`, detail: 'Reference tire + bolt plate · check sourced record' };
+  const selected = vehicleById(values.model ?? '');
+  const lugCount = selected?.lugCount ?? 0;
+  const holes = Array.from({ length: lugCount }, (_, i) => { const a = i * Math.PI * 2 / lugCount; return cylinder(.095, .23, dark, v(.9 + Math.cos(a) * .53, Math.sin(a) * .53, .12), 1, satin); });
+  return { scene: { meshes: [...wheel(v(-.8, 0, 0), .8, palette), annulusCylinder(.78, .27, .18, palette.metal, v(.9, 0, 0), 1, metal), ...holes], shadows: floor(1.7), fitRadius: 1.75 }, readout: selected ? `${selected.make} ${selected.model} · ${selected.boltPattern}` : local(locale, 'Select a sourced vehicle', 'Fahrzeug mit Quelle wählen', 'Elija un vehículo documentado'), detail: selected ? local(locale, 'Sourced reference · confirm exact trim', 'Referenz mit Quellen · genaue Ausstattung prüfen', 'Referencia documentada · confirme la versión exacta') : local(locale, 'No bolt pattern shown until a documented vehicle is selected', 'Lochkreis erst nach Auswahl eines dokumentierten Fahrzeugs', 'El patrón de pernos aparece tras elegir un vehículo documentado') };
 }
