@@ -1,0 +1,11 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import FitCheckForm from '../../../components/FitCheckForm.astro';
+import { toolById } from '../../../seo/tool-registry';
+const definition = toolById('tire-fit-check');
+---
+<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/can-i-fit-tire-size/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/passt-diese-reifengroesse/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/puedo-montar-esta-medida/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/can-i-fit-tire-size/' }]} visual={false} eyebrow="Tires & wheels · Decision" intro="Enter your current tire and the size you want. Atlas runs every relevant check and tells you what it means — and what still needs confirming." limitation="Geometry and reference data only. Atlas cannot see your car's clearance, load requirement or local approval rules — those checks are marked NOT VERIFIED.">
+  <FitCheckForm slot="tool" />
+  <div slot="explanation"><h2>How the decision is built</h2><p>Atlas calculates the overall diameter of both sizes and derives the speedometer and ride-height effects from it. Within ±3% — a widely used industry rule of thumb — a change counts as geometrically close. That is not a legal limit.</p><p>Whether a size is manufactured is checked against a reference list of production tire sizes. The list is not exhaustive, so a missing size is never described as “non-existent”.</p><p>Everything Atlas cannot see — clearance, load index and speed rating, approved rim width, approval and registration — is listed explicitly as NOT VERIFIED.</p></div>
+</ToolPage>
+<script>import { initializeFitCheck } from '../../../ui/fit-check'; initializeFitCheck();</script>

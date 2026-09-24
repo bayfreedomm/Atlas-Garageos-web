@@ -11,9 +11,11 @@ const intendedRoutes = [
   '/tools/',
   '/methodology/',
   '/privacy-policy/',
+  '/contact/',
   '/fitment-studio/',
   '/tools/tire-size-calculator/',
   '/tools/tire-size-comparison/',
+  '/tools/can-i-fit-tire-size/',
   '/tools/wheel-offset-calculator/',
   '/tools/speedometer-error-calculator/',
   '/tools/gear-ratio-calculator/',
@@ -65,9 +67,11 @@ describe('SEO tool registry', () => {
 
   it('renders a sitemap with intended canonical pages and no app state', () => {
     const entries = sitemapEntries();
-    // Localized (DE/ES) platform + tool pages are appended after the English routes;
-    // the flagship fitment-studio page has no localized version and is intentionally excluded.
-    const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented' && tool.id !== 'fitment-studio').length;
+    // Localized (DE/ES) platform + tool pages are appended after the English routes. Every
+    // registry entry now has a DE/ES route — including the fitment-studio flagship, which gained
+    // /de/fitment-studio/ and /es/fitment-studio/ — and the five platform pages include /contact/.
+    const localizedPlatformPages = 5;
+    const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented').length;
     // Vehicle pages: three localized index routes, three comparison hubs, plus one route per
     // US vehicle and two (DE + ES) per non-US vehicle. Pair state stays query-only.
     const vehicleRoutes = 6 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
@@ -76,7 +80,7 @@ describe('SEO tool registry', () => {
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
     // hand-maintained page count.
     const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
-    const expectedCount = intendedRoutes.length + 2 * (4 + localizedTools) + vehicleRoutes + entityRoutes;
+    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');
@@ -86,8 +90,9 @@ describe('SEO tool registry', () => {
     expect(entries).toContain('https://atlasgarageos.com/vehicles/compare/');
     expect(entries).toContain('https://atlasgarageos.com/de/fahrzeuge/vergleichen/');
     expect(entries).toContain('https://atlasgarageos.com/es/vehiculos/comparar/');
-    expect(entries).not.toContain('https://atlasgarageos.com/de/fitment-studio/');
-    expect(entries).not.toContain('https://atlasgarageos.com/es/fitment-studio/');
+    // The flagship now has localized pages; they must be in the sitemap.
+    expect(entries).toContain('https://atlasgarageos.com/de/fitment-studio/');
+    expect(entries).toContain('https://atlasgarageos.com/es/fitment-studio/');
     const xml = renderSitemapXml();
     expect(xml.match(/<url>/g)).toHaveLength(expectedCount);
     expect(xml).not.toContain('#');

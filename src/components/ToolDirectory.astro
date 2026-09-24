@@ -47,13 +47,13 @@ const dataProducts = toolRegistry.filter(({ kind }) => kind === 'data-product');
 // dashboard is the first thing in the Fuel & Trips view (which is itself the first category
 // in TOOL_CATEGORY_ORDER), without any per-row special case in the markup.
 const listedEntries = [...dataProducts, ...tools];
-const popularIds: readonly ToolId[] = ['gas-prices-today', 'fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
+const popularIds: readonly ToolId[] = ['gas-prices-today', 'fuel-cost-calculator', 'road-trip-cost-calculator', 'tire-size-calculator', 'tire-fit-check', 'wheel-offset-calculator', 'psi-bar-converter', 'mpg-l100km-converter', 'power-to-weight-calculator'];
 const displayedTools = mode === 'home'
   ? [...popularIds.map((id) => listedEntries.find((tool) => tool.id === id)!), ...listedEntries.filter((tool) => !popularIds.includes(tool.id))]
   : [...listedEntries].sort((left, right) => TOOL_CATEGORY_ORDER.indexOf(left.category) - TOOL_CATEGORY_ORDER.indexOf(right.category));
 const helper = new Map<ToolId, string>([
   ['fuel-cost-calculator', 'Fuel used and total journey cost'], ['road-trip-cost-calculator', 'Trips, extras, and cost per person'],
-  ['tire-size-calculator', 'See the tire behind the numbers'], ['tire-size-comparison', 'Compare diameter and ride height'],
+  ['tire-size-calculator', 'See the tire behind the numbers'], ['tire-size-comparison', 'Compare diameter and ride height'], ['tire-fit-check', 'Every check for a size change, on one page'],
   ['wheel-offset-calculator', 'See inner clearance and outer position'], ['speedometer-error-calculator', 'Compare indicated and actual speed'],
   ['fitment-map', 'Explore width and offset geometry'], ['measure-my-car', 'Record real clearance measurements'],
   ['gear-ratio-calculator', 'See tire-size effects on gearing and RPM'],

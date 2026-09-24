@@ -20,6 +20,6 @@ describe('tool next decisions', () => {
     expect(model.actions[0]?.href).toBe('/tools/measure-my-car/');
     expect(model.actions[0]?.detail).toContain('Measure real');
     const german = toolNextDecision('wheel-offset-calculator', 'de');
-    expect(german.supportingActions?.find((action) => action.id === 'support-fitment-studio')?.href).toBe('/fitment-studio/');
+    expect(german.supportingActions?.find((action) => action.id === 'support-fitment-studio')?.href).toBe('/de/fitment-studio/');
   });
 });

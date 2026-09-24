@@ -27,7 +27,7 @@ describe('toolbox-first product surfaces', () => {
   });
 
   it('keeps every implemented tool discoverable and direct popular links on home', () => {
-    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(22);
+    expect(toolRegistry.filter(({ kind }) => kind === 'tool')).toHaveLength(23);
     expect(hub).toContain('<ToolDirectory mode="all"');
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('data-tool-search-form');
@@ -42,7 +42,9 @@ describe('toolbox-first product surfaces', () => {
     // The fitment link's label is now locale-aware (uiStrings with an English fallback),
     // so it renders as a JS string default (plain &) rather than a static HTML entity.
     expect(drawer).toContain("?? 'Wheel & Tire Compare'");
-    expect(drawer).not.toContain('My Garage');
+    // The drawer links My Garage (Fitment Studio #garage) with the locale prefix, like the header nav.
+    expect(drawer).toContain("?? 'My Garage'");
+    expect(drawer).toContain('${prefix}/fitment-studio/#garage');
     expect(drawer).toContain('<ThemeControl');
   });
 

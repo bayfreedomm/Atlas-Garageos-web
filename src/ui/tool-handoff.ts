@@ -105,6 +105,12 @@ const HANDOFFS: Readonly<Record<string, Partial<Record<ToolId, Builder>>>> = {
       return stateHandoff('speedometer', { 'original-widthMm': w!, 'original-aspectRatio': a!, 'original-rimDiameterInches': r! });
     },
   },
+  'tire-fit-check': {
+    'tire-size-comparison': (form) => { const search = tirePair(form); return search ? { search } : null; },
+    'speedometer-error-calculator': (form) => { const search = tirePair(form); return search ? { search } : null; },
+    'measure-my-car': (form, locale) => { const search = tirePair(form); return search ? { path: fitmentStudioPath(locale), search, hash: '#measure-flow' } : null; },
+    'wheel-offset-calculator': (form) => { const search = wheelSearch(form); return search ? { search } : null; },
+  },
   speedometer: {
     'tire-size-comparison': (form) => { const search = tirePair(form); return search ? { search } : null; },
     // The size calculator describes one tire; the new one is the size being considered.

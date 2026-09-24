@@ -6,6 +6,7 @@ interface Props { definition: ToolDefinition; compact?: boolean; }
 const { definition, compact = false } = Astro.props;
 const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'fitment-studio': ['Wheel, tire, and body', 'One connected workspace'],
+  'tire-fit-check': ['One question, every check', 'Number, shape, meaning, decision'],
   'fuel-cost-calculator': ['Distance meets consumption', 'See fuel and cost together'],
   'road-trip-cost-calculator': ['Plan the whole drive', 'Fuel, extras, and people'],
   'tire-size-calculator': ['Read the tire profile', 'Width · sidewall · rim'],

@@ -11,12 +11,14 @@ const existing3D = new Set([
   'tire-size-calculator', 'tire-size-comparison', 'wheel-offset-calculator',
   'speedometer-error-calculator', 'gear-ratio-calculator', 'ev-charging-cost-calculator',
   'bolt-pattern-calculator', 'compression-ratio-calculator',
+  // The tire-size fit check embeds the same parametric tire-comparison 3D panel (mode="tire").
+  'tire-fit-check',
 ]);
 
 describe('3D coverage for the complete tool directory', () => {
   it('assigns every published tool route exactly one 3D experience', () => {
     const tools = toolRegistry.filter((tool) => tool.kind === 'tool');
-    expect(tools).toHaveLength(22);
+    expect(tools).toHaveLength(23);
     for (const tool of tools) {
       expect(Number(existing3D.has(tool.id)) + Number((additional3DToolIds as readonly string[]).includes(tool.id))).toBe(1);
     }

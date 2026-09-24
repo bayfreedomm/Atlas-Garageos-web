@@ -73,6 +73,33 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { question: 'Warum weicht mein berechneter Durchmesser von der Messung im Reifenfachbetrieb ab?', answer: 'Dieser Rechner nutzt die auf der Flanke aufgedruckte Nenngröße. Reale Reifen variieren leicht je nach Hersteller, Profilverschleiß und Luftdruck, daher ist eine kleine Abweichung von einer physischen Messung normal.' },
     ],
   },
+  'tire-fit-check': {
+    title: 'Passt diese Reifengröße?',
+    description: 'Prüfen Sie einen Reifengrößenwechsel an einem Ort — Durchmesser, Tacho, Bodenfreiheit, ob die Größe hergestellt wird und was sie für Ihre Felgen bedeutet —, jedes Ergebnis mit seiner Verlässlichkeit gekennzeichnet.',
+    category: 'Reifen & Felgen',
+    eyebrow: 'Reifen & Felgen · Entscheidung',
+    intro: 'Geben Sie Ihren aktuellen Reifen und die gewünschte Größe ein. Atlas führt alle relevanten Prüfungen aus und sagt, was sie bedeuten — und was noch bestätigt werden muss.',
+    limitation: 'Nur Geometrie und Referenzdaten. Atlas sieht weder den Freigang an Ihrem Auto noch die Tragfähigkeitsanforderung oder die Zulassungsregeln — diese Punkte sind als NICHT GEPRÜFT markiert.',
+    explanation: [
+      { heading: 'Wie die Entscheidung entsteht', paragraphs: [
+        'Atlas berechnet den Gesamtdurchmesser beider Größen und leitet daraus Tachoabweichung und Bodenfreiheit ab. Innerhalb von ±3 % gilt eine Änderung nach verbreiteter Branchen-Faustregel als geometrisch nah — das ist keine gesetzliche Grenze.',
+        'Ob eine Größe hergestellt wird, prüft Atlas gegen eine Referenzliste von Serienreifengrößen. Diese Liste ist nicht vollständig; eine fehlende Größe wird deshalb nie als „nicht existent“ bezeichnet.',
+        'Alles, was Atlas nicht sehen kann — Freigang, Trag- und Geschwindigkeitsindex, zulässige Felgenbreite, Freigabe und Eintragung —, wird ausdrücklich als NICHT GEPRÜFT aufgeführt.',
+      ] },
+    ],
+    facts: [
+      { title: 'Der Durchmesser bestimmt die meisten Nebenwirkungen', body: 'Tachoanzeige, Übersetzung, Bodenfreiheit und ABS/ESP-Abstimmung folgen dem Gesamtdurchmesser — deshalb wird er zuerst geprüft.' },
+      { title: 'Hergestellt heißt nicht freigegeben', body: 'Eine Größe kann hergestellt werden und geometrisch passen und trotzdem für Fahrzeug, Felgenbreite oder Tragfähigkeit nicht freigegeben sein.' },
+      { title: 'Jedes Ergebnis nennt seine Verlässlichkeit', body: 'BERECHNET heißt exakte Nenngeometrie, REFERENZDATEN stammen aus einer kuratierten Liste, NICHT GEPRÜFT heißt: Atlas sieht es nicht, Sie müssen es bestätigen.' },
+    ],
+    commonMistake: '„Innerhalb von ±3 %“ als „passt an mein Auto“ lesen. Die Faustregel begrenzt nur Tacho- und Übersetzungseffekte; über Freigang, Tragfähigkeit oder Freigabe sagt sie nichts.',
+    warning: 'Nur Geometrie und Referenzdaten. Freigang zu Bremse, Fahrwerk und Karosserie, Trag- und Geschwindigkeitsindex, zulässige Felgenbreite und Zulassungsregeln werden nicht geprüft.',
+    faqs: [
+      { question: 'Darf ich eine Reifengröße fahren, die nicht in den Fahrzeugpapieren steht?', answer: 'Oft ja, aber in Deutschland in der Regel nur mit Freigabe (z. B. ABE oder Teilegutachten) und gegebenenfalls einer Eintragung durch TÜV oder DEKRA. Trag- und Geschwindigkeitsindex müssen mindestens den Vorgaben entsprechen.' },
+      { question: 'Warum gilt ±3 % als Grenze?', answer: 'Das ist eine verbreitete Branchen-Faustregel, die Tacho-, Übersetzungs- und ABS/ESP-Effekte klein hält. Sie ist weder eine gesetzliche Grenze noch eine Herstellerfreigabe.' },
+      { question: 'Warum ist ein größerer Reifen für den Tacho wichtig?', answer: 'Nach UN-Regelung 39 darf ein Tacho nie weniger als die tatsächliche Geschwindigkeit anzeigen. Ein größerer Reifen legt pro Radumdrehung mehr Strecke zurück, der Tacho zeigt also weniger an als bisher und kann seine Reserve aufbrauchen.' },
+    ],
+  },
   'tire-size-comparison': {
     title: 'Reifengrößen-Vergleich',
     description: 'Vergleichen Sie zwei Reifengrößen mit transparenter Darstellung von Durchmesser, Flankenhöhe, Umfang und Tachoabweichung.',

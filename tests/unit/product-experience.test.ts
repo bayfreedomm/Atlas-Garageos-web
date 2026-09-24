@@ -35,7 +35,7 @@ describe('Milestone 8 product experience', () => {
   });
 
   it('publishes a useful home and maps every implemented tool into the hub', () => {
-    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/', '/tools/', '/methodology/', '/privacy-policy/']);
+    expect(platformPageRegistry.map(({ pathname }) => pathname)).toEqual(['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/']);
     expect(home).toContain('<HomeLauncher');
     expect(homeLauncher).toContain('What do you want to calculate?');
     expect(homeLauncher).toContain('tool-launch-row');
@@ -49,7 +49,10 @@ describe('Milestone 8 product experience', () => {
   });
 
   it('keeps key internal routes connected', () => {
-    expect(siteLayout).not.toContain('/fitment-studio/#garage');
+    // My Garage is a first-class nav destination again (it lives in Fitment Studio's #garage
+    // section) and must stay locale-aware: /de/… and /es/… pages link to their own studio.
+    expect(siteLayout).toContain("'/fitment-studio/#garage'");
+    expect(siteLayout).toContain('/${locale}/fitment-studio/#garage');
     expect(studio).toContain('id="garage"');
     expect(studio).toContain('href="/"');
     expect(studio).toContain('id="compare"');

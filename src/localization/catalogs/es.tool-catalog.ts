@@ -47,6 +47,33 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
       { question: '¿Por qué mi diámetro calculado difiere de la medición en el taller?', answer: 'Esta calculadora usa la medida nominal impresa en el flanco. Los neumáticos reales varían ligeramente según el fabricante, el desgaste de la banda de rodadura y la presión, así que una pequeña diferencia frente a una medición física es normal.' },
     ],
   },
+  'tire-fit-check': {
+    title: '¿Puedo montar esta medida?',
+    description: 'Compruebe un cambio de medida de neumático en un solo lugar — diámetro, velocímetro, altura libre, si la medida se fabrica y qué implica para sus llantas —, con cada resultado etiquetado según su fiabilidad.',
+    category: 'Neumáticos y Llantas',
+    eyebrow: 'Neumáticos y llantas · Decisión',
+    intro: 'Introduzca su neumático actual y la medida que quiere montar. Atlas ejecuta todas las comprobaciones relevantes y le dice qué significan — y qué falta por confirmar.',
+    limitation: 'Solo geometría y datos de referencia. Atlas no ve la holgura de su coche, el índice de carga exigido ni las normas de homologación — esos puntos aparecen como NO VERIFICADO.',
+    explanation: [
+      { heading: 'Cómo se construye la decisión', paragraphs: [
+        'Atlas calcula el diámetro total de ambas medidas y de ahí deduce el efecto en el velocímetro y en la altura libre. Dentro del ±3 %, una regla práctica habitual del sector, el cambio se considera geométricamente cercano — no es un límite legal.',
+        'Atlas comprueba si una medida se fabrica con una lista de referencia de medidas de serie. La lista no es exhaustiva, así que una medida ausente nunca se presenta como «inexistente».',
+        'Todo lo que Atlas no puede ver — holgura, índice de carga y velocidad, ancho de llanta aprobado, homologación e ITV — aparece expresamente como NO VERIFICADO.',
+      ] },
+    ],
+    facts: [
+      { title: 'El diámetro decide la mayoría de los efectos', body: 'La lectura del velocímetro, el desarrollo, la altura libre y la calibración del ABS/ESP siguen al diámetro total — por eso se comprueba primero.' },
+      { title: 'Fabricada no significa homologada', body: 'Una medida puede fabricarse y ser geométricamente cercana y aun así no estar aprobada para su vehículo, su ancho de llanta o su carga.' },
+      { title: 'Cada resultado indica su fiabilidad', body: 'CALCULADO significa geometría nominal exacta, DATO DE REFERENCIA procede de una lista curada, NO VERIFICADO significa que Atlas no puede verlo y debe confirmarlo usted.' },
+    ],
+    commonMistake: 'Entender «dentro del ±3 %» como «cabe en mi coche». La regla práctica solo limita los efectos en velocímetro y desarrollo; no dice nada de holgura, índice de carga ni homologación.',
+    warning: 'Solo geometría y datos de referencia. No se comprueban la holgura con frenos, suspensión y carrocería, el índice de carga y velocidad, el ancho de llanta aprobado ni las normas de homologación.',
+    faqs: [
+      { question: '¿Puedo montar una medida que no figura en la ficha técnica?', answer: 'A menudo sí, pero en España suele requerir homologación como reforma y pasar por la ITV. El índice de carga y el código de velocidad deben ser al menos los exigidos.' },
+      { question: '¿Por qué se usa el ±3 % como límite?', answer: 'Es una regla práctica muy extendida en el sector que mantiene pequeños los efectos en velocímetro, desarrollo y ABS/ESP. No es un límite legal ni una aprobación del fabricante.' },
+      { question: '¿Por qué importa un neumático más grande para el velocímetro?', answer: 'El Reglamento n.º 39 de la ONU exige que el velocímetro nunca marque menos que la velocidad real. Un neumático más grande recorre más distancia por vuelta, así que el velocímetro marca menos que antes y puede agotar su margen.' },
+    ],
+  },
   'tire-size-comparison': {
     title: 'Comparación de Tamaños de Neumáticos',
     description: 'Compare dos tamaños de neumático con diferencias transparentes de diámetro, flanco, circunferencia y velocímetro.',

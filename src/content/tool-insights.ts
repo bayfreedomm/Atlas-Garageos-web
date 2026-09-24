@@ -35,6 +35,20 @@ export const toolInsights: Readonly<Record<ToolId, ToolInsightContent>> = Object
       { question: 'Why does my calculated diameter differ from what my tire shop measures?', answer: 'This calculator uses the nominal size printed on the sidewall. Real tires vary slightly by manufacturer, tread wear, and inflation pressure, so a small difference from a physical measurement is normal.' },
     ],
   },
+  'tire-fit-check': {
+    facts: [
+      { title: 'Diameter decides most side effects', body: 'Speedometer reading, gearing, ride height and ABS/ESC calibration all follow the overall diameter — which is why it is checked first.' },
+      { title: 'A made size is not an approved size', body: 'A size can be manufactured, geometrically close and still not be approved for your vehicle, rim width or load requirement.' },
+      { title: 'Every result says how sure it is', body: 'CALCULATED means exact nominal geometry, REFERENCE DATA comes from a curated list, NOT VERIFIED means Atlas cannot see it and you must confirm it.' },
+    ],
+    commonMistake: 'Reading “within ±3%” as “fits my car”. The rule of thumb only limits speedometer and gearing effects; it says nothing about clearance, load index or approval.',
+    warning: 'Geometry and reference data only. Brake, suspension and body clearance, the tire’s load index and speed rating, the approved rim width and local approval rules are not checked.',
+    faqs: [
+      { question: 'Can I fit a tire size that is not listed in my vehicle documents?', answer: 'Often yes, but it depends on the country. Many require the new size to be approved for the vehicle, and some require an inspection or registration entry. The size also needs at least the original load index and speed rating.' },
+      { question: 'Why is ±3% used as the limit?', answer: 'It is a widely used industry rule of thumb that keeps speedometer, gearing and ABS/ESC effects small. It is not a legal limit or a manufacturer approval.' },
+      { question: 'Why does a bigger tire matter for the speedometer?', answer: 'UN Regulation 39 requires speedometers never to show less than the true speed. A larger tire makes the car travel further per wheel turn, so the speedometer reads lower than before and can use up the margin it was built with.' },
+    ],
+  },
   'tire-size-comparison': {
     facts: [
       { title: 'Width and diameter are different', body: 'A wider tire can still have nearly the same — or even a smaller — overall diameter.' },

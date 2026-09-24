@@ -1,0 +1,46 @@
+---
+/**
+ * Form + result regions for "Can I fit this tire size?" (ui/fit-check.ts renders the results).
+ * Field names deliberately match the tire comparison ("original-" and "new-" prefixes) and the wheel offset
+ * calculator (originalWidthInches…), so the 3D panel, share links, the print sheet and tool
+ * hand-off links all work on this page without special cases.
+ */
+import TireInputGroup from './TireInputGroup.astro';
+import Parametric3DPanel from './Parametric3DPanel.astro';
+import type { ContentLocale } from '../localization/site-catalog';
+
+interface Props { readonly locale?: ContentLocale | undefined; }
+const { locale } = Astro.props;
+const t = {
+  en: { current: 'Current tire', proposed: 'Tire you want to fit', wheels: 'Add wheel sizes (optional)', wheelsHint: 'Fill in all four to see how far the wheel edges move.', cw: 'Current wheel width (J)', ce: 'Current offset (ET)', nw: 'New wheel width (J)', ne: 'New offset (ET)', submit: 'Check this size', result: 'Fit check result', shape: 'Tire shape comparison', checks: 'Individual checks' },
+  de: { current: 'Aktueller Reifen', proposed: 'Gewünschter Reifen', wheels: 'Felgenmaße ergänzen (optional)', wheelsHint: 'Alle vier ausfüllen, um die Verschiebung der Felgenkanten zu sehen.', cw: 'Aktuelle Felgenbreite (J)', ce: 'Aktuelle Einpresstiefe (ET)', nw: 'Neue Felgenbreite (J)', ne: 'Neue Einpresstiefe (ET)', submit: 'Diese Größe prüfen', result: 'Ergebnis der Passprüfung', shape: 'Reifenvergleich als Grafik', checks: 'Einzelne Prüfungen' },
+  es: { current: 'Neumático actual', proposed: 'Neumático que quiere montar', wheels: 'Añadir medidas de llanta (opcional)', wheelsHint: 'Rellene los cuatro campos para ver cuánto se desplazan los bordes de la llanta.', cw: 'Ancho de llanta actual (J)', ce: 'Offset actual (ET)', nw: 'Ancho de llanta nuevo (J)', ne: 'Offset nuevo (ET)', submit: 'Comprobar esta medida', result: 'Resultado de la comprobación', shape: 'Comparación gráfica de neumáticos', checks: 'Comprobaciones individuales' },
+}[locale ?? 'en'];
+---
+<form class="calculator-form fit-check-form" data-calculator="tire-fit-check" novalidate>
+  <div class="calculator-columns">
+    <TireInputGroup locale={locale} prefix="original-" title={t.current} width={225} aspect={45} rim={17} />
+    <TireInputGroup locale={locale} prefix="new-" title={t.proposed} width={235} aspect={40} rim={18} />
+  </div>
+  <details class="fit-check-wheels" data-fit-wheels>
+    <summary>{t.wheels}</summary>
+    <p>{t.wheelsHint}</p>
+    <div class="grid">
+      <label>{t.cw}<input name="originalWidthInches" type="number" step="0.5" inputmode="decimal" /></label>
+      <label>{t.ce}<input name="originalOffsetMm" type="number" step="1" inputmode="numeric" /></label>
+      <label>{t.nw}<input name="newWidthInches" type="number" step="0.5" inputmode="decimal" /></label>
+      <label>{t.ne}<input name="newOffsetMm" type="number" step="1" inputmode="numeric" /></label>
+    </div>
+  </details>
+  <div class="form-actions"><button type="submit">{t.submit}</button></div>
+  <div class="inline-errors" data-fit-errors role="alert" hidden></div>
+
+  <div class="fit-result" data-fit-result aria-label={t.result} hidden>
+    <section class="fit-verdict" data-fit-verdict aria-live="polite" aria-labelledby="fit-verdict-title"></section>
+    <figure class="fit-shape" aria-label={t.shape}><div data-fit-shape></div></figure>
+    <ol class="fit-checks" data-fit-checks aria-label={t.checks}></ol>
+    <nav class="fit-actions" data-fit-actions></nav>
+    <Parametric3DPanel mode="tire" locale={locale ?? 'en'} />
+    <section class="fit-legend" data-fit-legend></section>
+  </div>
+</form>

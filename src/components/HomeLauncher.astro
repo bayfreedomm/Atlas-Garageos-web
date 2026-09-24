@@ -24,6 +24,7 @@ const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
 const popularIds: readonly ToolId[] = [
   'fuel-cost-calculator',
   'tire-size-calculator',
+  'tire-fit-check',
   'road-trip-cost-calculator',
   'wheel-offset-calculator',
   'psi-bar-converter',
@@ -43,6 +44,7 @@ const shortNames = new Map<ToolId, string>([
   ['mpg-l100km-converter', 'MPG ↔ L/100km'],
   ['power-to-weight-calculator', 'Power-to-weight'],
   ['tire-size-comparison', 'Tire size comparison'],
+  ['tire-fit-check', 'Can I fit this tire?'],
   ['speedometer-error-calculator', 'Speedometer error'],
   ['gear-ratio-calculator', 'Gear ratio'],
   ['fitment-map', 'Fitment map'],
@@ -54,6 +56,7 @@ const shortNames = new Map<ToolId, string>([
 const helper = new Map<ToolId, string>([
   ['fuel-cost-calculator', 'Distance, consumption and fuel price'],
   ['tire-size-calculator', 'Diameter, sidewall and circumference'],
+  ['tire-fit-check', 'Every check for a size change, on one page'],
   ['road-trip-cost-calculator', 'Fuel, extras and cost per traveller'],
   ['wheel-offset-calculator', 'Inner clearance and outer position'],
   ['psi-bar-converter', 'Pressure in PSI, bar and kPa'],
