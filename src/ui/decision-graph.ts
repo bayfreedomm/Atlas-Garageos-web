@@ -154,6 +154,11 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
 
 const makeAction = (id: string, href: string, text: Pair): DecisionAction => Object.freeze({ id, href, title: text[0], detail: text[1] });
 
+// The Fitment Studio flagship app keeps the same unprefixed slug in every locale (unlike
+// calculators, which get a fully localized slug from localizedToolPath), so it needs its own
+// locale-prefix-only path here rather than a bare '/fitment-studio/'.
+const fitmentStudioHref = (locale: EntityLocale): string => (locale === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`);
+
 function tireEntryForVehicle(vehicle: VehicleFitment): TireSizeEntry {
   const parsed = parseTireNotation(vehicle.tireSize);
   if (!parsed) throw new Error(`No tire-size entity for vehicle ${vehicle.id}: ${vehicle.tireSize}`);
@@ -171,7 +176,7 @@ export function vehicleDecisionGraph(vehicle: VehicleFitment, locale: EntityLoca
       makeAction('vehicle-tire', entityDetailPath('tire-size', locale, tire.slug), copy.vehicle.tire),
       makeAction('vehicle-bolt', entityDetailPath('bolt-pattern', locale, boltPatternSlug(vehicle.boltPattern)), copy.vehicle.bolt),
       makeAction('vehicle-compare', vehicleComparisonHref(locale, vehicle.id), copy.vehicle.compare),
-      makeAction('vehicle-setup', '/fitment-studio/', copy.vehicle.setup),
+      makeAction('vehicle-setup', fitmentStudioHref(locale), copy.vehicle.setup),
       makeAction('vehicle-trip', vehicleTripHref(locale, vehicle.id), copy.vehicle.trip),
     ]),
     supportingActions: Object.freeze([
@@ -205,7 +210,7 @@ export function boltDecisionGraph(entry: BoltPatternEntry, locale: EntityLocale)
       makeAction('bolt-vehicles', '#entity-vehicles', copy.bolt.vehicles),
       makeAction('bolt-measure', boltPatternCalculatorHref(locale, entry), copy.bolt.measure),
       makeAction('bolt-offset', localizedToolPath(locale, 'wheel-offset-calculator', 'tool'), copy.bolt.offset),
-      makeAction('bolt-setup', '/fitment-studio/', copy.bolt.setup),
+      makeAction('bolt-setup', fitmentStudioHref(locale), copy.bolt.setup),
     ]),
     supportingActions: Object.freeze([
       makeAction('bolt-tires', '#entity-related', copy.bolt.tires),

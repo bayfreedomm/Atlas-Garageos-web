@@ -15,10 +15,13 @@ function localizedRoutes(): readonly string[] {
       routes.push(path === '/' ? `/${locale}/` : `/${locale}${path}`);
     }
     for (const tool of toolRegistry) {
-      // The fitment-studio flagship page has no localized version yet; it stays English-only.
-      if (tool.id === 'fitment-studio') continue;
       if (!(tool.indexable && tool.status === 'implemented')) continue;
-      routes.push(localizedToolPath(locale, tool.id, tool.kind));
+      // The fitment-studio flagship page now has a published DE/ES route too, but — unlike
+      // every calculator, which gets a fully localized slug from localizedToolPath — it keeps
+      // the same unprefixed 'fitment-studio' slug in every locale (see the DE/ES pages under
+      // src/pages/de/fitment-studio/ and src/pages/es/fitment-studio/), so it needs its own
+      // locale-prefix-only path here instead of localizedToolPath's localized slug.
+      routes.push(tool.id === 'fitment-studio' ? `/${locale}/fitment-studio/` : localizedToolPath(locale, tool.id, tool.kind));
     }
   }
   return routes;

@@ -95,7 +95,7 @@ export function guidedTireDecision(
     finalHref: localizedToolPath(locale, 'measure-my-car', 'tool'),
     finalDetail: copy.finalDetail,
     setupTitle: copy.setupTitle,
-    setupHref: `/fitment-studio/?current=${encodeURIComponent(originalSize)}&new=${encodeURIComponent(size)}#compare`,
+    setupHref: `${locale === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`}?current=${encodeURIComponent(originalSize)}&new=${encodeURIComponent(size)}#compare`,
     setupDetail: copy.setupDetail,
   });
 }

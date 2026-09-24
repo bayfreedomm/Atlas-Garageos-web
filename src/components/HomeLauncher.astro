@@ -105,7 +105,7 @@ const categories = home
 
       <div class="home-v7-actions" aria-label="Primary actions">
         <a class="home-v7-cta home-v7-cta--primary" href={`${prefix}/tools/`}>{home?.ctaExplore ?? 'Explore tools'} <span aria-hidden="true">→</span></a>
-        <a class="home-v7-cta home-v7-cta--secondary" href="/fitment-studio/">{home?.ctaCompare ?? 'Compare fitment'}</a>
+        <a class="home-v7-cta home-v7-cta--secondary" href={`${prefix}/fitment-studio/`}>{home?.ctaCompare ?? 'Compare fitment'}</a>
       </div>
 
       <nav class="home-v7-capabilities" aria-label="Tool families">
@@ -148,7 +148,7 @@ const categories = home
     </section>
 
     <a class="home-fuel-feature" href={fuelPricesPath}><span class:list={['home-fuel-feature__badge', fuelBadgeModifier]}><i aria-hidden="true"></i>{fuelBadgeText}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Weekly US average for regular, midgrade, premium and diesel, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
-    <a class="home-fitment-feature" href="/fitment-studio/"><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-fitment-feature" href={`${prefix}/fitment-studio/`}><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>
 <script>import { initializeToolboxes } from '../ui/toolbox-filter'; initializeToolboxes();</script>

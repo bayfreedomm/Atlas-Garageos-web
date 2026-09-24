@@ -46,15 +46,14 @@ export function toolNextDecision(id: ToolId, locale: 'en' | ContentLocale): Deci
   const target = toolById(next.tool);
   const copy = COPY[locale];
   const href = (toolId: ToolId): string => {
-    // The full Fitment Studio currently has one published English route.
-    if (toolId === 'fitment-studio') return '/fitment-studio/';
+    // The Fitment Studio flagship app now has a published route per locale, but it keeps the
+    // same unprefixed slug in every locale (unlike calculators, which get a fully localized
+    // slug from localizedToolPath) — so it needs its own locale-prefix-only path here.
+    if (toolId === 'fitment-studio') return locale === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`;
     const tool = toolById(toolId);
     return localizedToolPath(locale, toolId, tool.kind);
   };
-  const title = (toolId: ToolId): string => {
-    const translated = locale === 'en' ? toolById(toolId).title : localizedTool(toolId, locale).title;
-    return toolId === 'fitment-studio' && locale !== 'en' ? `${translated} (EN)` : translated;
-  };
+  const title = (toolId: ToolId): string => (locale === 'en' ? toolById(toolId).title : localizedTool(toolId, locale).title);
   const supporting = source.relatedToolIds.filter((relatedId) => relatedId !== next.tool).slice(0, 2);
   return Object.freeze({
     eyebrow: copy.eyebrow,

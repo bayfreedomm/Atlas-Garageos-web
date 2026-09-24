@@ -5,7 +5,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('fitment-map');
 const c = localizedTool('fitment-map', 'es');
 ---
-<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/fitment-studio/#fitment-map-section" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fitment-map/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-karte/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/mapa-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fitment-map/' }]}>
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/es/fitment-studio/#fitment-map-section" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fitment-map/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-karte/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/mapa-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fitment-map/' }]}>
   <div slot="tool" class="entry-workspace">
     <div><p class="eyebrow">Antes de abrir el mapa</p><h2>Traiga una línea base medida</h2><p>El mapa interactivo necesita el ancho y offset actuales de su llanta, las holguras interiores y exteriores medidas, y el rango que desea explorar.</p>
       <ol class="entry-steps">
@@ -14,7 +14,7 @@ const c = localizedTool('fitment-map', 'es');
         <li><strong>Revise las celdas</strong><span>Lea las holguras proyectadas y la explicación de cada estado.</span></li>
       </ol>
     </div>
-    <a class="button" href="/fitment-studio/#fitment-map-section">Iniciar con el mapa interactivo</a>
+    <a class="button" href="/es/fitment-studio/#fitment-map-section">Iniciar con el mapa interactivo</a>
   </div>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>

@@ -5,7 +5,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('fitment-map');
 const c = localizedTool('fitment-map', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/fitment-studio/#fitment-map-section" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fitment-map/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-karte/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/mapa-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fitment-map/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/de/fitment-studio/#fitment-map-section" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fitment-map/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-karte/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/mapa-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fitment-map/' }]}>
   <div slot="tool" class="entry-workspace">
     <div><p class="eyebrow">Bevor Sie die Karte öffnen</p><h2>Bringen Sie eine gemessene Basislinie mit</h2><p>Die interaktive Karte benötigt Ihre aktuelle Felgenbreite und Einpresstiefe, gemessene Innen- und Außenabstände sowie den Bereich, den Sie erkunden möchten.</p>
       <ol class="entry-steps">
@@ -14,7 +14,7 @@ const c = localizedTool('fitment-map', 'de');
         <li><strong>Zellen prüfen</strong><span>Lesen Sie projizierte Freigänge und die Begründung jedes Zustands.</span></li>
       </ol>
     </div>
-    <a class="button" href="/fitment-studio/#fitment-map-section">Mit der interaktiven Karte starten</a>
+    <a class="button" href="/de/fitment-studio/#fitment-map-section">Mit der interaktiven Karte starten</a>
   </div>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>

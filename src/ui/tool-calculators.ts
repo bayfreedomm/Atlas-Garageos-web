@@ -333,8 +333,17 @@ function setWheelVisual(form: HTMLFormElement, inner: number, outer: number): vo
 }
 
 
+/**
+ * toFixed() always emits a '.' decimal point. DE/ES pages already write their result copy with
+ * ',' (see the equivalents `diff` strings above), so the live visual labels next to that copy
+ * must match. toFixed never adds grouping separators, so a single '.' -> ',' swap is exact.
+ */
+function localDecimal(text: string): string {
+  return getPageLocale() === 'en' ? text : text.replace('.', ',');
+}
+
 function signed(value: number, digits = 1): string {
-  const rounded = Math.abs(value).toFixed(digits).replace(/\.0$/, '');
+  const rounded = localDecimal(Math.abs(value).toFixed(digits).replace(/\.0$/, ''));
   return `${value > 0 ? '+' : value < 0 ? '-' : ''}${rounded}`;
 }
 
@@ -424,7 +433,9 @@ function setGuidedTireDecision(form: HTMLFormElement, original: TireToolInput, p
 function prefillSpeedometerFromGuide(form: HTMLFormElement): void {
   const params = new URLSearchParams(window.location.search);
   const parse = (token: string | null): TireToolInput | null => {
-    if (!token || !/^\d{2,3}-\d{2,3}-\d{2}$/.test(token)) return null;
+    // Half-inch rims (16.5", 17.5") are valid in the tire comparison that links here, so
+    // accept them too — the stricter `\d{2}$` silently dropped those handoffs.
+    if (!token || !/^\d{2,3}-\d{2,3}-\d{2}(?:\.5)?$/.test(token)) return null;
     const [widthMm, aspectRatio, rimDiameterInches] = token.split('-').map(Number);
     if (widthMm === undefined || aspectRatio === undefined || rimDiameterInches === undefined) return null;
     return { widthMm, aspectRatio, rimDiameterInches };
@@ -454,7 +465,8 @@ function updateJourneyLink(selector: string, pathname: string, values: Readonly<
 function tireToken(input: TireToolInput): string { return `${input.widthMm}-${input.aspectRatio}-${input.rimDiameterInches}`; }
 
 function syncOffsetJourney(form: HTMLFormElement): void {
-  updateJourneyLink('[data-decision="support-fitment-studio"]', '/fitment-studio/#compare', {
+  const locale = getPageLocale();
+  updateJourneyLink('[data-decision="support-fitment-studio"]', locale === 'en' ? '/fitment-studio/#compare' : `/${locale}/fitment-studio/#compare`, {
     ow: String(numberValue(form, 'originalWidthInches')),
     oe: String(numberValue(form, 'originalOffsetMm')),
     nw: String(numberValue(form, 'newWidthInches')),
@@ -677,7 +689,7 @@ function setWheelOffsetTechnicalVisual(
     leftHead?.setAttribute('d', `M${a.toFixed(1)} ${y-4}l-7 4 7 4`);
     rightHead?.setAttribute('d', `M${b.toFixed(1)} ${y-4}l7 4-7 4`);
     const text = visual.querySelector<SVGTextElement>(`[data-${kind}-delta]`);
-    if (text) { text.setAttribute('x', ((a+b)/2).toFixed(1)); text.textContent = `${Math.abs(value).toFixed(2)} mm`; }
+    if (text) { text.setAttribute('x', ((a+b)/2).toFixed(1)); text.textContent = `${localDecimal(Math.abs(value).toFixed(2))} mm`; }
   };
   setArrow('inner', current.left, next.left, innerPositionChangeMm);
   setArrow('outer', current.right, next.right, outerPokeChangeMm);
@@ -689,8 +701,8 @@ function setWheelOffsetTechnicalVisual(
   setText('[data-outer-value]', `${signed(outerPokeChangeMm, 2)} mm`);
   setText('[data-inner-copy]', innerPositionChangeMm >= 0 ? direction.fartherInward : direction.moreInnerClearance);
   setText('[data-outer-copy]', outerPokeChangeMm >= 0 ? direction.fartherOutward : direction.lessOutward);
-  setText('[data-inner-meaning]', innerPositionChangeMm === 0 ? copy.innerMeaningSame : copy.innerMeaningDiff(Math.abs(innerPositionChangeMm).toFixed(2), innerPositionChangeMm > 0));
-  setText('[data-outer-meaning]', outerPokeChangeMm === 0 ? copy.outerMeaningSame : copy.outerMeaningDiff(Math.abs(outerPokeChangeMm).toFixed(2), outerPokeChangeMm > 0));
+  setText('[data-inner-meaning]', innerPositionChangeMm === 0 ? copy.innerMeaningSame : copy.innerMeaningDiff(localDecimal(Math.abs(innerPositionChangeMm).toFixed(2)), innerPositionChangeMm > 0));
+  setText('[data-outer-meaning]', outerPokeChangeMm === 0 ? copy.outerMeaningSame : copy.outerMeaningDiff(localDecimal(Math.abs(outerPokeChangeMm).toFixed(2)), outerPokeChangeMm > 0));
 
   // Mini stance view magnifies only the outer-edge movement; the cutaway above stays proportional.
   const currentMini = visual.querySelector<SVGRectElement>('[data-current-mini-wheel]');

@@ -270,7 +270,6 @@ export class Three3DRenderer {
   private pinchDistance: number | null = null;
   private annotations: readonly Annotation3D[] = [];
   private annotationObjects: THREE.Object3D[] = [];
-  private tireScene = false;
   private toolStudioScene = false;
   private labels: HTMLElement[] = [];
   private raf = 0;
@@ -423,7 +422,6 @@ export class Three3DRenderer {
     this.fitRadius = scene.fitRadius ?? 1.5;
     this.annotations = scene.studio ? [] : (scene.annotations ?? []);
     this.annotationObjects = [];
-    this.tireScene = scene.products?.some((product) => product.kind === 'tire-wheel') ?? false;
     this.toolStudioScene = Boolean(scene.studio);
 
     if (scene.studio) {
@@ -547,7 +545,7 @@ export class Three3DRenderer {
     // whole measurement HUD vanish — and stay gone — after a completely normal
     // amount of rotating. The per-annotation projected-span/depth checks below
     // already fade a guide out correctly as its line becomes edge-on, so that's
-    // the only gate needed; it no longer depends on `this.tireScene`.
+    // the only gate needed.
     const visible = this.content.visible;
     const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
     const hud = this.stage.querySelector<HTMLElement>('.parametric-3d__hud');

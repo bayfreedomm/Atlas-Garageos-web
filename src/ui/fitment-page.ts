@@ -8,7 +8,8 @@ import { createFitmentMap, findNearestGreenAlternatives, type FitmentMapCell, ty
 import type { CombinedFitmentCandidate, RankedCriterion } from '../core/fitment/combined-candidate';
 import { preflightFitmentExplorer, searchFitmentExplorer, type FitmentExplorerInput } from '../features/fitment-explorer/fitment-explorer';
 import { createSetupShareHash, decodeSetupShareHash, type SetupShareV1 } from '../features/share/setup-share';
-import { translate } from '../localization/catalog';
+import { fitmentStudioText } from '../localization/fitment-studio-catalog';
+import { getPageLocale } from './page-locale';
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
 import { formatNumber } from './format-number';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
@@ -86,6 +87,8 @@ function showIssues(container: HTMLElement, issues: readonly ValidationIssue[]):
 }
 
 export async function initializeFitmentPage(): Promise<void> {
+  const locale = getPageLocale();
+  const t = fitmentStudioText[locale];
   const form = required<HTMLFormElement>('#fitment-form');
   const results = required<HTMLDListElement>('#results');
   const errors = required<HTMLDivElement>('#errors');
@@ -134,12 +137,12 @@ export async function initializeFitmentPage(): Promise<void> {
 
   function reasonText(cell: FitmentMapCell, profile: VehicleClearanceProfile): string {
     const messages: string[] = [];
-    if (cell.reasons.includes('inner-overlap')) messages.push(`Calculated inner overlap: ${formatNumber(Math.abs(cell.projectedInnerClearanceMm))} mm.`);
-    if (cell.reasons.includes('outer-overlap')) messages.push(`Calculated outer overlap: ${formatNumber(Math.abs(cell.projectedOuterClearanceMm))} mm.`);
-    if (cell.reasons.includes('inner-below-target') && profile.minimumDesiredInnerClearanceMm !== null) messages.push(`Inner clearance is ${formatNumber(profile.minimumDesiredInnerClearanceMm - cell.projectedInnerClearanceMm)} mm below your target.`);
-    if (cell.reasons.includes('outer-below-target') && profile.minimumDesiredOuterClearanceMm !== null) messages.push(`Outer clearance is ${formatNumber(profile.minimumDesiredOuterClearanceMm - cell.projectedOuterClearanceMm)} mm below your target.`);
-    if (cell.reasons.includes('meets-targets')) messages.push('Both projected clearances meet your supplied targets. This is not a road-safety verdict.');
-    if (cell.reasons.includes('no-targets')) messages.push('No desired margins were supplied; only non-negative geometric clearance was checked.');
+    if (cell.reasons.includes('inner-overlap')) messages.push(t.calculatedInnerOverlap(formatNumber(Math.abs(cell.projectedInnerClearanceMm))));
+    if (cell.reasons.includes('outer-overlap')) messages.push(t.calculatedOuterOverlap(formatNumber(Math.abs(cell.projectedOuterClearanceMm))));
+    if (cell.reasons.includes('inner-below-target') && profile.minimumDesiredInnerClearanceMm !== null) messages.push(t.innerBelowTarget(formatNumber(profile.minimumDesiredInnerClearanceMm - cell.projectedInnerClearanceMm)));
+    if (cell.reasons.includes('outer-below-target') && profile.minimumDesiredOuterClearanceMm !== null) messages.push(t.outerBelowTarget(formatNumber(profile.minimumDesiredOuterClearanceMm - cell.projectedOuterClearanceMm)));
+    if (cell.reasons.includes('meets-targets')) messages.push(t.meetsTargetsReason);
+    if (cell.reasons.includes('no-targets')) messages.push(t.noTargetsReason);
     return messages.join(' ');
   }
 
@@ -155,7 +158,7 @@ export async function initializeFitmentPage(): Promise<void> {
     if (cell.state !== 'green' && activeMap && activeMapProfile === profile) {
       const nearest = findNearestGreenAlternatives({ widthInches: cell.wheelWidthInches, offsetMm: cell.offsetMm }, activeMap, 3);
       const nearestHeading = document.createElement('h4');
-      nearestHeading.textContent = 'Closest geometric matches';
+      nearestHeading.textContent = t.closestGeometricMatches;
       const list = document.createElement('ol');
       list.className = 'nearest-list';
       for (const alternative of nearest) {
@@ -163,14 +166,22 @@ export async function initializeFitmentPage(): Promise<void> {
         const widthSteps = Math.abs(alternative.cell.wheelWidthInches - cell.wheelWidthInches) / activeMap.widthStepInches;
         const offsetSteps = Math.abs(alternative.cell.offsetMm - cell.offsetMm) / activeMap.offsetStepMm;
         const label = document.createElement('span');
-        label.textContent = `${alternative.cell.wheelWidthInches}J ET${alternative.cell.offsetMm} — GREEN · inner ${formatNumber(alternative.cell.projectedInnerClearanceMm)} mm · outer ${formatNumber(alternative.cell.projectedOuterClearanceMm)} mm · ${formatNumber(alternative.distanceInGridSteps)} grid steps (${formatNumber(widthSteps)} width + ${formatNumber(offsetSteps)} offset)`;
+        label.textContent = t.nearestAlternativeSummary(
+          `${alternative.cell.wheelWidthInches}J ET${alternative.cell.offsetMm}`,
+          t.legendGreen,
+          formatNumber(alternative.cell.projectedInnerClearanceMm),
+          formatNumber(alternative.cell.projectedOuterClearanceMm),
+          formatNumber(alternative.distanceInGridSteps),
+          formatNumber(widthSteps),
+          formatNumber(offsetSteps),
+        );
         item.append(label);
-        appendButton(item, 'Load into comparison', () => loadWheelCandidate(alternative.cell, rimDiameter), 'secondary');
+        appendButton(item, t.loadIntoComparison, () => loadWheelCandidate(alternative.cell, rimDiameter), 'secondary');
         list.append(item);
       }
       if (nearest.length === 0) {
         const empty = document.createElement('p');
-        empty.textContent = 'No green alternatives exist in the current map range.';
+        empty.textContent = t.noGreenAlternatives;
         mapDetail.append(nearestHeading, empty);
       } else {
         mapDetail.append(nearestHeading, list);
@@ -188,7 +199,7 @@ export async function initializeFitmentPage(): Promise<void> {
     writeSetup('proposed', candidateSetup(cell, rimDiameter));
     input('proposed-setup-name').value = `${cell.wheelWidthInches}J ET${cell.offsetMm}`;
     renderComparison();
-    status.textContent = 'Candidate loaded into comparison. It has not been saved.';
+    status.textContent = t.candidateLoaded;
   }
 
   function generateMap(): void {
@@ -208,7 +219,7 @@ export async function initializeFitmentPage(): Promise<void> {
     const head = document.createElement('thead');
     const headerRow = document.createElement('tr');
     const corner = document.createElement('th');
-    corner.textContent = 'Width / Offset';
+    corner.textContent = t.mapWidthOffsetHeader;
     headerRow.append(corner);
     for (const offset of result.value.offsetValuesMm) {
       const header = document.createElement('th');
@@ -273,8 +284,8 @@ export async function initializeFitmentPage(): Promise<void> {
   }
 
   const criterionText = (criterion: RankedCriterion): string => {
-    const labels: Record<RankedCriterion['key'], string> = { outerPresence: 'outer presence', innerClearance: 'projected inner clearance', minimumClearance: 'minimum projected clearance', outerTargetDistance: 'distance from outer target', geometryChange: 'absolute wheel-position change', tireDiameterDifference: 'absolute tire diameter difference' };
-    return `${labels[criterion.key]} ${formatNumber(criterion.value)} ${criterion.unit === 'percent' ? '%' : 'mm'} (${criterion.preferred} ranks first)`;
+    const labels: Record<RankedCriterion['key'], string> = { outerPresence: t.criterionOuterPresence, innerClearance: t.criterionInnerClearance, minimumClearance: t.criterionMinimumClearance, outerTargetDistance: t.criterionOuterTargetDistance, geometryChange: t.criterionGeometryChange, tireDiameterDifference: t.criterionTireDiameterDifference };
+    return t.criterionRanksFirst(labels[criterion.key], formatNumber(criterion.value), criterion.unit === 'percent' ? '%' : 'mm', criterion.preferred);
   };
 
   function candidateToInput(candidate: CombinedFitmentCandidate): SetupInput {
@@ -285,7 +296,7 @@ export async function initializeFitmentPage(): Promise<void> {
     writeSetup('proposed', candidateToInput(candidate));
     input('proposed-setup-name').value = `${candidate.setup.tire.widthMm}/${candidate.setup.tire.aspectRatio}R${candidate.setup.tire.rimDiameterInches} · ${candidate.setup.wheel.widthInches}J ET${candidate.setup.wheel.offsetMm}`;
     renderComparison();
-    status.textContent = 'Combined candidate loaded into comparison. It has not been saved.';
+    status.textContent = t.combinedCandidateLoaded;
   }
 
   function showCombinedDetail(candidate: CombinedFitmentCandidate): void {
@@ -293,48 +304,48 @@ export async function initializeFitmentPage(): Promise<void> {
     const heading = document.createElement('h3');
     heading.textContent = `${candidate.setup.tire.widthMm}/${candidate.setup.tire.aspectRatio}R${candidate.setup.tire.rimDiameterInches} · ${candidate.setup.wheel.widthInches}J ET${candidate.setup.wheel.offsetMm} — ${candidate.wheelGeometry.state.toUpperCase()}`;
     const wheel = document.createElement('p');
-    wheel.textContent = `CALCULATED wheel · inner change ${formatNumber(candidate.wheelGeometry.innerPositionChangeMm)} mm · outer poke ${formatNumber(candidate.wheelGeometry.outerPokeChangeMm)} mm`;
+    wheel.textContent = t.combinedWheelSummary(formatNumber(candidate.wheelGeometry.innerPositionChangeMm), formatNumber(candidate.wheelGeometry.outerPokeChangeMm));
     const tire = document.createElement('p');
-    tire.textContent = `CALCULATED tire · diameter ${formatNumber(candidate.tireGeometry.overallDiameterMm)} mm · difference ${formatNumber(candidate.tireGeometry.diameterDifferenceMm)} mm / ${formatNumber(candidate.tireGeometry.diameterDifferencePercent)}% · sidewall ${formatNumber(candidate.tireGeometry.sidewallDifferenceMm)} mm · circumference ${formatNumber(candidate.tireGeometry.circumferenceDifferenceMm)} mm · speed ${formatNumber(candidate.tireGeometry.speedometerDifferencePercent)}%`;
+    tire.textContent = t.combinedTireSummary(formatNumber(candidate.tireGeometry.overallDiameterMm), formatNumber(candidate.tireGeometry.diameterDifferenceMm), formatNumber(candidate.tireGeometry.diameterDifferencePercent), formatNumber(candidate.tireGeometry.sidewallDifferenceMm), formatNumber(candidate.tireGeometry.circumferenceDifferenceMm), formatNumber(candidate.tireGeometry.speedometerDifferencePercent));
     const clearance = document.createElement('p');
-    clearance.textContent = `USER MEASURED → CALCULATED clearance · inner ${formatNumber(candidate.wheelGeometry.projectedInnerClearanceMm)} mm · outer ${formatNumber(candidate.wheelGeometry.projectedOuterClearanceMm)} mm`;
+    clearance.textContent = t.combinedClearanceSummary(formatNumber(candidate.wheelGeometry.projectedInnerClearanceMm), formatNumber(candidate.wheelGeometry.projectedOuterClearanceMm));
     const criteria = document.createElement('p');
-    criteria.textContent = `Ranked lexicographically: ${candidate.explanation.orderedCriteria.map(criterionText).join(' → ')}.`;
+    criteria.textContent = t.rankedLexicographically(candidate.explanation.orderedCriteria.map(criterionText).join(' → '));
     const constraints = document.createElement('p');
-    constraints.textContent = candidate.explanation.constraints.length === 0 ? 'No optional USER TARGET constraints were supplied.' : `USER TARGET checks: ${candidate.explanation.constraints.map((item) => `${item.key} ${item.satisfied ? 'met' : 'missed'} by ${formatNumber(Math.abs(item.difference))}`).join(' · ')}`;
+    constraints.textContent = candidate.explanation.constraints.length === 0 ? t.noOptionalTargets : t.userTargetChecks(candidate.explanation.constraints.map((item) => `${item.key} ${item.satisfied ? t.targetMet : t.targetMissed} by ${formatNumber(Math.abs(item.difference))}`).join(' · '));
     const disclaimer = document.createElement('p');
-    disclaimer.textContent = 'Geometry-only result. GREEN does not mean road-safe or verified compatible.';
+    disclaimer.textContent = t.geometryOnlyDisclaimer;
     explorerDetail.append(heading, wheel, tire, clearance, criteria, constraints, disclaimer);
     explorerDetail.hidden = false;
   }
 
   async function saveCombinedCandidate(candidate: CombinedFitmentCandidate): Promise<void> {
-    const result = await service.saveSetup({ name: `Explorer ${candidate.setup.tire.widthMm}/${candidate.setup.tire.aspectRatio}R${candidate.setup.tire.rimDiameterInches} · ${candidate.setup.wheel.widthInches}J ET${candidate.setup.wheel.offsetMm}`, vehicleNickname: input('vehicle-nickname').value, setup: candidateToInput(candidate) });
+    const result = await service.saveSetup({ name: `${t.explorerCandidateNamePrefix} ${candidate.setup.tire.widthMm}/${candidate.setup.tire.aspectRatio}R${candidate.setup.tire.rimDiameterInches} · ${candidate.setup.wheel.widthInches}J ET${candidate.setup.wheel.offsetMm}`, vehicleNickname: input('vehicle-nickname').value, setup: candidateToInput(candidate) });
     if (!result.ok) { showIssues(whatFitsErrors, result.issues); return; }
     renderGarage(result.value);
-    status.textContent = 'Selected combined candidate saved explicitly to the selected vehicle.';
+    status.textContent = t.combinedCandidateSaved;
   }
 
   function updatePreflight(): void {
     const result = preflightFitmentExplorer(explorerInput());
     searchPreflight.textContent = result.ok
-      ? `Preflight: ${result.value.wheelCandidateCount} wheel × ${result.value.tireCandidateCount} tire = ${result.value.combinationCount} combinations (technical ceiling ${result.value.maximumCombinationCount}).`
-      : 'Complete valid measurements and ranges to calculate the search size.';
+      ? t.preflightSummary(result.value.wheelCandidateCount, result.value.tireCandidateCount, result.value.combinationCount, result.value.maximumCombinationCount)
+      : t.preflightIncomplete;
   }
 
   function searchWhatFitsFromInputs(): void {
     const result = searchFitmentExplorer(explorerInput());
-    if (!result.ok) { showIssues(whatFitsErrors, result.issues); whatFitsResults.replaceChildren(); whatFitsSummary.textContent = 'Search did not start.'; return; }
+    if (!result.ok) { showIssues(whatFitsErrors, result.issues); whatFitsResults.replaceChildren(); whatFitsSummary.textContent = t.searchDidNotStart; return; }
     whatFitsErrors.hidden = true;
-    searchPreflight.textContent = `Preflight: ${result.value.preflight.wheelCandidateCount} wheel × ${result.value.preflight.tireCandidateCount} tire = ${result.value.preflight.combinationCount} combinations (technical ceiling ${result.value.preflight.maximumCombinationCount}).`;
-    whatFitsSummary.textContent = `Preflight ${result.value.preflight.combinationCount} · eligible wheel ${result.value.eligibleWheelCandidateCount} · eligible tire ${result.value.eligibleTireCandidateCount} · overlap wheels rejected ${result.value.rejectedOverlapWheelCount} · showing ${result.value.candidates.length}`;
+    searchPreflight.textContent = t.preflightSummary(result.value.preflight.wheelCandidateCount, result.value.preflight.tireCandidateCount, result.value.preflight.combinationCount, result.value.preflight.maximumCombinationCount);
+    whatFitsSummary.textContent = t.whatFitsSummary(result.value.preflight.combinationCount, result.value.eligibleWheelCandidateCount, result.value.eligibleTireCandidateCount, result.value.rejectedOverlapWheelCount, result.value.candidates.length);
     if (result.value.candidates.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
       const title = document.createElement('strong');
       const copy = document.createElement('span');
-      title.textContent = 'No geometric matches in this range';
-      copy.textContent = 'Review your explicit constraints or narrow a different part of the search range.';
+      title.textContent = t.noMatchesTitle;
+      copy.textContent = t.noMatchesCopy;
       empty.append(title, copy);
       whatFitsResults.replaceChildren(empty);
       return;
@@ -364,10 +375,10 @@ export async function initializeFitmentPage(): Promise<void> {
       const metrics = document.createElement('div');
       metrics.className = 'result-metrics';
       const metricValues = [
-        ['Inner clearance', candidate.wheelGeometry.projectedInnerClearanceMm, 'mm'],
-        ['Outer clearance', candidate.wheelGeometry.projectedOuterClearanceMm, 'mm'],
-        ['Diameter change', candidate.tireGeometry.diameterDifferencePercent, '%'],
-        ['Speedometer', candidate.tireGeometry.speedometerDifferencePercent, '%'],
+        [t.resultMetricInnerClearance, candidate.wheelGeometry.projectedInnerClearanceMm, 'mm'],
+        [t.resultMetricOuterClearance, candidate.wheelGeometry.projectedOuterClearanceMm, 'mm'],
+        [t.resultMetricDiameterChange, candidate.tireGeometry.diameterDifferencePercent, '%'],
+        [t.resultMetricSpeedometer, candidate.tireGeometry.speedometerDifferencePercent, '%'],
       ] as const;
       for (const [label, value, unit] of metricValues) {
         const item = document.createElement('div');
@@ -381,7 +392,7 @@ export async function initializeFitmentPage(): Promise<void> {
       }
       const provenance = document.createElement('div');
       provenance.className = 'provenance-row';
-      for (const label of ['CALCULATED', 'USER MEASURED']) {
+      for (const label of [t.provenanceCalculated, t.provenanceUserMeasured]) {
         const badge = document.createElement('span');
         badge.className = 'source-badge';
         badge.textContent = label;
@@ -389,10 +400,10 @@ export async function initializeFitmentPage(): Promise<void> {
       }
       const actions = document.createElement('div');
       actions.className = 'actions';
-      appendButton(actions, 'Compare', () => loadCombinedCandidate(candidate));
-      appendButton(actions, 'Save to Garage', () => saveCombinedCandidate(candidate));
-      appendButton(actions, 'See geometry details', () => showCombinedDetail(candidate), 'secondary');
-      appendButton(actions, 'Share', async () => { loadCombinedCandidate(candidate); await copyShare(); }, 'tertiary');
+      appendButton(actions, t.compareResultButton, () => loadCombinedCandidate(candidate));
+      appendButton(actions, t.saveToGarageButton, () => saveCombinedCandidate(candidate));
+      appendButton(actions, t.seeGeometryDetailsButton, () => showCombinedDetail(candidate), 'secondary');
+      appendButton(actions, t.shareResultButton, async () => { loadCombinedCandidate(candidate); await copyShare(); }, 'tertiary');
       card.append(top, offset, tireSize, summary, metrics, provenance, actions);
       return card;
     }));
@@ -416,8 +427,8 @@ export async function initializeFitmentPage(): Promise<void> {
     const measuredInner = input('measured-inner').value.trim();
     const measuredOuter = input('measured-outer').value.trim();
     required<HTMLElement>('#decision-measure').textContent = measuredInner !== '' && measuredOuter !== '' && Number.isFinite(Number(measuredInner)) && Number.isFinite(Number(measuredOuter)) && Number(measuredInner) >= 0 && Number(measuredOuter) >= 0
-      ? `Entered: inner ${measuredInner} mm · outer ${measuredOuter} mm`
-      : 'Inner and outer gaps not entered';
+      ? t.measurementEnteredSummary(measuredInner, measuredOuter)
+      : t.measurementNotEntered;
   }
 
   function renderComparison(): void {
@@ -425,8 +436,8 @@ export async function initializeFitmentPage(): Promise<void> {
     if (!comparison.ok) {
       showIssues(errors, comparison.issues);
       results.replaceChildren();
-      required<HTMLElement>('#decision-tire').textContent = 'Enter valid tire and wheel values to compare';
-      required<HTMLElement>('#decision-wheel').textContent = 'No valid wheel-position result yet';
+      required<HTMLElement>('#decision-tire').textContent = t.decisionTireInvalid;
+      required<HTMLElement>('#decision-wheel').textContent = t.decisionWheelInvalid;
       updateMeasurementDecision();
       return;
     }
@@ -455,27 +466,27 @@ export async function initializeFitmentPage(): Promise<void> {
     const summary = fitmentComparisonSummary(value);
     required<HTMLElement>('#comparison-summary').textContent = summary;
     visual.querySelector<HTMLElement>('[data-visual-summary]')!.textContent = summary;
-    visual.querySelector<HTMLElement>('[data-current-tire-label]')!.textContent = `Current · ${formatNumber(value.current.overallDiameterMm)} mm`;
-    visual.querySelector<HTMLElement>('[data-new-tire-label]')!.textContent = `New · ${formatNumber(value.proposed.overallDiameterMm)} mm`;
-    visual.querySelector<HTMLElement>('[data-inner-label]')!.textContent = `Inner · ${formatNumber(value.wheelInnerPositionChangeMm)} mm`;
-    visual.querySelector<HTMLElement>('[data-outer-label]')!.textContent = `Outer · ${formatNumber(value.wheelOuterPokeChangeMm)} mm`;
+    visual.querySelector<HTMLElement>('[data-current-tire-label]')!.textContent = t.visualCurrentLabel(formatNumber(value.current.overallDiameterMm));
+    visual.querySelector<HTMLElement>('[data-new-tire-label]')!.textContent = t.visualNewLabel(formatNumber(value.proposed.overallDiameterMm));
+    visual.querySelector<HTMLElement>('[data-inner-label]')!.textContent = t.visualInnerLabel(formatNumber(value.wheelInnerPositionChangeMm));
+    visual.querySelector<HTMLElement>('[data-outer-label]')!.textContent = t.visualOuterLabel(formatNumber(value.wheelOuterPokeChangeMm));
     const rows: readonly [string, number, string][] = [
-        ['Current sidewall', value.current.sidewallHeightMm, 'mm'],
-        ['New sidewall', value.proposed.sidewallHeightMm, 'mm'],
-        ['Current diameter', value.current.overallDiameterMm, 'mm'],
-        ['New diameter', value.proposed.overallDiameterMm, 'mm'],
-        ['Diameter difference', value.diameterDifferenceMm, 'mm'],
-        ['Diameter difference', value.diameterDifferencePercent, '%'],
-        ['Ride-height difference', value.rideHeightDifferenceMm, 'mm'],
-        ['Speed at same wheel RPM', value.speedometerDifferencePercent, '%'],
-        ['Inner-position change', value.wheelInnerPositionChangeMm, 'mm'],
-        ['Outer-poke change', value.wheelOuterPokeChangeMm, 'mm'],
-        ['Current circumference', value.current.circumferenceMm, 'mm'],
-        ['New circumference', value.proposed.circumferenceMm, 'mm'],
-        ['Current revolutions', value.current.revolutionsPerKilometer, '/km'],
-        ['New revolutions', value.proposed.revolutionsPerKilometer, '/km'],
-        ['Current revolutions', value.current.revolutionsPerMile, '/mile'],
-        ['New revolutions', value.proposed.revolutionsPerMile, '/mile'],
+        [t.rowCurrentSidewall, value.current.sidewallHeightMm, 'mm'],
+        [t.rowNewSidewall, value.proposed.sidewallHeightMm, 'mm'],
+        [t.rowCurrentDiameter, value.current.overallDiameterMm, 'mm'],
+        [t.rowNewDiameter, value.proposed.overallDiameterMm, 'mm'],
+        [t.rowDiameterDifference, value.diameterDifferenceMm, 'mm'],
+        [t.rowDiameterDifference, value.diameterDifferencePercent, '%'],
+        [t.rowRideHeightDifference, value.rideHeightDifferenceMm, 'mm'],
+        [t.rowSpeedSameRpm, value.speedometerDifferencePercent, '%'],
+        [t.rowInnerPositionChange, value.wheelInnerPositionChangeMm, 'mm'],
+        [t.rowOuterPokeChange, value.wheelOuterPokeChangeMm, 'mm'],
+        [t.rowCurrentCircumference, value.current.circumferenceMm, 'mm'],
+        [t.rowNewCircumference, value.proposed.circumferenceMm, 'mm'],
+        [t.rowCurrentRevolutions, value.current.revolutionsPerKilometer, '/km'],
+        [t.rowNewRevolutions, value.proposed.revolutionsPerKilometer, '/km'],
+        [t.rowCurrentRevolutions, value.current.revolutionsPerMile, '/mile'],
+        [t.rowNewRevolutions, value.proposed.revolutionsPerMile, '/mile'],
     ];
     results.replaceChildren(...rows.map(([label, amount, unit]) => {
       const row = document.createElement('div');
@@ -494,23 +505,23 @@ export async function initializeFitmentPage(): Promise<void> {
     const presentation = activeGaragePresentation(state);
     const shellVehicle = document.querySelector<HTMLElement>('#shell-vehicle');
     const vehicleSummary = required<HTMLElement>('#vehicle-summary');
-    if (shellVehicle) shellVehicle.textContent = presentation.vehicle?.displayName ?? 'No vehicle selected';
+    if (shellVehicle) shellVehicle.textContent = presentation.vehicle?.displayName ?? t.noVehicleSelected;
     vehicleSummary.replaceChildren();
     const vehicleTitle = document.createElement('h3');
     const vehicleCopy = document.createElement('p');
     const vehicleStatus = document.createElement('div');
     vehicleStatus.className = 'vehicle-card__status';
-    vehicleTitle.textContent = presentation.vehicle?.displayName ?? 'Your garage is ready';
+    vehicleTitle.textContent = presentation.vehicle?.displayName ?? t.garageReady;
     const currentSetup = presentation.currentSetup;
     vehicleCopy.textContent = currentSetup
-      ? `Current setup · ${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches} · ${currentSetup.wheel.widthInches}J ET${currentSetup.wheel.offsetMm}`
-      : 'Save a setup or complete Measure My Car to create a vehicle record.';
+      ? t.currentSetupSummary(`${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches} · ${currentSetup.wheel.widthInches}J ET${currentSetup.wheel.offsetMm}`)
+      : t.saveOrMeasurePrompt;
     const measurementBadge = document.createElement('span');
     measurementBadge.className = 'source-badge';
-    measurementBadge.textContent = presentation.isMeasured ? '✓ Measured' : 'Not measured';
+    measurementBadge.textContent = presentation.isMeasured ? t.measuredBadge : t.notMeasuredBadge;
     const setupBadge = document.createElement('span');
     setupBadge.className = 'source-badge';
-    setupBadge.textContent = `${presentation.setups.length} saved setup${presentation.setups.length === 1 ? '' : 's'}`;
+    setupBadge.textContent = t.savedSetupCount(presentation.setups.length);
     vehicleStatus.append(measurementBadge, setupBadge);
     vehicleSummary.append(vehicleTitle, vehicleCopy, vehicleStatus);
     if (currentSetup) {
@@ -521,10 +532,10 @@ export async function initializeFitmentPage(): Promise<void> {
       const metrics = document.createElement('dl');
       metrics.className = 'garage-metrics';
       const entries: readonly (readonly [string, string])[] = [
-        ['Tire', `${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches}`],
-        ['Wheel', `${currentSetup.wheel.widthInches}J · ET${currentSetup.wheel.offsetMm}`],
-        ['Measurements', presentation.isMeasured ? 'Recorded' : 'Not recorded'],
-        ['Saved setups', String(presentation.setups.length)],
+        [t.metricTire, `${currentSetup.tire.widthMm}/${currentSetup.tire.aspectRatio} R${currentSetup.tire.rimDiameterInches}`],
+        [t.metricWheel, `${currentSetup.wheel.widthInches}J · ET${currentSetup.wheel.offsetMm}`],
+        [t.metricMeasurements, presentation.isMeasured ? t.recorded : t.notRecorded],
+        [t.metricSavedSetups, String(presentation.setups.length)],
       ];
       for (const [label, detail] of entries) {
         const row = document.createElement('div');
@@ -540,7 +551,7 @@ export async function initializeFitmentPage(): Promise<void> {
     activeVehicle.replaceChildren();
     const noVehicle = document.createElement('option');
     noVehicle.value = '';
-    noVehicle.textContent = 'No saved vehicle';
+    noVehicle.textContent = t.noSavedVehicleOption;
     activeVehicle.append(noVehicle, ...state.vehicles.map((vehicle) => {
       const option = document.createElement('option');
       option.value = vehicle.id;
@@ -555,8 +566,8 @@ export async function initializeFitmentPage(): Promise<void> {
       empty.className = 'empty-state';
       const title = document.createElement('strong');
       const copy = document.createElement('span');
-      title.textContent = translate('en', 'garageEmpty');
-      copy.textContent = 'A setup appears here only after you choose Save.';
+      title.textContent = t.garageEmpty;
+      copy.textContent = t.garageEmptyCopy;
       empty.append(title, copy);
       garageList.append(empty);
       return;
@@ -570,11 +581,11 @@ export async function initializeFitmentPage(): Promise<void> {
       title.textContent = saved.name;
       detail.textContent = describeSetup(saved);
       actions.className = 'actions';
-      appendButton(actions, 'Load as current', () => { writeSetup('current', setupToInput(saved)); renderComparison(); });
-      appendButton(actions, 'Load as new', () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); });
-      appendButton(actions, 'Share', async () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); await copyShare(); }, 'secondary');
-      appendButton(actions, 'Delete', async () => {
-        if (!window.confirm(`Delete “${saved.name}”?`)) return;
+      appendButton(actions, t.loadAsCurrentButton, () => { writeSetup('current', setupToInput(saved)); renderComparison(); });
+      appendButton(actions, t.loadAsNewButton, () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); });
+      appendButton(actions, t.shareButton, async () => { writeSetup('proposed', setupToInput(saved)); renderComparison(); await copyShare(); }, 'secondary');
+      appendButton(actions, t.deleteButton, async () => {
+        if (!window.confirm(t.deleteConfirm(saved.name))) return;
         const deleted = await service.deleteSetup(saved.id);
         if (!deleted.ok) { showIssues(errors, deleted.issues); return; }
         renderGarage(deleted.value);
@@ -594,7 +605,7 @@ export async function initializeFitmentPage(): Promise<void> {
       showIssues(errors, result.issues);
       return;
     }
-    status.textContent = 'Setup saved to this browser.';
+    status.textContent = t.setupSavedToBrowser;
     renderGarage(result.value);
   }
 
@@ -610,7 +621,7 @@ export async function initializeFitmentPage(): Promise<void> {
     const validation = compareSetupInputs(readSetup('current'), readSetup('proposed'));
     if (!validation.ok) {
       showIssues(errors, validation.issues);
-      announce('Fix the highlighted setup issues before sharing.');
+      announce(t.fixSetupBeforeSharing);
       return;
     }
     const payload: SetupShareV1 = { v: 1, current: readSetup('current'), proposed: readSetup('proposed') };
@@ -620,8 +631,8 @@ export async function initializeFitmentPage(): Promise<void> {
     const shareUrl = url.toString();
     if (typeof navigator.share === 'function') {
       try {
-        await navigator.share({ title: 'Atlas GarageOS — wheel & tire setup', text: 'A wheel and tire fitment comparison from Atlas GarageOS.', url: shareUrl });
-        announce('Setup shared. Opening the link will not save anything automatically.');
+        await navigator.share({ title: t.shareDialogTitle, text: t.shareDialogText, url: shareUrl });
+        announce(t.setupSharedNativeMessage);
         return;
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return; // user dismissed the native share sheet
@@ -630,9 +641,9 @@ export async function initializeFitmentPage(): Promise<void> {
     }
     try {
       await navigator.clipboard.writeText(shareUrl);
-      announce('Link copied. Opening it will not save anything automatically.');
+      announce(t.linkCopiedMessage);
     } catch {
-      announce(`Copy was unavailable. Share this link: ${shareUrl}`);
+      announce(t.copyUnavailableMessage(shareUrl));
     }
   }
 
@@ -640,13 +651,13 @@ export async function initializeFitmentPage(): Promise<void> {
     const profile = readClearanceProfile(garageState?.activeVehicleId ?? 'measurement-preview');
     if (!profile.ok) {
       showIssues(measurementErrors, profile.issues);
-      measurementReview.textContent = 'Both inner and outer measurements are required. Without them, projected clearance and combined search cannot run.';
+      measurementReview.textContent = t.measurementReviewIncomplete;
       return;
     }
     measurementErrors.hidden = true;
-    const desiredInner = profile.value.minimumDesiredInnerClearanceMm === null ? 'not supplied' : `${formatNumber(profile.value.minimumDesiredInnerClearanceMm)} mm`;
-    const desiredOuter = profile.value.minimumDesiredOuterClearanceMm === null ? 'not supplied' : `${formatNumber(profile.value.minimumDesiredOuterClearanceMm)} mm`;
-    measurementReview.textContent = `USER MEASURED · inner ${formatNumber(profile.value.measuredInnerClearance.valueMm)} mm · outer ${formatNumber(profile.value.measuredOuterClearance.valueMm)} mm. USER TARGET · inner ${desiredInner} · outer ${desiredOuter}. No target means no invented margin.`;
+    const desiredInner = profile.value.minimumDesiredInnerClearanceMm === null ? t.desiredNotSupplied : `${formatNumber(profile.value.minimumDesiredInnerClearanceMm)} mm`;
+    const desiredOuter = profile.value.minimumDesiredOuterClearanceMm === null ? t.desiredNotSupplied : `${formatNumber(profile.value.minimumDesiredOuterClearanceMm)} mm`;
+    measurementReview.textContent = t.measurementReviewSummary(formatNumber(profile.value.measuredInnerClearance.valueMm), formatNumber(profile.value.measuredOuterClearance.valueMm), desiredInner, desiredOuter);
   }
 
   function showMeasurementStep(step: number): void {
@@ -655,7 +666,7 @@ export async function initializeFitmentPage(): Promise<void> {
     document.querySelectorAll<HTMLElement>('[data-measure-step]').forEach((panel) => { panel.hidden = Number(panel.dataset.measureStep) !== measurementStep; });
     document.querySelectorAll<HTMLButtonElement>('[data-measure-go]').forEach((button) => { button.classList.toggle('secondary', Number(button.dataset.measureGo) !== measurementStep); });
     required<HTMLElement>('#measure-progress').style.width = `${progress.percent}%`;
-    required<HTMLElement>('#measure-step-label').textContent = `Step ${progress.current} of ${progress.total}`;
+    required<HTMLElement>('#measure-step-label').textContent = t.stepOf(progress.current, progress.total);
     required<HTMLButtonElement>('#measure-back').disabled = !progress.canGoBack;
     const next = required<HTMLButtonElement>('#measure-next');
     next.disabled = !progress.canContinue;
@@ -670,7 +681,7 @@ export async function initializeFitmentPage(): Promise<void> {
     if (!shared) return;
     const result = await service.saveSharedSetup(shared, input('shared-setup-name').value, input('vehicle-nickname').value);
     if (!result.ok) { showIssues(errors, result.issues); return; }
-    status.textContent = 'Shared new setup saved to this browser.';
+    status.textContent = t.sharedSetupSaved;
     renderGarage(result.value);
   });
   required('#generate-map').addEventListener('click', generateMap);
@@ -684,7 +695,7 @@ export async function initializeFitmentPage(): Promise<void> {
       minimumDesiredOuterClearanceMm: optionalNumber('desired-outer'),
     });
     if (!result.ok) { showIssues(measurementErrors, result.issues); return; }
-    status.textContent = 'User-measured clearance profile saved to this vehicle.';
+    status.textContent = t.clearanceProfileSaved;
     renderGarage(result.value);
     generateMap();
   });
@@ -733,7 +744,7 @@ export async function initializeFitmentPage(): Promise<void> {
   renderGarage(loaded.state);
   const storedClearance = loaded.state.clearanceProfiles.find((profile) => profile.vehicleId === loaded.state.activeVehicleId);
   if (storedClearance) populateClearance(storedClearance);
-  if (loaded.status.startsWith('recovered-')) status.textContent = 'Invalid garage data was ignored and a safe empty garage was opened.';
+  if (loaded.status.startsWith('recovered-')) status.textContent = t.recoveredEmptyGarage;
 
   const decoded = decodeSetupShareHash(window.location.hash);
   const journey = decoded ? null : parseJourneyPrefill(window.location.search, readSetup('current'), readSetup('proposed'));
@@ -746,8 +757,12 @@ export async function initializeFitmentPage(): Promise<void> {
     input('desired-outer').value = '';
     required<HTMLElement>('#journey-import').hidden = false;
     required<HTMLElement>('#journey-import-copy').textContent = journey.source === 'tire'
-      ? 'Both tire sizes were carried over. Wheel widths and ET values are still example defaults: replace them with your actual wheels before interpreting the comparison.'
-      : 'Wheel dimensions were carried over. Tire sizes still use the values shown in the form: confirm them before interpreting the comparison.';
+      ? t.journeyImportTireCopy
+      : t.journeyImportWheelCopy;
+    // Links from other tools land on #compare or #measure-flow. The browser scrolls there before
+    // this script runs, and the banner just un-hidden above pushes the target down — re-align.
+    const target = window.location.hash.length > 1 ? document.getElementById(window.location.hash.slice(1)) : null;
+    target?.scrollIntoView({ block: 'start' });
   }
   if (decoded) {
     sharedPanel.hidden = false;
@@ -757,7 +772,7 @@ export async function initializeFitmentPage(): Promise<void> {
       writeSetup('proposed', decoded.value.proposed);
       renderComparison();
     } else {
-      required<HTMLElement>('#shared-message').textContent = 'The shared setup is invalid and was not loaded or saved.';
+      required<HTMLElement>('#shared-message').textContent = t.sharedInvalidMessage;
       required<HTMLButtonElement>('#save-shared').disabled = true;
     }
   }

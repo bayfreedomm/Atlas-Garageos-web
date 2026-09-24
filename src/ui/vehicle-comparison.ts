@@ -210,7 +210,7 @@ export function compareVehicleIds(firstId: string | null | undefined, secondId: 
     { href: aVehicleLink, label: copy.actions.vehicleA },
     { href: bVehicleLink, label: copy.actions.vehicleB },
     { href: tireComparisonHref(locale, aTire, bTire), label: copy.actions.compareTires },
-    { href: '/fitment-studio/', label: copy.actions.fitment },
+    { href: locale === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`, label: copy.actions.fitment },
   ]);
 
   return Object.freeze({ status: 'ready', message: '', canonicalIds: Object.freeze([canonicalA, canonicalB] as const), vehicleA: a, vehicleB: b, summaries, rows, actions, diameterDifferencePercent });

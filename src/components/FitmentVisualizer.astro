@@ -1,30 +1,39 @@
 ---
-interface Props { mode?: 'tire-single' | 'tire-comparison' | 'wheel' | 'full'; title?: string; }
-const { mode = 'full', title = 'Visual fitment comparison' } = Astro.props;
+interface Props { mode?: 'tire-single' | 'tire-comparison' | 'wheel' | 'full'; title?: string; locale?: 'en' | 'de' | 'es'; }
+const { mode = 'full', title, locale = 'en' } = Astro.props;
+
+// Static labels that the page controller never overwrites (the value labels and summary
+// below are replaced by fitment-page.ts at runtime, so they only need a sensible first paint).
+const text = {
+  en: { title: 'Visual fitment comparison', kicker: 'Calculated geometry', summary: 'Enter a setup to see the geometry.', sideLabel: 'Side view · scaled diameter', sideAria: 'Scaled side view', sideSvgAria: 'Current and new tire and rim diameters shown to scale', axleLabel: 'Axle view · relative movement', axleAria: 'Wheel position view', axleSvgAria: 'Current and new wheel edges relative to the hub mounting plane', current: 'CURRENT', next: 'NEW', hub: 'HUB PLANE', currentValue: 'Current', newValue: 'New', inner: 'Inner position', outer: 'Outer position' },
+  de: { title: 'Visueller Passformvergleich', kicker: 'Berechnete Geometrie', summary: 'Geben Sie ein Setup ein, um die Geometrie zu sehen.', sideLabel: 'Seitenansicht · maßstäblicher Durchmesser', sideAria: 'Maßstäbliche Seitenansicht', sideSvgAria: 'Aktuelle und neue Reifen- und Felgendurchmesser maßstäblich dargestellt', axleLabel: 'Achsansicht · relative Verschiebung', axleAria: 'Ansicht der Radposition', axleSvgAria: 'Aktuelle und neue Felgenkanten relativ zur Nabenanlagefläche', current: 'AKTUELL', next: 'NEU', hub: 'NABENEBENE', currentValue: 'Aktuell', newValue: 'Neu', inner: 'Innere Position', outer: 'Äußere Position' },
+  es: { title: 'Comparación visual de ajuste', kicker: 'Geometría calculada', summary: 'Introduzca una configuración para ver la geometría.', sideLabel: 'Vista lateral · diámetro a escala', sideAria: 'Vista lateral a escala', sideSvgAria: 'Diámetros de neumático y llanta actuales y nuevos a escala', axleLabel: 'Vista del eje · desplazamiento relativo', axleAria: 'Vista de la posición de la rueda', axleSvgAria: 'Bordes de la llanta actual y nueva respecto al plano de montaje del buje', current: 'ACTUAL', next: 'NUEVA', hub: 'PLANO DEL BUJE', currentValue: 'Actual', newValue: 'Nueva', inner: 'Posición interior', outer: 'Posición exterior' },
+}[locale];
+const resolvedTitle = title ?? text.title;
 ---
 <figure class="fitment-visualizer" data-fitment-visualizer data-mode={mode} aria-labelledby={`visual-${mode}-title`}>
-  <figcaption><span class="visual-kicker">Calculated geometry</span><strong id={`visual-${mode}-title`}>{title}</strong><p data-visual-summary>Enter a setup to see the geometry.</p></figcaption>
+  <figcaption><span class="visual-kicker">{text.kicker}</span><strong id={`visual-${mode}-title`}>{resolvedTitle}</strong><p data-visual-summary>{text.summary}</p></figcaption>
   <div class="visualizer-panels">
-    <section class="visual-panel visual-panel--tire" aria-label="Scaled side view">
-      <span class="visual-panel__label">Side view · scaled diameter</span>
-      <svg viewBox="0 0 360 190" role="img" aria-label="Current and new tire and rim diameters shown to scale">
+    <section class="visual-panel visual-panel--tire" aria-label={text.sideAria}>
+      <span class="visual-panel__label">{text.sideLabel}</span>
+      <svg viewBox="0 0 360 190" role="img" aria-label={text.sideSvgAria}>
         <path class="measure-axis" d="M16 168H344M22 164v8M90 164v8M180 164v8M270 164v8M338 164v8" />
         <g class="tire-set tire-set--current"><circle data-current-tire cx="103" cy="91" r="62" /><circle data-current-rim cx="103" cy="91" r="35" /><path d="M103 20v142M32 91h142" /></g>
         <g class="tire-set tire-set--new"><circle data-new-tire cx="257" cy="91" r="62" /><circle data-new-rim cx="257" cy="91" r="35" /><path d="M257 20v142M186 91h142" /></g>
-        <text x="103" y="184" text-anchor="middle">CURRENT</text><text class="new-label" x="257" y="184" text-anchor="middle">NEW</text>
+        <text x="103" y="184" text-anchor="middle">{text.current}</text><text class="new-label" x="257" y="184" text-anchor="middle">{text.next}</text>
       </svg>
-      <div class="visual-values"><span data-current-tire-label>Current</span><span data-new-tire-label>New</span></div>
+      <div class="visual-values"><span data-current-tire-label>{text.currentValue}</span><span data-new-tire-label>{text.newValue}</span></div>
     </section>
-    <section class="visual-panel visual-panel--wheel" aria-label="Wheel position view">
-      <span class="visual-panel__label">Axle view · relative movement</span>
-      <svg viewBox="0 0 360 190" role="img" aria-label="Current and new wheel edges relative to the hub mounting plane">
+    <section class="visual-panel visual-panel--wheel" aria-label={text.axleAria}>
+      <span class="visual-panel__label">{text.axleLabel}</span>
+      <svg viewBox="0 0 360 190" role="img" aria-label={text.axleSvgAria}>
         <path class="measure-axis" d="M24 166H336M32 162v8M106 162v8M180 160v12M254 162v8M328 162v8" />
-        <path class="hub-plane" d="M180 19V171" /><text x="180" y="14" text-anchor="middle">HUB PLANE</text>
+        <path class="hub-plane" d="M180 19V171" /><text x="180" y="14" text-anchor="middle">{text.hub}</text>
         <rect class="wheel-bar wheel-bar--current" data-current-wheel x="82" y="58" width="196" height="32" rx="8" />
         <rect class="wheel-bar wheel-bar--new" data-new-wheel x="76" y="105" width="212" height="32" rx="8" />
-        <text x="32" y="80">CURRENT</text><text class="new-label" x="32" y="127">NEW</text>
+        <text x="32" y="80">{text.current}</text><text class="new-label" x="32" y="127">{text.next}</text>
       </svg>
-      <div class="visual-values"><span data-inner-label>Inner position</span><span data-outer-label>Outer position</span></div>
+      <div class="visual-values"><span data-inner-label>{text.inner}</span><span data-outer-label>{text.outer}</span></div>
     </section>
   </div>
 </figure>

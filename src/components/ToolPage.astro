@@ -13,7 +13,8 @@ import { additional3DToolIds } from '../localization/tool-3d-catalog';
 
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string | undefined; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale | undefined; titleOverride?: string | undefined; descriptionOverride?: string | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
-const { definition, eyebrow, intro, limitation, studioCta, studioHref = '/fitment-studio/', visual = true, explanationBeforeInsights = false, locale, titleOverride, descriptionOverride, alternates } = Astro.props;
+const { definition, eyebrow, intro, limitation, studioCta, studioHref, visual = true, explanationBeforeInsights = false, locale, titleOverride, descriptionOverride, alternates } = Astro.props;
+const resolvedStudioHref = studioHref ?? (locale ? `/${locale}/fitment-studio/` : '/fitment-studio/');
 const journeyLocale = locale ?? 'en';
 const nextDecision = toolNextDecision(definition.id, journeyLocale);
 const displayTitle = titleOverride ?? definition.title;
@@ -55,7 +56,7 @@ const breadcrumbs = [
   {explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}
   <ToolInsights id={definition.id} locale={locale} />
   {!explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}
-  {studioCta && <a class="studio-cta studio-cta--row" href={studioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
+  {studioCta && <a class="studio-cta studio-cta--row" href={resolvedStudioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
   {definition.id !== 'tire-size-comparison' && <section class="tool-decision-area" aria-label={t?.relatedTools ?? 'Related tools'}><DecisionGraph model={nextDecision} locale={journeyLocale} id="tool-next-decision" /></section>}
 </SiteLayout>
-<script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; import { initializeShareableToolState } from '../ui/shareable-tool-state'; initializeToolVisualMotion(); window.setTimeout(initializeShareableToolState, 0);</script>
+<script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; import { initializeShareableToolState } from '../ui/shareable-tool-state'; import { initializeToolHandoff } from '../ui/tool-handoff'; initializeToolVisualMotion(); initializeToolHandoff(); window.setTimeout(initializeShareableToolState, 0);</script>
