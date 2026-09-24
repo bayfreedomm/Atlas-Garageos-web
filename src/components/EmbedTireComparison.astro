@@ -1,0 +1,73 @@
+---
+/**
+ * Embeddable tire-size comparison (/embed/tire-size-comparison/ and DE/ES equivalents).
+ *
+ * A complete, chrome-free page meant to live in an <iframe> on someone else's site. It reuses the
+ * real comparison form and ui/tool-calculators.ts, so results, availability status and the print
+ * sheet behave exactly like the full tool. Framing is allowed ONLY for these /embed/ paths (see
+ * public/_headers); every other page keeps X-Frame-Options: DENY / frame-ancestors 'none'. The
+ * rest of the security policy (default-src, base-uri, object-src, form-action…) still applies here
+ * through the CSP <meta> Astro injects on every page (astro.config.mjs → security.csp).
+ *
+ * noindex + canonical to the full tool: the embed is not a second copy of the page for search.
+ */
+import TireInputGroup from './TireInputGroup.astro';
+import ThemeBoot from './ThemeBoot.astro';
+import { canonicalForPath } from '../seo/tool-registry';
+import { localizedToolPath } from '../localization/locales';
+import type { ContentLocale } from '../localization/site-catalog';
+import '../styles/global.css';
+import '../styles/product-v3.css';
+import '../styles/product-v4.css';
+
+interface Props { readonly locale?: ContentLocale | undefined; }
+const { locale } = Astro.props;
+const lang = locale ?? 'en';
+const toolPath = locale ? localizedToolPath(locale, 'tire-size-comparison', 'tool') : '/tools/tire-size-comparison/';
+const toolUrl = canonicalForPath(toolPath);
+const t = {
+  en: { title: 'Tire size comparison', original: 'Original tire', proposed: 'New tire', submit: 'Compare tire sizes', resultAria: 'Primary tire comparison result', diameterChange: 'Diameter change', primaryCopy: 'Compare the two sizes to see the main change.', speedLabel: 'At 100 km/h indicated', speedNote: 'Theoretical rolling-geometry example', summary: 'Your comparison summary will appear here.', details: 'Details', nominal: 'Nominal geometry', powered: 'Tire size comparison by', full: 'Open the full tool' },
+  de: { title: 'Reifengrößen-Vergleich', original: 'Ursprünglicher Reifen', proposed: 'Neuer Reifen', submit: 'Reifengrößen vergleichen', resultAria: 'Primäres Reifenvergleichsergebnis', diameterChange: 'Durchmesseränderung', primaryCopy: 'Vergleichen Sie die beiden Größen, um die Hauptänderung zu sehen.', speedLabel: 'Bei angezeigten 100 km/h', speedNote: 'Theoretisches Abrollgeometrie-Beispiel', summary: 'Ihre Vergleichszusammenfassung erscheint hier.', details: 'Details', nominal: 'Nominale Geometrie', powered: 'Reifengrößen-Vergleich von', full: 'Vollständiges Werkzeug öffnen' },
+  es: { title: 'Comparador de neumáticos', original: 'Neumático original', proposed: 'Neumático nuevo', submit: 'Comparar tamaños de neumático', resultAria: 'Resultado principal de la comparación de neumáticos', diameterChange: 'Cambio de diámetro', primaryCopy: 'Compare ambos tamaños para ver el cambio principal.', speedLabel: 'A 100 km/h indicados', speedNote: 'Ejemplo teórico de geometría de rodadura', summary: 'Su resumen de comparación aparecerá aquí.', details: 'Detalles', nominal: 'Geometría nominal', powered: 'Comparador de neumáticos de', full: 'Abrir la herramienta completa' },
+}[lang];
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <ThemeBoot />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,follow" />
+    <link rel="canonical" href={toolUrl} />
+    <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
+    <title>{t.title} — Atlas GarageOS</title>
+  </head>
+  <body class="embed-body">
+    <main class="embed-shell" data-embed-shell>
+      <form class="calculator-form" data-calculator="tire-comparison" novalidate>
+        <div class="calculator-columns">
+          <TireInputGroup locale={locale} prefix="original-" title={t.original} width={225} aspect={45} rim={18} />
+          <TireInputGroup locale={locale} prefix="new-" title={t.proposed} width={235} aspect={40} rim={19} />
+        </div>
+        <div class="form-actions"><button type="submit">{t.submit}</button></div>
+        <div class="inline-errors" data-errors role="alert" hidden></div>
+        <section class="tire-primary-result is-pending" data-tire-primary-result aria-live="polite" aria-label={t.resultAria}>
+          <div class="tire-primary-result__answer"><span>{t.diameterChange}</span><strong data-tire-primary-percent>—</strong><p data-tire-primary-copy>{t.primaryCopy}</p></div>
+          <div class="tire-primary-result__speed"><span>{t.speedLabel}</span><strong data-tire-speed-example>—</strong><small>{t.speedNote}</small></div>
+        </section>
+        <p class="result-summary is-pending" data-result-summary aria-live="polite">{t.summary}</p>
+        <div class="tire-detail-heading" aria-hidden="true"><span>{t.details}</span><small>{t.nominal}</small></div>
+        <dl class="tool-results" data-results aria-live="polite"></dl>
+      </form>
+      <p class="embed-credit">{t.powered} <a href={toolUrl} target="_blank" rel="noopener" data-embed-full-link>Atlas GarageOS</a> · <a href={toolUrl} target="_blank" rel="noopener" data-embed-full-link>{t.full} ↗</a></p>
+    </main>
+    <script>
+      import { initializeShareableToolState } from '../ui/shareable-tool-state';
+      import { initializeToolCalculators } from '../ui/tool-calculators';
+      import { initializeEmbedFrame } from '../ui/embed-frame';
+      initializeEmbedFrame();
+      initializeShareableToolState();
+      initializeToolCalculators();
+    </script>
+  </body>
+</html>

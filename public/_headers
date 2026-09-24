@@ -7,6 +7,22 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 
+# Embeddable calculators (/embed/…): the ONLY pages other sites may put in an <iframe>.
+# The two headers above that forbid framing are detached here rather than overridden, because
+# Cloudflare joins repeated headers with a comma and the stricter frame-ancestors would still win.
+# Everything else in the page policy stays in force via the CSP <meta> Astro injects.
+/embed/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+
+/de/embed/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+
+/es/embed/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 

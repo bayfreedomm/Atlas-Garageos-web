@@ -253,15 +253,15 @@ export function resultCardModel(candidate: CombinedFitmentCandidate, locale: UiL
 }
 
 const MAP_CELL_TEXT = {
-  en: { checked: 'CHECKED', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projected inner ${innerMm} mm; projected outer ${outerMm} mm` },
-  de: { checked: 'GEPRÜFT', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projizierter innerer Freigang ${innerMm} mm; projizierter äußerer Freigang ${outerMm} mm` },
-  es: { checked: 'VERIFICADO', ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; holgura interior proyectada ${innerMm} mm; holgura exterior proyectada ${outerMm} mm` },
-} as const satisfies Record<UiLocale, { checked: string; ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => string }>;
+  en: { checked: 'CHECKED', states: { green: 'GREEN', yellow: 'YELLOW', red: 'RED' }, ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projected inner ${innerMm} mm; projected outer ${outerMm} mm` },
+  de: { checked: 'GEPRÜFT', states: { green: 'GRÜN', yellow: 'GELB', red: 'ROT' }, ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; projizierter innerer Freigang ${innerMm} mm; projizierter äußerer Freigang ${outerMm} mm` },
+  es: { checked: 'VERIFICADO', states: { green: 'VERDE', yellow: 'AMARILLO', red: 'ROJO' }, ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => `${wheelWidthInches}J ET${offsetMm}: ${stateLabel}; holgura interior proyectada ${innerMm} mm; holgura exterior proyectada ${outerMm} mm` },
+} as const satisfies Record<UiLocale, { checked: string; states: Readonly<Record<'green' | 'yellow' | 'red', string>>; ariaLabel: (wheelWidthInches: number, offsetMm: number, stateLabel: string, innerMm: string, outerMm: string) => string }>;
 
 export function mapCellPresentation(cell: FitmentMapCell, selected: boolean, locale: UiLocale = getPageLocale()) {
   const text = MAP_CELL_TEXT[locale];
   const neutral = cell.reasons?.includes('no-targets') ?? false;
-  const stateLabel = neutral ? text.checked : cell.state.toUpperCase();
+  const stateLabel = neutral ? text.checked : text.states[cell.state];
   const symbol = neutral ? '•' : cell.state === 'green' ? '✓' : cell.state === 'yellow' ? '!' : '×';
   return Object.freeze({
     stateLabel,

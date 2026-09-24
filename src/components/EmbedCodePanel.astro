@@ -1,0 +1,52 @@
+---
+/**
+ * "Embed this calculator" — copyable snippet for other sites (blogs, forums, tire shops).
+ *
+ * The snippet deliberately carries a normal <a> link to the full tool OUTSIDE the iframe: links
+ * inside an iframe belong to our document, not the host page, so that visible credit link is the
+ * part that actually refers readers (and search engines) back to Atlas GarageOS.
+ * The optional <script> only resizes iframes whose src is ours, and only on messages whose origin
+ * is atlasgarageos.com (see ui/embed-frame.ts for the sender).
+ */
+import { SITE_ORIGIN } from '../seo/tool-registry';
+import { localizedToolPath } from '../localization/locales';
+import type { ContentLocale } from '../localization/site-catalog';
+
+interface Props { readonly locale?: ContentLocale | undefined; }
+const { locale } = Astro.props;
+const lang = locale ?? 'en';
+const origin = SITE_ORIGIN.replace(/\/$/, '');
+const embedUrl = `${origin}${locale ? `/${locale}` : ''}/embed/tire-size-comparison/`;
+const toolUrl = `${origin}${locale ? localizedToolPath(locale, 'tire-size-comparison', 'tool') : '/tools/tire-size-comparison/'}`;
+const t = {
+  en: { summary: 'Embed this calculator on your site', intro: 'Free for blogs, forums and tire shops. Paste the code into your page’s HTML. Please keep the credit link.', iframeTitle: 'Tire size comparison', credit: 'Tire size comparison calculator', by: 'by Atlas GarageOS', copy: 'Copy embed code', copied: 'Copied', label: 'Embed code', tip: 'Tip: add ?theme=light or ?theme=dark to the iframe address to match your site.' },
+  de: { summary: 'Diesen Rechner auf Ihrer Website einbinden', intro: 'Kostenlos für Blogs, Foren und Reifenhändler. Fügen Sie den Code in das HTML Ihrer Seite ein. Bitte lassen Sie den Quellenlink stehen.', iframeTitle: 'Reifengrößen-Vergleich', credit: 'Reifengrößen-Vergleichsrechner', by: 'von Atlas GarageOS', copy: 'Einbettungscode kopieren', copied: 'Kopiert', label: 'Einbettungscode', tip: 'Tipp: Hängen Sie ?theme=light oder ?theme=dark an die iframe-Adresse an, passend zu Ihrer Website.' },
+  es: { summary: 'Inserte esta calculadora en su web', intro: 'Gratis para blogs, foros y talleres. Pegue el código en el HTML de su página. Mantenga el enlace de crédito, por favor.', iframeTitle: 'Comparador de neumáticos', credit: 'Calculadora comparativa de neumáticos', by: 'de Atlas GarageOS', copy: 'Copiar código', copied: 'Copiado', label: 'Código para insertar', tip: 'Consejo: añada ?theme=light o ?theme=dark a la dirección del iframe para que combine con su web.' },
+}[lang];
+const resizer = `<script>addEventListener("message",function(e){if(e.origin!=="${origin}"||!e.data||e.data.type!=="atlas-garageos:embed-height")return;document.querySelectorAll('iframe[src^="${origin}/"]').forEach(function(f){if(f.contentWindow===e.source)f.style.height=Math.min(Math.max(e.data.height,300),4000)+"px"})});</script>`;
+const code = [
+  `<iframe src="${embedUrl}" title="${t.iframeTitle}" width="100%" height="900" style="border:0;width:100%;max-width:720px" loading="lazy"></iframe>`,
+  `<p><a href="${toolUrl}">${t.credit}</a> ${t.by}</p>`,
+  resizer,
+].join('\n');
+---
+<details class="embed-code" data-embed-code>
+  <summary>{t.summary}</summary>
+  <p>{t.intro}</p>
+  <label class="embed-code__label">{t.label}<textarea readonly rows="6" spellcheck="false" data-embed-code-text>{code}</textarea></label>
+  <div class="embed-code__actions"><button type="button" class="secondary" data-embed-code-copy data-copied={t.copied}>{t.copy}</button><span role="status" aria-live="polite" data-embed-code-status></span></div>
+  <p class="embed-code__tip">{t.tip}</p>
+</details>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-embed-code]').forEach((panel) => {
+    const text = panel.querySelector<HTMLTextAreaElement>('[data-embed-code-text]');
+    const button = panel.querySelector<HTMLButtonElement>('[data-embed-code-copy]');
+    const status = panel.querySelector<HTMLElement>('[data-embed-code-status]');
+    if (!text || !button) return;
+    text.addEventListener('focus', () => text.select());
+    button.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(text.value); } catch { text.focus(); text.select(); return; }
+      if (status) { status.textContent = button.dataset.copied ?? ''; window.setTimeout(() => { status.textContent = ''; }, 1800); }
+    });
+  });
+</script>

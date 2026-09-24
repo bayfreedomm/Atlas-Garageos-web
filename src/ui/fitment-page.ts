@@ -149,9 +149,9 @@ export async function initializeFitmentPage(): Promise<void> {
   function showMapDetail(cell: FitmentMapCell, rimDiameter: number, profile: VehicleClearanceProfile): void {
     mapDetail.replaceChildren();
     const heading = document.createElement('h3');
-    heading.textContent = `${rimDiameter}x${cell.wheelWidthInches} ET${cell.offsetMm} — ${cell.state.toUpperCase()}`;
+    heading.textContent = `${rimDiameter}x${cell.wheelWidthInches} ET${cell.offsetMm} — ${mapCellPresentation(cell, true).stateLabel}`;
     const metrics = document.createElement('p');
-    metrics.textContent = `Inner change: ${formatNumber(cell.innerPositionChangeMm)} mm · Outer poke change: ${formatNumber(cell.outerPokeChangeMm)} mm · Projected inner: ${formatNumber(cell.projectedInnerClearanceMm)} mm · Projected outer: ${formatNumber(cell.projectedOuterClearanceMm)} mm`;
+    metrics.textContent = t.mapCellMetrics(formatNumber(cell.innerPositionChangeMm), formatNumber(cell.outerPokeChangeMm), formatNumber(cell.projectedInnerClearanceMm), formatNumber(cell.projectedOuterClearanceMm));
     const reason = document.createElement('p');
     reason.textContent = reasonText(cell, profile);
     mapDetail.append(heading, metrics, reason);
@@ -445,8 +445,8 @@ export async function initializeFitmentPage(): Promise<void> {
     const value = comparison.value;
     const currentSetup = readSetup('current');
     const proposedSetup = readSetup('proposed');
-    required<HTMLElement>('#decision-tire').textContent = `${formatNumber(value.current.overallDiameterMm, 1)} → ${formatNumber(value.proposed.overallDiameterMm, 1)} mm diameter`;
-    required<HTMLElement>('#decision-wheel').textContent = `Inner ${formatNumber(value.wheelInnerPositionChangeMm, 1)} mm · outer ${formatNumber(value.wheelOuterPokeChangeMm, 1)} mm`;
+    required<HTMLElement>('#decision-tire').textContent = t.decisionTireValue(formatNumber(value.current.overallDiameterMm, 1), formatNumber(value.proposed.overallDiameterMm, 1));
+    required<HTMLElement>('#decision-wheel').textContent = t.decisionWheelValue(formatNumber(value.wheelInnerPositionChangeMm, 1), formatNumber(value.wheelOuterPokeChangeMm, 1));
     updateMeasurementDecision();
     const visual = required<HTMLElement>('[data-fitment-visualizer]');
     const tireScale = tireScaleMapping({

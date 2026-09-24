@@ -1,9 +1,12 @@
-import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, nearEquivalentSizesTool, speedometerTableTool, type NearEquivalentSize, type SpeedometerTableRow, type TireToolInput } from '../features/tools/calculator-tools';
+import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, speedometerTableTool, type SpeedometerTableRow, type TireToolInput } from '../features/tools/calculator-tools';
+import { plusSizeOptions, referenceTireSizeCount, tireSizeAvailability, type TireAvailability, type TireSizeSuggestion } from '../features/tools/tire-availability';
+import { localizedToolPath } from '../localization/locales';
 import { speedometerMetrics, speedometerSummary, tireCalculatorMetrics, tireCalculatorSummary, tireComparisonMetrics, tireComparisonSummary, toolIssueText, wheelOffsetMetrics, wheelOffsetSummary, type PresentedMetric } from './tool-presentation';
 import { tireScaleMapping, wheelOffsetVisualMapping } from './fitment-visualizer-model';
 import { getPageLocale } from './page-locale';
 import { computeTireCrossSection } from './tire-cross-section';
 import { guidedTireDecision } from './guided-tire-decision';
+import { initializeTirePrintSheet } from './tire-print-sheet';
 
 const numberValue = (form: HTMLFormElement, name: string): number => Number(new FormData(form).get(name));
 const tireValue = (form: HTMLFormElement, prefix: string): TireToolInput => ({ widthMm: numberValue(form, `${prefix}widthMm`), aspectRatio: numberValue(form, `${prefix}aspectRatio`), rimDiameterInches: numberValue(form, `${prefix}rimDiameterInches`) });
@@ -89,47 +92,144 @@ function setTireVisual(form: HTMLFormElement, input: TireToolInput, currentDiame
 }
 
 
+/** One decimal with a sign; anything that rounds to zero is shown as ±0.0 rather than "-0.0". */
+const signedPercent = (percent: number): string => {
+  const rounded = Math.round(percent * 10) / 10;
+  return rounded === 0 ? '±0.0' : `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}`;
+};
+
 const NEAR_SIZES_TEXT = {
   en: {
-    heading: 'Near-equivalent sizes',
-    note: 'Calculated matches within about 3% of this diameter at nearby rim sizes — not confirmed against a real tire catalog.',
-    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}% diameter`,
+    heading: 'Real sizes that keep this diameter',
+    note: (count: number) => `Manufactured sizes from our reference list of ${count} production sizes, within 3% of this overall diameter. Open one to compare it side by side. Load index, speed rating, rim width and clearance still need checking — this is not a stock check.`,
+    diff: (percent: number) => `${signedPercent(percent)}% diameter`,
+    rim: (rim: number) => `${rim}" rim`,
+    compare: (size: string) => `Compare with ${size}`,
+    listed: 'Manufactured size — it appears in our reference list of production tire sizes.',
+    unlisted: 'Not in our reference list. It may be a rare or specialist size — confirm with a tire retailer before planning around it.',
+    nonstandard: 'Unusual notation — modern metric widths end in 5 (…195, 205, 215…) and profiles go in steps of 5. Check the sidewall again.',
+    nearest: 'Closest listed sizes on this rim:',
+    none: 'No listed alternative within 3% on nearby rims.',
+    currentLabel: 'Current', newLabel: 'New',
   },
   de: {
-    heading: 'Ähnliche Ersatzgrößen',
-    note: 'Berechnete Übereinstimmungen innerhalb von etwa 3 % dieses Durchmessers bei benachbarten Felgengrößen — nicht mit einem echten Reifenkatalog abgeglichen.',
-    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1).replace('.', ',')}% Durchmesser`,
+    heading: 'Echte Größen mit gleichem Durchmesser',
+    note: (count: number) => `Hergestellte Größen aus unserer Referenzliste mit ${count} Serienreifengrößen, innerhalb von 3 % des Gesamtdurchmessers. Öffnen Sie eine Größe für den direkten Vergleich. Tragfähigkeit, Geschwindigkeitsindex, Felgenbreite und Freigang müssen weiterhin geprüft werden — keine Verfügbarkeitsprüfung.`,
+    diff: (percent: number) => `${signedPercent(percent).replace('.', ',')}% Durchmesser`,
+    rim: (rim: number) => `${rim}-Zoll-Felge`,
+    compare: (size: string) => `Mit ${size} vergleichen`,
+    listed: 'Hergestellte Größe — sie steht in unserer Referenzliste der Serienreifengrößen.',
+    unlisted: 'Nicht in unserer Referenzliste. Möglicherweise eine seltene Sondergröße — klären Sie die Verfügbarkeit beim Reifenhändler, bevor Sie damit planen.',
+    nonstandard: 'Ungewöhnliche Angabe — metrische Breiten enden auf 5 (…195, 205, 215…) und Querschnitte gehen in 5er-Schritten. Prüfen Sie die Reifenflanke erneut.',
+    nearest: 'Nächste gelistete Größen auf dieser Felge:',
+    none: 'Keine gelistete Alternative innerhalb von 3 % auf benachbarten Felgen.',
+    currentLabel: 'Aktuell', newLabel: 'Neu',
   },
   es: {
-    heading: 'Tamaños equivalentes cercanos',
-    note: 'Coincidencias calculadas dentro de aproximadamente un 3% de este diámetro en llantas de tamaño cercano — no confirmadas en un catálogo real de neumáticos.',
-    diff: (percent: number) => `${percent >= 0 ? '+' : ''}${percent.toFixed(1).replace('.', ',')}% de diámetro`,
+    heading: 'Medidas reales con el mismo diámetro',
+    note: (count: number) => `Medidas fabricadas de nuestra lista de referencia de ${count} medidas de serie, dentro de un 3% de este diámetro total. Abra una para compararla. Índice de carga, código de velocidad, ancho de llanta y holgura siguen requiriendo comprobación — no es una consulta de stock.`,
+    diff: (percent: number) => `${signedPercent(percent).replace('.', ',')}% de diámetro`,
+    rim: (rim: number) => `Llanta de ${rim}"`,
+    compare: (size: string) => `Comparar con ${size}`,
+    listed: 'Medida fabricada — aparece en nuestra lista de referencia de medidas de serie.',
+    unlisted: 'No está en nuestra lista de referencia. Puede ser una medida poco común o especial — confírmela con un distribuidor antes de contar con ella.',
+    nonstandard: 'Notación inusual — los anchos métricos terminan en 5 (…195, 205, 215…) y los perfiles van de 5 en 5. Revise de nuevo el flanco.',
+    nearest: 'Medidas listadas más cercanas en esta llanta:',
+    none: 'Ninguna alternativa listada dentro del 3% en llantas cercanas.',
+    currentLabel: 'Actual', newLabel: 'Nuevo',
   },
 } as const;
+
+const sizeText = (s: { readonly widthMm: number; readonly aspectRatio: number; readonly rimDiameterInches: number }): string => `${s.widthMm}/${s.aspectRatio} R${s.rimDiameterInches}`;
+const sizeToken = (s: { readonly widthMm: number; readonly aspectRatio: number; readonly rimDiameterInches: number }): string => `${s.widthMm}-${s.aspectRatio}-${s.rimDiameterInches}`;
+
+/** One status line (✓ / ! / ×) plus, when not listed, links to the closest listed sizes. */
+function availabilityBlock(availability: TireAvailability, label: string | null, suggestionHref: (s: TireSizeSuggestion) => string): HTMLElement {
+  const t = NEAR_SIZES_TEXT[getPageLocale()];
+  const block = document.createElement('div');
+  block.className = `tire-availability tire-availability--${availability.status}`;
+  block.dataset.availabilityStatus = availability.status;
+  const line = document.createElement('p');
+  const icon = document.createElement('strong'); icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = availability.status === 'listed' ? '✓' : availability.status === 'unlisted' ? '!' : '×';
+  const text = document.createElement('span');
+  text.textContent = `${label ? `${label}: ` : ''}${t[availability.status]}`;
+  line.append(icon, text);
+  block.append(line);
+  if (availability.status !== 'listed' && availability.nearest.length > 0) {
+    const nearest = document.createElement('p'); nearest.className = 'tire-availability__nearest';
+    nearest.append(document.createTextNode(`${t.nearest} `));
+    availability.nearest.forEach((suggestion, index) => {
+      if (index > 0) nearest.append(document.createTextNode(' · '));
+      const link = document.createElement('a');
+      link.href = suggestionHref(suggestion);
+      link.textContent = `${sizeText(suggestion.size)} (${t.diff(suggestion.diameterDifferencePercent)})`;
+      nearest.append(link);
+    });
+    block.append(nearest);
+  }
+  return block;
+}
 
 function renderNearEquivalentSizes(form: HTMLFormElement, input: TireToolInput): void {
   const container = form.querySelector<HTMLElement>('[data-near-sizes]');
   if (!container) return;
-  const result = nearEquivalentSizesTool(input);
-  if (!result.ok || result.value.length === 0) { container.hidden = true; return; }
-  const t = NEAR_SIZES_TEXT[getPageLocale()];
+  const locale = getPageLocale();
+  const t = NEAR_SIZES_TEXT[locale];
   const heading = container.querySelector<HTMLElement>('[data-near-sizes-heading]');
   const note = container.querySelector<HTMLElement>('[data-near-sizes-note]');
   const list = container.querySelector<HTMLUListElement>('[data-near-sizes-list]');
+  const comparisonPath = localizedToolPath(locale, 'tire-size-comparison', 'tool');
+
+  // Availability of the size itself sits above the heading; a suggestion reloads this calculator with it.
+  container.querySelector('[data-tire-availability]')?.remove();
+  const availability = availabilityBlock(tireSizeAvailability(input), null, (s) => `?size=${encodeURIComponent(sizeToken(s.size))}`);
+  availability.dataset.tireAvailability = '';
+  container.prepend(availability);
+
   if (heading) heading.textContent = t.heading;
-  if (note) note.textContent = t.note;
+  if (note) note.textContent = t.note(referenceTireSizeCount());
   if (list) {
-    list.replaceChildren(...result.value.map((candidate: NearEquivalentSize) => {
-      const item = document.createElement('li');
-      const size = document.createElement('span'); size.className = 'near-sizes__size';
-      size.textContent = `${candidate.tire.widthMm}/${candidate.tire.aspectRatio}R${candidate.tire.rimDiameterInches}`;
-      const diff = document.createElement('span'); diff.className = 'near-sizes__diff';
-      diff.textContent = t.diff(candidate.diameterDifferencePercent);
-      item.append(size, diff);
-      return item;
-    }));
+    const rows = plusSizeOptions(input);
+    if (rows.length === 0) {
+      const empty = document.createElement('li'); empty.className = 'near-sizes__empty'; empty.textContent = t.none;
+      list.replaceChildren(empty);
+    } else {
+      list.replaceChildren(...rows.flatMap((row) => row.options.map((option) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.className = 'near-sizes__link';
+        link.href = `${comparisonPath}?${new URLSearchParams({ current: sizeToken(input), new: sizeToken(option.size) }).toString()}`;
+        link.setAttribute('aria-label', t.compare(sizeText(option.size)));
+        const rim = document.createElement('span'); rim.className = 'near-sizes__rim'; rim.textContent = t.rim(row.rimDiameterInches);
+        const size = document.createElement('span'); size.className = 'near-sizes__size'; size.textContent = sizeText(option.size);
+        const diff = document.createElement('span'); diff.className = 'near-sizes__diff'; diff.textContent = t.diff(option.diameterDifferencePercent);
+        link.append(rim, size, diff);
+        item.append(link);
+        return item;
+      })));
+    }
   }
   container.hidden = false;
+}
+
+/** Both sizes on the comparison page; a suggestion swaps that side and keeps the other one. */
+function setTireComparisonAvailability(form: HTMLFormElement, original: TireToolInput, proposed: TireToolInput): void {
+  const t = NEAR_SIZES_TEXT[getPageLocale()];
+  let host = form.querySelector<HTMLElement>('[data-tire-availability-pair]');
+  if (!host) {
+    host = document.createElement('div');
+    host.className = 'tire-availability-pair';
+    host.dataset.tireAvailabilityPair = '';
+    host.setAttribute('aria-live', 'polite');
+    const summary = form.querySelector('[data-result-summary]');
+    if (summary) summary.after(host); else form.append(host);
+  }
+  const href = (current: TireToolInput, next: TireToolInput): string => `?${new URLSearchParams({ current: sizeToken(current), new: sizeToken(next) }).toString()}`;
+  host.replaceChildren(
+    availabilityBlock(tireSizeAvailability(original), `${t.currentLabel} ${sizeText(original)}`, (s) => href(s.size, proposed)),
+    availabilityBlock(tireSizeAvailability(proposed), `${t.newLabel} ${sizeText(proposed)}`, (s) => href(original, s.size)),
+  );
 }
 
 const SPEED_TABLE_TEXT = {
@@ -771,6 +871,7 @@ export function initializeToolCalculators(): void {
         setSummary(form, tireComparisonSummary(result.value));
         setTireComparisonPrimaryResult(form, result.value);
         setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm);
+        setTireComparisonAvailability(form, original, proposed);
         setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm);
         setTireComparisonTechnicalVisual(form, original, proposed, result.value);
         if (results) renderMetrics(results, tireComparisonMetrics(result.value));
@@ -779,10 +880,11 @@ export function initializeToolCalculators(): void {
     bindCalculator(form, () => {
       const original = tireValue(form, 'original-'); const proposed = tireValue(form, 'new-');
       const result = compareTireSizesTool(original, proposed);
-      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
+      if (result.ok) { setSummary(form, tireComparisonSummary(result.value)); setTireComparisonPrimaryResult(form, result.value); setGuidedTireDecision(form, original, proposed, result.value.diameterDifferenceMm); setTireComparisonAvailability(form, original, proposed); setTireVisual(form, original, result.value.current.overallDiameterMm, proposed, result.value.proposed.overallDiameterMm); setTireComparisonTechnicalVisual(form, original, proposed, result.value); }
       return result.ok ? { ok: true as const, metrics: tireComparisonMetrics(result.value) } : result;
     });
     form.addEventListener('input', coalesceToNextFrame(preview));
+    initializeTirePrintSheet(form);
   });
   document.querySelectorAll<HTMLFormElement>('[data-calculator="wheel-offset"]').forEach((form) => {
     const preview = (): void => {

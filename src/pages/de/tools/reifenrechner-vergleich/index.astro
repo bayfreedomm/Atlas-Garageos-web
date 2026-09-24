@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
+import EmbedCodePanel from '../../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../../components/TireInputGroup.astro';
 import TireVisualStudio from '../../../../components/TireVisualStudio.astro';
 import GuidedTireDecision from '../../../../components/GuidedTireDecision.astro';
@@ -39,5 +40,6 @@ const c = localizedTool('tire-size-comparison', 'de');
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+  <EmbedCodePanel slot="explanation" locale="de" />
 </ToolPage>
 <script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

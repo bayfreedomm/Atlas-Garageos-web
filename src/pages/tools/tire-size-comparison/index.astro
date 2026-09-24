@@ -1,5 +1,6 @@
 ---
 import ToolPage from '../../../components/ToolPage.astro';
+import EmbedCodePanel from '../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../components/TireInputGroup.astro';
 import TireVisualStudio from '../../../components/TireVisualStudio.astro';
 import GuidedTireDecision from '../../../components/GuidedTireDecision.astro';
@@ -42,5 +43,6 @@ const definition = toolById('tire-size-comparison');
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
   <div slot="explanation"><h2>What changes between the sizes</h2><p>Positive diameter and circumference differences mean the new tire is larger. Ride-height difference is half of the diameter change. The speedometer percentage shows the theoretical change at the same wheel rotation rate.</p><p>No percentage is treated as an automatic compatibility or safety limit.</p></div>
+  <EmbedCodePanel slot="explanation" />
 </ToolPage>
 <script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

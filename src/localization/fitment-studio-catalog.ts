@@ -176,6 +176,9 @@ export interface FitmentStudioText {
   readonly mapIntro: string;
   readonly generateMapButton: string;
   readonly mapLegendAria: string;
+  readonly mapCellMetrics: (inner: string, outer: string, projectedInner: string, projectedOuter: string) => string;
+  readonly decisionTireValue: (current: string, proposed: string) => string;
+  readonly decisionWheelValue: (inner: string, outer: string) => string;
   readonly legendChecked: string;
   readonly legendCheckedDetail: string;
   readonly legendGreen: string;
@@ -467,6 +470,9 @@ export const fitmentStudioText: Readonly<Record<UiLocale, FitmentStudioText>> = 
     mapIntro: 'Explore wheel width and offset. Select any cell for its calculated detail.',
     generateMapButton: 'Generate map',
     mapLegendAria: 'Map status legend',
+    mapCellMetrics: (inner, outer, projectedInner, projectedOuter) => `Inner change: ${inner} mm · Outer poke change: ${outer} mm · Projected inner: ${projectedInner} mm · Projected outer: ${projectedOuter} mm`,
+    decisionTireValue: (current, proposed) => `${current} → ${proposed} mm diameter`,
+    decisionWheelValue: (inner, outer) => `Inner ${inner} mm · outer ${outer} mm`,
     legendChecked: 'CHECKED',
     legendCheckedDetail: 'no calculated wheel overlap; no margin target supplied',
     legendGreen: 'GREEN',
@@ -756,6 +762,9 @@ export const fitmentStudioText: Readonly<Record<UiLocale, FitmentStudioText>> = 
     mapIntro: 'Erkunden Sie Felgenbreite und Einpresstiefe. Wählen Sie eine Zelle für ihr berechnetes Detail.',
     generateMapButton: 'Karte erstellen',
     mapLegendAria: 'Legende der Kartenstatus',
+    mapCellMetrics: (inner, outer, projectedInner, projectedOuter) => `Innere Änderung: ${inner} mm · Änderung Außenüberstand: ${outer} mm · Projiziert innen: ${projectedInner} mm · Projiziert außen: ${projectedOuter} mm`,
+    decisionTireValue: (current, proposed) => `${current} → ${proposed} mm Durchmesser`,
+    decisionWheelValue: (inner, outer) => `Innen ${inner} mm · außen ${outer} mm`,
     legendChecked: 'GEPRÜFT',
     legendCheckedDetail: 'keine berechnete Radüberschneidung; kein Margen-Zielwert angegeben',
     legendGreen: 'GRÜN',
@@ -1045,6 +1054,9 @@ export const fitmentStudioText: Readonly<Record<UiLocale, FitmentStudioText>> = 
     mapIntro: 'Explore el ancho y el offset de la llanta. Seleccione cualquier celda para ver su detalle calculado.',
     generateMapButton: 'Generar mapa',
     mapLegendAria: 'Leyenda de estados del mapa',
+    mapCellMetrics: (inner, outer, projectedInner, projectedOuter) => `Cambio interior: ${inner} mm · Cambio de salida exterior: ${outer} mm · Interior proyectado: ${projectedInner} mm · Exterior proyectado: ${projectedOuter} mm`,
+    decisionTireValue: (current, proposed) => `${current} → ${proposed} mm de diámetro`,
+    decisionWheelValue: (inner, outer) => `Interior ${inner} mm · exterior ${outer} mm`,
     legendChecked: 'VERIFICADO',
     legendCheckedDetail: 'sin solapamiento calculado de la llanta; sin objetivo de margen indicado',
     legendGreen: 'VERDE',

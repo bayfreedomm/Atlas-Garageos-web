@@ -915,6 +915,26 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .near-sizes__list li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .55rem .8rem; border: 1px solid var(--color-line); border-radius: .6rem; background: var(--color-surface-subtle); }
 .near-sizes__size { font-weight: 700; }
 .near-sizes__diff { font-size: .82rem; color: var(--color-ink-muted); }
+/* Plus/minus-size rows are links into the comparison (ui/tool-calculators.ts renderNearEquivalentSizes). */
+.near-sizes__list li:has(> .near-sizes__link) { padding: 0; }
+.near-sizes__link { display: grid; grid-template-columns: minmax(5.5rem, auto) 1fr auto; align-items: center; gap: .75rem; width: 100%; padding: .55rem .8rem; border-radius: .6rem; color: inherit; text-decoration: none; }
+.near-sizes__link:hover { background: var(--color-surface-selected); }
+.near-sizes__link:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+.near-sizes__rim { font-size: .78rem; color: var(--color-ink-muted); }
+.near-sizes__empty { justify-content: flex-start !important; color: var(--color-ink-muted); font-size: .85rem; }
+@media (max-width: 30rem) { .near-sizes__link { grid-template-columns: 1fr auto; } .near-sizes__rim { grid-column: 1 / -1; } }
+/* "Is this size manufactured?" status (features/tools/tire-availability.ts). */
+.tire-availability { margin: 0 0 .75rem; padding: .6rem .8rem; border: 1px solid var(--color-line); border-left-width: 3px; border-radius: .6rem; background: var(--color-surface-subtle); font-size: .85rem; line-height: 1.45; }
+.tire-availability p { display: flex; gap: .5rem; margin: 0; }
+.tire-availability > p > strong { flex: none; width: 1rem; text-align: center; }
+.tire-availability__nearest { display: block !important; margin-top: .35rem !important; padding-left: 1.5rem; }
+.tire-availability__nearest a { font-weight: 700; white-space: nowrap; }
+.tire-availability--listed { border-left-color: var(--color-brand); }
+.tire-availability--unlisted { border-color: var(--semantic-warning-border); background: var(--semantic-warning-bg); color: var(--semantic-warning-text); }
+.tire-availability--nonstandard { border-color: var(--semantic-danger-border); background: var(--semantic-danger-bg); color: var(--semantic-danger-text); }
+.tire-availability--unlisted a, .tire-availability--nonstandard a { color: inherit; }
+.tire-availability-pair { display: grid; gap: .5rem; margin: .75rem 0; }
+.tire-availability-pair .tire-availability { margin: 0; }
 
 /* Speedometer Error Calculator — actual speed across a spread of indicated speeds. */
 .speed-table { margin: 1.1rem 0 0; padding-top: .9rem; border-top: 1px solid var(--color-line); }
@@ -1260,3 +1280,50 @@ body.has-expanded-3d{overflow:hidden}
 .contact-direct__note{margin:.2rem 0 0;color:var(--color-ink-muted);font-size:.82rem;line-height:1.55}
 @media(min-width:56rem){.contact-page{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}}
 :root[data-theme="dark"] .contact-field input,:root[data-theme="dark"] .contact-field select,:root[data-theme="dark"] .contact-field textarea{background:#0d202d;border-color:#29404f;color:#f3f7fa}
+
+/* ── Tire-shop print sheet (ui/tire-print-sheet.ts) ─────────────────────────────────────────────
+   Hidden on screen. When the "Print for the tire shop" button is used, body gets
+   .is-printing-sheet and ONLY then does print output collapse to the sheet — a normal Ctrl+P on
+   any page is untouched. Plain black-on-white for cheap, legible printing in both themes. */
+.print-sheet { display: none; }
+@media print {
+  body.is-printing-sheet > *:not(.print-sheet) { display: none !important; }
+  /* Always ink-on-paper, even when the visitor browses in the dark theme. */
+  html:has(body.is-printing-sheet), body.is-printing-sheet { background: #fff !important; color-scheme: light !important; }
+  body.is-printing-sheet .print-sheet { display: block; color: #000; background: #fff; font: 10.5pt/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .print-sheet, .print-sheet * { color: #000 !important; background-color: transparent; }
+  .print-sheet h1 { max-width: none; margin: .1rem 0 .2rem; font-size: 17pt; line-height: 1.2; letter-spacing: normal; }
+  .print-sheet h2, .print-sheet p { max-width: none; }
+  .print-sheet h2 { margin: 0 0 .35rem; font-size: 11.5pt; }
+  .print-sheet header p { margin: 0; }
+  .print-sheet__brand { font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 9pt; }
+  .print-sheet__meta { font-size: 9pt; margin-top: .25rem !important; }
+  .print-sheet table { width: 100%; margin: 1rem 0; border-collapse: collapse; }
+  .print-sheet th, .print-sheet td { padding: .35rem .5rem; border: 1px solid #999; text-align: left; vertical-align: top; }
+  .print-sheet thead th { background-color: #eee; }
+  .print-sheet tbody th { font-weight: 600; width: 28%; }
+  .print-sheet__columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1rem; }
+  .print-sheet ul { margin: 0; padding-left: 1.1rem; }
+  .print-sheet__checklist { list-style: none; padding-left: 0 !important; }
+  .print-sheet__checklist li::before { content: "\2610\00a0\00a0"; } /* ☐ — escaped so it survives any CSS charset */
+  .print-sheet footer { margin-top: 1rem; padding-top: .5rem; border-top: 1px solid #999; font-size: 9pt; }
+  .print-sheet footer p { margin: .15rem 0; }
+  .print-sheet__url { word-break: break-all; }
+  @page { margin: 14mm; }
+}
+
+/* ── Embeddable calculator page (components/EmbedTireComparison.astro) ─────────────────────── */
+.embed-body { min-height: 0; background: var(--color-surface); background-image: none; }
+.embed-shell { max-width: 46rem; margin: 0 auto; padding: 1rem; }
+.embed-shell .calculator-form { margin: 0; }
+.embed-credit { margin: 1rem 0 0; padding-top: .75rem; border-top: 1px solid var(--color-line); font-size: .82rem; color: var(--color-ink-muted); }
+.embed-credit a { font-weight: 700; color: var(--color-ink); }
+
+/* ── "Embed this calculator" panel on the tool page (components/EmbedCodePanel.astro) ─────── */
+.embed-code { margin: 1.25rem 0 0; padding: .8rem 1rem; border: 1px solid var(--color-line); border-radius: .75rem; background: var(--color-surface-subtle); }
+.embed-code summary { cursor: pointer; font-weight: 700; }
+.embed-code p { margin: .6rem 0; font-size: .9rem; }
+.embed-code__label { display: grid; gap: .35rem; font-size: .8rem; font-weight: 700; }
+.embed-code textarea { width: 100%; min-height: 8rem; padding: .6rem; border: 1px solid var(--color-line); border-radius: .5rem; background: var(--color-surface); color: var(--color-ink); font: .75rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; resize: vertical; }
+.embed-code__actions { display: flex; align-items: center; gap: .75rem; margin-top: .6rem; }
+.embed-code__tip { color: var(--color-ink-muted); font-size: .8rem !important; }
