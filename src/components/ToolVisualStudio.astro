@@ -30,8 +30,12 @@ const tabs = {
     const tabs = [...studio.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const panels = [...studio.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
     const plate = studio.querySelector<HTMLElement>('[data-tool-engineering-2d]');
-    const form = studio.closest('.tool-machine')?.querySelector<HTMLFormElement>('.tool-workspace form');
     const id = plate?.getAttribute('data-tool-engineering-2d');
+    const previous = studio.previousElementSibling;
+    const machine = previous instanceof HTMLElement && previous.matches('.tool-machine')
+      ? previous
+      : studio.parentElement?.querySelector<HTMLElement>(id ? `.tool-machine[data-tool-id="${CSS.escape(id)}"]` : '.tool-machine');
+    const form = machine?.querySelector<HTMLFormElement>('.tool-workspace form');
     const legacySelector = id === 'fuel-cost-calculator' ? '[data-fuel-technical-visual]' : id === 'road-trip-cost-calculator' ? '[data-trip-visual]' : null;
     const legacy = legacySelector ? form?.querySelector<HTMLElement>(legacySelector) : null;
     if (legacy && panels[1]) panels[1].append(legacy);

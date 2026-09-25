@@ -348,3 +348,9 @@ Next implementation pass:
 - [x] Those fourteen routes open on their tool-specific Engineering 2D explanation and keep the heavier interactive 3D view optional, preserving the earlier first-paint performance decision.
 - [x] Tools with native tire, offset, PCD, speed, gearing, compression, EV or fit-check studios keep those purpose-built visuals; the page shell avoids rendering a redundant side illustration beside a full studio.
 - [x] Visual coverage is tested against the complete published `kind: 'tool'` registry so a future tool cannot silently ship without a visual family assignment.
+
+## Tool-specific 2D explainer correction — 2026-09-25
+- [x] The seven repeated abstract blueprint families are replaced by fourteen tool-specific 2D explainers.
+- [x] Torque, power-to-weight, fuel economy, pressure, power, tire codes, DOT date, towing, quarter-mile, fitment and measurement views now label the relationship they explain.
+- [x] Every restored route retains a visual; the correction improves meaning instead of removing coverage.
+- [x] Live calculator readouts and optional 3D tabs remain intact.
