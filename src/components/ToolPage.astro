@@ -8,8 +8,6 @@ import ToolVisual from './ToolVisual.astro';
 import ToolInsights from './ToolInsights.astro';
 import DecisionGraph from './DecisionGraph.astro';
 import { toolNextDecision } from '../ui/tool-next-decision';
-import ToolVisualStudio from './ToolVisualStudio.astro';
-import { additional3DToolIds } from '../localization/tool-3d-catalog';
 
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string | undefined; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale | undefined; titleOverride?: string | undefined; descriptionOverride?: string | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
@@ -24,7 +22,16 @@ const backHref = locale ? `/${locale}/tools/` : '/tools/';
 const layoutTitle = titleOverride ?? definition.title;
 const layoutDescription = descriptionOverride ?? definition.description;
 const layoutPathname = locale ? localizedToolPath(locale, definition.id, definition.kind) : undefined;
-const hasAdditional3D = (additional3DToolIds as readonly string[]).includes(definition.id);
+// These routes already explain the calculation with purpose-built result cards,
+// diagrams or a guided workspace. A second generic illustration beside the form
+// makes the page noisier without answering another user question.
+const resultLedToolIds = [
+  'fitment-map', 'measure-my-car', 'fuel-cost-calculator', 'road-trip-cost-calculator',
+  'mpg-l100km-converter', 'psi-bar-converter', 'hp-kw-converter', 'nm-lb-ft-converter',
+  'power-to-weight-calculator', 'tire-load-speed-rating', 'tire-date-code-decoder',
+  'towing-capacity-calculator', 'quarter-mile-calculator', 'vehicle-fitment-finder',
+] as const;
+const hasPurposeBuiltResult = (resultLedToolIds as readonly string[]).includes(definition.id);
 const hasEmbeddedStudio = ['tire-size-calculator', 'speedometer-error-calculator', 'gear-ratio-calculator', 'compression-ratio-calculator', 'ev-charging-cost-calculator'].includes(definition.id);
 // Without this, SiteLayout's own default breadcrumb trail (Home -> Tools, both English-only
 // paths) is used for every locale, so the BreadcrumbList JSON-LD on every DE/ES tool page
@@ -46,11 +53,10 @@ const breadcrumbs = [
       <div><p class="eyebrow">{eyebrow}</p><h1>{displayTitle}</h1><p class="hero-copy">{intro}</p></div>
     </header>
 
-    <div class:list={['tool-stage', { 'tool-stage--single': !visual || hasAdditional3D || hasEmbeddedStudio }]}>
+    <div class:list={['tool-stage', { 'tool-stage--single': !visual || hasPurposeBuiltResult || hasEmbeddedStudio }]}> 
       <section class="tool-workspace" aria-label={`${displayTitle} calculator`}><slot name="tool" /></section>
-      {visual && !hasAdditional3D && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={`${displayTitle} visual explanation`}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} /></aside>}
+      {visual && !hasPurposeBuiltResult && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={`${displayTitle} visual explanation`}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} /></aside>}
     </div>
-    {hasAdditional3D && <ToolVisualStudio {definition} locale={journeyLocale} />}
   </article>
 
   {explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}

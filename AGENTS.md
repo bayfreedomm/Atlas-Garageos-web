@@ -18,3 +18,17 @@ Before a checkpoint, run `pnpm test`, `pnpm typecheck`, and `pnpm build`. Add un
 
 ## V3 decision ledger
 Before significant product, UI, SEO, localization, growth, or visual changes, read `V3_MASTER_PLAN.md`. Locked decisions must not be silently removed or reversed; update the ledger when an implementation pass changes status.
+
+## Persistent project memory
+
+The current project-memory source of truth is:
+
+- `docs/atlas/MASTER_PLAN.md` — reconciled product strategy and non-negotiable boundaries.
+- `docs/atlas/PROJECT_STATE.md` — verified repository reality only; never a wish list.
+- `docs/atlas/ROADMAP.md` — accepted future work, ordered by priority.
+
+Before important Atlas work, read those three files and then consult `docs/atlas/DECISIONS.md`, `docs/atlas/IDEA_BANK.md`, or `docs/atlas/HANDOFF.md` when relevant. Do not rely on old chat memory or assumptions. Treat current code, routes, data, tests, and configuration as the authority for what exists.
+
+Use these status labels consistently: `VERIFIED DONE`, `PARTIAL`, `PLANNED`, `BLOCKED`, `IDEA`, and `REJECTED / SUPERSEDED`. A `VERIFIED DONE` claim should name evidence such as a route, file/component, test, data source, or configuration. Update `PROJECT_STATE.md` and `ROADMAP.md` after meaningful work, record durable product decisions with date and rationale in `DECISIONS.md`, and keep unaccepted ideas in `IDEA_BANK.md`. Update `HANDOFF.md` at the end of a substantial session with what changed, what was verified, what remains, and the next sensible task.
+
+Preserve working behavior and data contracts. Do not silently replace an existing decision, create a duplicate memory system, or treat a generated/static artifact as the source of truth. This repository currently has no server-side user-account database; local Garage storage is not durable multi-user persistence.

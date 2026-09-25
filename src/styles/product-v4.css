@@ -646,6 +646,8 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="light"] .source-badge{color:#4a5765!important}
 .tool-machine .calculator-form>button:not(.secondary){border-color:#075fb8!important;background:linear-gradient(180deg,#0a67d8,#075fb8)!important;color:#fff!important;text-shadow:none!important}
 :root[data-theme="light"] .tool-machine .calculator-form>button:not(.secondary),:root[data-theme="dark"] .tool-machine .calculator-form>button:not(.secondary){color:#fff!important}
+.tool-machine .calculator-form>button.secondary.share-result-button{border-color:var(--color-line-strong)!important;background:var(--color-surface)!important;color:var(--color-ink)!important;text-shadow:none!important}
+.tool-machine .calculator-form>button.secondary.share-result-button:hover{border-color:var(--color-brand)!important;background:var(--color-surface-subtle)!important;color:var(--color-ink)!important}
 
 /* Shared result hierarchy for utility calculators. */
 .standard-answer{display:grid;gap:.7rem;margin:.85rem 0 0;padding:.82rem;border:1px solid #b9d8f6;border-radius:1rem;background:linear-gradient(145deg,#edf7ff,#f8fbfe)}

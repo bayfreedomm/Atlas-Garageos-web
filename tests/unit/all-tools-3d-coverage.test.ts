@@ -4,7 +4,7 @@ import { visualization3DText } from '../../src/localization/visualization-3d';
 import { tool3DText } from '../../src/localization/tool-3d-catalog';
 import { sceneForTool } from '../../src/lib/visualization/tool-3d-scenes';
 import { compressionChamberScene, evBatteryScene } from '../../src/lib/visualization/scene-builders';
-import { toolRegistry } from '../../src/seo/tool-registry';
+import toolPage from '../../src/components/ToolPage.astro?raw';
 
 const palette = { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' };
 const existing3D = new Set([
@@ -15,13 +15,15 @@ const existing3D = new Set([
   'tire-fit-check',
 ]);
 
-describe('3D coverage for the complete tool directory', () => {
-  it('assigns every published tool route exactly one 3D experience', () => {
-    const tools = toolRegistry.filter((tool) => tool.kind === 'tool');
-    expect(tools).toHaveLength(23);
-    for (const tool of tools) {
-      expect(Number(existing3D.has(tool.id)) + Number((additional3DToolIds as readonly string[]).includes(tool.id))).toBe(1);
-    }
+describe('truthful visual coverage', () => {
+  it('keeps 3D for spatial/mechanical tools without forcing a studio onto every route', () => {
+    expect(existing3D).toEqual(new Set([
+      'tire-size-calculator', 'tire-size-comparison', 'wheel-offset-calculator',
+      'speedometer-error-calculator', 'gear-ratio-calculator', 'ev-charging-cost-calculator',
+      'bolt-pattern-calculator', 'compression-ratio-calculator', 'tire-fit-check',
+    ]));
+    expect(toolPage).not.toContain('ToolVisualStudio');
+    expect(toolPage).toContain('hasPurposeBuiltResult');
     expect(visualization3DText.en.fitmentTitle).toBeTruthy();
   });
 

@@ -1,0 +1,50 @@
+# Atlas GarageOS — Accepted Decisions
+
+Durable decisions are recorded with date, status, rationale, and evidence. Historical V3 decisions remain in `V3_MASTER_PLAN.md`.
+
+## 2026-09-25 — Canonical project memory
+
+Status: `VERIFIED DONE`.
+
+`docs/atlas/MASTER_PLAN.md`, `PROJECT_STATE.md`, `ROADMAP.md`, `DECISIONS.md`, `IDEA_BANK.md`, and `HANDOFF.md` are the current memory layer. Root package/handoff notes remain historical and are not deleted. `AGENTS.md` tells future sessions to read the canonical trio before important work.
+
+Rationale: repository reality must not depend on chat memory, and duplicate planning systems create contradictory instructions.
+
+## 2026-09-25 — Documentation-only reconciliation
+
+Status: `VERIFIED DONE`.
+
+This pass must not change product/runtime code, routes, data, or media. Current code and tests outrank stale documentation when describing what exists; old product decisions are retained as history or explicitly marked superseded.
+
+## 2026-09-25 — Visual truthfulness over universal coverage
+
+Status: `VERIFIED DONE`.
+
+The old universal “every tool has a 3D + Engineering 2D studio” checkpoint is superseded. Spatial/mechanical relationships retain meaningful visuals; result-led utility/reference routes use their calculation-specific result visuals and do not receive decorative generic studios.
+
+Rationale: the shared blueprint plate repeated one metaphor across unrelated calculations and competed with better result explanations. This follows the locked V3 rule: multiple views are allowed only when each answers a different question.
+
+## 2026-09-25 — OBD/DTC is a P1 foundation candidate, not immediate code
+
+Status: `PLANNED`.
+
+OBD/DTC is accepted as a high-value organic cluster and knowledge-graph entity family. The first implementation requires a bounded sourced MVP, provenance/confidence, generic versus vehicle-specific separation, and safety language before route generation.
+
+Rationale: the opportunity is large, but unsupported automotive facts would create trust and safety debt.
+
+## 2026-09-25 — No universal fitment verdict
+
+Status: `VERIFIED DONE`.
+
+Geometry, measured clearances, sourced reference data, and evidence labels may support `calculated`, `user measured`, `reference`, or `needs review` explanations. They must not silently become a universal “safe” or “fits” claim.
+
+## 2026-09-25 — User persistence is a later infrastructure block
+
+Status: `PLANNED`.
+
+Current local Garage storage is not presented as durable account storage. Any future multi-user persistence must define auth, consent, export, deletion, retention, and backup before D1/R2 implementation.
+
+## Historical decisions retained
+
+- The V3 decision ledger remains authoritative for existing architecture, localization, SEO, trust, and visual principles unless a later dated decision explicitly supersedes a specific item.
+- Package notes 5.1–6.8 remain implementation evidence and historical context; they are not current roadmap priorities by themselves.

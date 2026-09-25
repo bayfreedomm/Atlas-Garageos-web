@@ -2,6 +2,8 @@
 
 This file is the decision ledger. Do not silently remove a locked decision. Update status after each major implementation pass.
 
+> Current-memory note (2026-09-25): this historical ledger remains important for locked V3 decisions and implementation history. The reconciled current strategy, verified state, accepted roadmap, and session handoff live in `docs/atlas/MASTER_PLAN.md`, `docs/atlas/PROJECT_STATE.md`, `docs/atlas/ROADMAP.md`, `docs/atlas/DECISIONS.md`, and `docs/atlas/HANDOFF.md`. Later checkpoint entries supersede earlier counts or implementation claims only where they explicitly say so.
+
 ## North star
 - Primary growth objective: win valuable automotive calculator queries in Google organic search.
 - Secondary channels: shareable results, embeds/backlinks, communities/social, Bing/IndexNow, and later browser extensions when product usage data justifies one.
@@ -332,3 +334,11 @@ Next implementation pass:
 - [x] A repository-level data vault documents revision/provenance contracts for vehicle fitment and fuel observations, with JSON schemas and a D1/R2 growth path. The current small static projections remain in `src/data` until a reviewed migration is needed.
 - [x] Primary blue and light-theme muted text were darkened to meet normal-text contrast without changing the established navy/blue/orange brand language.
 - [ ] Deployed Core Web Vitals, physical-device GPU behavior, the shared CSS payload and production D1/R2 provisioning remain measured infrastructure follow-ups.
+
+## Visual truthfulness cleanup checkpoint — 2026-09-25
+- [x] The Package 6.2–6.3 universal “3D + Engineering 2D on every tool” rule is superseded. Visuals are now selected by explanatory value, not route-count coverage.
+- [x] Fourteen utility, reference and guided-entry routes no longer render the shared schematic Visual Studio. Their existing calculation-specific result cards, fuel/trip breakdowns and guided workspaces remain the primary explanation.
+- [x] The generic side illustration is also suppressed on those result-led routes so one calculation is not presented through two competing visual metaphors.
+- [x] Spatial and mechanical tools retain their purpose-built tire, wheel, offset, PCD, speed, gearing, compression, EV and fitment visualizations where geometry or state genuinely benefits from a visual model.
+- [x] This pass changes presentation only: canonical calculations, validation, routes, SEO copy, localization, fuel/vehicle data and Cloudflare configuration remain unchanged.
+- [ ] Remaining retained 2D/3D scenes require a separate page-by-page visual polish and real-device acceptance pass; a scene is not considered valuable merely because it is interactive.
