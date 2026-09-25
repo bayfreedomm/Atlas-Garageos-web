@@ -48,13 +48,71 @@ const tabs = {
       if (!id) return;
       const values: Record<string, string> = {};
       for (const [key, value] of new FormData(form)) if (typeof value === 'string') values[key] = value;
-      const [{ sceneForTool }, { tool3DText }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog')]);
+      const [{ sceneForTool }, { tool3DText }, { convertPressureTool }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog'), import('../features/tools/utility-tools')]);
       if (version !== updateVersion) return;
       const language = locale === 'de' || locale === 'es' ? locale : 'en';
       const tool = id as import('../localization/tool-3d-catalog').Additional3DToolId;
       const result = sceneForTool(tool, values, { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' }, language, false);
       const reading = plate.querySelector<HTMLElement>('[data-tool-engineering-reading]');
       if (reading) reading.textContent = language !== 'en' && (tool === 'fitment-map' || tool === 'measure-my-car') ? tool3DText(language, tool).title : result.readout;
+      const visualState = result.scene.studio?.kind === 'tool-studio' ? result.scene.studio : undefined;
+      const primary = visualState?.primary ?? .35;
+      if (tool === 'psi-bar-converter') {
+        const unit = values.unit === 'bar' || values.unit === 'kpa' ? values.unit : 'psi';
+        const converted = convertPressureTool(Number(values.value), unit);
+        if (converted.ok) {
+          const psi = plate.querySelector<SVGTextContentElement>('[data-pressure-psi]');
+          const bar = plate.querySelector<SVGTextContentElement>('[data-pressure-bar]');
+          const kpa = plate.querySelector<SVGTextContentElement>('[data-pressure-kpa]');
+          if (psi) psi.textContent = converted.value.psi.toFixed(2);
+          if (bar) bar.textContent = converted.value.bar.toFixed(3);
+          if (kpa) kpa.textContent = converted.value.kpa.toFixed(2);
+        }
+      }
+      const needle = plate.querySelector<SVGElement>('[data-tool-needle]');
+      if (needle) needle.setAttribute('transform', `rotate(${-50 + primary * 100} 380 214)`);
+      const rotor = plate.querySelector<SVGElement>('[data-tool-rotor]');
+      if (rotor) rotor.setAttribute('transform', `rotate(${primary * 180} 160 170)`);
+      const lever = plate.querySelector<SVGElement>('[data-tool-lever]');
+      if (lever) lever.setAttribute('transform', `rotate(${-18 + primary * 36} 250 198)`);
+      plate.querySelectorAll<SVGPathElement>('[data-tool-level]').forEach((level) => {
+        level.setAttribute('pathLength', '1');
+        level.style.strokeDasharray = '1';
+        level.style.strokeDashoffset = String(1 - primary);
+      });
+      const progress = plate.querySelector<SVGCircleElement>('[data-tool-progress]');
+      if (progress) progress.setAttribute('cx', String(84 + primary * 580));
+      const car = plate.querySelector<SVGElement>('[data-tool-car]');
+      if (car) car.setAttribute('transform', `translate(${primary * 320} 0)`);
+      if (tool === 'tire-load-speed-rating') {
+        const load = values.loadIndex || '91';
+        const speed = values.speedRating || 'V';
+        const code = plate.querySelector<SVGTextContentElement>('[data-tool-code]');
+        if (code) code.textContent = `${load}${speed}`;
+        const loadLabel = plate.querySelector<SVGTextContentElement>('[data-tool-load-label]');
+        const speedLabel = plate.querySelector<SVGTextContentElement>('[data-tool-speed-label]');
+        if (loadLabel) { loadLabel.dataset.label ??= loadLabel.textContent?.split('=').slice(1).join('=').trim() || ''; loadLabel.textContent = `${load} = ${loadLabel.dataset.label}`; }
+        if (speedLabel) { speedLabel.dataset.label ??= speedLabel.textContent?.split('=').slice(1).join('=').trim() || ''; speedLabel.textContent = `${speed} = ${speedLabel.dataset.label}`; }
+      }
+      if (tool === 'tire-date-code-decoder') {
+        const code = (values.code || '2219').replace(/[^0-9]/g, '').slice(0, 4).padEnd(4, '–');
+        const dotCode = plate.querySelector<SVGTextContentElement>('[data-tool-dot-code]');
+        const weekLabel = plate.querySelector<SVGTextContentElement>('[data-tool-week-label]');
+        const yearLabel = plate.querySelector<SVGTextContentElement>('[data-tool-year-label]');
+        if (dotCode) dotCode.textContent = `DOT ${code}`;
+        if (weekLabel) { weekLabel.dataset.label ??= weekLabel.textContent?.split('=').slice(1).join('=').trim() || ''; weekLabel.textContent = `${code.slice(0, 2)} = ${weekLabel.dataset.label}`; }
+        if (yearLabel) { yearLabel.dataset.label ??= yearLabel.textContent?.split('=').slice(1).join('=').trim() || ''; yearLabel.textContent = `${code.slice(2, 4)} = ${yearLabel.dataset.label}`; }
+      }
+      if (tool === 'vehicle-fitment-finder') {
+        const count = visualState?.count ?? 0;
+        plate.querySelectorAll<SVGCircleElement>('[data-tool-lug]').forEach((lug, index) => {
+          lug.style.display = index >= count ? 'none' : '';
+          if (index >= count || count < 1) return;
+          const angle = index * Math.PI * 2 / count - Math.PI / 2;
+          lug.setAttribute('cx', String(540 + Math.cos(angle) * 62));
+          lug.setAttribute('cy', String(158 + Math.sin(angle) * 62));
+        });
+      }
     };
     const choose = (index: number, focus = false) => {
       tabs.forEach((tab, i) => { tab.setAttribute('aria-selected', String(i === index)); tab.tabIndex = i === index ? 0 : -1; });

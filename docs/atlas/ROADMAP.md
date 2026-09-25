@@ -7,6 +7,7 @@ Updated: 2026-09-25. Priority combines user value, organic opportunity, differen
 - `PLANNED` — Finish deployed launch gates: Search Console, Bing Webmaster/IndexNow, canonical/hreflang/sitemap/404/redirect smoke tests, Open Graph checks, and Core Web Vitals on the deployed build.
 - `PLANNED` — Analyze Cloudflare 3xx/4xx by path and status. Separate intentional language/HTTPS redirects from broken URLs, bot probes, and real user errors; do not block Googlebot/Bingbot blindly.
 - `PLANNED` — Complete visual acceptance on representative mobile widths, WebKit/Firefox, keyboard/assistive technology, reduced motion, low-power GPU, and deployed pages.
+- `PLANNED` — Add a page-by-page visual/content consistency gate: any visual claiming to respond to input must actually change with that input, and displayed codes/units/vehicle geometry must match current form state.
 - `PLANNED` — Keep the current data contracts and tests green while consolidating the canonical project memory.
 - `PLANNED` — Select a licensed/permissioned automotive data strategy before adding safety-relevant specifications or large vehicle coverage.
 
@@ -15,6 +16,7 @@ Updated: 2026-09-25. Priority combines user value, organic opportunity, differen
 - `ACCEPTED` — Add French (`fr`) and Brazilian Portuguese (`pt-BR`) as the next language families; do not expose either locale until its published route set has complete human-reviewed UI, SEO, FAQ, warning, and navigation copy.
 - `PLANNED` — Keep language-specific URLs and reciprocal `hreflang`/canonical metadata correct for every published route; language variants are localized product pages, not keyword-only copies.
 - `PLANNED` — Roll out in bounded waves: platform/home/tools first, then the highest-value calculator and entity clusters, then the remaining catalog after translation and visual QA.
+- `PLANNED` — Audit hardcoded English, locale jumps, navigation/footer copy, result/validation text, visual labels, metadata, schema, canonical, reciprocal `hreflang`, sitemap membership and internal links before each locale launch.
 - `PLANNED` — Use Search Console query/country data to choose the next language after French and Brazilian Portuguese rather than guessing from page-count potential.
 - `REJECTED / SUPERSEDED` — Publish incomplete machine-translated catalogues merely to multiply indexed URLs.
 
@@ -34,6 +36,14 @@ Build the first high-quality cluster, not thousands of thin pages.
 - `PLANNED` — Expand vehicle coverage only through a licensed or explicitly permitted source, preserving market/year/trim/axle/position scope and provenance.
 - `PLANNED` — Improve current fitment records from reference rows toward exact trim/setup records before adding “compatible” language.
 - `PLANNED` — Add selected exact-spec clusters only where a trustworthy source exists: oil/coolant/fluid, plugs/gap, lug torque, tire pressure, battery group/CCA, wiper/filter sizes, and service intervals.
+- `PLANNED` — Model official recalls, manufacturer communications/TSBs, government investigations, owner complaints and community reports as separate evidence classes; never turn report concentration into a confirmed-defect claim.
+- `PLANNED` — Evaluate model-year/generation depth from Search Console demand and verified unique data; do not create thin year pages.
+
+## P1 — search, navigation and graph readiness
+
+- `PLANNED` — Extend the current homepage search/tool finder into an entity-aware router for tools, vehicles, tire sizes, bolt patterns and, once published, DTC/warning/symptom records.
+- `PLANNED` — Keep the frontend simple while the graph expands; expose problem-first entry points and relevant next actions rather than a feature dump.
+- `PLANNED` — Use Search Console queries and country data as recurring roadmap input, recording which clusters Google is testing before expanding them.
 
 ## P2 — guided diagnosis and ownership context
 
@@ -41,6 +51,8 @@ Build the first high-quality cluster, not thousands of thin pages.
 - `PLANNED` — Service Second Opinion MVP for structured text/manual entry first; separate parts, labor, fluids, fees, diagnostic charges, scheduled vs repair vs optional work, urgency, and questions to ask. Add PDF/photo extraction only after privacy and parser quality are ready.
 - `PLANNED` — Maintenance and repair history linked to My Garage, with explicit user-entered versus sourced versus calculated records.
 - `PLANNED` — Repair-or-replace, fuel/charging cost history, maintenance debt, and ownership-cost views after durable user storage exists.
+- `PLANNED` — Add known-problem/TSB/recall/complaint views only after the evidence model and permitted data adapters exist.
+- `PLANNED` — Preserve user-entered, sourced, calculated and estimated history as visibly separate record types throughout My Garage.
 
 ## P2 — durable user context
 
@@ -51,6 +63,7 @@ Build the first high-quality cluster, not thousands of thin pages.
 ## LATER / IDEA
 
 - `IDEA` — Ask Atlas source-bound intent router across calculators, DTC, warnings, symptoms, fitment, maintenance and service quotes.
+- `IDEA` — VIN as an optional exact-vehicle resolver feeding trusted context, never as a standalone claim of complete vehicle truth.
 - `IDEA` — Freeze-frame/live-data explanation for P0171/P0301-style workflows after the generic DTC MVP is proven.
 - `IDEA` — Modification compatibility graph for vehicle + wheel + tire + offset + spacer + suspension with `COMPATIBLE`, `NEEDS REVIEW`, `CONFLICT`, and `UNKNOWN` states.
 - `IDEA` — Fuse/relay, service reset, TPMS reset, EPB service mode, battery registration, owner manual, key-fob battery, bulbs, filters, paint/VIN/OBD-port/jack-point locations, dimensions, garage fit, cargo/ground clearance, EV range/charging intelligence, real-world consumption, model-year changelog, platform/engine sharing, and OEM part supersession.

@@ -10,6 +10,8 @@ Updated: 2026-09-25.
 - Added persistent-memory rules to `AGENTS.md` and linked the historical V3 ledger to the canonical docs.
 - Added `OBD_DTC_MVP_BRIEF.md` as the implementation gate for a bounded, evidence-first OBD/DTC cluster.
 - Restored the visual-studio mount for fourteen result-led tools after confirming the user's product rule that every calculator keeps a relevant visual; Engineering 2D opens first and 3D remains optional.
+- Reconciled the full strategy scope into canonical memory so language expansion, OBD/warnings/symptoms, exact specs, evidence classes, service second opinion, durable Garage data, digital twin, modification compatibility, Ask Atlas and retained micro-intents are not dependent on chat history.
+- Corrected shared 2D state binding: PSI/bar needle, hp/kW level, torque lever, selected tire code, DOT date, towing/quarter-mile indicators and vehicle lug count now follow current calculator or sourced vehicle state.
 
 ## What was verified
 

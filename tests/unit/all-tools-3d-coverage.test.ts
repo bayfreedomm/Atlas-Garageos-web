@@ -6,6 +6,8 @@ import { sceneForTool } from '../../src/lib/visualization/tool-3d-scenes';
 import { compressionChamberScene, evBatteryScene } from '../../src/lib/visualization/scene-builders';
 import { toolRegistry } from '../../src/seo/tool-registry';
 import toolPage from '../../src/components/ToolPage.astro?raw';
+import engineering2D from '../../src/components/ToolEngineering2D.astro?raw';
+import toolVisualStudio from '../../src/components/ToolVisualStudio.astro?raw';
 
 const palette = { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' };
 const existing3D = new Set([
@@ -83,6 +85,18 @@ describe('truthful visual coverage', () => {
     expect(sceneForTool('psi-bar-converter', { value: '20', unit: 'psi' }, palette).scene.studio?.primary)
       .not.toBe(sceneForTool('psi-bar-converter', { value: '80', unit: 'psi' }, palette).scene.studio?.primary);
     expect(sceneForTool('vehicle-fitment-finder', { model: 'peugeot-208' }, palette).scene.studio?.count).toBe(4);
+  });
+
+  it('binds data-bearing 2D labels and shapes to current form state', () => {
+    for (const hook of ['data-pressure-psi', 'data-pressure-bar', 'data-pressure-kpa', 'data-tool-level', 'data-tool-rotor', 'data-tool-lever', 'data-tool-code', 'data-tool-dot-code', 'data-tool-car', 'data-tool-lug']) {
+      expect(engineering2D, hook).toContain(hook);
+      expect(toolVisualStudio, hook).toContain(hook);
+    }
+    expect(toolVisualStudio).toContain('convertPressureTool');
+    expect(toolVisualStudio).toContain('values.loadIndex');
+    expect(toolVisualStudio).toContain('values.speedRating');
+    expect(toolVisualStudio).toContain("values.code");
+    expect(toolVisualStudio).toContain('visualState?.count');
   });
 
   it('drives the native engine and battery sections from validated calculator inputs', () => {

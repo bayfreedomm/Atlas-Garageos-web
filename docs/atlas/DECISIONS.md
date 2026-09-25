@@ -26,6 +26,8 @@ Rationale: removing a tool's relevant visual entirely weakens the product promis
 
 Correction: the fourteen result-led tools retain their tool-specific Engineering 2D view with optional 3D exploration. The 2D view is the default so the page paints quickly; removing those visual studios entirely is superseded.
 
+Additional acceptance rule: a diagram that says it responds to pressure, power, torque, code, date, vehicle or another input must be bound to that current value. A changing caption beneath a static contradictory shape is not accepted as a working visualization.
+
 ## 2026-09-25 — OBD/DTC is a P1 foundation candidate, not immediate code
 
 Status: `PLANNED`.

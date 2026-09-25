@@ -42,6 +42,7 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 - `VERIFIED DONE` — All 23 published calculator tools are assigned to a relevant visual family. Fourteen result-led utility/reference/guided-entry routes again expose their tool-specific Engineering 2D view by default with optional 3D exploration; the other nine retain their native tire, offset, PCD, speed, gearing, compression, EV, and fit-check visual systems.
 - `VERIFIED DONE` — Public assets actively used are `public/atlas-hero-car.webp` for the homepage, `public/atlas-hero-car.png` for social metadata, and `public/atlas-mark.svg` / `favicon.svg` for identity. Three `design/brand-concepts/*.svg` files are reference concepts, not active UI assets.
 - `PARTIAL` — Visual quality still needs page-by-page physical-device, WebKit/Firefox, GPU, accessibility, and deployed performance acceptance.
+- `VERIFIED DONE` — The shared 2D explainers now bind pressure needle, power level, torque lever, selected tire load/speed code, DOT week/year, towing allowance, quarter-mile motion and sourced vehicle lug count to current validated form state instead of changing only the caption.
 
 ## Feature reality matrix
 

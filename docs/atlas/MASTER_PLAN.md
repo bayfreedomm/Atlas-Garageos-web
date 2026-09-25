@@ -57,6 +57,20 @@ Moats: Vehicle Intelligence Graph, Digital Twin/My Garage, Service Second Opinio
 
 The correct order is evidence and reusable entities first, then UI surfaces and SEO expansion.
 
+## Complete accepted strategy scope
+
+The following scope is intentionally preserved in canonical memory. An item appearing here is not automatically implemented; execution status and priority live in `PROJECT_STATE.md` and `ROADMAP.md`.
+
+- Acquisition: calculators, tire/wheel/vehicle entities, model-year depth where sourced, OBD/DTC, warning lights, symptoms, exact specifications, maintenance queries, known problems, recalls/TSBs, focused fitment lookups, controlled localization, internal links, embeds, Search Console, Bing/IndexNow and useful community distribution.
+- Vehicle intelligence: Vehicle → Generation → Model Year → Trim → Platform → Engine → Transmission → System → Component → Part → Specification → DTC → Warning Light → Symptom → TSB → Recall → Maintenance → Repair → Cost → Tire → Wheel → PCD → Fitment → Fuel → Trip → Ownership.
+- Decision products: guided diagnosis, service second opinion, modification compatibility, exact-vehicle trip/ownership context, repair-or-replace support and source-bound Ask Atlas routing.
+- Durable user context: My Garage, exact vehicle, mileage, tires/wheels/modifications, maintenance and repair history, replaced parts, recalls, fuel/charging history, saved calculations, ownership costs, export/deletion/retention and eventual multi-device digital twin.
+- Micro-intents retained for evaluation: fuse/relay, OBD/VIN/paint-code locations, jack points, TPMS/service resets, EPB service mode, battery registration, bulbs, filters, batteries, wipers, owner manuals, dimensions, garage fit, cargo/ground clearance, EV range/charging and key-fob batteries.
+- Evidence disciplines: generic versus vehicle-specific separation; official recall, TSB/manufacturer communication, government investigation, complaint, community report, calculated and estimated evidence remain distinct; unsupported facts stay `UNKNOWN` / `NOT VERIFIED`.
+- Commercial possibilities retained for later evaluation: licensed product catalogues, parts/price comparison, affiliates and stable advertising placements with disclosure and without obstructing the primary answer.
+
+Nothing in this scope should be silently discarded. Items may move between `P0`, `P1`, `P2`, or `LATER / IDEA` only through an explicit dated decision.
+
 ## Scope of this reconciliation
 
 This pass changed documentation only. No product/runtime code, route, data file, or media asset was changed while creating this memory system.

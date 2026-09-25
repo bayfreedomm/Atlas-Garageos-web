@@ -1410,3 +1410,5 @@ body.has-expanded-3d{overflow:hidden}
 .tool-engineering-plate .bp-code { fill: #edf6fa; font-size: 17px; font-weight: 850; letter-spacing: .03em; }
 .tool-engineering-plate .bp-code-accent { fill: var(--bp-accent); }
 .tool-engineering-plate .bp-vertical { transform-box: fill-box; transform-origin: center; transform: rotate(-90deg); }
+.tool-engineering-plate .bp-dynamic,.tool-engineering-plate [data-tool-level],.tool-engineering-plate [data-tool-progress] { transition: transform .28s ease, stroke-dashoffset .28s ease, cx .28s ease; }
+@media (prefers-reduced-motion: reduce) { .tool-engineering-plate .bp-dynamic,.tool-engineering-plate [data-tool-level],.tool-engineering-plate [data-tool-progress] { transition: none; } }
