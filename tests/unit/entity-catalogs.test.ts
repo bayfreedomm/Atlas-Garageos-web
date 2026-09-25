@@ -19,6 +19,7 @@ import {
   splitHeadingAroundKey, tireSizeMetrics, torqueIsUnconfirmed,
 } from '../../src/ui/entity-page-model';
 import { vehicleFitmentData, type VehicleFitment } from '../../src/data/vehicle-fitment';
+import { productionTireSizeNotations } from '../../src/data/production-tire-sizes';
 import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
 
@@ -52,16 +53,18 @@ describe('tire-size catalog', () => {
     }
   });
 
-  it('derives exactly the unique tire sizes present in the vehicle dataset', () => {
-    const unique = new Set(vehicleFitmentData.map((vehicle) => vehicle.tireSize));
+  it('derives exactly the production reference plus vehicle-only OEM sizes', () => {
+    const unique = new Set([...productionTireSizeNotations(), ...vehicleFitmentData.map((vehicle) => vehicle.tireSize)]);
     expect(tireSizeCatalog).toHaveLength(unique.size);
     expect(new Set(tireSizeCatalog.map((entry) => entry.notation))).toEqual(unique);
     expect(new Set(tireSizeCatalog.map((entry) => entry.slug)).size).toBe(tireSizeCatalog.length);
   });
 
-  it('publishes no size without at least one sourced vehicle entry, and excludes nothing today', () => {
+  it('publishes only sourced production or OEM sizes and preserves vehicle relationships where known', () => {
     expect(excludedTireSizes).toEqual([]);
-    for (const entry of tireSizeCatalog) expect(vehiclesForTireSize(entry.notation).length).toBeGreaterThan(0);
+    const known = new Set([...productionTireSizeNotations(), ...vehicleFitmentData.map((vehicle) => vehicle.tireSize)]);
+    for (const entry of tireSizeCatalog) expect(known.has(entry.notation)).toBe(true);
+    for (const vehicle of vehicleFitmentData) expect(vehiclesForTireSize(vehicle.tireSize).length).toBeGreaterThan(0);
   });
 
   it('computes geometry from the shared tire functions, not per-page constants', () => {

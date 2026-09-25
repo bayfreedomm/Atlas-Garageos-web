@@ -1,10 +1,10 @@
 /**
- * Tire-size catalog, derived at module load from vehicleFitmentData.
+ * Tire-size catalog, derived at module load from the maintained production-size reference and
+ * the sourced vehicle fitment rows.
  *
- * Nothing in this file is hand-copied: every entry comes from parsing the `tireSize` string
- * of a real, sourced vehicle row. That is the whole point — adding a vehicle with a new tire
- * size to vehicle-fitment.ts produces a new tire-size page on the next build with no new
- * files and no edit here.
+ * Nothing in this file is hand-copied: every entry comes from either the compact reference in
+ * production-tire-sizes.ts or the `tireSize` string of a sourced vehicle row. Adding a real
+ * reference size or a vehicle-only OEM size produces a page on the next build with no route edit.
  *
  * Two different failure modes are handled differently, on purpose:
  *   - A `tireSize` string that cannot be parsed at all is a broken dataset, so
@@ -15,6 +15,7 @@
  *     `excludedTireSizes` with a reason, so it never reaches getStaticPaths() or the sitemap.
  */
 import { vehicleFitmentData, type VehicleFitment } from './vehicle-fitment';
+import { productionTireSizeNotations } from './production-tire-sizes';
 
 export interface TireSizeEntry {
   /** e.g. "205/55R16" — exactly as written in vehicleFitmentData */
@@ -109,7 +110,10 @@ export interface TireSizeCatalogBuild {
  * can feed it deliberately malformed rows and prove the throw and the exclusion paths both
  * actually fire, instead of trusting a validator that never runs against bad input.
  */
-export function buildTireSizeCatalog(vehicles: readonly VehicleFitment[]): TireSizeCatalogBuild {
+export function buildTireSizeCatalog(
+  vehicles: readonly VehicleFitment[],
+  referenceNotations: readonly string[] = [],
+): TireSizeCatalogBuild {
   const byNotation = new Map<string, VehicleFitment[]>();
   for (const vehicle of vehicles) {
     if (parseTireNotation(vehicle.tireSize) === null) {
@@ -120,18 +124,23 @@ export function buildTireSizeCatalog(vehicles: readonly VehicleFitment[]): TireS
     else byNotation.set(vehicle.tireSize, [vehicle]);
   }
 
+  const catalogNotations = new Set(byNotation.keys());
+  for (const notation of referenceNotations) {
+    if (parseTireNotation(notation) === null) {
+      throw new Error(`Malformed tire size ${JSON.stringify(notation)} in the production-size reference. Expected {width}/{aspect}R{rim}.`);
+    }
+    catalogNotations.add(notation);
+  }
+
   const entries: TireSizeEntry[] = [];
   const excluded: ExcludedEntry[] = [];
   const vehiclesByNotation = new Map<string, readonly VehicleFitment[]>();
 
-  for (const [notation, matched] of byNotation) {
+  for (const notation of catalogNotations) {
+    const matched = byNotation.get(notation) ?? [];
     const parsed = parseTireNotation(notation)!;
     const problem = tireGeometryProblem(parsed);
     if (problem !== null) { excluded.push({ notation, reason: problem }); continue; }
-    // Defensive: the catalog is derived FROM the vehicles, so this cannot be empty today.
-    // It is still checked, because a future refactor that sources notations from anywhere
-    // else must not be able to publish a page with no sourced vehicle entry behind it.
-    if (matched.length === 0) { excluded.push({ notation, reason: 'no sourced Atlas vehicle entry uses this size' }); continue; }
     entries.push(Object.freeze({ notation, slug: tireSizeSlug(notation), ...parsed }));
     vehiclesByNotation.set(notation, Object.freeze([...matched]));
   }
@@ -140,7 +149,7 @@ export function buildTireSizeCatalog(vehicles: readonly VehicleFitment[]): TireS
   return Object.freeze({ entries: Object.freeze(entries), excluded: Object.freeze(excluded), vehiclesByNotation });
 }
 
-const build = buildTireSizeCatalog(vehicleFitmentData);
+const build = buildTireSizeCatalog(vehicleFitmentData, productionTireSizeNotations());
 
 /** Every publishable tire size, sorted by rim diameter then width then aspect ratio. */
 export const tireSizeCatalog: readonly TireSizeEntry[] = build.entries;

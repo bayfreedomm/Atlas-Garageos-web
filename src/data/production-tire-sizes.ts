@@ -30,3 +30,24 @@ export const PRODUCTION_TIRE_SIZES_BY_RIM: Readonly<Record<number, string>> = {
 };
 
 export const PRODUCTION_TIRE_SIZES_SOURCE = 'tiresize.com size chart and size index (2026-09), plus Atlas vehicle OEM data';
+
+/**
+ * Expands the compact rim-indexed source into canonical metric notations.
+ *
+ * Keep this conversion beside the source so availability checks and indexable entity pages
+ * cannot quietly develop two different interpretations of the same reference data.
+ */
+export function productionTireSizeNotations(): readonly string[] {
+  const notations: string[] = [];
+  for (const [rimText, pairs] of Object.entries(PRODUCTION_TIRE_SIZES_BY_RIM)) {
+    const rim = Number(rimText);
+    if (!Number.isFinite(rim)) throw new Error(`Invalid production tire rim key: ${JSON.stringify(rimText)}`);
+    for (const pair of pairs.split(/\s+/)) {
+      if (!pair) continue;
+      const match = /^(\d{2,3})\/(\d{2})$/.exec(pair);
+      if (!match) throw new Error(`Invalid production tire size pair: ${JSON.stringify(pair)} on rim ${rimText}`);
+      notations.push(`${match[1]}/${match[2]}R${rim}`);
+    }
+  }
+  return Object.freeze(notations);
+}

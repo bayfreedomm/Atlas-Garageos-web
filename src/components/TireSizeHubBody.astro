@@ -3,8 +3,8 @@
 //
 // The listing is rendered as real <a href> links, grouped by rim diameter, at build time.
 // The search box only hides rows that are already there, so the hub is crawlable and fully
-// usable without JavaScript. With ~20 entries that is the right amount of interactivity —
-// an index, a filter and jump links, not a search product.
+// usable without JavaScript. Even at hundreds of sourced sizes this remains a crawlable index;
+// the client filter only helps readers narrow the already-rendered list.
 import { tireSizeCatalog, tireSizesByRimDiameter, vehiclesForTireSize } from '../data/tire-size-catalog';
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizePageText } from '../content/entity-page-text';

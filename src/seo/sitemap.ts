@@ -50,10 +50,9 @@ function vehiclePageRoutes(): readonly string[] {
 
 /**
  * Tire-size and bolt-pattern entity pages, iterated out of their catalogs exactly the way
- * vehiclePageRoutes() iterates vehicleFitmentData. The catalogs are derived from that same
- * dataset and have already excluded any malformed or vehicle-less entry, so nothing listed
- * here can be a URL that does not render — and a new tire size added to vehicle-fitment.ts
- * appears in the sitemap automatically, with no edit to this file.
+ * vehiclePageRoutes() iterates vehicleFitmentData. The tire catalog combines the maintained
+ * production-size reference with vehicle-only OEM sizes; both catalogs have already excluded
+ * malformed data. A sourced catalog addition reaches the sitemap automatically.
  */
 function entityPageRoutes(): readonly string[] {
   const routes: string[] = [];

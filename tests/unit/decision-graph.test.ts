@@ -88,12 +88,12 @@ describe('shared automotive decision graph', () => {
 });
 
 describe('decision graph route-count guard', () => {
-  it('preserves the locked record and entity URL counts', () => {
+  it('preserves the expanded sourced record and entity URL counts', () => {
     expect(vehicleFitmentData).toHaveLength(30);
-    expect(tireSizeCatalog).toHaveLength(20);
+    expect(tireSizeCatalog).toHaveLength(582);
     expect(boltPatternCatalog).toHaveLength(10);
     const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos)\//.test(url));
-    expect(entityUrls).toHaveLength(96);
-    expect(new Set(entityUrls)).toHaveLength(96);
+    expect(entityUrls).toHaveLength(1782);
+    expect(new Set(entityUrls)).toHaveLength(1782);
   });
 });

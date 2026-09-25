@@ -2,16 +2,16 @@
 // Localized tire-size detail pages (DE).
 //
 // One route file generates every page in this locale: getStaticPaths() returns one entry per
-// row of tireSizeCatalog, which is itself derived from vehicleFitmentData. Adding a vehicle with a
-// new tire size publishes a new page here on the next build with no new file.
+// row of tireSizeCatalog, sourced from the production-size reference plus documented vehicle-only
+// OEM sizes. Adding a sourced size publishes a new page here on the next build with no new file.
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import TireSizeEntity from '../../../../components/TireSizeEntity.astro';
 import { tireSizeCatalog, type TireSizeEntry } from '../../../../data/tire-size-catalog';
 import { tireSizeDetailMeta } from '../../../../ui/entity-page-model';
 
 export function getStaticPaths() {
-  // tireSizeCatalog has already had malformed and vehicle-less entries excluded, so anything
-  // reaching this point is a page with real, validated data behind it.
+  // tireSizeCatalog has already rejected malformed/out-of-range source data, so anything reaching
+  // this point is a page with real, validated reference data behind it.
   return tireSizeCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
 }
 

@@ -1,4 +1,4 @@
-import { PRODUCTION_TIRE_SIZES_BY_RIM } from '../../data/production-tire-sizes';
+import { productionTireSizeNotations } from '../../data/production-tire-sizes';
 import { vehicleFitmentData } from '../../data/vehicle-fitment';
 import { inchesToMillimeters } from '../../core/units/conversion';
 import type { TireToolInput } from './calculator-tools';
@@ -56,12 +56,10 @@ function buildReference(): { readonly byRim: ReadonlyMap<number, readonly Refere
     list.push(Object.freeze({ widthMm, aspectRatio, rimDiameterInches: rim, overallDiameterMm: diameterMm(widthMm, aspectRatio, rim) }));
     byRim.set(rim, list);
   };
-  for (const [rimText, pairs] of Object.entries(PRODUCTION_TIRE_SIZES_BY_RIM)) {
-    const rim = Number(rimText);
-    for (const pair of pairs.split(' ')) {
-      const [w, a] = pair.split('/').map(Number);
-      if (w !== undefined && a !== undefined && Number.isFinite(w) && Number.isFinite(a)) add(w, a, rim);
-    }
+  for (const notation of productionTireSizeNotations()) {
+    const match = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)$/.exec(notation);
+    if (!match) throw new Error(`Malformed production tire notation: ${JSON.stringify(notation)}`);
+    add(Number(match[1]), Number(match[2]), Number(match[3]));
   }
   // Every OEM size Atlas documents is, by definition, a manufactured size.
   for (const vehicle of vehicleFitmentData) {

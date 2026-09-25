@@ -317,3 +317,10 @@ Next implementation pass:
 - [x] Canvas fallback gains bounded two-finger pinch and a low-power DPR cap. The Three renderer sizes from the canvas bounds, preserving round wheels when the measurement rail changes the stage aspect.
 - [x] No dependency, canonical math, fuel JSON/history, route, localization catalog, or Wrangler/Cloudflare config change.
 - [ ] Physical mobile touch, WebKit/Firefox, forced context loss, accessibility assistive-technology review and deployed GPU/performance checks remain launch gates. Schematic tool scenes are still explanatory, not photoreal physical replicas.
+
+## Traffic foundation audit + sourced tire-reference expansion — 2026-09-25
+- [x] Full static inventory and rendered-output SEO audit completed before the change: 413 source/project files across 139 directories, 237 indexable URLs, no orphan pages, no broken internal targets, no sitemap gaps, and reciprocal published hreflang sets.
+- [x] The existing production tire reference is now the source for tire-size entity generation instead of being limited to availability checks; documented vehicle-only OEM sizes are merged without duplication.
+- [x] Tire-size entity coverage expands from 20 to 582 sourced sizes in EN/DE/ES. Each page retains calculated geometry, proportional cross-section, real near-diameter alternatives, calculator hand-offs, provenance limits and fitment caveats; a missing vehicle relationship is never presented as a compatibility conclusion.
+- [x] Earlier 20-size / 96-entity-URL checkpoints remain historical records and are superseded by 582 tire entities and 1,782 tire/PCD entity URLs for this implementation state.
+- [ ] Search Console indexation and query performance, deployed Core Web Vitals, the existing 855 KB minified lazy Three.js chunk, and the 272 KB shared CSS asset remain separate measured follow-up work.
