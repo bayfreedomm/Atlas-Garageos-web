@@ -23,6 +23,27 @@ const palette = (panel: HTMLElement): VisualizationPalette => ({
   warning: css(panel, '--p3d-warning', '#ffc35b'),
 });
 
+/**
+ * Additional-tool studios are rendered immediately after `.tool-machine`, not
+ * inside it. Prefer an embedded form when one exists, then resolve the sibling
+ * machine owned by the same tool id. Keeping this lookup here makes both a 3D
+ * tab opened after an edit and an already-mounted scene read the live form.
+ */
+function resolveToolForm(panel: HTMLElement, id: Additional3DToolId): HTMLFormElement | null {
+  const embedded = panel.closest<HTMLElement>('.tool-machine')?.querySelector<HTMLFormElement>('.tool-workspace form');
+  if (embedded) return embedded;
+
+  const studio = panel.closest<HTMLElement>('[data-tool-visual-studio]');
+  const previous = studio?.previousElementSibling;
+  if (previous instanceof HTMLElement && previous.matches('.tool-machine') && previous.dataset.toolId === id) {
+    return previous.querySelector<HTMLFormElement>('.tool-workspace form');
+  }
+
+  const machine = [...(studio?.parentElement?.querySelectorAll<HTMLElement>('.tool-machine') ?? [])]
+    .find((candidate) => candidate.dataset.toolId === id);
+  return machine?.querySelector<HTMLFormElement>('.tool-workspace form') ?? null;
+}
+
 export async function mountTool3D(panel: HTMLElement): Promise<void> {
   if (mounted.has(panel)) return;
   // Digits after a dash do not camel-case in DOMStringMap (`data-tool-3d`
@@ -37,7 +58,7 @@ export async function mountTool3D(panel: HTMLElement): Promise<void> {
   mounted.add(panel);
   let canvas = initialCanvas;
   const events = new AbortController();
-  const form = panel.closest('.tool-machine')?.querySelector<HTMLFormElement>('.tool-workspace form') ?? null;
+  const form = resolveToolForm(panel, id);
   let renderer: Renderer;
   try {
     const { Three3DRenderer } = await import('../lib/visualization/three-3d');

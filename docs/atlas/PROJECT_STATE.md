@@ -43,6 +43,8 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 - `VERIFIED DONE` — Public assets actively used are `public/atlas-hero-car.webp` for the homepage, `public/atlas-hero-car.png` for social metadata, and `public/atlas-mark.svg` / `favicon.svg` for identity. Three `design/brand-concepts/*.svg` files are reference concepts, not active UI assets.
 - `PARTIAL` — Visual quality still needs page-by-page physical-device, WebKit/Firefox, GPU, accessibility, and deployed performance acceptance.
 - `VERIFIED DONE` — The shared 2D explainers now bind pressure needle, power level, torque lever, selected tire load/speed code, DOT week/year, towing allowance, quarter-mile motion and sourced vehicle lug count to current validated form state instead of changing only the caption.
+- `VERIFIED DONE` — Optional 3D studios on the fourteen result-led tools now resolve the sibling calculator form they belong to and rebuild from current values on `input`, `change`, and `submit`. Evidence: `src/ui/tool-3d.ts` form resolution plus the two-value coverage and controller-binding regressions in `tests/unit/all-tools-3d-coverage.test.ts`.
+- `VERIFIED DONE` — A live 390 px browser sweep covered all 23 English tool routes with no document-level horizontal overflow; every opened 3D studio initialized through WebGL. The shared mobile Engineering 2D plates now preserve a readable drawing scale inside an internally pannable, initially centered viewport instead of shrinking 760-unit diagrams into unreadable labels. Evidence: `src/styles/product-v4.css`, `src/components/ToolVisualStudio.astro`, and the mobile-legibility regression.
 
 ## Feature reality matrix
 

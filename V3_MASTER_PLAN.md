@@ -125,6 +125,13 @@ Next implementation pass:
 - Browser extension until Atlas usage data indicates the best job to solve.
 - China localization/distribution in the first wave.
 
+## Optional 3D live-state regression checkpoint — 2026-09-25
+- [x] The fourteen result-led tool studios resolve their sibling calculator form rather than assuming the 3D panel is nested inside it.
+- [x] Current form values are read when a deferred 3D tab mounts, and already-mounted scenes refresh on input, change, and submit.
+- [x] Two-value scene regressions cover every input-driven additional 3D tool; the measurement/map reference explainers remain intentionally static.
+- [x] A 390 px live Chromium sweep covers all 23 English tool routes without document overflow; shared mobile Engineering 2D plates retain readable scale through a centered internal pan viewport.
+- [x] Canonical calculations and data contracts are unchanged; 267 tests, Astro typecheck, and the 1,927-page production build pass.
+
 ## V4 visual implementation checkpoint — 2026-09-14
 - Approved dark automotive chrome + bright app-like calculator surface is now implemented in source.
 - Mobile bottom navigation is implemented.

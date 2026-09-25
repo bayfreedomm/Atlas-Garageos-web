@@ -7,7 +7,9 @@ Updated: 2026-09-25. Priority combines user value, organic opportunity, differen
 - `PLANNED` — Finish deployed launch gates: Search Console, Bing Webmaster/IndexNow, canonical/hreflang/sitemap/404/redirect smoke tests, Open Graph checks, and Core Web Vitals on the deployed build.
 - `PLANNED` — Analyze Cloudflare 3xx/4xx by path and status. Separate intentional language/HTTPS redirects from broken URLs, bot probes, and real user errors; do not block Googlebot/Bingbot blindly.
 - `PLANNED` — Complete visual acceptance on representative mobile widths, WebKit/Firefox, keyboard/assistive technology, reduced motion, low-power GPU, and deployed pages.
+- `VERIFIED DONE` — Local Chromium acceptance at 390 px covered all 23 English tool routes: no document-level horizontal overflow, all opened 3D studios initialized with WebGL, and no browser console error/warning was observed in the sampled live-state pass. Physical devices, WebKit/Firefox, accessibility and deployed performance remain in the broader acceptance item above.
 - `PLANNED` — Add a page-by-page visual/content consistency gate: any visual claiming to respond to input must actually change with that input, and displayed codes/units/vehicle geometry must match current form state.
+- `VERIFIED DONE` — Optional 3D studio post-mount synchronization was repaired. The shared 3D controller now locates the calculator rendered as the studio's sibling instead of searching only its ancestors, reads current form data at mount, and refreshes on `input`, `change`, and `submit`. Regression coverage compares two valid states across all twelve input-driven additional scenes; the two intentionally static measurement/map explainers remain static.
 - `PLANNED` — Keep the current data contracts and tests green while consolidating the canonical project memory.
 - `PLANNED` — Select a licensed/permissioned automotive data strategy before adding safety-relevant specifications or large vehicle coverage.
 
