@@ -28,6 +28,7 @@ interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocal
 const { entry, locale } = Astro.props;
 
 const t = boltPatternPageText[locale];
+const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de pernos 3D interactivo' }[locale];
 const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
 const spacingValue = `${spacingMm.toFixed(2)} mm`;
@@ -82,7 +83,10 @@ const decisions = boltDecisionGraph(entry, locale);
     spacingLabel={t.metrics.holeSpacing}
     spacingValue={spacingValue}
   />
-  <Parametric3DPanel mode="pcd" locale={locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
+  <details class="visual-on-demand">
+    <summary>{load3d}</summary>
+    <Parametric3DPanel mode="pcd" locale={locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
+  </details>
   <p class="entity-note">{t.diagramNote(entry.lugCount, entry.pcdMm)}</p>
 </section>
 

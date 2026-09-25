@@ -89,7 +89,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-prices.json');
 const HISTORY_PATH = path.join(__dirname, '..', 'src', 'data', 'fuel-price-history.json');
-const HISTORY_MAX_POINTS = 90;
 
 const FETCH_TIMEOUT_MS = 15_000;
 // The official nationwide Spain response contains more than 11,000 stations and takes
@@ -463,11 +462,12 @@ function productsToMap(products) {
 }
 
 /**
- * Updates the per-country history log. DE/ES are keyed by today's UTC calendar date; a row
- * is only written/updated when THAT country's fetch this run was a genuine fresh success —
+ * Appends to the per-country history log. DE/ES are keyed by today's UTC calendar date; a row
+ * is only written when THAT country's fetch this run was a genuine fresh success —
  * a stale fallback or a still-pending country never touches history. US is keyed by the
  * real EIA `weekOf` period and only gets a new point when this run's fresh fetch reports a
- * weekOf not already present (so a week is never duplicated across daily runs).
+ * period not already present. Existing observations are immutable and history has no rolling
+ * retention cap; corrections must be added through an explicit, reviewed data migration.
  */
 export function updateHistoryData(currentHistory, output, ran) {
   const history = {
@@ -483,12 +483,9 @@ export function updateHistoryData(currentHistory, output, ran) {
     // 'fresh' snapshot from an earlier manual run is last-known data, not a new observation.
     if (!ran.has(key)) continue;
     if (country.status !== 'fresh') continue;
-    const row = { date: today, products: productsToMap(country.products) };
-    const idx = history[key].findIndex((entry) => entry.date === today);
-    if (idx >= 0) history[key][idx] = row;
-    else history[key].push(row);
+    const exists = history[key].some((entry) => entry.date === today);
+    if (!exists) history[key].push({ date: today, products: productsToMap(country.products) });
     history[key].sort((a, b) => a.date.localeCompare(b.date));
-    history[key] = history[key].slice(-HISTORY_MAX_POINTS);
   }
 
   if (ran.has('us') && output.us.status === 'fresh' && output.us.weekOf) {
@@ -496,7 +493,6 @@ export function updateHistoryData(currentHistory, output, ran) {
     if (!exists) {
       history.us.push({ weekOf: output.us.weekOf, products: productsToMap(output.us.products) });
       history.us.sort((a, b) => a.weekOf.localeCompare(b.weekOf));
-      history.us = history.us.slice(-HISTORY_MAX_POINTS);
     }
   }
 

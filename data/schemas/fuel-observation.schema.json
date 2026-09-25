@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlasgarageos.com/schemas/fuel-observation.schema.json",
+  "title": "Atlas GarageOS append-only fuel observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "observationId", "market", "productId", "observedPeriod",
+    "value", "unit", "currency", "providerId", "sourceScope", "fetchedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "observationId": { "type": "string", "minLength": 8 },
+    "supersedesObservationId": { "type": "string", "minLength": 8 },
+    "market": { "type": "string", "minLength": 2 },
+    "productId": { "type": "string", "minLength": 1 },
+    "observedPeriod": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "value": { "type": "number", "minimum": 0 },
+    "unit": { "enum": ["per-litre", "per-gallon"] },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "providerId": { "type": "string", "minLength": 1 },
+    "sourceScope": { "enum": ["national-average", "regional-average", "monitored-sample"] },
+    "fetchedAt": { "type": "string", "format": "date-time" },
+    "rawSnapshotSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "note": { "type": "string" }
+  }
+}

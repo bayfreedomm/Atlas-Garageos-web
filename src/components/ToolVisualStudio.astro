@@ -18,12 +18,12 @@ const tabs = {
   <header class="tire-visual-studio__header">
     <div><span>{tabs.badge}</span><h3>{t.title}</h3><p>{t.intro}</p></div>
     <div class="tire-visual-studio__tabs" role="tablist" aria-label={tabs.label}>
-      <button type="button" role="tab" aria-selected="true" aria-controls={`tool-studio-3d-${id}`} id={`tool-tab-3d-${id}`} data-visual-tab="3d">{tabs.studio}</button>
-      <button type="button" role="tab" aria-selected="false" aria-controls={`tool-studio-2d-${id}`} id={`tool-tab-2d-${id}`} tabindex="-1" data-visual-tab="2d">{tabs.drawing}</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls={`tool-studio-3d-${id}`} id={`tool-tab-3d-${id}`} tabindex="-1" data-visual-tab="3d">{tabs.studio}</button>
+      <button type="button" role="tab" aria-selected="true" aria-controls={`tool-studio-2d-${id}`} id={`tool-tab-2d-${id}`} data-visual-tab="2d">{tabs.drawing}</button>
     </div>
   </header>
-  <div role="tabpanel" id={`tool-studio-3d-${id}`} aria-labelledby={`tool-tab-3d-${id}`} data-visual-panel="3d"><Tool3DPanel {id} {locale} studio /></div>
-  <div role="tabpanel" id={`tool-studio-2d-${id}`} aria-labelledby={`tool-tab-2d-${id}`} data-visual-panel="2d" hidden><ToolEngineering2D {id} {locale} /></div>
+  <div role="tabpanel" id={`tool-studio-3d-${id}`} aria-labelledby={`tool-tab-3d-${id}`} data-visual-panel="3d" hidden><Tool3DPanel {id} {locale} studio /></div>
+  <div role="tabpanel" id={`tool-studio-2d-${id}`} aria-labelledby={`tool-tab-2d-${id}`} data-visual-panel="2d"><ToolEngineering2D {id} {locale} /></div>
 </section>
 <script>
   document.querySelectorAll<HTMLElement>('[data-tool-visual-studio]').forEach((studio) => {
@@ -68,5 +68,6 @@ const tabs = {
     });
     form?.addEventListener('input', () => { void update2D(); });
     form?.addEventListener('change', () => { void update2D(); });
+    void update2D();
   });
 </script>

@@ -12,9 +12,9 @@ import type { ContentLocale } from '../localization/site-catalog';
 interface Props { readonly locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const t = {
-  en: { current: 'Current tire', proposed: 'Tire you want to fit', wheels: 'Add wheel sizes (optional)', wheelsHint: 'Fill in all four to see how far the wheel edges move.', cw: 'Current wheel width (J)', ce: 'Current offset (ET)', nw: 'New wheel width (J)', ne: 'New offset (ET)', submit: 'Check this size', result: 'Fit check result', shape: 'Tire shape comparison', checks: 'Individual checks' },
-  de: { current: 'Aktueller Reifen', proposed: 'Gewünschter Reifen', wheels: 'Felgenmaße ergänzen (optional)', wheelsHint: 'Alle vier ausfüllen, um die Verschiebung der Felgenkanten zu sehen.', cw: 'Aktuelle Felgenbreite (J)', ce: 'Aktuelle Einpresstiefe (ET)', nw: 'Neue Felgenbreite (J)', ne: 'Neue Einpresstiefe (ET)', submit: 'Diese Größe prüfen', result: 'Ergebnis der Passprüfung', shape: 'Reifenvergleich als Grafik', checks: 'Einzelne Prüfungen' },
-  es: { current: 'Neumático actual', proposed: 'Neumático que quiere montar', wheels: 'Añadir medidas de llanta (opcional)', wheelsHint: 'Rellene los cuatro campos para ver cuánto se desplazan los bordes de la llanta.', cw: 'Ancho de llanta actual (J)', ce: 'Offset actual (ET)', nw: 'Ancho de llanta nuevo (J)', ne: 'Offset nuevo (ET)', submit: 'Comprobar esta medida', result: 'Resultado de la comprobación', shape: 'Comparación gráfica de neumáticos', checks: 'Comprobaciones individuales' },
+  en: { current: 'Current tire', proposed: 'Tire you want to fit', wheels: 'Add wheel sizes (optional)', wheelsHint: 'Fill in all four to see how far the wheel edges move.', cw: 'Current wheel width (J)', ce: 'Current offset (ET)', nw: 'New wheel width (J)', ne: 'New offset (ET)', submit: 'Check this size', result: 'Fit check result', shape: 'Tire shape comparison', checks: 'Individual checks', load3d: 'Open interactive 3D comparison' },
+  de: { current: 'Aktueller Reifen', proposed: 'Gewünschter Reifen', wheels: 'Felgenmaße ergänzen (optional)', wheelsHint: 'Alle vier ausfüllen, um die Verschiebung der Felgenkanten zu sehen.', cw: 'Aktuelle Felgenbreite (J)', ce: 'Aktuelle Einpresstiefe (ET)', nw: 'Neue Felgenbreite (J)', ne: 'Neue Einpresstiefe (ET)', submit: 'Diese Größe prüfen', result: 'Ergebnis der Passprüfung', shape: 'Reifenvergleich als Grafik', checks: 'Einzelne Prüfungen', load3d: 'Interaktiven 3D-Vergleich öffnen' },
+  es: { current: 'Neumático actual', proposed: 'Neumático que quiere montar', wheels: 'Añadir medidas de llanta (opcional)', wheelsHint: 'Rellene los cuatro campos para ver cuánto se desplazan los bordes de la llanta.', cw: 'Ancho de llanta actual (J)', ce: 'Offset actual (ET)', nw: 'Ancho de llanta nuevo (J)', ne: 'Offset nuevo (ET)', submit: 'Comprobar esta medida', result: 'Resultado de la comprobación', shape: 'Comparación gráfica de neumáticos', checks: 'Comprobaciones individuales', load3d: 'Abrir comparación 3D interactiva' },
 }[locale ?? 'en'];
 ---
 <form class="calculator-form fit-check-form" data-calculator="tire-fit-check" novalidate>
@@ -40,7 +40,10 @@ const t = {
     <figure class="fit-shape" aria-label={t.shape}><div data-fit-shape></div></figure>
     <ol class="fit-checks" data-fit-checks aria-label={t.checks}></ol>
     <nav class="fit-actions" data-fit-actions></nav>
-    <Parametric3DPanel mode="tire" locale={locale ?? 'en'} />
+    <details class="visual-on-demand">
+      <summary>{t.load3d}</summary>
+      <Parametric3DPanel mode="tire" locale={locale ?? 'en'} />
+    </details>
     <section class="fit-legend" data-fit-legend></section>
   </div>
 </form>

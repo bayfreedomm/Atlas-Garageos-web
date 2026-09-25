@@ -7,7 +7,7 @@
    have time to do a real cleanup, the long-term fix is deleting the superseded sizing rules from those two files
    so there is exactly one definition per selector, not three fighting each other. */
 :root {
-  --v4-blue:#0878f9; --v4-blue-2:#0a67d8; --v4-navy:#07131d; --v4-navy-2:#0b1c29;
+  --v4-blue:#0872ea; --v4-blue-2:#075fc7; --v4-navy:#07131d; --v4-navy-2:#0b1c29;
   --v4-paper:#f6f8fb; --v4-card:#fff; --v4-ink:#152232; --v4-muted:#667486; --v4-line:#dce3ea;
   --color-canvas:var(--v4-paper); --color-surface:#fff; --color-surface-subtle:#f2f5f8; --color-surface-strong:#eaf0f5;
   --color-ink:var(--v4-ink); --color-ink-muted:var(--v4-muted); --color-ink-soft:#8995a3; --color-brand:var(--v4-blue); --color-brand-hover:var(--v4-blue-2); --color-accent:#ff8a22;
@@ -89,7 +89,7 @@ main{padding-top:0!important}.breadcrumbs{margin:.3rem 0 .3rem!important;padding
   --day-surface:#ffffff;
   --day-surface-2:#f1f4f6;
   --day-ink:#111d2b;
-  --day-muted:#657386;
+  --day-muted:#596879;
   --night-canvas:#08131c;
   --night-surface:#0f1d28;
   --night-surface-2:#142633;
@@ -418,7 +418,7 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .offset-wheel--new rect{fill:rgb(241 138 77 / 8%)!important;stroke-dasharray:6 4}.offset-fixed-hub{fill:#111a20;stroke:#e5edf1;stroke-width:1.7}.offset-overlay-legend text{font-size:7px!important}.offset-brake-disc{stroke:#d9e1e4;stroke-width:1.2;opacity:.82}.offset-brake-hat{fill:#29363e;stroke:#9fb0b8;stroke-width:1.1}
 :root[data-theme="light"] .offset-fixed-hub{fill:#f5f8fa;stroke:#566b79}
 /* V4 owns brand semantics in both themes; legacy V3 theme tokens must not recolor navigation/CTAs. */
-:root[data-theme="light"],:root[data-theme="dark"]{--color-brand:#0878f9;--color-brand-hover:#086bdc;--color-accent:#ff8a22}
+:root[data-theme="light"],:root[data-theme="dark"]{--color-brand:#0872ea;--color-brand-hover:#075fc7;--color-accent:#ff8a22}
 
 
 /* V4.3 Tire Comparison answer hierarchy: one decision-grade answer before the engineering detail. */
@@ -1386,3 +1386,12 @@ body.has-expanded-3d{overflow:hidden}
 .fit-actions__link { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 3rem; padding: .6rem .9rem; border: 1px solid var(--color-line); border-radius: .75rem; background: var(--color-surface); color: var(--color-ink); font-weight: 700; text-decoration: none; }
 .fit-actions__link:hover { border-color: var(--color-line-strong); background: var(--color-surface-selected); }
 .fit-actions__link i { color: var(--color-accent); font-style: normal; font-size: 1.3rem; }
+.visual-on-demand { border: 1px solid var(--color-line); border-radius: .9rem; background: var(--color-surface-subtle); }
+.visual-on-demand > summary { cursor: pointer; padding: .85rem 1rem; color: var(--color-ink); font-weight: 800; }
+.visual-on-demand[open] > summary { border-bottom: 1px solid var(--color-line); }
+.visual-on-demand > .parametric-3d { margin: .75rem; }
+@media (min-width: 64rem) {
+  .tool-machine--tire-fit-check .tool-stage--single .tool-workspace { max-width: none; }
+  .tool-machine--tire-fit-check .fit-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+  .tool-machine--tire-fit-check .fit-check { min-height: 100%; }
+}

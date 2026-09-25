@@ -324,3 +324,11 @@ Next implementation pass:
 - [x] Tire-size entity coverage expands from 20 to 582 sourced sizes in EN/DE/ES. Each page retains calculated geometry, proportional cross-section, real near-diameter alternatives, calculator hand-offs, provenance limits and fitment caveats; a missing vehicle relationship is never presented as a compatibility conclusion.
 - [x] Earlier 20-size / 96-entity-URL checkpoints remain historical records and are superseded by 582 tire entities and 1,782 tire/PCD entity URLs for this implementation state.
 - [ ] Search Console indexation and query performance, deployed Core Web Vitals, the existing 855 KB minified lazy Three.js chunk, and the 272 KB shared CSS asset remain separate measured follow-up work.
+
+## Performance, fit-check layout and durable data checkpoint — 2026-09-25
+- [x] Visual studios now open on their lightweight engineering 2D view. The existing interactive 3D product remains available on demand, but its Three.js chunk no longer competes with first-page interaction merely because the studio is above the fold.
+- [x] The desktop tire fit-check workspace is no longer capped at the old single-tool width; evidence checks use a balanced two-column layout while narrow screens retain one column.
+- [x] Fuel history is append-only: an existing day/week is not overwritten and no rolling point limit deletes older observations. Latest snapshots remain independently replaceable.
+- [x] A repository-level data vault documents revision/provenance contracts for vehicle fitment and fuel observations, with JSON schemas and a D1/R2 growth path. The current small static projections remain in `src/data` until a reviewed migration is needed.
+- [x] Primary blue and light-theme muted text were darkened to meet normal-text contrast without changing the established navy/blue/orange brand language.
+- [ ] Deployed Core Web Vitals, physical-device GPU behavior, the shared CSS payload and production D1/R2 provisioning remain measured infrastructure follow-ups.

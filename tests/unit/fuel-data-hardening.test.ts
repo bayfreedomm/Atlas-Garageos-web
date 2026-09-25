@@ -54,6 +54,24 @@ describe('fuel snapshot trust states', () => {
     expect(updateHistoryData(history, output, new Set(['us'])).us.map((row: { weekOf: string }) => row.weekOf)).toEqual(['2026-09-14', '2026-09-21']);
   });
 
+  it('never overwrites an existing daily observation and never trims old history', () => {
+    const es = Array.from({ length: 120 }, (_, index) => ({
+      date: `2025-${String(Math.floor(index / 28) + 1).padStart(2, '0')}-${String(index % 28 + 1).padStart(2, '0')}`,
+      products: { gasoline95: { perLitre: 1 + index / 100 } },
+    }));
+    const original = { date: '2026-09-22', products: { gasoline95: { perLitre: 1.49 } } };
+    const history = { es: [...es, original], de: [], us: [] };
+    const output = {
+      generatedAt: '2026-09-22T20:00:00.000Z',
+      es: { status: 'fresh', products: [{ id: 'gasoline95', valuePerLitre: 9.99 }] },
+      de: { status: 'pending', products: [] },
+      us: { status: 'pending', products: [] },
+    };
+    const updated = updateHistoryData(history, output, new Set(['es']));
+    expect(updated.es).toHaveLength(121);
+    expect(updated.es.find((row: { date: string }) => row.date === original.date)).toEqual(original);
+  });
+
   it('keeps Germany explicitly described as a monitored sample', () => {
     expect(PROVIDERS.de.source).toContain('monitored sample');
     expect(PROVIDERS.de.source).toContain('not a national average');
