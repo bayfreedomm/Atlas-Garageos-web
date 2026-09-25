@@ -42,7 +42,7 @@ The strongest verified foundation is Tires & Wheels plus Fuel & Trips: validated
 ## Reconciliation summary
 
 - Keep the existing toolbox, calculator engines, fitment boundaries, provenance language, localization rules, shareable state, and data-vault direction.
-- Treat old universal 3D coverage as superseded by the 2026-09-25 visual-truthfulness decision: geometry gets a visual model when it answers a real question; utility conversions do not need decorative 3D.
+- Treat old universal 3D coverage as superseded by the 2026-09-25 visual-truthfulness decision: every tool keeps a relevant visual explanation, while 3D is reserved for geometry or other state where it answers a real question.
 - Treat the historical 20-tire/96-entity counts as superseded by the verified 582 tire sizes and 1,782 tire/PCD entity URLs in the current source state.
 - Treat the old “DE/ES unpublished” wording in early V3 sections as historical; current code publishes EN/DE/ES and keeps PT-BR/FR unpublished until QA.
 - Do not start a giant vehicle × code × locale SEO matrix. Build small, sourced, high-value clusters first.

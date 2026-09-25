@@ -342,3 +342,9 @@ Next implementation pass:
 - [x] Spatial and mechanical tools retain their purpose-built tire, wheel, offset, PCD, speed, gearing, compression, EV and fitment visualizations where geometry or state genuinely benefits from a visual model.
 - [x] This pass changes presentation only: canonical calculations, validation, routes, SEO copy, localization, fuel/vehicle data and Cloudflare configuration remain unchanged.
 - [ ] Remaining retained 2D/3D scenes require a separate page-by-page visual polish and real-device acceptance pass; a scene is not considered valuable merely because it is interactive.
+
+## Complete relevant-visual restoration checkpoint — 2026-09-25
+- [x] The removal of the shared visual-studio mount from fourteen result-led tools is superseded: every published calculator again has a related visual surface.
+- [x] Those fourteen routes open on their tool-specific Engineering 2D explanation and keep the heavier interactive 3D view optional, preserving the earlier first-paint performance decision.
+- [x] Tools with native tire, offset, PCD, speed, gearing, compression, EV or fit-check studios keep those purpose-built visuals; the page shell avoids rendering a redundant side illustration beside a full studio.
+- [x] Visual coverage is tested against the complete published `kind: 'tool'` registry so a future tool cannot silently ship without a visual family assignment.

@@ -4,6 +4,7 @@ import { visualization3DText } from '../../src/localization/visualization-3d';
 import { tool3DText } from '../../src/localization/tool-3d-catalog';
 import { sceneForTool } from '../../src/lib/visualization/tool-3d-scenes';
 import { compressionChamberScene, evBatteryScene } from '../../src/lib/visualization/scene-builders';
+import { toolRegistry } from '../../src/seo/tool-registry';
 import toolPage from '../../src/components/ToolPage.astro?raw';
 
 const palette = { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' };
@@ -16,14 +17,17 @@ const existing3D = new Set([
 ]);
 
 describe('truthful visual coverage', () => {
-  it('keeps 3D for spatial/mechanical tools without forcing a studio onto every route', () => {
+  it('keeps 3D for spatial/mechanical tools while retaining a related visual for every tool page', () => {
     expect(existing3D).toEqual(new Set([
       'tire-size-calculator', 'tire-size-comparison', 'wheel-offset-calculator',
       'speedometer-error-calculator', 'gear-ratio-calculator', 'ev-charging-cost-calculator',
       'bolt-pattern-calculator', 'compression-ratio-calculator', 'tire-fit-check',
     ]));
-    expect(toolPage).not.toContain('ToolVisualStudio');
-    expect(toolPage).toContain('hasPurposeBuiltResult');
+    const publishedToolIds = new Set(toolRegistry.filter(({ kind }) => kind === 'tool').map(({ id }) => id));
+    expect(new Set([...existing3D, ...additional3DToolIds])).toEqual(publishedToolIds);
+    expect(toolPage).toContain('ToolVisualStudio');
+    expect(toolPage).toContain('Every tool keeps a relevant visual explanation');
+    expect(toolPage).toContain('hasToolVisualStudio');
     expect(visualization3DText.en.fitmentTitle).toBeTruthy();
   });
 

@@ -8,6 +8,8 @@ Updated: 2026-09-25.
 - Established the canonical `docs/atlas/` memory layer without deleting historical package notes.
 - Added the reconciled product strategy, verified state matrix, prioritized roadmap, accepted decisions, idea bank, and this handoff.
 - Added persistent-memory rules to `AGENTS.md` and linked the historical V3 ledger to the canonical docs.
+- Added `OBD_DTC_MVP_BRIEF.md` as the implementation gate for a bounded, evidence-first OBD/DTC cluster.
+- Restored the visual-studio mount for fourteen result-led tools after confirming the user's product rule that every calculator keeps a relevant visual; Engineering 2D opens first and 3D remains optional.
 
 ## What was verified
 
@@ -15,6 +17,7 @@ Updated: 2026-09-25.
 - Local Garage storage exists, but there is no auth-backed durable user database.
 - OBD/DTC, warning-light, symptom diagnosis, Service Second Opinion, TSB/recall, VIN, and Ask Atlas surfaces are not present in the current source inventory.
 - Public hero/brand assets and unused design concept assets were inventoried; no media was deleted.
+- Visual coverage now maps all 23 published calculator tools to either a native visual system or the restored 2D/3D studio; 40 test files / 263 tests, Astro typecheck, and the 1,927-page production build passed after restoration.
 - This reconciliation pass changed documentation only. Product/runtime code was not changed.
 
 ## What remains
@@ -26,4 +29,4 @@ Updated: 2026-09-25.
 
 ## Next sensible task
 
-Create a source and data-contract brief for the P1 OBD/DTC MVP: code normalization, generic evidence schema, source licensing, route model, internal links, and the first 25–50 code selection. Do not generate routes or runtime code until that brief is accepted and the data source is available.
+Review `OBD_DTC_MVP_BRIEF.md`, then source and approve the data/licensing plan and the first 25–50 code set. In parallel, prepare the FR/PT-BR localization inventory, but do not expose locale routes until the full-copy and `hreflang` acceptance gates pass. Do not generate OBD routes or runtime code until the brief's acceptance gates pass.

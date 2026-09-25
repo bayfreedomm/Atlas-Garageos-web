@@ -15,6 +15,7 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 - `VERIFIED DONE` — `src/seo/tool-registry.ts` defines the implemented calculator/data-product registry and localized route helpers.
 - `VERIFIED DONE` — 23 registry entries are `kind: 'tool'`, plus the Fitment Studio flagship and Gas Prices Today data product.
 - `VERIFIED DONE` — EN, DE, and ES are published route families. PT-BR and FR remain unpublished pending full translation QA.
+- `ACCEPTED` — FR and PT-BR are the next language families; they remain `PLANNED` until complete localized catalogues and route QA exist.
 - `VERIFIED DONE` — Tool families include tires/wheels, fuel/trips, converters, performance, EV, fitment, vehicle reference, and gas-price history.
 - `VERIFIED DONE` — Shareable calculator state is client-side URL state; clean canonical routes remain separate from application state.
 - `VERIFIED DONE` — Page-specific quick facts, common mistakes, warnings, methodology, related tools, decision graphs, and localized copy are implemented for the current registry.
@@ -38,7 +39,7 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 ## Visual system
 
 - `VERIFIED DONE` — Tire, wheel offset, PCD, speedometer, gear, compression, EV, fitment, and fit-check surfaces have purpose-built technical visual systems with Canvas/WebGL fallbacks where applicable.
-- `VERIFIED DONE` — The 2026-09-25 visual-truthfulness pass removed the shared generic Visual Studio from 14 result-led utility/reference/guided-entry routes. Their calculation-specific result visuals remain.
+- `VERIFIED DONE` — All 23 published calculator tools are assigned to a relevant visual family. Fourteen result-led utility/reference/guided-entry routes again expose their tool-specific Engineering 2D view by default with optional 3D exploration; the other nine retain their native tire, offset, PCD, speed, gearing, compression, EV, and fit-check visual systems.
 - `VERIFIED DONE` — Public assets actively used are `public/atlas-hero-car.webp` for the homepage, `public/atlas-hero-car.png` for social metadata, and `public/atlas-mark.svg` / `favicon.svg` for identity. Three `design/brand-concepts/*.svg` files are reference concepts, not active UI assets.
 - `PARTIAL` — Visual quality still needs page-by-page physical-device, WebKit/Firefox, GPU, accessibility, and deployed performance acceptance.
 
@@ -59,4 +60,3 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 | Fitment / compatibility | `PARTIAL` | Deterministic geometry, measured clearance projections, entity references and Fitment Studio exist; no universal fit/safety verdict. |
 | Ownership cost | `PARTIAL` | Fuel cost, road trip, EV charge and fuel-price history exist; repairs, maintenance, depreciation and total ownership cost do not. |
 | Ask Atlas | `NOT FOUND` | No intent router or source-bound automotive assistant surface found. |
-

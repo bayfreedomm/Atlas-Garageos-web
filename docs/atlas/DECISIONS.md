@@ -16,13 +16,15 @@ Status: `VERIFIED DONE`.
 
 This pass must not change product/runtime code, routes, data, or media. Current code and tests outrank stale documentation when describing what exists; old product decisions are retained as history or explicitly marked superseded.
 
-## 2026-09-25 — Visual truthfulness over universal coverage
+## 2026-09-25 — Visual truthfulness with complete relevant coverage
 
 Status: `VERIFIED DONE`.
 
-The old universal “every tool has a 3D + Engineering 2D studio” checkpoint is superseded. Spatial/mechanical relationships retain meaningful visuals; result-led utility/reference routes use their calculation-specific result visuals and do not receive decorative generic studios.
+The old universal “every tool has a 3D + Engineering 2D studio” checkpoint is superseded. Every tool must still expose a relevant visual explanation, but the visual may be a calculation-specific result diagram, a technical SVG, a data graphic, or a native 3D scene. 3D is used only where it answers a real spatial/mechanical question; it is not forced onto unrelated utility pages.
 
-Rationale: the shared blueprint plate repeated one metaphor across unrelated calculations and competed with better result explanations. This follows the locked V3 rule: multiple views are allowed only when each answers a different question.
+Rationale: removing a tool's relevant visual entirely weakens the product promise. A shared blueprint plate repeated one metaphor across unrelated calculations and competed with better result explanations, so retained visuals must stay tool-specific and non-decorative.
+
+Correction: the fourteen result-led tools retain their tool-specific Engineering 2D view with optional 3D exploration. The 2D view is the default so the page paints quickly; removing those visual studios entirely is superseded.
 
 ## 2026-09-25 — OBD/DTC is a P1 foundation candidate, not immediate code
 
@@ -31,6 +33,14 @@ Status: `PLANNED`.
 OBD/DTC is accepted as a high-value organic cluster and knowledge-graph entity family. The first implementation requires a bounded sourced MVP, provenance/confidence, generic versus vehicle-specific separation, and safety language before route generation.
 
 Rationale: the opportunity is large, but unsupported automotive facts would create trust and safety debt.
+
+## 2026-09-25 — French and Brazilian Portuguese are the next language rollout
+
+Status: `ACCEPTED`.
+
+FR and PT-BR are the next language families. They remain unpublished until their main content, metadata, navigation, warnings, FAQs, internal links, and reciprocal `hreflang` annotations pass completeness and visual QA.
+
+Rationale: more languages expand addressable markets, but language count is not a substitute for localized usefulness. Bounded waves protect quality and make Search Console measurement meaningful.
 
 ## 2026-09-25 — No universal fitment verdict
 

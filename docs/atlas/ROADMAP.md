@@ -10,11 +10,19 @@ Updated: 2026-09-25. Priority combines user value, organic opportunity, differen
 - `PLANNED` — Keep the current data contracts and tests green while consolidating the canonical project memory.
 - `PLANNED` — Select a licensed/permissioned automotive data strategy before adding safety-relevant specifications or large vehicle coverage.
 
+## P1 — controlled language expansion
+
+- `ACCEPTED` — Add French (`fr`) and Brazilian Portuguese (`pt-BR`) as the next language families; do not expose either locale until its published route set has complete human-reviewed UI, SEO, FAQ, warning, and navigation copy.
+- `PLANNED` — Keep language-specific URLs and reciprocal `hreflang`/canonical metadata correct for every published route; language variants are localized product pages, not keyword-only copies.
+- `PLANNED` — Roll out in bounded waves: platform/home/tools first, then the highest-value calculator and entity clusters, then the remaining catalog after translation and visual QA.
+- `PLANNED` — Use Search Console query/country data to choose the next language after French and Brazilian Portuguese rather than guessing from page-count potential.
+- `REJECTED / SUPERSEDED` — Publish incomplete machine-translated catalogues merely to multiply indexed URLs.
+
 ## P1 — evidence-first OBD/DTC and warning-light foundation
 
 Build the first high-quality cluster, not thousands of thin pages.
 
-- `PLANNED` — Create a small curated DTC MVP: approximately 25–50 high-intent generic codes across P0xxx, P03xx, P04xx, P01xx, U0xxx, and selected ABS/body families only when source quality is sufficient.
+- `PLANNED` — Create a small curated DTC MVP: approximately 25–50 high-intent generic codes across P0xxx, P03xx, P04xx, P01xx, U0xxx, and selected ABS/body families only when source quality is sufficient. The implementation gate is `docs/atlas/OBD_DTC_MVP_BRIEF.md`.
 - `PLANNED` — Publish `/obd-codes/` and `/obd-codes/{code}/` with normalized code, family, system, plain meaning, symptoms, possible causes, first checks, diagnostic order, related codes/lights/symptoms, limitations, and provenance/confidence.
 - `PLANNED` — Separate generic code meaning from vehicle-specific evidence. Do not create vehicle-code combinations until unique sourced data exists.
 - `PLANNED` — Add warning-light MVP for check-engine, ABS, airbag, battery/charging, oil pressure, coolant temperature, TPMS, brake, steering, traction, DPF, and glow-plug families; each needs urgency context and safe immediate action language.
