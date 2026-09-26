@@ -1,6 +1,7 @@
 ---
 import ToolPage from '../../../../components/ToolPage.astro';
 import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('gear-ratio-calculator');
@@ -14,7 +15,7 @@ const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
     <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Relación de eje efectiva</span><strong data-gear-effective>—</strong><p data-gear-context>Su comparación de relación de transmisión aparecerá aquí.</p></div><div class="standard-answer__secondary"><span>Relación equivalente a la sensación original</span><strong data-gear-matching>—</strong><small data-gear-rpm>Las RPM en transmisión directa aparecerán aquí.</small></div></section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Su relación efectiva aparecerá aquí.</p>
     <Parametric3DPanel mode="gear" locale="es" />
-    <figure class="gear-technical-visual is-pending" data-gear-visual aria-label="Relación entre el diámetro del neumático y la relación efectiva"><figcaption><span>DIÁMETRO DE NEUMÁTICO → RELACIÓN EFECTIVA</span><small>Los círculos esquemáticos usan la relación de diámetros introducida</small></figcaption><div class="gear-wheel-pair" aria-hidden="true"><div><i data-gear-current-wheel></i><small>Actual <strong data-gear-current-diameter>—</strong></small></div><b>→</b><div><i data-gear-new-wheel></i><small>Nuevo <strong data-gear-new-diameter>—</strong></small></div></div><p data-gear-visual-meaning>Introduzca ambos diámetros de neumático para comparar el efecto en la relación.</p></figure>
+    <GearRatioTechnicalVisual locale="es" />
     <div class="fuel-detail-heading" aria-hidden="true"><span>Detalles</span><small>Relación y cálculo en transmisión directa</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
     <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">NEUMÁTICOS DE 25–44 PULGADAS</p><h2 id="rpm-matrix-heading">Mapa de RPM a <span data-matrix-speed>65</span> mph</h2><p>Transmisión directa (1,00:1). El color muestra la RPM relativa solo dentro de esta tabla.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Neumático</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>RPM relativa más baja</span><i aria-hidden="true"></i><span>RPM relativa más alta</span></p></section>
   </form>

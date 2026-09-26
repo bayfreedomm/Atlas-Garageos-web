@@ -361,3 +361,9 @@ Next implementation pass:
 - [x] Torque, power-to-weight, fuel economy, pressure, power, tire codes, DOT date, towing, quarter-mile, fitment and measurement views now label the relationship they explain.
 - [x] Every restored route retains a visual; the correction improves meaning instead of removing coverage.
 - [x] Live calculator readouts and optional 3D tabs remain intact.
+
+## Visual-meaning polish group 1 — 2026-09-26
+- [x] MPG/L·100 km, hp/kW, Nm/lb-ft and power-to-weight Engineering 2D drawings now carry authoritative converted values inside calculation-specific geometry instead of relying on generic boxes or unlabeled shapes.
+- [x] Gear Ratio replaces plain rings with recognizable proportional tire/wheel assemblies and a live installed-axle → effective-axle relationship shared across EN/DE/ES.
+- [x] Live value hooks and the shared conversion functions are covered by regression tests; canonical calculation functions remain unchanged.
+- [x] Desktop and 390 px Chromium checks show no document overflow or console warning/error. Physical-device, WebKit/Firefox and deployed performance remain separate acceptance gates.

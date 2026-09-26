@@ -9,6 +9,7 @@ import { toolRegistry } from '../../src/seo/tool-registry';
 import toolPage from '../../src/components/ToolPage.astro?raw';
 import engineering2D from '../../src/components/ToolEngineering2D.astro?raw';
 import toolVisualStudio from '../../src/components/ToolVisualStudio.astro?raw';
+import gearRatioTechnicalVisual from '../../src/components/GearRatioTechnicalVisual.astro?raw';
 import tool3DController from '../../src/ui/tool-3d.ts?raw';
 const productV4Css = readFileSync(new URL('../../src/styles/product-v4.css', import.meta.url), 'utf8');
 
@@ -91,11 +92,15 @@ describe('truthful visual coverage', () => {
   });
 
   it('binds data-bearing 2D labels and shapes to current form state', () => {
-    for (const hook of ['data-pressure-psi', 'data-pressure-bar', 'data-pressure-kpa', 'data-tool-level', 'data-tool-rotor', 'data-tool-lever', 'data-tool-code', 'data-tool-dot-code', 'data-tool-car', 'data-tool-lug']) {
+    for (const hook of ['data-fuel-us-mpg', 'data-fuel-imperial-mpg', 'data-fuel-l100', 'data-pressure-psi', 'data-pressure-bar', 'data-pressure-kpa', 'data-power-hp', 'data-power-kw', 'data-torque-nm', 'data-torque-lbft', 'data-pw-power', 'data-pw-mass', 'data-pw-ratio', 'data-tool-power-level', 'data-tool-mass-level', 'data-tool-level', 'data-tool-rotor', 'data-tool-lever', 'data-tool-code', 'data-tool-dot-code', 'data-tool-car', 'data-tool-lug']) {
       expect(engineering2D, hook).toContain(hook);
       expect(toolVisualStudio, hook).toContain(hook);
     }
     expect(toolVisualStudio).toContain('convertPressureTool');
+    expect(toolVisualStudio).toContain('convertFuelEconomyTool');
+    expect(toolVisualStudio).toContain('convertPowerTool');
+    expect(toolVisualStudio).toContain('convertTorqueTool');
+    expect(toolVisualStudio).toContain('calculatePowerToWeightTool');
     expect(toolVisualStudio).toContain('values.loadIndex');
     expect(toolVisualStudio).toContain('values.speedRating');
     expect(toolVisualStudio).toContain("values.code");
@@ -137,6 +142,16 @@ describe('truthful visual coverage', () => {
     expect(productV4Css).toContain('.tool-engineering-plate__drawing svg{width:30rem;max-width:none');
     expect(toolVisualStudio).toContain('centerMobileDrawing');
     expect(toolVisualStudio).toContain('(drawing.scrollWidth - drawing.clientWidth) / 2');
+  });
+
+  it('keeps the redesigned converter and gearing visuals tied to authoritative live values', () => {
+    for (const hook of ['data-fuel-us-mpg', 'data-fuel-imperial-mpg', 'data-fuel-l100', 'data-power-hp', 'data-power-kw', 'data-torque-nm', 'data-torque-lbft', 'data-pw-power', 'data-pw-mass', 'data-pw-ratio']) {
+      expect(engineering2D).toContain(hook);
+      expect(toolVisualStudio).toContain(hook);
+    }
+    for (const hook of ['data-gear-current-wheel', 'data-gear-new-wheel', 'data-gear-current-ratio', 'data-gear-effective-visual']) {
+      expect(gearRatioTechnicalVisual).toContain(hook);
+    }
   });
 
   it('drives the native engine and battery sections from validated calculator inputs', () => {

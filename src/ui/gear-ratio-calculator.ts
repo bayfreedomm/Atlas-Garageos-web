@@ -81,6 +81,7 @@ export function initializeGearRatioCalculators(): void {
       text('[data-gear-context]', t.context(formatNumber(input.newDiameter, 1), formatNumber(input.currentRatio, 2), formatNumber(result.value.effectiveRatio, 2)));
       text('[data-gear-rpm]', t.rpm(formatNumber(result.value.rpmAtSpeedDirectDrive, 0), formatNumber(input.speedMph, 0)));
       text('[data-gear-current-diameter]', `${formatNumber(input.currentDiameter, 1)} in`); text('[data-gear-new-diameter]', `${formatNumber(input.newDiameter, 1)} in`);
+      text('[data-gear-current-ratio]', formatNumber(input.currentRatio, 2)); text('[data-gear-effective-visual]', formatNumber(result.value.effectiveRatio, 2));
       const change = (input.newDiameter / input.currentDiameter - 1) * 100;
       text('[data-gear-visual-meaning]', `${Math.abs(change) < .005 ? t.matched : t.changed(formatNumber(Math.abs(change), 1), change > 0)}`);
       const currentWheel = form.querySelector<HTMLElement>('[data-gear-current-wheel]'); const newWheel = form.querySelector<HTMLElement>('[data-gear-new-wheel]');

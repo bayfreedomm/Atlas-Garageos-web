@@ -54,7 +54,7 @@ const tabs = {
       if (!id) return;
       const values: Record<string, string> = {};
       for (const [key, value] of new FormData(form)) if (typeof value === 'string') values[key] = value;
-      const [{ sceneForTool }, { tool3DText }, { convertPressureTool }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog'), import('../features/tools/utility-tools')]);
+      const [{ sceneForTool }, { tool3DText }, { convertFuelEconomyTool, convertPressureTool, convertPowerTool, convertTorqueTool, calculatePowerToWeightTool }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog'), import('../features/tools/utility-tools')]);
       if (version !== updateVersion) return;
       const language = locale === 'de' || locale === 'es' ? locale : 'en';
       const tool = id as import('../localization/tool-3d-catalog').Additional3DToolId;
@@ -63,6 +63,26 @@ const tabs = {
       if (reading) reading.textContent = language !== 'en' && (tool === 'fitment-map' || tool === 'measure-my-car') ? tool3DText(language, tool).title : result.readout;
       const visualState = result.scene.studio?.kind === 'tool-studio' ? result.scene.studio : undefined;
       const primary = visualState?.primary ?? .35;
+      const setSvgText = (selector: string, value: string) => {
+        const node = plate.querySelector<SVGTextContentElement>(selector);
+        if (node) node.textContent = value;
+      };
+      const setLevel = (selector: string, value: number) => {
+        const level = plate.querySelector<SVGPathElement>(selector);
+        if (!level) return;
+        level.setAttribute('pathLength', '1');
+        level.style.strokeDasharray = '1';
+        level.style.strokeDashoffset = String(1 - Math.max(0, Math.min(1, value)));
+      };
+      if (tool === 'mpg-l100km-converter') {
+        const unit = values.unit === 'imperial-mpg' || values.unit === 'l100km' ? values.unit : 'us-mpg';
+        const converted = convertFuelEconomyTool(Number(values.value), unit);
+        if (converted.ok) {
+          setSvgText('[data-fuel-us-mpg]', converted.value.usMpg.toFixed(1));
+          setSvgText('[data-fuel-imperial-mpg]', converted.value.imperialMpg.toFixed(1));
+          setSvgText('[data-fuel-l100]', converted.value.litersPer100Km.toFixed(2));
+        }
+      }
       if (tool === 'psi-bar-converter') {
         const unit = values.unit === 'bar' || values.unit === 'kpa' ? values.unit : 'psi';
         const converted = convertPressureTool(Number(values.value), unit);
@@ -73,6 +93,35 @@ const tabs = {
           if (psi) psi.textContent = converted.value.psi.toFixed(2);
           if (bar) bar.textContent = converted.value.bar.toFixed(3);
           if (kpa) kpa.textContent = converted.value.kpa.toFixed(2);
+        }
+      }
+      if (tool === 'hp-kw-converter') {
+        const unit = values.unit === 'kw' ? 'kw' : 'hp';
+        const converted = convertPowerTool(Number(values.value), unit);
+        if (converted.ok) {
+          setSvgText('[data-power-hp]', converted.value.mechanicalHorsepower.toFixed(1));
+          setSvgText('[data-power-kw]', converted.value.kilowatts.toFixed(1));
+        }
+      }
+      if (tool === 'nm-lb-ft-converter') {
+        const unit = values.unit === 'lb-ft' ? 'lb-ft' : 'nm';
+        const converted = convertTorqueTool(Number(values.value), unit);
+        if (converted.ok) {
+          setSvgText('[data-torque-nm]', converted.value.newtonMeters.toFixed(1));
+          setSvgText('[data-torque-lbft]', converted.value.poundFeet.toFixed(1));
+        }
+      }
+      if (tool === 'power-to-weight-calculator') {
+        const powerUnit = values.powerUnit === 'kw' ? 'kw' : 'hp';
+        const weightUnit = values.weightUnit === 'lb' ? 'lb' : 'kg';
+        const calculated = calculatePowerToWeightTool({ power: Number(values.power), powerUnit, weight: Number(values.weight), weightUnit });
+        const convertedPower = convertPowerTool(Number(values.power), powerUnit);
+        if (calculated.ok && convertedPower.ok) {
+          setSvgText('[data-pw-power]', `${convertedPower.value.mechanicalHorsepower.toFixed(0)} hp`);
+          setSvgText('[data-pw-mass]', `${calculated.value.kilograms.toFixed(0)} kg`);
+          setSvgText('[data-pw-ratio]', `${calculated.value.mechanicalHorsepowerPerTonne.toFixed(1)} hp/t`);
+          setLevel('[data-tool-power-level]', convertedPower.value.mechanicalHorsepower / 600);
+          setLevel('[data-tool-mass-level]', calculated.value.kilograms / 2500);
         }
       }
       const needle = plate.querySelector<SVGElement>('[data-tool-needle]');

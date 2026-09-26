@@ -16,6 +16,7 @@ Updated: 2026-09-25.
 - Added regression coverage for the sibling form contract and two distinct valid states across every input-driven additional 3D scene.
 - Ran a live browser sweep across all 23 English tool routes at a 390 px viewport. No route produced document-level horizontal overflow; every opened 3D studio initialized through WebGL.
 - Improved shared Engineering 2D phone legibility: the wide technical drawing keeps a readable scale in an internal horizontal viewport, starts centered on the working geometry, and no longer shrinks its labels to near-illegible sizes.
+- Rebuilt the first five weak visual explanations: MPG/L·100 km now compares both gallon standards with L/100 km around a fuel/road relationship; hp/kW shows one mechanical output in both units; Nm/lb-ft shows a bolt, lever arm, applied force and both units; power-to-weight separates live power, normalized mass and hp/tonne; Gear Ratio now uses recognizable tire/wheel assemblies and an installed-to-effective axle-ratio flow shared by EN/DE/ES.
 
 ## What was verified
 
@@ -26,6 +27,7 @@ Updated: 2026-09-25.
 - Visual coverage now maps all 23 published calculator tools to either a native visual system or the restored 2D/3D studio. After the 3D synchronization and mobile-legibility repair, 40 test files / 267 tests, Astro typecheck, and the 1,927-page production build passed.
 - Live form checks confirmed changing values in fuel, road-trip, MPG, pressure, power, torque, power-to-weight, tire code, DOT date, towing, quarter-mile and vehicle lookup updates the already-open 3D readout; 3D remains uninitialized until its tab is opened.
 - The 3D synchronization pass changed `src/ui/tool-3d.ts`, its regression coverage, and canonical project memory; canonical calculations and data contracts were not changed.
+- The visual-meaning polish passed the regression suite, Astro typecheck, and the 1,927-page production build. Live Chromium checks confirmed all five revised visuals render current values, produce no console warning/error, and cause no document-level overflow at a 390 px viewport.
 
 ## What remains
 
@@ -34,6 +36,7 @@ Updated: 2026-09-25.
 - Decide the first licensed/permitted evidence source before adding safety-relevant vehicle data.
 - Design and review the bounded OBD/DTC MVP before implementation.
 - Keep the current calculation/fitment foundation stable while the knowledge graph model is specified.
+- Continue the page-by-page visual-meaning audit with the remaining shared studios, prioritizing fuel/road-trip, towing/quarter-mile, and the tire-code/reference family; preserve any visual that is already specific and truthful.
 
 ## Next sensible task
 

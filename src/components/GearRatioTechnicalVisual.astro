@@ -1,0 +1,48 @@
+---
+type Locale = 'en' | 'de' | 'es';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const copy = {
+  en: {
+    aria: 'Tire diameter and effective axle ratio relationship',
+    title: 'TIRE DIAMETER → EFFECTIVE AXLE RATIO',
+    note: 'Tires are drawn at the entered diameter ratio',
+    current: 'Current tire', next: 'New tire', installed: 'Installed axle', effective: 'Effective axle',
+    pending: 'Enter both tire diameters to compare their gearing effect.',
+  },
+  de: {
+    aria: 'Zusammenhang zwischen Reifendurchmesser und effektiver Achsübersetzung',
+    title: 'REIFENDURCHMESSER → EFFEKTIVE ACHSÜBERSETZUNG',
+    note: 'Reifen werden im eingegebenen Durchmesserverhältnis gezeichnet',
+    current: 'Aktueller Reifen', next: 'Neuer Reifen', installed: 'Verbaute Achse', effective: 'Effektive Achse',
+    pending: 'Geben Sie beide Reifendurchmesser ein, um den Übersetzungseffekt zu vergleichen.',
+  },
+  es: {
+    aria: 'Relación entre el diámetro del neumático y la relación efectiva del eje',
+    title: 'DIÁMETRO DEL NEUMÁTICO → RELACIÓN EFECTIVA DEL EJE',
+    note: 'Los neumáticos se dibujan con la proporción de diámetros introducida',
+    current: 'Neumático actual', next: 'Neumático nuevo', installed: 'Eje instalado', effective: 'Eje efectivo',
+    pending: 'Introduzca ambos diámetros para comparar su efecto en la relación.',
+  },
+}[locale];
+---
+<figure class="gear-technical-visual gear-technical-visual--assembly is-pending" data-gear-visual aria-label={copy.aria}>
+  <figcaption><span>{copy.title}</span><small>{copy.note}</small></figcaption>
+  <div class="gear-wheel-pair">
+    <div>
+      <span class="gear-wheel-assembly gear-wheel-assembly--current" data-gear-current-wheel aria-hidden="true"><i></i><b></b></span>
+      <small>{copy.current} <strong data-gear-current-diameter>—</strong></small>
+    </div>
+    <span class="gear-wheel-pair__flow" aria-hidden="true">→</span>
+    <div>
+      <span class="gear-wheel-assembly gear-wheel-assembly--new" data-gear-new-wheel aria-hidden="true"><i></i><b></b></span>
+      <small>{copy.next} <strong data-gear-new-diameter>—</strong></small>
+    </div>
+  </div>
+  <div class="gear-ratio-flow" aria-label={`${copy.installed} to ${copy.effective}`}>
+    <span><small>{copy.installed}</small><strong data-gear-current-ratio>—</strong></span>
+    <i aria-hidden="true">× <b>D<sub>1</sub> / D<sub>2</sub></b></i>
+    <span><small>{copy.effective}</small><strong data-gear-effective-visual>—</strong></span>
+  </div>
+  <p data-gear-visual-meaning>{copy.pending}</p>
+</figure>
