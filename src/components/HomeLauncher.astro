@@ -151,6 +151,7 @@ const categories = home
     </section>
 
     <a class="home-fuel-feature" href={fuelPricesPath}><span class:list={['home-fuel-feature__badge', fuelBadgeModifier]}><i aria-hidden="true"></i>{fuelBadgeText}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Weekly US average for regular, midgrade, premium and diesel, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-diagnostics-feature" href="/obd-codes/"><span class="home-diagnostics-feature__badge">ATLAS DIAGNOSTICS</span><span class="home-diagnostics-feature__copy"><strong>OBD-II Code Lookup</strong><small>Enter a scanner code, understand what the monitor detected, and see what to check before replacing a part.</small></span><span class="home-diagnostics-feature__code" aria-hidden="true">P0420</span><span class="home-diagnostics-feature__arrow" aria-hidden="true">→</span></a>
     <a class="home-fitment-feature" href={`${prefix}/fitment-studio/`}><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>

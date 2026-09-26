@@ -5,6 +5,7 @@ import { vehicleFitmentData } from '../../src/data/vehicle-fitment';
 import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
 import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
 import { entityLocales } from '../../src/seo/entity-routes';
+import { dtcRecords } from '../../src/data/dtc-records';
 
 const intendedRoutes = [
   '/',
@@ -80,7 +81,10 @@ describe('SEO tool registry', () => {
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
     // hand-maintained page count.
     const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
-    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes;
+    // Diagnostics adds one directory plus exactly one page per record that passed the production
+    // catalog publication gate. Draft fixtures and arbitrary input state never reach the sitemap.
+    const diagnosticRoutes = 1 + dtcRecords.length;
+    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');
@@ -93,6 +97,8 @@ describe('SEO tool registry', () => {
     // The flagship now has localized pages; they must be in the sitemap.
     expect(entries).toContain('https://atlasgarageos.com/de/fitment-studio/');
     expect(entries).toContain('https://atlasgarageos.com/es/fitment-studio/');
+    expect(entries).toContain('https://atlasgarageos.com/obd-codes/');
+    for (const record of dtcRecords) expect(entries).toContain(`https://atlasgarageos.com/obd-codes/${record.slug}/`);
     const xml = renderSitemapXml();
     expect(xml.match(/<url>/g)).toHaveLength(expectedCount);
     expect(xml).not.toContain('#');

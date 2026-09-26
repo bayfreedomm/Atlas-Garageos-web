@@ -6,6 +6,7 @@ import {
   dtcPublicationIssues,
   publishableDtcRecords,
 } from '../../src/domain/dtc';
+import { dtcRecords } from '../../src/data/dtc-records';
 
 const evidence = {
   id: 'source-1',
@@ -59,6 +60,14 @@ describe('DTC normalization and trust boundary', () => {
 });
 
 describe('DTC publication gate', () => {
+  it('keeps every production record publishable and route-safe', () => {
+    expect(dtcRecords.length).toBeGreaterThanOrEqual(16);
+    for (const item of dtcRecords) {
+      expect(dtcPublicationIssues(item)).toEqual([]);
+      expect(item.slug).toBe(item.code.toLowerCase());
+    }
+  });
+
   it('blocks records without confirmed reusable authoritative evidence', () => {
     const result = createDtcRecord(record('P0420', {
       evidence: [{ ...evidence, reusePermission: 'citation-only' }],

@@ -1,0 +1,46 @@
+---
+import { dtcRecords } from '../data/dtc-records';
+
+const knownCodes = dtcRecords.map(({ code }) => code);
+---
+<section class="dtc-lookup" aria-labelledby="dtc-lookup-title" data-dtc-lookup data-known-codes={JSON.stringify(knownCodes)}>
+  <div class="dtc-lookup__copy">
+    <p class="dtc-kicker">OBD-II CODE CHECKER</p>
+    <h2 id="dtc-lookup-title">Enter the code exactly as your scanner shows it</h2>
+    <p>Atlas validates P, B, C and U codes. Reviewed codes open a detailed guide; other valid codes still show their system family without inventing a meaning.</p>
+  </div>
+  <form class="dtc-lookup__form" data-dtc-form novalidate>
+    <label for="dtc-code">Diagnostic trouble code</label>
+    <div><input id="dtc-code" name="code" type="text" inputmode="text" autocomplete="off" maxlength="5" placeholder="P0420" aria-describedby="dtc-lookup-status" data-dtc-input /><button type="submit">Check code</button></div>
+    <p id="dtc-lookup-status" class="dtc-lookup__status" aria-live="polite" data-dtc-status>Use five characters, for example P0420 or U0100.</p>
+  </form>
+</section>
+
+<script>
+  const familyNames: Readonly<Record<string, string>> = { P: 'Powertrain', B: 'Body', C: 'Chassis', U: 'Network communication' };
+  document.querySelectorAll<HTMLElement>('[data-dtc-lookup]').forEach((root) => {
+    const form = root.querySelector<HTMLFormElement>('[data-dtc-form]');
+    const input = root.querySelector<HTMLInputElement>('[data-dtc-input]');
+    const status = root.querySelector<HTMLElement>('[data-dtc-status]');
+    if (!form || !input || !status) return;
+    const known = new Set<string>(JSON.parse(root.dataset.knownCodes ?? '[]'));
+    input.addEventListener('input', () => { input.value = input.value.toUpperCase().replace(/[^PBCU0-9A-F]/g, '').slice(0, 5); });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const code = input.value.trim().toUpperCase();
+      if (!/^[PBCU][0-3][0-9A-F]{3}$/.test(code)) {
+        status.textContent = 'That is not a valid five-character OBD-II code. Try a format such as P0420.';
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      if (known.has(code)) {
+        status.textContent = `Opening the reviewed ${code} guide…`;
+        window.location.assign(`/obd-codes/${code.toLowerCase()}/`);
+        return;
+      }
+      status.textContent = `${code} is a valid ${familyNames[code.charAt(0)] ?? 'OBD'}-family code. Atlas does not have a reviewed meaning for it yet, so no definition is guessed.`;
+    });
+  });
+</script>

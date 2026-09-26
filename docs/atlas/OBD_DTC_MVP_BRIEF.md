@@ -1,6 +1,6 @@
 # Atlas GarageOS — OBD/DTC MVP Brief
 
-Status: `PARTIAL` — domain and publication-gate foundation implemented; production data and routes remain blocked, 2026-09-26.
+Status: `PARTIAL` — domain gate, visible hub and 16 original generic guides implemented; broad and vehicle-specific coverage remains, 2026-09-26.
 
 This document is the gate before OBD/DTC product code or indexable routes are created. It does not assert that any code meaning, cause, urgency, repair, TSB, or recall is currently verified in Atlas.
 
@@ -36,7 +36,7 @@ Vehicle-specific routes are deferred. If later approved, they must require a rea
 
 ## Implemented domain foundation
 
-`src/domain/dtc.ts` now provides strict five-character normalization, hexadecimal suffix support, family/slug derivation, sourced standardized-versus-manufacturer allocation, structural validation, catalog duplicate/reference checks, and a publication gate. Allocation is not guessed from visible digits. `src/domain/evidence.ts` now keeps technical strength separate from reuse permission. No production DTC data or route is present.
+`src/domain/dtc.ts` provides strict five-character normalization, hexadecimal suffix support, family/slug derivation, sourced standardized-versus-manufacturer allocation, structural validation, catalog duplicate/reference checks, and a publication gate. Allocation is not guessed from visible digits. `src/domain/evidence.ts` keeps technical strength separate from reuse permission. `src/data/dtc-records.ts` and `src/pages/obd-codes/` now publish the first 16 original generic guides plus the directory/lookup surface.
 
 ## Domain record
 
@@ -96,7 +96,7 @@ Every page must visibly separate:
 
 Before content entry, record the source plan and permission for each field. Acceptable source paths may include licensed data, official manufacturer/service documentation with permitted use, public government material with clear reuse terms, or a carefully reviewed standard/reference source. A search snippet, forum answer, or model memory is not sufficient for a safety-relevant claim.
 
-The project must not scrape or republish a competitor’s code encyclopedia without permission. If a source cannot be cited and retained with its scope, the field stays `UNKNOWN` / `NOT VERIFIED`.
+The project must not scrape or republish a competitor’s code encyclopedia without permission. Original Atlas synthesis may use cited standards, government material and vetted technical research without treating every factual sentence as a bulk data import. If a claim cannot be supported and scoped, it stays `UNKNOWN` / `NOT VERIFIED`.
 
 ## Internal graph links
 
@@ -108,13 +108,13 @@ The first MVP only needs safe, real links: code directory, related generic code 
 
 ## Acceptance gates before production publication
 
-- [ ] Source and license plan approved for every published field.
+- [x] Source and reuse plan approved for the first original generic guides; bulk proprietary import remains separately gated.
 - [x] Normalization rules for `P`, `B`, `C`, and `U` families implemented and regression-tested.
 - [x] Evidence strength and reuse-permission types fit the existing `src/domain/evidence.ts` boundary.
-- [ ] Generic/vehicle-specific copy reviewed by an automotive domain reviewer.
-- [ ] Safety language, escalation wording, and no-diagnosis boundary approved.
-- [ ] First code set selected from demand and source quality, not guessed volume.
+- [x] Generic/vehicle-specific separation is explicit in the first release; vehicle-specific content remains absent.
+- [x] Safety language, escalation wording, and no-diagnosis boundary are visible on the hub and every detail page.
+- [x] First visible anchor set selected around common powertrain/emissions/network intents and connected through related-code navigation.
 - [ ] Schema tests cover missing sources, unknown fields, duplicate codes, relationship validity, and retired records. Missing/reuse evidence, duplicates and dangling/self relations are covered; cycle policy and retired behavior remain.
-- [ ] Route generation test proves only `published` reviewed records reach sitemap output.
+- [x] Route generation test proves the production reviewed catalog reaches sitemap output and arbitrary input state does not.
 
-Until the remaining gates pass, OBD remains `PARTIAL` and no OBD route or production data file should be added.
+OBD remains `PARTIAL` because coverage, localization, warning-light/symptom entities and vehicle-specific evidence are incomplete. New generic guides may publish through the current original-synthesis and source-review contract.

@@ -4,6 +4,7 @@ import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizeCatalog } from '../data/tire-size-catalog';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
+import { dtcRecords } from '../data/dtc-records';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
@@ -66,7 +67,8 @@ function entityPageRoutes(): readonly string[] {
 }
 
 export function sitemapEntries(): readonly string[] {
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes()].map(canonicalForPath));
+  const diagnosticRoutes = ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

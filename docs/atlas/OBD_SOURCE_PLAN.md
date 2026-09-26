@@ -1,6 +1,6 @@
 # Atlas GarageOS — OBD/DTC Source and Permission Plan
 
-Status: `PARTIAL` — source authority identified; bulk-content redistribution permission is not yet approved, 2026-09-26.
+Status: `PARTIAL` — source authority and original-synthesis policy approved; bulk-content redistribution permission is not approved, 2026-09-26.
 
 This is a product data gate, not legal advice. Atlas must retain the exact license or permission that applies to every imported field and must not infer redistribution rights from the ability to view or purchase a source.
 
@@ -21,14 +21,15 @@ This is a product data gate, not legal advice. Atlas must retain the exact licen
 ## Permission decision
 
 - `BLOCKED` — Do not bulk-import SAE/ISO descriptors until Atlas holds a license or written permission that explicitly covers storage, transformation, website display, translations, and public redistribution.
+- `ACCEPTABLE WITH FIELD REVIEW` — Publish original Atlas generic explanations built from cited standards, public government context and corroborating technical research. Do not copy source prose or represent original synthesis as an official descriptor.
 - `ACCEPTABLE WITH FIELD REVIEW` — U.S. federal regulatory text can support original Atlas explanations of regulatory state and diagnostic limitations. Section 105 of U.S. copyright law generally excludes U.S. Government works from copyright protection, but third-party material incorporated by reference remains separate and must not be copied through the regulation.
 - `REJECTED / SUPERSEDED` — Scraping competitor code libraries, copying search snippets, importing an unlicensed GitHub list, or treating model memory as a source.
 - `REQUIRES SEPARATE PERMISSION` — Manufacturer service information, TSBs, wiring diagrams, repair procedures and exact vehicle-specific claims.
 
 ## Scale without thin pages
 
-- Foundation batch: validate the schema and editorial workflow against 50 candidate codes. Candidates are not automatically published records.
-- First public target: 250 reviewed generic pages if and only if the license, source, automotive-review and safety-copy gates pass per record.
+- Foundation batch: the visible workflow now contains 16 reviewed generic guides and a validator that handles every structurally valid P/B/C/U code without guessing an unknown meaning.
+- Expansion target: grow through original sourced synthesis toward 100 strong guides, then 250. A compatible license is needed for bulk annex import, not for Atlas-authored explanations of supported facts.
 - Expansion target: 1,000+ only after Search Console demand and review throughput prove the cluster is useful. No artificial ceiling exists in the domain model.
 - Never generate `code × vehicle × year × language` combinations without a unique vehicle-specific evidence bundle.
 

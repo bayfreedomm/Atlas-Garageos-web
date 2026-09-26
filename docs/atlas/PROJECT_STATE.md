@@ -58,7 +58,7 @@ Snapshot date: 2026-09-26. This file records what the repository proves today; i
 
 | Area | Status | Evidence / boundary |
 |---|---|---|
-| OBD / DTC intelligence | `PARTIAL` | `src/domain/dtc.ts` implements normalization, schema/catalog validation and a source/review/reuse publication gate with regression coverage. There is still no production DTC dataset, public route, sitemap output or diagnostic engine. |
+| OBD / DTC intelligence | `PARTIAL` | A visible `/obd-codes/` Diagnostics hub, validated lookup, 16 reviewed generic code guides, home/header/drawer/footer entry points, TechArticle schema and sitemap projection are implemented. `src/domain/dtc.ts` still gates catalog validity and publication. Coverage is intentionally incomplete and no vehicle-specific diagnostic engine exists. |
 | Warning lights | `NOT FOUND` | No warning-light entity family or route found. |
 | Symptom diagnosis | `NOT FOUND` | No guided symptom-to-system diagnosis engine found. |
 | Service Second Opinion | `NOT FOUND` | No upload/quote parser or repair-cost reasoning surface found. |

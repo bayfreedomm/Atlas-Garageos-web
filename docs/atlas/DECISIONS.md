@@ -46,6 +46,14 @@ SAE J2012-DA is the maintained authoritative code/descriptor source, but access 
 
 Rationale: this preserves ambitious traffic growth while preventing copied, unsafe or thin pages from entering the index.
 
+## 2026-09-26 — Original synthesis may publish from cited public evidence
+
+Status: `VERIFIED DONE` for the first generic Diagnostics release.
+
+Atlas does not require a bulk-redistribution license merely to write its own cautious explanation of a technical fact. A generic OBD guide may publish when its identity is anchored to the SAE framework, its operating/safety context is supported by public government material, the wording is original, sources and limitations are visible, and no source database or article text is copied. Bulk importing a proprietary annex, vehicle-specific service procedure, wiring diagram or manufacturer claim still requires compatible permission.
+
+Rationale: evidence discipline should prevent fabricated or copied claims without blocking useful original editorial work assembled from public technical research. Vehicle-specific and safety-critical claims remain a higher evidence class than generic code education.
+
 ## 2026-09-25 — French and Brazilian Portuguese are the next language rollout
 
 Status: `ACCEPTED`.

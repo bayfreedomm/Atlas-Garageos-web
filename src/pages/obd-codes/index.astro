@@ -1,0 +1,40 @@
+---
+import SiteLayout from '../../components/SiteLayout.astro';
+import DtcLookup from '../../components/DtcLookup.astro';
+import { dtcRecords } from '../../data/dtc-records';
+
+const families = [
+  { id: 'powertrain', code: 'P', title: 'Powertrain', copy: 'Engine, emissions and transmission monitoring.' },
+  { id: 'body', code: 'B', title: 'Body', copy: 'Cabin, restraint and body-control systems. Meanings are often manufacturer-specific.' },
+  { id: 'chassis', code: 'C', title: 'Chassis', copy: 'Brakes, steering, suspension and stability systems.' },
+  { id: 'network', code: 'U', title: 'Network', copy: 'Communication between vehicle controllers.' },
+] as const;
+const byFamily = Object.fromEntries(families.map((family) => [family.id, dtcRecords.filter((record) => record.family === family.id)]));
+---
+<SiteLayout title="OBD-II Code Lookup & Diagnostic Guides" description="Check an OBD-II trouble code, understand its system family, review common symptoms and causes, and follow safer first diagnostic steps." pathname="/obd-codes/" active="diagnostics" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'OBD codes', href: '/obd-codes/' }]}>
+  <section class="dtc-page-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">OBD codes</span></nav>
+    <header class="dtc-hero">
+      <div><p class="dtc-kicker">ATLAS DIAGNOSTICS</p><h1>Understand the code before replacing the part.</h1><p>Look up a reviewed OBD-II code, see what the monitor detected, what it does not prove, and which evidence to collect next.</p></div>
+      <div class="dtc-hero__signal" aria-hidden="true"><span>01</span><strong>DTC</strong><i>SCAN · RECORD · VERIFY</i></div>
+    </header>
+    <DtcLookup />
+    <section class="dtc-family-grid" aria-labelledby="dtc-families-title">
+      <div class="dtc-section-heading"><p class="dtc-kicker">CODE FAMILIES</p><h2 id="dtc-families-title">The first letter identifies the monitored system family</h2></div>
+      <div class="dtc-family-list">
+        {families.map((family) => <article><span>{family.code}</span><div><h3>{family.title}</h3><p>{family.copy}</p><small>{byFamily[family.id]?.length ?? 0} reviewed guides</small></div></article>)}
+      </div>
+    </section>
+    <section class="dtc-guide-list" aria-labelledby="reviewed-guides-title">
+      <div class="dtc-section-heading"><p class="dtc-kicker">REVIEWED GUIDES</p><h2 id="reviewed-guides-title">Start with a real stored code</h2><p>These pages use original Atlas explanations with standards and government context. Vehicle-specific procedures still outrank a generic guide.</p></div>
+      <div class="dtc-card-grid">
+        {dtcRecords.map((record) => <a href={`/obd-codes/${record.slug}/`}><span>{record.code}</span><strong>{record.title}</strong><small>{record.family}</small><i aria-hidden="true">→</i></a>)}
+      </div>
+    </section>
+    <section class="dtc-explain-grid">
+      <article><p class="dtc-kicker">A CODE IS A CLUE</p><h2>Not a parts verdict</h2><p>A stored code reports a monitored condition. It does not prove the named sensor or component has failed. Wiring, air leaks, voltage, mechanical faults and upstream conditions can produce the same code.</p></article>
+      <article><p class="dtc-kicker">SAVE THE CONTEXT</p><h2>Do not clear it first</h2><p>Record stored, pending and permanent codes plus freeze-frame data before clearing anything. That snapshot can preserve the operating condition that triggered the monitor.</p></article>
+      <article><p class="dtc-kicker">WARNING LIGHT</p><h2>Flashing changes the response</h2><p>A flashing malfunction indicator can accompany a severe active misfire. Reduce load and stop safely if the vehicle shakes, loses power, overheats or otherwise feels unsafe.</p></article>
+    </section>
+  </section>
+</SiteLayout>

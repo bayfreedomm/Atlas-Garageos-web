@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths } from 'astro';
+import SiteLayout from '../../components/SiteLayout.astro';
+import { dtcRecords } from '../../data/dtc-records';
+import { serializeJsonLd } from '../../seo/safe-json-ld';
+
+export const getStaticPaths = (() => dtcRecords.map((record) => ({ params: { code: record.slug }, props: { record } }))) satisfies GetStaticPaths;
+const { record } = Astro.props;
+const familyLabels = { powertrain: 'Powertrain', body: 'Body', chassis: 'Chassis', network: 'Network communication' } as const;
+const title = `${record.code}: ${record.title}`;
+const description = `${record.code} OBD-II guide: ${record.title}. Review common symptoms, possible causes, diagnostic order and important limitations.`;
+const pathname = `/obd-codes/${record.slug}/`;
+const jsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'TechArticle', headline: title, description, mainEntityOfPage: `https://atlasgarageos.com${pathname}`, dateModified: record.reviewedAt, author: { '@type': 'Organization', name: 'Atlas GarageOS' } });
+---
+<SiteLayout {title} {description} {pathname} active="diagnostics" breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'OBD codes', href: '/obd-codes/' }, { name: record.code, href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={jsonLd}></script>
+  <article class="dtc-page-shell dtc-detail">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/obd-codes/">OBD codes</a><span aria-hidden="true">/</span><span aria-current="page">{record.code}</span></nav>
+    <header class="dtc-detail__hero"><div><p class="dtc-kicker">{familyLabels[record.family]} · GENERIC OBD-II GUIDE</p><h1><span>{record.code}</span>{record.title}</h1><p>{record.meaning}</p></div><aside><small>CONFIDENCE</small><strong>Reviewed reference</strong><span>Updated {new Date(record.reviewedAt!).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span></aside></header>
+    <section class="dtc-alert"><strong>Do not replace a part from this code alone.</strong><p>Record related codes and freeze-frame data. If the warning light flashes, the vehicle shakes, overheats, loses braking assistance or otherwise feels unsafe, reduce load and stop safely.</p></section>
+    <div class="dtc-detail__grid">
+      <section><p class="dtc-kicker">WHAT YOU MAY NOTICE</p><h2>Common symptoms</h2><ul>{record.symptoms.map((item) => <li>{item}</li>)}</ul></section>
+      <section><p class="dtc-kicker">POSSIBILITIES, NOT A DIAGNOSIS</p><h2>Possible causes</h2><ul>{record.possibleCauses.map((item) => <li>{item}</li>)}</ul></section>
+    </div>
+    <section class="dtc-steps"><p class="dtc-kicker">DIAGNOSTIC ORDER</p><h2>What to check first</h2><ol>{record.diagnosticOrder.map((item, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><p>{item}</p></li>)}</ol></section>
+    <div class="dtc-detail__grid">
+      <section><p class="dtc-kicker">LIMITS</p><h2>What this page cannot prove</h2><ul>{record.limitations.map((item) => <li>{item}</li>)}</ul></section>
+      <section><p class="dtc-kicker">PRESERVE THE EVIDENCE</p><h2>Useful next actions</h2><ul>{record.nextActions.map((item) => <li>{item}</li>)}</ul></section>
+    </div>
+    {record.relatedCodes.length > 0 && <section class="dtc-related"><p class="dtc-kicker">RELATED CODES</p><div>{record.relatedCodes.map((code) => <a href={`/obd-codes/${code.toLowerCase()}/`}>{code}<span>→</span></a>)}</div></section>}
+    <section class="dtc-sources"><p class="dtc-kicker">SOURCES & BOUNDARY</p><h2>Where the guidance comes from</h2><p>Atlas uses the SAE code framework as the authority for standardized DTC identity and EPA material for OBD/MIL/readiness context. The explanation above is original Atlas wording, not a copied diagnostic database.</p><ul>{record.evidence.map((source) => <li><a href={source.locator} rel="nofollow noopener" target="_blank">{source.publisher}: {source.title}</a><span>{source.scope}</span></li>)}</ul></section>
+    <a class="dtc-back" href="/obd-codes/">← Check another OBD code</a>
+  </article>
+</SiteLayout>

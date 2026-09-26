@@ -374,3 +374,10 @@ Next implementation pass:
 - [x] Unique per-language title/description checks, route-matching canonicals, self/reciprocal hreflang with `x-default`, valid JSON-LD, indexable H1 and robots/sitemap contracts all pass.
 - [x] Shared entity metadata and the remaining page-specific outliers were tightened; the build now reports zero titles over 75 characters and zero descriptions over 180 characters.
 - [ ] Search Console/Bing submission, Google-selected canonical/index coverage, deployed redirect/404/Open Graph smoke tests and real-user Core Web Vitals remain external launch gates; local technical correctness does not guarantee ranking.
+
+## Atlas Diagnostics visible-product checkpoint — 2026-09-26
+- [x] The earlier domain-only OBD foundation is now connected to a real `/obd-codes/` product surface with code validation, system-family feedback and reviewed-guide routing.
+- [x] Sixteen generic guides publish original Atlas meaning, symptoms, possible causes, diagnostic order, limitations, related codes and visible SAE/EPA source context; they do not claim a vehicle-specific diagnosis.
+- [x] Diagnostics is discoverable from the homepage, desktop navigation, drawer and footer, and every published guide is projected into the sitemap with TechArticle structured data.
+- [x] Catalog and sitemap regression tests, 352-file Astro check, 1,944-page production build and the 1,940-URL rendered SEO audit pass with zero metadata-length advisories.
+- [ ] Expand toward broad high-intent coverage, localized Diagnostics, warning-light and symptom entities. Bulk proprietary imports and vehicle-specific service content still require compatible rights and stronger review.

@@ -21,6 +21,7 @@ Updated: 2026-09-26.
 - Added `OBD_SOURCE_PLAN.md`, recording SAE J2012-DA as the maintained authority, government regulations as context rather than a replacement dataset, and the 50-candidate → 250-public → 1,000+ evidence-gated scale decision.
 - Added a durable rendered-output SEO audit and release script. It checks every generated page for title, description, H1, robots, canonical, sitemap, language, reciprocal hreflang, JSON-LD and duplicate metadata failures.
 - Shortened shared EN/DE/ES tire and bolt entity metadata plus the remaining long fuel, fit-check, homepage and Spanish vehicle titles/descriptions. The final audit has no metadata-length advisories.
+- Shipped the first visible Atlas Diagnostics product: an OBD hub and validated lookup, 16 reviewed generic code guides, related-code navigation, evidence panels, safety boundaries, home/header/drawer/footer entry points, TechArticle schema and automatic sitemap projection.
 
 ## What was verified
 
@@ -35,6 +36,7 @@ Updated: 2026-09-26.
 - The new OBD domain unit suite covers canonical/hex code normalization, invalid formats, family/slug derivation, sourced allocation, missing reuse permission, thin-page blocking, draft filtering, duplicate codes and dangling/self relationships. The full gate passed with 41 files / 277 tests, zero typecheck diagnostics, and the unchanged 1,927-page production build. Production data and routes were intentionally not added.
 - The SEO release gate passed across 1,927 generated HTML files: 1,923 indexable canonical pages exactly match 1,923 sitemap URLs; the 404 and three embed pages are intentionally noindex and excluded. Duplicate per-language metadata, canonical/hreflang/JSON-LD errors and long-metadata advisories are zero.
 - Final verification after the SEO changes passed 41 test files / 277 tests, Astro check across 348 files with zero diagnostics, and a 1,927-page production build. The existing non-fatal lazy-chunk size warning remains.
+- Diagnostics verification passed 41 test files / 278 tests, Astro check across 352 files with zero diagnostics, a 1,944-page production build, and a rendered-output SEO audit reconciling 1,940 sitemap URLs with 1,940 indexable canonicals. Long-title and description advisories remain zero. Local browser checks confirmed the hub, P0420 detail guide and homepage entry expose the intended navigation and content.
 
 ## What remains
 
@@ -42,7 +44,8 @@ Updated: 2026-09-26.
 - Submit and inspect the production sitemap in Google Search Console and Bing Webmaster Tools, then measure coverage, selected canonicals, search-result title rewrites and deployed Core Web Vitals; local correctness cannot guarantee indexing or ranking.
 - Complete the remaining physical-device, WebKit/Firefox, keyboard/assistive-technology and deployed Core Web Vitals acceptance; the local Chromium/mobile route sweep is complete.
 - Decide the first licensed/permitted evidence source before adding safety-relevant vehicle data.
-- Obtain explicit SAE J2012-DA web redistribution/translation permission (or another compatible licensed source), choose the automotive reviewer, and approve safety wording before production DTC records or routes.
+- Obtain compatible SAE J2012-DA or alternative rights before any bulk descriptor import or translation. Generic original Atlas guides may expand from cited evidence; vehicle-specific service claims still need stronger source permission and review.
+- Expand the generic Diagnostics catalog through original sourced synthesis; do not bulk-copy SAE annexes or competitor encyclopedias. A bulk data license is still required for bulk import, and vehicle-specific service procedures remain separately permissioned.
 - Keep the current calculation/fitment foundation stable while the knowledge graph model is specified.
 - Continue the page-by-page visual-meaning audit with the remaining shared studios, prioritizing fuel/road-trip, towing/quarter-mile, and the tire-code/reference family; preserve any visual that is already specific and truthful.
 
