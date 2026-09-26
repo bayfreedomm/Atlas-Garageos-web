@@ -49,7 +49,7 @@ export const esToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
   },
   'tire-fit-check': {
     title: '¿Puedo montar esta medida?',
-    description: 'Compruebe un cambio de medida de neumático en un solo lugar — diámetro, velocímetro, altura libre, si la medida se fabrica y qué implica para sus llantas —, con cada resultado etiquetado según su fiabilidad.',
+    description: 'Compruebe diámetro, velocímetro, altura libre, medidas disponibles y llantas. Atlas indica la fiabilidad de cada resultado.',
     category: 'Neumáticos y Llantas',
     eyebrow: 'Neumáticos y llantas · Decisión',
     intro: 'Introduzca su neumático actual y la medida que quiere montar. Atlas ejecuta todas las comprobaciones relevantes y le dice qué significan — y qué falta por confirmar.',

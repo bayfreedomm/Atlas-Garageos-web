@@ -36,6 +36,16 @@ OBD/DTC is accepted as a high-value organic cluster and knowledge-graph entity f
 
 Rationale: the opportunity is large, but unsupported automotive facts would create trust and safety debt.
 
+## 2026-09-26 — OBD scale is gated by evidence, not an arbitrary page ceiling
+
+Status: `PARTIAL`.
+
+Fifty candidate codes are the technical/editorial validation batch, not the product limit. The first public target is 250 reviewed generic code pages, with 1,000+ accepted later when source coverage, demand and review throughput support it. Vehicle/year/language combinations are not generated without unique evidence.
+
+SAE J2012-DA is the maintained authoritative code/descriptor source, but access or purchase alone is not treated as public-redistribution permission. Production DTC content and routes remain blocked until Atlas records an explicit compatible license and automotive review process. The domain schema and publication gate may be built before that content license.
+
+Rationale: this preserves ambitious traffic growth while preventing copied, unsafe or thin pages from entering the index.
+
 ## 2026-09-25 — French and Brazilian Portuguese are the next language rollout
 
 Status: `ACCEPTED`.

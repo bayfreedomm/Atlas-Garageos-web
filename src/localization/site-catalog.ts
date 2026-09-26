@@ -275,7 +275,7 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
   },
   es: {
     home: {
-      title: 'Calculadoras de Coche Gratis y Herramientas para Automóviles',
+      title: 'Calculadoras de Coche y Herramientas Automotrices',
       description: 'Calculadoras de coche rápidas y precisas para neumáticos, combustible, viajes, presión, potencia, par motor y ajuste.',
       kicker: 'HERRAMIENTAS DE TALLER PARA CONDUCTORES REALES',
       h1: 'Herramientas más inteligentes para cada trayecto.',

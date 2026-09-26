@@ -29,8 +29,56 @@ export const EVIDENCE_LEVELS = [
 
 export type EvidenceLevel = (typeof EVIDENCE_LEVELS)[number];
 
+/**
+ * Reuse is deliberately separate from evidence strength. A source can be technically
+ * authoritative while its text/data still cannot be republished by Atlas.
+ */
+export const EVIDENCE_REUSE_PERMISSIONS = [
+  'public-domain',
+  'licensed',
+  'permission-granted',
+  'citation-only',
+  'unknown',
+  'prohibited',
+] as const;
+
+export type EvidenceReusePermission = (typeof EVIDENCE_REUSE_PERMISSIONS)[number];
+
+export const EVIDENCE_SOURCE_TYPES = [
+  'official-standard',
+  'government-regulation',
+  'manufacturer-service-information',
+  'official-recall-communication',
+  'vetted-technical-reference',
+  'measured-observation',
+  'owner-report',
+  'community-report',
+] as const;
+
+export type EvidenceSourceType = (typeof EVIDENCE_SOURCE_TYPES)[number];
+
+export interface EvidenceRecord {
+  readonly id: string;
+  readonly sourceType: EvidenceSourceType;
+  readonly level: EvidenceLevel;
+  readonly publisher: string;
+  readonly title: string;
+  /** Stable URL, DOI, standard identifier, bulletin number, or other durable locator. */
+  readonly locator: string;
+  readonly scope: string;
+  readonly retrievedAt: string;
+  readonly reusePermission: EvidenceReusePermission;
+  readonly permissionLocator: string | null;
+  readonly reviewNote: string;
+}
+
 /** Lower is stronger. Useful when a result combines inputs: it is only as strong as its weakest one. */
 export const evidenceRank = (level: EvidenceLevel): number => EVIDENCE_LEVELS.indexOf(level);
 
 export const weakestEvidence = (levels: readonly EvidenceLevel[]): EvidenceLevel =>
   levels.reduce<EvidenceLevel>((weakest, level) => (evidenceRank(level) > evidenceRank(weakest) ? level : weakest), 'oem-verified');
+
+export const evidenceCanBeRepublished = (evidence: EvidenceRecord): boolean =>
+  evidence.reusePermission === 'public-domain'
+  || evidence.reusePermission === 'licensed'
+  || evidence.reusePermission === 'permission-granted';

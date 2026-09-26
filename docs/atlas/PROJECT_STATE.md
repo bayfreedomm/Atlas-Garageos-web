@@ -1,6 +1,6 @@
 # Atlas GarageOS — Verified Project State
 
-Snapshot date: 2026-09-25. This file records what the repository proves today; it is not a wishlist.
+Snapshot date: 2026-09-26. This file records what the repository proves today; it is not a wishlist.
 
 ## Build and architecture
 
@@ -19,6 +19,13 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 - `VERIFIED DONE` — Tool families include tires/wheels, fuel/trips, converters, performance, EV, fitment, vehicle reference, and gas-price history.
 - `VERIFIED DONE` — Shareable calculator state is client-side URL state; clean canonical routes remain separate from application state.
 - `VERIFIED DONE` — Page-specific quick facts, common mistakes, warnings, methodology, related tools, decision graphs, and localized copy are implemented for the current registry.
+
+## Search and indexability
+
+- `VERIFIED DONE` — `scripts/audit-seo-build.mjs` now enforces the rendered-output SEO contract across all generated HTML: unique non-empty titles and descriptions per language, one indexable H1, route-matching canonical URLs, sitemap membership, valid JSON-LD, reciprocal self-referencing hreflang clusters with `x-default`, and no query/fragment URLs.
+- `VERIFIED DONE` — The latest production output contains 1,927 HTML files, 1,923 indexable canonical pages and exactly 1,923 sitemap URLs. The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
+- `VERIFIED DONE` — The latest length review reports zero titles over 75 characters and zero descriptions over 180 characters. Shared EN/DE/ES tire/bolt templates and the remaining page-specific outliers were shortened without changing route identity or page purpose.
+- `PARTIAL` — Local technical SEO is verified, but Google indexing, search-result rewrites, ranking, deployed Core Web Vitals and crawl behavior remain external outcomes requiring Search Console and production monitoring.
 
 ## Data and evidence
 
@@ -51,7 +58,7 @@ Snapshot date: 2026-09-25. This file records what the repository proves today; i
 
 | Area | Status | Evidence / boundary |
 |---|---|---|
-| OBD / DTC intelligence | `NOT FOUND` | No OBD/DTC catalog, routes, parser, or diagnostic engine found in source inventory. |
+| OBD / DTC intelligence | `PARTIAL` | `src/domain/dtc.ts` implements normalization, schema/catalog validation and a source/review/reuse publication gate with regression coverage. There is still no production DTC dataset, public route, sitemap output or diagnostic engine. |
 | Warning lights | `NOT FOUND` | No warning-light entity family or route found. |
 | Symptom diagnosis | `NOT FOUND` | No guided symptom-to-system diagnosis engine found. |
 | Service Second Opinion | `NOT FOUND` | No upload/quote parser or repair-cost reasoning surface found. |

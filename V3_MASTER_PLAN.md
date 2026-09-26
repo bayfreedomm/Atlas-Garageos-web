@@ -367,3 +367,10 @@ Next implementation pass:
 - [x] Gear Ratio replaces plain rings with recognizable proportional tire/wheel assemblies and a live installed-axle → effective-axle relationship shared across EN/DE/ES.
 - [x] Live value hooks and the shared conversion functions are covered by regression tests; canonical calculation functions remain unchanged.
 - [x] Desktop and 390 px Chromium checks show no document overflow or console warning/error. Physical-device, WebKit/Firefox and deployed performance remain separate acceptance gates.
+
+## Rendered-output SEO integrity checkpoint — 2026-09-26
+- [x] A repeatable `pnpm audit:seo` release gate now inspects every generated HTML document rather than inferring correctness only from source templates.
+- [x] The 1,927-page production output contains 1,923 indexable canonical pages and exactly 1,923 sitemap URLs; the 404 and three embed outputs are intentionally noindex and excluded.
+- [x] Unique per-language title/description checks, route-matching canonicals, self/reciprocal hreflang with `x-default`, valid JSON-LD, indexable H1 and robots/sitemap contracts all pass.
+- [x] Shared entity metadata and the remaining page-specific outliers were tightened; the build now reports zero titles over 75 characters and zero descriptions over 180 characters.
+- [ ] Search Console/Bing submission, Google-selected canonical/index coverage, deployed redirect/404/Open Graph smoke tests and real-user Core Web Vitals remain external launch gates; local technical correctness does not guarantee ranking.

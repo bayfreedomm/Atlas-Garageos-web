@@ -75,7 +75,7 @@ export const deToolCatalog: Readonly<Record<ToolId, ToolCatalogEntry>> = Object.
   },
   'tire-fit-check': {
     title: 'Passt diese Reifengröße?',
-    description: 'Prüfen Sie einen Reifengrößenwechsel an einem Ort — Durchmesser, Tacho, Bodenfreiheit, ob die Größe hergestellt wird und was sie für Ihre Felgen bedeutet —, jedes Ergebnis mit seiner Verlässlichkeit gekennzeichnet.',
+    description: 'Prüfen Sie Reifendurchmesser, Tacho, Bodenfreiheit, verfügbare Größen und Felgenhinweise. Atlas kennzeichnet die Verlässlichkeit jedes Ergebnisses.',
     category: 'Reifen & Felgen',
     eyebrow: 'Reifen & Felgen · Entscheidung',
     intro: 'Geben Sie Ihren aktuellen Reifen und die gewünschte Größe ein. Atlas führt alle relevanten Prüfungen aus und sagt, was sie bedeuten — und was noch bestätigt werden muss.',

@@ -1,10 +1,11 @@
 # Atlas GarageOS — Reconciled Roadmap
 
-Updated: 2026-09-25. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
+Updated: 2026-09-26. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
 
 ## P0 — protect and measure the current foundation
 
-- `PLANNED` — Finish deployed launch gates: Search Console, Bing Webmaster/IndexNow, canonical/hreflang/sitemap/404/redirect smoke tests, Open Graph checks, and Core Web Vitals on the deployed build.
+- `PARTIAL` — Finish deployed launch gates: local rendered-output canonical/hreflang/sitemap/noindex/JSON-LD/title/description checks now pass across all 1,927 HTML outputs. Search Console, Bing Webmaster/IndexNow, deployed 404/redirect/Open Graph smoke tests and Core Web Vitals remain.
+- `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 1,923 indexable canonicals with 1,923 sitemap URLs and reports zero long-title/description advisories.
 - `PLANNED` — Analyze Cloudflare 3xx/4xx by path and status. Separate intentional language/HTTPS redirects from broken URLs, bot probes, and real user errors; do not block Googlebot/Bingbot blindly.
 - `PLANNED` — Complete visual acceptance on representative mobile widths, WebKit/Firefox, keyboard/assistive technology, reduced motion, low-power GPU, and deployed pages.
 - `VERIFIED DONE` — Local Chromium acceptance at 390 px covered all 23 English tool routes: no document-level horizontal overflow, all opened 3D studios initialized with WebGL, and no browser console error/warning was observed in the sampled live-state pass. Physical devices, WebKit/Firefox, accessibility and deployed performance remain in the broader acceptance item above.
@@ -26,7 +27,8 @@ Updated: 2026-09-25. Priority combines user value, organic opportunity, differen
 
 Build the first high-quality cluster, not thousands of thin pages.
 
-- `PLANNED` — Create a small curated DTC MVP: approximately 25–50 high-intent generic codes across P0xxx, P03xx, P04xx, P01xx, U0xxx, and selected ABS/body families only when source quality is sufficient. The implementation gate is `docs/atlas/OBD_DTC_MVP_BRIEF.md`.
+- `VERIFIED DONE` — Add the pure domain foundation for five-character code normalization, hexadecimal suffixes, evidence/reuse records, catalog validation, and a publication gate. Evidence: `src/domain/dtc.ts`, `src/domain/evidence.ts`, and `tests/unit/dtc-domain.test.ts`.
+- `PARTIAL` — Use 50 high-intent candidates to validate the workflow, then target 250 reviewed generic pages for the first public release and 1,000+ only after demand/review capacity proves quality. Production content remains blocked until the written source license and automotive-review process pass `docs/atlas/OBD_SOURCE_PLAN.md` and `docs/atlas/OBD_DTC_MVP_BRIEF.md`.
 - `PLANNED` — Publish `/obd-codes/` and `/obd-codes/{code}/` with normalized code, family, system, plain meaning, symptoms, possible causes, first checks, diagnostic order, related codes/lights/symptoms, limitations, and provenance/confidence.
 - `PLANNED` — Separate generic code meaning from vehicle-specific evidence. Do not create vehicle-code combinations until unique sourced data exists.
 - `PLANNED` — Add warning-light MVP for check-engine, ABS, airbag, battery/charging, oil pressure, coolant temperature, TPMS, brake, steering, traction, DPF, and glow-plug families; each needs urgency context and safe immediate action language.
