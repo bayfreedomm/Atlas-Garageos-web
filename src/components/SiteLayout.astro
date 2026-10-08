@@ -2,7 +2,7 @@
 import type { ToolDefinition } from '../seo/tool-registry';
 import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registry';
 import { serializeJsonLd } from '../seo/safe-json-ld';
-import { uiStrings, type ContentLocale } from '../localization/site-catalog';
+import { chromePrefix, chromeStrings, type ChromeLocale } from '../localization/site-catalog';
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
@@ -15,7 +15,7 @@ import '../styles/product-v4.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
-interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ContentLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
+interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ChromeLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
 const props = Astro.props;
 const definition = props.definition;
 const title = props.title ?? definition?.title;
@@ -25,14 +25,16 @@ if (!title || !description || !pathname) throw new Error('SiteLayout requires de
 const active = props.active ?? (definition?.kind === 'flagship' ? 'fitment' : definition ? 'tools' : undefined);
 const canonical = canonicalForPath(pathname);
 const locale = props.locale;
-const t = locale ? uiStrings[locale] : undefined;
+const t = chromeStrings(locale);
+const prefix = chromePrefix(locale);
+const homeHref = locale ? `/${locale}/` : '/';
 const htmlLang = locale ?? definition?.locale ?? 'en';
 const alternates = props.alternates ?? [{ hreflang: 'en', href: canonical }, { hreflang: 'x-default', href: canonical }];
-const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES' };
-const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español' };
+const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES', fr: 'FR' };
+const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español', fr: 'Français' };
 const publishedLocaleAlternates = alternates.filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang in LOCALE_SHORT_LABELS);
-const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
-const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es', label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
+const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es' | 'fr', label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
+const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es' | 'fr', label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
 const websiteJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
 const applicationJsonLd = definition && definition.kind === 'tool' ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
@@ -73,9 +75,9 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
   <body class={active === 'home' ? 'page-home' : undefined}>
     <a class="skip-link" href="#main-content">{t?.skipToContent ?? 'Skip to main content'}</a>
     <header class="app-header"><div class="app-header__inner">
-      <a class="brand" href={locale ? `/${locale}/` : '/'} aria-label="Atlas GarageOS home"><Brand /></a>
+      <a class="brand" href={homeHref} aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
-        <nav class="desktop-nav" aria-label="Primary navigation"><a href={locale ? `/${locale}/` : '/'} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={locale ? `/${locale}/tools/` : '/tools/'} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href={locale === 'de' ? '/de/reifengroessen/' : locale === 'es' ? '/es/medidas-neumaticos/' : '/tire-sizes/'}>{locale === 'de' ? 'Reifengrößen' : locale === 'es' ? 'Medidas' : 'Tire sizes'}</a><a href="/obd-codes/" aria-current={active === 'diagnostics' ? 'page' : undefined}>{locale === 'de' ? 'OBD (Englisch)' : locale === 'es' ? 'OBD (inglés)' : 'Diagnostics'}</a><a href={locale ? `/${locale}/fitment-studio/` : '/fitment-studio/'} aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a><a href={locale ? `/${locale}/fitment-studio/#garage` : '/fitment-studio/#garage'} aria-current={active === 'garage' ? 'page' : undefined}>{t?.navGarage ?? 'My Garage'}</a></nav>
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href={homeHref} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={`${prefix}/tools/`} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href={locale === 'de' ? '/de/reifengroessen/' : locale === 'es' ? '/es/medidas-neumaticos/' : locale === 'fr' ? '/fr/dimensions-pneus/' : '/tire-sizes/'}>{locale === 'de' ? 'Reifengrößen' : locale === 'es' ? 'Medidas' : locale === 'fr' ? 'Dimensions de pneus' : 'Tire sizes'}</a><a href="/obd-codes/" aria-current={active === 'diagnostics' ? 'page' : undefined}>{locale === 'de' ? 'OBD (Englisch)' : locale === 'es' ? 'OBD (inglés)' : locale === 'fr' ? 'OBD (anglais)' : 'Diagnostics'}</a><a href={`${prefix}/fitment-studio/`} aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a><a href={locale === 'de' || locale === 'es' ? `/${locale}/fitment-studio/#garage` : '/fitment-studio/#garage'} aria-current={active === 'garage' ? 'page' : undefined}>{t?.navGarage ?? 'My Garage'}</a></nav>
         <LanguageQuickToggle links={headerLocaleLinks} current={htmlLang} />
         <ThemeQuickToggle />
         <NavigationDrawer locale={locale} localeLinks={drawerLocaleLinks} />

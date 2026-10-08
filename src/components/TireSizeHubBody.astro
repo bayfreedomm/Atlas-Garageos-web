@@ -9,7 +9,7 @@ import { tireSizeCatalog, tireSizesByRimDiameter, vehiclesForTireSize } from '..
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
-import { displayTireNotation, formatTireMetrics, homePath, tireDiameterGroupPath, tireDiameterGroups, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
+import { displayTireNotation, formatTireMetrics, homePath, tireDiameterGroupPath, tireDiameterGroups, tireSizeMetrics, toolLocale, vehicleHubPath } from '../ui/entity-page-model';
 import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
 import TireSizeLookup from './TireSizeLookup.astro';
@@ -116,8 +116,8 @@ const groupCards = groups.map(([rim, entries]) => ({
 <section class="entity-section" aria-labelledby="hub-tools">
   <h2 id="hub-tools">{t.toolsHeading}</h2>
   <div class="entity-links">
-    <a class="entity-link-card" href={localizedToolPath(locale, 'tire-size-calculator', 'tool')}><strong>{t.calculatorCta}</strong><span>{t.calculatorCtaDetail}</span><i aria-hidden="true">›</i></a>
-    <a class="entity-link-card" href={localizedToolPath(locale, 'tire-size-comparison', 'tool')}><strong>{t.comparisonCta}</strong><span>{t.comparisonCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={localizedToolPath(toolLocale(locale), 'tire-size-calculator', 'tool')}><strong>{t.calculatorCta}</strong><span>{t.calculatorCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={localizedToolPath(toolLocale(locale), 'tire-size-comparison', 'tool')}><strong>{t.comparisonCta}</strong><span>{t.comparisonCtaDetail}</span><i aria-hidden="true">›</i></a>
     <a class="entity-link-card" href={vehicleHubPath(locale)}><strong>{t.vehiclesCta}</strong><span>{t.vehiclesCtaDetail}</span><i aria-hidden="true">›</i></a>
     <a class="entity-link-card" href={entityHubPath('bolt-pattern', locale)}><strong>{t.boltHubCta}</strong><span>{t.boltHubCtaDetail}</span><i aria-hidden="true">›</i></a>
   </div>

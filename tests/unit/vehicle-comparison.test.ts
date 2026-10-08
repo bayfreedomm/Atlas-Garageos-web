@@ -61,10 +61,10 @@ describe('vehicle comparison model', () => {
 });
 
 describe('vehicle-aware trip hand-off and SEO scope', () => {
-  it('carries identity without consumption and rejects cross-market or invalid IDs', () => {
+  it('carries identity without consumption for every published vehicle and rejects invalid IDs', () => {
     expect(vehicleTripHref('en', 'toyota-corolla')).toBe('/tools/road-trip-cost-calculator/?vehicle=toyota-corolla');
     expect(tripVehicleForId('toyota-corolla', 'en')?.id).toBe('toyota-corolla');
-    expect(tripVehicleForId('vw-golf', 'en')).toBeUndefined();
+    expect(tripVehicleForId('vw-golf', 'en')?.id).toBe('vw-golf');
     expect(tripVehicleForId('missing', 'de')).toBeUndefined();
   });
 

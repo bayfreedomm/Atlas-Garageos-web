@@ -1,14 +1,14 @@
 ---
-import { uiStrings, type ContentLocale } from '../localization/site-catalog';
+import { chromePrefix, chromeStrings, type ChromeLocale } from '../localization/site-catalog';
 import { referenceLinks } from '../ui/reference-links';
-interface Props { locale?: ContentLocale | undefined; }
+interface Props { locale?: ChromeLocale | undefined; }
 const { locale } = Astro.props;
-const t = locale ? uiStrings[locale] : undefined;
-const prefix = locale ? `/${locale}` : '';
+const t = chromeStrings(locale);
+const prefix = chromePrefix(locale);
 const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
 const reference = referenceLinks(locale ?? 'en');
-const footerAria = locale === 'de' ? 'Fußzeile' : locale === 'es' ? 'Pie de página' : 'Footer';
-const diagnosticsLabel = locale === 'de' ? 'OBD-Diagnose (Englisch)' : locale === 'es' ? 'Diagnóstico OBD (inglés)' : 'OBD Diagnostics';
+const footerAria = locale === 'de' ? 'Fußzeile' : locale === 'es' ? 'Pie de página' : locale === 'fr' ? 'Pied de page' : 'Footer';
+const diagnosticsLabel = locale === 'de' ? 'OBD-Diagnose (Englisch)' : locale === 'es' ? 'Diagnóstico OBD (inglés)' : locale === 'fr' ? 'Diagnostic OBD (anglais)' : 'OBD Diagnostics';
 const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are estimates — verify anything safety-critical with your vehicle\'s manual.').replace('{year}', String(new Date().getFullYear()));
 ---
 <footer class="site-footer">

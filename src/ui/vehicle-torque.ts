@@ -1,6 +1,6 @@
 import type { VehicleFitment, WheelTorqueTrust } from '../data/vehicle-fitment';
 
-export type TorqueLocale = 'en' | 'de' | 'es';
+export type TorqueLocale = 'en' | 'de' | 'es' | 'fr';
 
 const QUALIFIERS: Readonly<Record<TorqueLocale, Readonly<Record<WheelTorqueTrust['evidence'] | 'medium' | 'low', string>>>> = {
   en: {
@@ -23,6 +23,13 @@ const QUALIFIERS: Readonly<Record<TorqueLocale, Readonly<Record<WheelTorqueTrust
     low: 'Referencia de confianza baja — no la use sin comprobar el manual del vehículo.',
     unconfirmed: 'Referencia sin confirmar — no la use sin comprobar el manual del vehículo.',
     extrapolated: 'Referencia extrapolada — no confirmada para esta generación exacta.',
+  },
+  fr: {
+    documented: 'Valeur de référence documentée — à confirmer pour le véhicule exact avant usage.',
+    medium: 'Référence de fiabilité moyenne — à confirmer dans le manuel avant usage.',
+    low: 'Référence peu fiable — ne pas utiliser sans vérifier le manuel du véhicule.',
+    unconfirmed: 'Référence non confirmée — ne pas utiliser sans vérifier le manuel du véhicule.',
+    extrapolated: 'Référence extrapolée — non confirmée pour cette génération précise.',
   },
 };
 

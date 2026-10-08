@@ -3,7 +3,7 @@ import { parseTireNotation, tireSizeSlug, type TireSizeEntry } from '../data/tir
 import { boltPatternCatalog, boltPatternSlug, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
 import { localizedToolPath } from '../localization/locales';
 import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
-import { boltPatternCalculatorHref, tireCalculatorHref, tireComparisonHref, vehicleHubPath } from './entity-page-model';
+import { boltPatternCalculatorHref, tireCalculatorHref, tireComparisonHref, toolLocale, vehicleHubPath } from './entity-page-model';
 import { vehicleComparisonHref, vehicleTripHref } from './vehicle-comparison';
 
 export interface DecisionAction { readonly id: string; readonly href: string; readonly title: string; readonly detail: string; }
@@ -150,6 +150,47 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
       vehicles: ['Partir de un vehículo documentado', 'Elegir una referencia e introducir su consumo real.'],
     },
   },
+  fr: {
+    eyebrow: 'Étapes suivantes', heading: 'Que vérifier ensuite', support: 'Autres vérifications',
+    intros: {
+      vehicle: 'Passez des données de référence au calcul qui répond à votre prochaine question.',
+      tire: 'Partez de la géométrie connue, puis comparez avant toute décision de montage.',
+      bolt: 'Traitez l’entraxe comme un élément d’une vérification de jante plus large.',
+      fuel: 'Transformez le prix publié en coût pour votre trajet.',
+    },
+    vehicle: {
+      tire: ['Ouvrir la taille de référence', 'Diamètre, flanc, circonférence et véhicules qui l’utilisent.'],
+      bolt: ['Ouvrir l’entraxe / PCD', 'Géométrie des trous, alésages et autres véhicules.'],
+      compare: ['Comparer avec un autre véhicule (en anglais)', 'Différences documentées de roues et de pneus, sans classement.'],
+      setup: ['Comparer jante et pneu (en anglais)', 'Géométrie pneu, jante et dégagement, sans promesse de compatibilité.'],
+      trip: ['Estimer le coût d’un trajet (en anglais)', 'Distance, consommation, extras et partage entre passagers.'],
+      tireCalc: ['Calculer cette taille (en anglais)', 'Ouvrir le calculateur prérempli avec la taille de référence.'],
+      tireCompare: ['Comparer cette taille (en anglais)', 'Préremplir la taille actuelle et en tester une autre.'],
+      boltCalc: ['Mesurer cet entraxe (en anglais)', 'Préremplir le nombre de trous et l’écart entre deux trous.'],
+      fuel: ['Calculer le coût en carburant (en anglais)', 'Saisissez votre consommation réelle ; Atlas ne l’invente pas.'],
+    },
+    tire: {
+      compare: ['Comparer cette taille (en anglais)', 'Diamètre et effet sur le compteur, taille préremplie.'],
+      calculate: ['Ouvrir le calculateur de taille (en anglais)', 'La même géométrie nominale, en interactif.'],
+      vehicles: ['Voir les véhicules avec cette taille', 'Aller aux véhicules documentés par Atlas ci-dessous.'],
+      pcd: ['Voir les entraxes associés', 'Suivre les véhicules vers leurs entraxes et alésages.'],
+      caution: 'Une taille géométriquement proche n’est pas une monte homologuée. Indice de charge, indice de vitesse, largeur de jante, dégagement, homologation constructeur et réglementation locale restent décisifs.',
+    },
+    bolt: {
+      vehicles: ['Voir les véhicules avec cet entraxe', 'Véhicules documentés et alésages centraux.'],
+      measure: ['Ouvrir le calculateur d’entraxe (en anglais)', 'Nombre de trous et écart entre trous préremplis.'],
+      offset: ['Comparer largeur de jante et déport (en anglais)', 'Position intérieure et débord extérieur calculés séparément.'],
+      setup: ['Comparer jante et pneu (en anglais)', 'Vérifier l’ensemble ; un même entraxe ne suffit pas.'],
+      tires: ['Voir les tailles de pneus associées', 'Suivre les véhicules documentés vers leurs tailles d’origine.'],
+      directory: ['Ouvrir la référence véhicules (en anglais)', 'Partir d’une marque et d’un modèle documentés.'],
+      caution: 'Un entraxe identique ne prouve pas la compatibilité. Alésage, déport, largeur de jante, dégagement des freins, visserie et exigences du véhicule comptent aussi.',
+    },
+    fuel: {
+      cost: ['Calculer le coût en carburant', 'Prix, consommation et distance en coût de trajet.'],
+      trip: ['Calculer un trajet', 'Distance, extras et coût par personne.'],
+      vehicles: ['Partir d’un véhicule documenté', 'Choisir une référence puis saisir sa consommation réelle.'],
+    },
+  },
 };
 
 const makeAction = (id: string, href: string, text: Pair): DecisionAction => Object.freeze({ id, href, title: text[0], detail: text[1] });
@@ -157,7 +198,7 @@ const makeAction = (id: string, href: string, text: Pair): DecisionAction => Obj
 // The Fitment Studio flagship app keeps the same unprefixed slug in every locale (unlike
 // calculators, which get a fully localized slug from localizedToolPath), so it needs its own
 // locale-prefix-only path here rather than a bare '/fitment-studio/'.
-const fitmentStudioHref = (locale: EntityLocale): string => (locale === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`);
+const fitmentStudioHref = (locale: EntityLocale): string => (locale === 'en' || locale === 'fr' ? '/fitment-studio/' : `/${locale}/fitment-studio/`);
 
 function tireEntryForVehicle(vehicle: VehicleFitment): TireSizeEntry {
   const parsed = parseTireNotation(vehicle.tireSize);
@@ -183,7 +224,7 @@ export function vehicleDecisionGraph(vehicle: VehicleFitment, locale: EntityLoca
       makeAction('vehicle-tire-calculator', tireCalculatorHref(locale, tire), copy.vehicle.tireCalc),
       makeAction('vehicle-tire-compare', tireComparisonHref(locale, tire), copy.vehicle.tireCompare),
       makeAction('vehicle-bolt-calculator', boltPatternCalculatorHref(locale, bolt), copy.vehicle.boltCalc),
-      makeAction('vehicle-fuel-cost', localizedToolPath(locale, 'fuel-cost-calculator', 'tool'), copy.vehicle.fuel),
+      makeAction('vehicle-fuel-cost', localizedToolPath(toolLocale(locale), 'fuel-cost-calculator', 'tool'), copy.vehicle.fuel),
     ]),
   });
 }
@@ -209,7 +250,7 @@ export function boltDecisionGraph(entry: BoltPatternEntry, locale: EntityLocale)
     actions: Object.freeze([
       makeAction('bolt-vehicles', '#entity-vehicles', copy.bolt.vehicles),
       makeAction('bolt-measure', boltPatternCalculatorHref(locale, entry), copy.bolt.measure),
-      makeAction('bolt-offset', localizedToolPath(locale, 'wheel-offset-calculator', 'tool'), copy.bolt.offset),
+      makeAction('bolt-offset', localizedToolPath(toolLocale(locale), 'wheel-offset-calculator', 'tool'), copy.bolt.offset),
       makeAction('bolt-setup', fitmentStudioHref(locale), copy.bolt.setup),
     ]),
     supportingActions: Object.freeze([
@@ -225,8 +266,8 @@ export function fuelDecisionGraph(locale: EntityLocale, note: string): DecisionG
   return Object.freeze({
     eyebrow: copy.eyebrow, heading: copy.heading, intro: `${copy.intros.fuel} ${note}`,
     actions: Object.freeze([
-      makeAction('fuel-cost', localizedToolPath(locale, 'fuel-cost-calculator', 'tool'), copy.fuel.cost),
-      makeAction('fuel-trip', localizedToolPath(locale, 'road-trip-cost-calculator', 'tool'), copy.fuel.trip),
+      makeAction('fuel-cost', localizedToolPath(toolLocale(locale), 'fuel-cost-calculator', 'tool'), copy.fuel.cost),
+      makeAction('fuel-trip', localizedToolPath(toolLocale(locale), 'road-trip-cost-calculator', 'tool'), copy.fuel.trip),
       makeAction('fuel-vehicle', vehicleHubPath(locale), copy.fuel.vehicles),
     ]),
   });

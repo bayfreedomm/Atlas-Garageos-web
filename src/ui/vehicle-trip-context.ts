@@ -2,9 +2,9 @@ import { vehicleFitmentData } from '../data/vehicle-fitment';
 import type { EntityLocale } from '../seo/entity-routes';
 import { vehicleLink } from './entity-page-model';
 
-export function tripVehicleForId(id: string | null | undefined, locale: EntityLocale) {
+export function tripVehicleForId(id: string | null | undefined, _locale?: EntityLocale) {
   if (!id) return undefined;
-  return vehicleFitmentData.find((vehicle) => vehicle.id === id && (locale === 'en' ? vehicle.market === 'us' : vehicle.market === 'eu'));
+  return vehicleFitmentData.find((vehicle) => vehicle.id === id);
 }
 
 export function initializeVehicleTripContext(): void {

@@ -2,15 +2,17 @@
 import SiteLayout from '../../components/SiteLayout.astro';
 import { vehiclePageText } from '../../content/vehicle-page-text';
 import { vehicleFitmentData } from '../../data/vehicle-fitment';
+import { vehicleAlternates, vehiclePagePath } from '../../ui/entity-page-model';
 
 const t = vehiclePageText.en;
 const pathname = '/vehicles/';
-const vehicles = vehicleFitmentData.filter((v) => v.market === 'us').slice().sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+const sorted = vehicleFitmentData.slice().sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+const groups = (['us', 'eu'] as const).map((market) => ({ market, label: market === 'us' ? t.hubUsMarket : t.hubEuMarket, vehicles: sorted.filter((v) => v.market === market) }));
 ---
-<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" alternates={[{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }]} breadcrumbs={[{ name: t.breadcrumbHome, href: '/' }, { name: t.breadcrumbVehicles, href: pathname }]}>
+<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" alternates={vehicleAlternates()} breadcrumbs={[{ name: t.breadcrumbHome, href: '/' }, { name: t.breadcrumbVehicles, href: pathname }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">{t.breadcrumbHome}</a><span aria-hidden="true">/</span><span aria-current="page">{t.breadcrumbVehicles}</span></nav>
   <header class="directory-identity methodology-hero">
-    <p class="eyebrow">{t.hubUsMarket}</p>
+    <p class="eyebrow">{sorted.length} · {t.breadcrumbVehicles}</p>
     <h1>{t.hubTitle}</h1>
     <p>{t.hubLead}</p>
   </header>
@@ -22,7 +24,12 @@ const vehicles = vehicleFitmentData.filter((v) => v.market === 'us').slice().sor
       <a class="vehicle-fuel-card" href="/tools/road-trip-cost-calculator/"><strong>{t.tripCardTitle}</strong><span>{t.tripCardCopy}</span><i aria-hidden="true">›</i></a>
     </div>
   </section>
-  <div class="methodology-source-links">
-    {vehicles.map((v) => <a href={`/vehicles/${v.id}/`}>{v.make} {v.model} — {v.tireSize} <span>↗</span></a>)}
-  </div>
+  {groups.map((group) => group.vehicles.length > 0 && (
+    <section class="entity-section" aria-label={group.label}>
+      <h2>{group.label} <span class="entity-card__meta">· {group.vehicles.length}</span></h2>
+      <div class="methodology-source-links">
+        {group.vehicles.map((v) => <a href={vehiclePagePath('en', v.id)}>{v.make} {v.model} — {v.tireSize} · {v.boltPattern} <span>›</span></a>)}
+      </div>
+    </section>
+  ))}
 </SiteLayout>

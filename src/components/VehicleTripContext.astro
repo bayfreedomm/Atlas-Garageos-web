@@ -1,6 +1,6 @@
 ---
 import type { EntityLocale } from '../seo/entity-routes';
-interface Props { readonly locale: EntityLocale; }
+interface Props { readonly locale: Exclude<EntityLocale, 'fr'>; }
 const { locale } = Astro.props;
 const copy = {
   en: { eyebrow: 'Vehicle context', text: 'Atlas does not store a trusted consumption figure for this vehicle. Enter your actual consumption below; any available market fuel price remains an editable reference.', open: 'Open vehicle reference' },

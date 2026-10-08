@@ -7,7 +7,7 @@
  */
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { tireSizeByNotation } from '../data/tire-size-catalog';
-import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath } from './entity-page-model';
+import { displayTireNotation, tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath } from './entity-page-model';
 import { tireSizePageText } from '../content/entity-page-text';
 
 export interface ReferenceLink { readonly href: string; readonly title: string; readonly helper: string; }
@@ -40,6 +40,13 @@ const COPY: Readonly<Record<EntityLocale, {
     vehicles: 'Referencia de vehículos', vehiclesHelper: 'Medida, patrón de birlos y par por modelo',
     popularHeading: 'Consultar una medida de neumático', popularKicker: 'REFERENCIA DE MEDIDAS', popularLead: 'Diámetro, circunferencia, medidas en pulgadas, equivalencias y error de velocímetro de cada medida.', allSizes: 'Todas las medidas',
   },
+  fr: {
+    group: 'DONNÉES DE RÉFÉRENCE',
+    tires: 'Dimensions de pneus', tiresHelper: 'Diamètre, circonférence et équivalences de chaque taille',
+    bolts: 'Entraxes', boltsHelper: 'PCD, écart entre trous et véhicules par entraxe',
+    vehicles: 'Référence véhicules (en anglais)', vehiclesHelper: 'Taille de pneu, entraxe et couple par modèle',
+    popularHeading: 'Rechercher une taille de pneu', popularKicker: 'RÉFÉRENCE DES DIMENSIONS', popularLead: 'Diamètre, circonférence, dimensions en pouces, équivalences et écart du compteur pour chaque taille.', allSizes: 'Toutes les tailles',
+  },
 };
 
 export function referenceCopy(locale: EntityLocale) { return COPY[locale]; }
@@ -62,10 +69,11 @@ const SHORTCUTS: Readonly<Record<EntityLocale, readonly string[]>> = {
   en: ['225/65R17', '235/65R17', '265/70R17', '275/65R18', '215/55R17', '235/45R18', '225/60R18', '205/55R16', '245/65R17', '265/65R18'],
   de: ['205/55R16', '195/65R15', '225/45R17', '205/60R16', '215/65R16', '225/40R18', '215/60R16', '185/65R15', '215/55R17', '235/55R18'],
   es: ['205/55R16', '195/65R15', '225/45R17', '205/60R16', '215/65R16', '185/65R15', '215/60R17', '225/40R18', '195/55R16', '215/55R17'],
+  fr: ['205/55R16', '195/65R15', '225/45R17', '205/60R16', '185/65R15', '215/65R16', '225/40R18', '215/55R17', '195/55R16', '235/55R18'],
 };
 
 /** Tire heights people shop by in the Americas ("33-inch tires"); EN and ES only. */
-const HEIGHT_SHORTCUTS: Readonly<Record<EntityLocale, readonly number[]>> = { en: [31, 33, 35, 37], de: [], es: [31, 33, 35] };
+const HEIGHT_SHORTCUTS: Readonly<Record<EntityLocale, readonly number[]>> = { en: [31, 33, 35, 37], de: [], es: [31, 33, 35], fr: [] };
 
 export function tireSizeShortcuts(locale: EntityLocale): readonly { readonly href: string; readonly label: string }[] {
   const published = new Set(tireDiameterGroups().map((group) => group.inches));
@@ -75,7 +83,7 @@ export function tireSizeShortcuts(locale: EntityLocale): readonly { readonly hre
       .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined)
       .map((entry) => ({
         href: entityDetailPath('tire-size', locale, entry.slug),
-        label: locale === 'en' ? entry.notation : entry.notation.replace(/R(\d)/, ' R$1'),
+        label: displayTireNotation(entry.notation, locale),
       })),
     ...HEIGHT_SHORTCUTS[locale]
       .filter((inches) => published.has(inches))

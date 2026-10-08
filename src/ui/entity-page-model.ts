@@ -282,13 +282,23 @@ export const signed = (value: number, digits: number, unit: string, locale: Numb
  * pre-fill instead of just saying "type it in".
  * ------------------------------------------------------------------------------------ */
 
+/**
+ * Calculators and the vehicle directory exist in EN/DE/ES only. French entity pages (tire sizes,
+ * bolt patterns) link to the English tools, and say so in their copy.
+ */
+export function toolLocale(locale: EntityLocale): 'en' | 'de' | 'es' {
+  return locale === 'fr' ? 'en' : locale;
+}
+
 export function tireCalculatorHref(locale: EntityLocale, entry: TireSizeEntry): string {
+  locale = toolLocale(locale);
   if (entry.flotation) return localizedToolPath(locale, 'tire-size-calculator', 'tool');
   const size = `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
   return `${localizedToolPath(locale, 'tire-size-calculator', 'tool')}?size=${size}`;
 }
 
 export function tireComparisonHref(locale: EntityLocale, current: TireSizeEntry, next?: TireSizeEntry): string {
+  locale = toolLocale(locale);
   const token = (entry: TireSizeEntry): string => `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
   const base = localizedToolPath(locale, 'tire-size-comparison', 'tool');
   if (current.flotation) return base;
@@ -297,6 +307,7 @@ export function tireComparisonHref(locale: EntityLocale, current: TireSizeEntry,
 }
 
 export function boltPatternCalculatorHref(locale: EntityLocale, entry: BoltPatternEntry): string {
+  locale = toolLocale(locale);
   const spacing = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount).toFixed(2);
   return `${localizedToolPath(locale, 'bolt-pattern-calculator', 'tool')}?lugs=${entry.lugCount}&spacing=${spacing}`;
 }
@@ -304,27 +315,35 @@ export function boltPatternCalculatorHref(locale: EntityLocale, entry: BoltPatte
 /* ---------------------------------------------------------------------------------------
  * Vehicle page links
  *
- * Vehicle detail pages are market-split: US vehicles have an English page only
- * (/vehicles/{id}/), EU vehicles have German and Spanish pages only. There is no
- * English page for a EU vehicle and no German page for a US one. Rather than dropping the
- * link (which would leave EU-only tire sizes with no vehicle links at all on the English
- * page), this resolves to the page that genuinely exists, preferring the reader's locale,
- * and reports the locale of the page it points at so the markup can mark a cross-language
- * link with hreflang.
+ * Every vehicle has a page in every entity locale (EN, DE, ES, FR) regardless of the market
+ * its data describes; the market is shown on the page. A vehicle link therefore always stays
+ * in the reader's language.
  * ------------------------------------------------------------------------------------ */
 
 export interface VehicleLink { readonly href: string; readonly locale: EntityLocale; readonly crossLocale: boolean; }
 
-export function vehicleLink(vehicle: VehicleFitment, locale: EntityLocale): VehicleLink {
-  if (vehicle.market === 'us') return Object.freeze({ href: `/vehicles/${vehicle.id}/`, locale: 'en', crossLocale: locale !== 'en' });
-  const target: EntityLocale = locale === 'es' ? 'es' : 'de';
-  const href = target === 'es' ? `/es/vehiculos/${vehicle.id}/` : `/de/fahrzeuge/${vehicle.id}/`;
-  return Object.freeze({ href, locale: target, crossLocale: locale !== target });
+const VEHICLE_SEGMENT: Readonly<Record<EntityLocale, string>> = { en: '/vehicles/', de: '/de/fahrzeuge/', es: '/es/vehiculos/', fr: '/fr/vehicules/' };
+
+/** The vehicle-directory index for this locale. */
+export function vehicleHubPath(locale: EntityLocale): string {
+  return VEHICLE_SEGMENT[locale];
 }
 
-/** The vehicle-directory index that exists for this locale. */
-export function vehicleHubPath(locale: EntityLocale): string {
-  return locale === 'de' ? '/de/fahrzeuge/' : locale === 'es' ? '/es/vehiculos/' : '/vehicles/';
+export function vehiclePagePath(locale: EntityLocale, id: string): string {
+  return `${VEHICLE_SEGMENT[locale]}${id}/`;
+}
+
+export function vehicleLink(vehicle: VehicleFitment, locale: EntityLocale): VehicleLink {
+  return Object.freeze({ href: vehiclePagePath(locale, vehicle.id), locale, crossLocale: false });
+}
+
+/** Reciprocal hreflang set for one vehicle (or for the directory when id is omitted). */
+export function vehicleAlternates(id?: string): readonly { readonly hreflang: string; readonly href: string }[] {
+  const path = (locale: EntityLocale): string => id === undefined ? vehicleHubPath(locale) : vehiclePagePath(locale, id);
+  return Object.freeze([
+    ...entityLocales().map((locale) => ({ hreflang: locale, href: `https://atlasgarageos.com${path(locale)}` })),
+    { hreflang: 'x-default', href: `https://atlasgarageos.com${path('en')}` },
+  ]);
 }
 
 export function homePath(locale: EntityLocale): string {
@@ -478,7 +497,7 @@ export const TIRE_DIAMETER_GROUP_RANGE = Object.freeze({ min: 22, max: 42 });
 export interface TireDiameterGroupMember { readonly entry: TireSizeEntry; readonly diameterIn: number; }
 export interface TireDiameterGroup { readonly inches: number; readonly members: readonly TireDiameterGroupMember[]; }
 
-const DIAMETER_SLUG_SUFFIX: Readonly<Record<EntityLocale, string>> = Object.freeze({ en: 'inch', de: 'zoll', es: 'pulgadas' });
+const DIAMETER_SLUG_SUFFIX: Readonly<Record<EntityLocale, string>> = Object.freeze({ en: 'inch', de: 'zoll', es: 'pulgadas', fr: 'pouces' });
 
 export function tireDiameterGroupSlug(inches: number, locale: EntityLocale): string {
   return `${inches}-${DIAMETER_SLUG_SUFFIX[locale]}`;

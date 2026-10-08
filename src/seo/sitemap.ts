@@ -5,7 +5,7 @@ import { tireSizeCatalog } from '../data/tire-size-catalog';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 import { dtcRecords } from '../data/dtc-records';
-import { tireDiameterGroupPath, tireDiameterGroups } from '../ui/entity-page-model';
+import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
@@ -35,17 +35,11 @@ function localizedRoutes(): readonly string[] {
 // every other page — listing it again here would only duplicate it.
 
 function vehiclePageRoutes(): readonly string[] {
-  const routes: string[] = [
-    '/vehicles/', '/vehicles/compare/',
-    '/de/fahrzeuge/', '/de/fahrzeuge/vergleichen/',
-    '/es/vehiculos/', '/es/vehiculos/comparar/',
-  ];
-  for (const vehicle of vehicleFitmentData) {
-    if (vehicle.market === 'us') routes.push(`/vehicles/${vehicle.id}/`);
-    else {
-      routes.push(`/de/fahrzeuge/${vehicle.id}/`);
-      routes.push(`/es/vehiculos/${vehicle.id}/`);
-    }
+  // Every vehicle has a page in every entity locale; comparison hubs exist for EN/DE/ES.
+  const routes: string[] = ['/vehicles/compare/', '/de/fahrzeuge/vergleichen/', '/es/vehiculos/comparar/'];
+  for (const locale of entityLocales()) {
+    routes.push(vehicleHubPath(locale));
+    for (const vehicle of vehicleFitmentData) routes.push(vehiclePagePath(locale, vehicle.id));
   }
   return routes;
 }
@@ -70,7 +64,9 @@ function entityPageRoutes(): readonly string[] {
 
 export function sitemapEntries(): readonly string[] {
   const diagnosticRoutes = ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes].map(canonicalForPath));
+  // French publishes the reference families only; its home is the entry to them.
+  const frenchRoutes = ['/fr/'];
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...frenchRoutes].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

@@ -92,7 +92,7 @@ describe('tire-height group pages', () => {
     expect(tireDiameterGroupPath(33, 'de')).toBe('/de/reifengroessen/33-zoll/');
     expect(tireDiameterGroupPath(33, 'es')).toBe('/es/medidas-neumaticos/33-pulgadas/');
     const group = tireDiameterGroups().find((candidate) => candidate.inches === 33)!;
-    for (const locale of ['en', 'de', 'es'] as const) {
+    for (const locale of ['en', 'de', 'es', 'fr'] as const) {
       const meta = tireDiameterGroupMeta(group, locale);
       expect(meta.alternates.map((alt) => alt.href)).toContain(`https://atlasgarageos.com${meta.pathname}`);
       expect(`${meta.title} — Atlas GarageOS`.length).toBeLessThanOrEqual(75);
@@ -102,7 +102,7 @@ describe('tire-height group pages', () => {
   it('lists every group page in the sitemap and in the shortcuts', () => {
     const urls = new Set(sitemapEntries());
     for (const group of tireDiameterGroups()) {
-      for (const locale of ['en', 'de', 'es'] as const) expect(urls.has(`https://atlasgarageos.com${tireDiameterGroupPath(group.inches, locale)}`)).toBe(true);
+      for (const locale of ['en', 'de', 'es', 'fr'] as const) expect(urls.has(`https://atlasgarageos.com${tireDiameterGroupPath(group.inches, locale)}`)).toBe(true);
     }
     expect(tireSizeShortcuts('en').some((shortcut) => shortcut.href === '/tire-sizes/33-inch/')).toBe(true);
   });
@@ -113,12 +113,28 @@ describe('search-intent titles', () => {
     expect(tireSizeDetailMeta(entry('265/80R16'), 'en').title).toMatch(/^265\/80R16 Tire Size in Inches: \d+\.\d″ × \d+\.\d″$/);
     expect(tireSizeDetailMeta(entry('265/80R16'), 'es').title).toContain('en pulgadas');
     for (const candidate of tireSizeCatalog) {
-      for (const locale of ['en', 'de', 'es'] as const) {
+      for (const locale of ['en', 'de', 'es', 'fr'] as const) {
         const meta = tireSizeDetailMeta(candidate, locale);
         // The audit measures the raw HTML title, where '&' is written as '&amp;'.
         expect(`${meta.title} — Atlas GarageOS`.replace(/&/g, '&amp;').length, `${candidate.notation} ${locale}`).toBeLessThanOrEqual(75);
         expect(meta.description.length, `${candidate.notation} ${locale}`).toBeLessThanOrEqual(180);
       }
     }
+  });
+});
+
+describe('French reference families', () => {
+  it('publishes French tire and bolt URLs with French copy and reciprocal hreflang', () => {
+    const entry = tireSizeCatalog.find((candidate) => candidate.notation === '205/55R16')!;
+    const fr = tireSizeDetailMeta(entry, 'fr');
+    expect(fr.pathname).toBe('/fr/dimensions-pneus/205-55-r16/');
+    expect(fr.title).toContain('Pneu 205/55 R16');
+    expect(fr.title).toContain('631,9 mm');
+    const en = tireSizeDetailMeta(entry, 'en');
+    expect(en.alternates.map((alt) => alt.hreflang)).toEqual(['en', 'de', 'es', 'fr', 'x-default']);
+    expect(tireDiameterGroupPath(25, 'fr')).toBe('/fr/dimensions-pneus/25-pouces/');
+    const urls = new Set(sitemapEntries());
+    expect(urls.has('https://atlasgarageos.com/fr/')).toBe(true);
+    expect(urls.has('https://atlasgarageos.com/fr/entraxes/5x112/')).toBe(true);
   });
 });

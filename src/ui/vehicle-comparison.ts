@@ -72,7 +72,7 @@ interface ComparisonCopy {
   readonly actions: { readonly vehicleA: string; readonly vehicleB: string; readonly compareTires: string; readonly fitment: string };
 }
 
-const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = {
+const BASE_COPY: Readonly<Record<'en' | 'de' | 'es', ComparisonCopy>> = {
   en: {
     chooseBoth: 'Choose two vehicles to compare their documented wheel and tire references.',
     same: 'Choose two different vehicles. A vehicle cannot be compared with itself.',
@@ -122,6 +122,8 @@ const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = {
     actions: { vehicleA: 'Abrir Vehículo A', vehicleB: 'Abrir Vehículo B', compareTires: 'Comparar estos neumáticos', fitment: 'Abrir comparación de llantas y neumáticos' },
   },
 };
+// French has no vehicle-comparison page; French entity pages link to the English one.
+const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = { ...BASE_COPY, fr: BASE_COPY.en };
 
 export const comparisonPath = (locale: EntityLocale): string => locale === 'de' ? '/de/fahrzeuge/vergleichen/' : locale === 'es' ? '/es/vehiculos/comparar/' : '/vehicles/compare/';
 
@@ -138,11 +140,11 @@ export function vehicleComparisonHref(locale: EntityLocale, firstId?: string, se
 }
 
 export function vehicleTripHref(locale: EntityLocale, vehicleId: string): string {
-  return `${localizedToolPath(locale, 'road-trip-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
+  return `${localizedToolPath(locale === 'fr' ? 'en' : locale, 'road-trip-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
 }
 
 export function vehicleFuelHref(locale: EntityLocale, vehicleId: string): string {
-  return `${localizedToolPath(locale, 'fuel-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
+  return `${localizedToolPath(locale === 'fr' ? 'en' : locale, 'fuel-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
 }
 
 export function geometryForVehicle(vehicle: VehicleFitment): VehicleGeometry {

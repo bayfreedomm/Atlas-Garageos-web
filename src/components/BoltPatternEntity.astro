@@ -29,7 +29,7 @@ interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocal
 const { entry, locale } = Astro.props;
 
 const t = boltPatternPageText[locale];
-const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo' }[locale];
+const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo', fr: 'Ouvrir l’entraxe en 3D interactif' }[locale];
 const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
 const spacingValue = `${formatDecimal(spacingMm, 2, locale)} mm`;
@@ -63,16 +63,71 @@ const decisions = boltDecisionGraph(entry, locale);
 <header class="entity-hero">
   <p class="eyebrow">{t.detailKicker}</p>
   <h1 class="entity-hero__title">{heading.before}<span class="entity-hero__key">{heading.key}</span>{heading.after}</h1>
+  <dl class="entity-answer">
+    {metricRows.slice(0, 4).map((row) => <div class="entity-answer__item"><dt>{row.label}</dt><dd><strong>{row.value}</strong></dd></div>)}
+  </dl>
   <p class="entity-hero__lead">{t.detailLead(entry.lugCount, entry.pcdMm)}</p>
+  <nav class="entity-pagenav" aria-label={t.metricsHeading}>
+    <a href="#entity-metrics">{t.metricsHeading}</a>
+    <a href="#entity-vehicles">{t.vehiclesHeading}</a>
+    <a href="#entity-diagram">{t.diagramHeading}</a>
+    <a href="#entity-faq">{t.faqHeading}</a>
+  </nav>
 </header>
 
 <section class="entity-section" aria-labelledby="entity-metrics">
   <h2 id="entity-metrics">{t.metricsHeading}</h2>
-  <dl class="entity-metrics">
-    {metricRows.map((row) => <div class="entity-metric"><dt>{row.label}</dt><dd>{row.value}</dd></div>)}
-  </dl>
-  <p class="entity-note">{t.metricNote}</p>
-  <p class="entity-note">{t.holeSpacingNote}</p>
+  <table class="entity-spec entity-spec--two">
+    <tbody>
+      {metricRows.map((row) => <tr><th scope="row">{row.label}</th><td class="entity-spec__wrap">{row.value}</td></tr>)}
+    </tbody>
+  </table>
+  <p class="entity-note">{t.metricNote} {t.holeSpacingNote}</p>
+</section>
+
+
+<section class="entity-section" aria-labelledby="entity-vehicles">
+  <h2 id="entity-vehicles">{t.vehiclesHeading}</h2>
+  {vehicles.length === 0 ? (
+    <p class="entity-empty">{t.vehiclesEmpty}</p>
+  ) : (
+    <>
+      <p class="entity-note">{t.vehiclesIntro(vehicles.length)}</p>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr>
+            <th scope="col">{t.colVehicle}</th><th scope="col">{t.colTireSize}</th><th scope="col">{t.colCenterBore}</th>
+            <th scope="col" class="is-optional">{t.colWheel}</th><th scope="col">{t.colTorque}</th><th scope="col" class="is-optional">{t.colFastener}</th>
+            <th scope="col" class="is-optional">{t.colConfidence}</th>
+          </tr></thead>
+          <tbody>
+            {vehicles.map((vehicle) => {
+              const link = vehicleLink(vehicle, locale);
+              // Torque is the one safety-critical number in this table, so a low-confidence or
+              // explicitly extrapolated figure is muted and marked rather than shown as if it
+              // carried the same weight as a manual-sourced one.
+              const torque = torquePresentation(vehicle, locale);
+              return (
+                <tr>
+                  <th scope="row"><a href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{vehicle.make} {vehicle.model}</a></th>
+                  <td><a href={entityDetailPath('tire-size', locale, tireSizeSlug(vehicle.tireSize))}>{displayTireNotation(vehicle.tireSize, locale)}</a></td>
+                  <td>{vehicle.centerBoreMm === undefined ? '—' : `${formatPlain(vehicle.centerBoreMm, locale)} mm`}</td>
+                  <td class="is-optional">{vehicle.wheelSize}</td>
+                  <td class={torque.qualified ? 'entity-soft' : undefined} title={torque.qualifier ?? undefined}>
+                    {torque.value}
+                    {torque.qualified && <abbr class="entity-soft__mark" title={torque.qualifier ?? t.torqueUnconfirmedTitle}>*</abbr>}
+                  </td>
+                  <td class="is-optional">{vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt}</td>
+                  <td class="is-optional"><span class={`entity-confidence entity-confidence--${vehicle.confidence}`}>{t.confidence[vehicle.confidence]}</span></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p class="entity-note">{t.confidenceNote}</p>
+    </>
+  )}
 </section>
 
 <section class="entity-section" aria-labelledby="entity-diagram">
@@ -87,53 +142,9 @@ const decisions = boltDecisionGraph(entry, locale);
   />
   <details class="visual-on-demand">
     <summary>{load3d}</summary>
-    <Parametric3DPanel mode="pcd" locale={locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
+    <Parametric3DPanel mode="pcd" locale={locale === 'fr' ? 'en' : locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
   </details>
   <p class="entity-note">{t.diagramNote(entry.lugCount, entry.pcdMm)}</p>
-</section>
-
-<section class="entity-section" aria-labelledby="entity-vehicles">
-  <h2 id="entity-vehicles">{t.vehiclesHeading}</h2>
-  {vehicles.length === 0 ? (
-    <p class="entity-empty">{t.vehiclesEmpty}</p>
-  ) : (
-    <>
-      <p class="entity-note">{t.vehiclesIntro(vehicles.length)}</p>
-      <div class="entity-table-scroll">
-        <table class="entity-table">
-          <thead><tr>
-            <th scope="col">{t.colVehicle}</th><th scope="col">{t.colTireSize}</th><th scope="col">{t.colCenterBore}</th>
-            <th scope="col">{t.colWheel}</th><th scope="col">{t.colTorque}</th><th scope="col">{t.colFastener}</th>
-            <th scope="col">{t.colConfidence}</th>
-          </tr></thead>
-          <tbody>
-            {vehicles.map((vehicle) => {
-              const link = vehicleLink(vehicle, locale);
-              // Torque is the one safety-critical number in this table, so a low-confidence or
-              // explicitly extrapolated figure is muted and marked rather than shown as if it
-              // carried the same weight as a manual-sourced one.
-              const torque = torquePresentation(vehicle, locale);
-              return (
-                <tr>
-                  <th scope="row"><a href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{vehicle.make} {vehicle.model}</a></th>
-                  <td><a href={entityDetailPath('tire-size', locale, tireSizeSlug(vehicle.tireSize))}>{vehicle.tireSize}</a></td>
-                  <td>{vehicle.centerBoreMm === undefined ? '—' : `${formatPlain(vehicle.centerBoreMm, locale)} mm`}</td>
-                  <td>{vehicle.wheelSize}</td>
-                  <td class={torque.qualified ? 'entity-soft' : undefined} title={torque.qualifier ?? undefined}>
-                    {torque.value}
-                    {torque.qualified && <abbr class="entity-soft__mark" title={torque.qualifier ?? t.torqueUnconfirmedTitle}>*</abbr>}
-                  </td>
-                  <td>{vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt}</td>
-                  <td><span class={`entity-confidence entity-confidence--${vehicle.confidence}`}>{t.confidence[vehicle.confidence]}</span></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <p class="entity-note">{t.confidenceNote}</p>
-    </>
-  )}
 </section>
 
 <section class="entity-section entity-section--warn" aria-labelledby="entity-safety">

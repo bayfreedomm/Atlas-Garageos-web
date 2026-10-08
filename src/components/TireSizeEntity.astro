@@ -42,7 +42,7 @@ const boltHubHref = entityHubPath('bolt-pattern', locale);
 const flotation = entry.flotation;
 const rimText = formatPlain(entry.rimDiameterInches, locale);
 const diameterGroup = tireDiameterGroupFor(entry);
-const inchClass = diameterGroup ? (locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : `${diameterGroup.inches} pulgadas`) : '';
+const inchClass = diameterGroup ? (locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : locale === 'fr' ? `${diameterGroup.inches} pouces` : `${diameterGroup.inches} pulgadas`) : '';
 const generalFaqs = t.faqs({ notation: shownNotation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
 const faqs = [
   ...t.sizeFaqs(shownNotation, {
@@ -79,8 +79,8 @@ const specRows = [
 ];
 // The answer strip: the four numbers a searcher wants, readable without scrolling. English and
 // Spanish readers (US/LatAm queries are "in inches"/"en pulgadas") get inches as the headline
-// figure; German readers get millimetres.
-const inchesFirst = locale !== 'de';
+// figure; German and French readers get millimetres.
+const inchesFirst = locale === 'en' || locale === 'es';
 const answer = [
   { label: t.answerLabels.diameter, mm: formatMm(metrics.overallDiameterMm, 0, locale), inch: inchValue(metrics.overallDiameterMm) },
   { label: t.answerLabels.width, mm: formatMm(metrics.sectionWidthMm, 0, locale), inch: inchValue(metrics.sectionWidthMm) },

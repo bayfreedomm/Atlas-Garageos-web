@@ -7,7 +7,7 @@
  * added: four-digit engineering figures such as a 1985,2 mm circumference read cleanly
  * without them in all three languages, and it keeps every rendered value unambiguous.
  */
-export type NumberLocale = 'en' | 'de' | 'es';
+export type NumberLocale = 'en' | 'de' | 'es' | 'fr';
 
 /** Fixed-digit decimal with the locale's decimal separator. Minus is the typographic sign. */
 export function formatDecimal(value: number, digits: number, locale: NumberLocale): string {

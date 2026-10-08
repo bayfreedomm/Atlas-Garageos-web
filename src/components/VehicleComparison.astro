@@ -2,7 +2,7 @@
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import type { EntityLocale } from '../seo/entity-routes';
 
-interface Props { readonly locale: EntityLocale; }
+interface Props { readonly locale: Exclude<EntityLocale, 'fr'>; }
 const { locale } = Astro.props;
 const copy = {
   en: { a: 'Vehicle A', b: 'Vehicle B', choose: 'Choose a vehicle', compare: 'Compare vehicles', prompt: 'Choose two vehicles to see the differences Atlas can support.', summary: 'What is actually different', field: 'Reference field' },
@@ -10,7 +10,6 @@ const copy = {
   es: { a: 'Vehículo A', b: 'Vehículo B', choose: 'Elegir vehículo', compare: 'Comparar vehículos', prompt: 'Elija dos vehículos para ver las diferencias que Atlas puede respaldar.', summary: 'Qué es realmente diferente', field: 'Campo de referencia' },
 }[locale];
 const vehicles = vehicleFitmentData
-  .filter((vehicle) => locale === 'en' ? vehicle.market === 'us' : vehicle.market === 'eu')
   .slice()
   .sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
 ---

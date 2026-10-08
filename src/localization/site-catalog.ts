@@ -123,6 +123,62 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
   },
 });
 
+/**
+ * French publishes only the reference families (tire sizes, bolt patterns) plus a French home.
+ * Its page chrome is French; links to calculators, the fitment studio and policy pages go to
+ * the English pages and say so.
+ */
+export type ChromeLocale = ContentLocale | 'fr';
+
+export const frUiStrings: UiStrings = Object.freeze({
+  skipToContent: 'Aller au contenu principal',
+  navHome: 'Accueil',
+  navTools: 'Outils (anglais)',
+  navFitment: 'Comparateur (anglais)',
+  navGarage: 'Mon garage (anglais)',
+  breadcrumbHome: 'Accueil',
+  breadcrumbTools: 'Outils',
+  allToolsBack: '← Tous les outils',
+  seeWhatNumbersLabel: 'CE QUE DISENT LES CHIFFRES',
+  howItWorks: 'Fonctionnement',
+  keepInMind: 'À retenir',
+  relatedTools: 'Outils associés',
+  advancedWheelTireTool: 'Outil avancé jantes et pneus',
+  quickUnderstanding: 'En bref',
+  whatMattersHere: 'Ce qui compte ici',
+  commonMistakeLabel: 'Erreur fréquente',
+  importantWarningLabel: 'Avertissement important',
+  faqHeading: 'Questions fréquentes',
+  footerTagline: 'Calculateurs auto rapides et honnêtes. Sans compte, sans superflu.',
+  footerToolbox: 'Boîte à outils (anglais)',
+  footerFitment: 'Comparateur jantes et pneus (anglais)',
+  footerMethodology: 'Précision et méthode (anglais)',
+  footerPrivacy: 'Confidentialité (anglais)',
+  footerFuelPrices: 'Prix des carburants (anglais)',
+  footerContact: 'Contact (anglais)',
+  footerCopy: '© {year} Atlas GarageOS. Tous les calculs sont des estimations — vérifiez toute valeur liée à la sécurité dans le manuel de votre véhicule.',
+  langLabel: 'Langue',
+  langSwitchAria: 'Changer de langue',
+  goStraightTo: 'ALLER DIRECTEMENT À',
+  navHomeHelper: 'Dimensions de pneus, entraxes et recherche de taille',
+  allToolsTitle: 'Tous les outils (anglais)',
+  allToolsHelper: 'Calculateurs et convertisseurs, en anglais',
+  fitmentHelper: 'Comparer deux montes visuellement',
+  garageHelper: 'Vos véhicules et montes enregistrés',
+  toolsByJob: 'OUTILS PAR BESOIN (ANGLAIS)',
+  displayLabel: 'AFFICHAGE',
+});
+
+export function chromeStrings(locale: ChromeLocale | undefined): UiStrings | undefined {
+  if (locale === 'fr') return frUiStrings;
+  return locale ? uiStrings[locale] : undefined;
+}
+
+/** Path prefix for pages that exist per locale (tools, fitment studio, policies): FR uses EN. */
+export function chromePrefix(locale: ChromeLocale | undefined): string {
+  return locale === 'de' || locale === 'es' ? `/${locale}` : '';
+}
+
 export interface PlatformPageCopy {
   readonly title: string;
   readonly description: string;

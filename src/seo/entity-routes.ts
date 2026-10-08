@@ -18,7 +18,7 @@ import { publishedLocales, type AtlasLocale } from '../localization/locales';
 
 export type EntityFamily = 'tire-size' | 'bolt-pattern';
 /** The locales these families actually publish in. Narrower than AtlasLocale by design. */
-export type EntityLocale = 'en' | 'de' | 'es';
+export type EntityLocale = 'en' | 'de' | 'es' | 'fr';
 
 /**
  * One localized top-level path segment per family per locale. German follows the compound-noun
@@ -27,22 +27,29 @@ export type EntityLocale = 'en' | 'de' | 'es';
  * 'calculadora-patron-birlos'). Both use the same ASCII transliteration rules as those slugs.
  */
 const ENTITY_SEGMENTS: Readonly<Record<EntityFamily, Readonly<Record<EntityLocale, string>>>> = Object.freeze({
-  'tire-size': Object.freeze({ en: 'tire-sizes', de: 'reifengroessen', es: 'medidas-neumaticos' }),
-  'bolt-pattern': Object.freeze({ en: 'bolt-patterns', de: 'lochkreise', es: 'patrones-birlos' }),
+  'tire-size': Object.freeze({ en: 'tire-sizes', de: 'reifengroessen', es: 'medidas-neumaticos', fr: 'dimensions-pneus' }),
+  'bolt-pattern': Object.freeze({ en: 'bolt-patterns', de: 'lochkreise', es: 'patrones-birlos', fr: 'entraxes' }),
 });
 
-const ENTITY_LOCALE_ORDER: readonly EntityLocale[] = Object.freeze(['en', 'de', 'es']);
+const ENTITY_LOCALE_ORDER: readonly EntityLocale[] = Object.freeze(['en', 'de', 'es', 'fr']);
 
 function isEntityLocale(code: AtlasLocale): code is EntityLocale {
-  return code === 'en' || code === 'de' || code === 'es';
+  return code === 'en' || code === 'de' || code === 'es' || code === 'fr';
 }
 
 /**
  * Published locales that this route family has localized copy and a URL segment for.
  * Derived from publishedLocales() so pt-br/fr (published: false) can never leak in.
  */
+/**
+ * Locales whose reference families (tire sizes, bolt patterns) are published ahead of the full
+ * site translation. French has complete, reviewed copy for these two families and a French
+ * home; its calculators stay unpublished (published: false in locales.ts) until translated.
+ */
+const ENTITY_FAMILY_ONLY_LOCALES: readonly EntityLocale[] = Object.freeze(['fr']);
+
 export function entityLocales(): readonly EntityLocale[] {
-  const published = new Set(publishedLocales());
+  const published = new Set<string>([...publishedLocales(), ...ENTITY_FAMILY_ONLY_LOCALES]);
   return Object.freeze(ENTITY_LOCALE_ORDER.filter((code) => published.has(code) && isEntityLocale(code)));
 }
 

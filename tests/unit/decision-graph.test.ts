@@ -5,6 +5,7 @@ import boltComponent from '../../src/components/BoltPatternEntity.astro?raw';
 import enVehiclePage from '../../src/pages/vehicles/[id].astro?raw';
 import deVehiclePage from '../../src/pages/de/fahrzeuge/[id].astro?raw';
 import esVehiclePage from '../../src/pages/es/vehiculos/[id].astro?raw';
+import vehicleBody from '../../src/components/VehicleEntityBody.astro?raw';
 import fuelActionPanel from '../../src/components/FuelActionPanel.astro?raw';
 import { vehicleFitmentData } from '../../src/data/vehicle-fitment';
 import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
@@ -79,9 +80,10 @@ describe('shared automotive decision graph', () => {
     expect(decisionComponent).toContain('<a class="decision-action" href={item.href}');
     expect(decisionComponent).not.toContain('client:');
     for (const source of [enVehiclePage, deVehiclePage, esVehiclePage]) {
-      expect(source).toContain('vehicleDecisionGraph(vehicle, LOCALE)');
-      expect(source).toContain('<DecisionGraph model={decisions}');
+      expect(source).toContain('<VehicleEntityBody vehicle={vehicle} locale={LOCALE}');
     }
+    expect(vehicleBody).toContain('vehicleDecisionGraph(vehicle, locale)');
+    expect(vehicleBody).toContain('<DecisionGraph model={decisions}');
     expect(tireComponent).toContain('tireDecisionGraph(entry, locale)');
     expect(boltComponent).toContain('boltDecisionGraph(entry, locale)');
     expect(fuelActionPanel).toContain('fuelDecisionGraph(locale, note)');
@@ -95,8 +97,8 @@ describe('decision graph route-count guard', () => {
     expect(vehicleFitmentData.length).toBeGreaterThanOrEqual(30);
     expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(950);
     expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
-    const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos)\//.test(url));
-    const expected = 3 * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
+    const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes)\//.test(url));
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
     expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls)).toHaveLength(expected);

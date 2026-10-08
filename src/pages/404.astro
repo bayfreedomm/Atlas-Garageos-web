@@ -43,10 +43,11 @@ import ThemeControl from '../components/ThemeControl.astro';
       // switched to German or Spanish from the requested path, and a mistyped tire-size address
       // (e.g. /de/reifengroessen/205-55-16) is offered its canonical form.
       const path = window.location.pathname.toLowerCase();
-      const locale = path.startsWith('/de/') ? 'de' : path.startsWith('/es/') ? 'es' : 'en';
+      const locale = path.startsWith('/de/') ? 'de' : path.startsWith('/es/') ? 'es' : path.startsWith('/fr/') ? 'fr' : 'en';
       const copy = {
         en: { eyebrow: 'Error 404', title: 'That page is not in the garage.', lead: 'The address may have changed, or the link may be incomplete. Your saved Garage data remains on this device.', primary: 'Open Wheel & Tire Compare', primaryHref: '/fitment-studio/', tools: 'Browse tools', toolsHref: '/tools/', tires: 'Tire sizes', tiresHref: '/tire-sizes/', suggest: 'Did you mean tire size', home: '/' },
         de: { eyebrow: 'Fehler 404', title: 'Diese Seite ist nicht in der Garage.', lead: 'Die Adresse hat sich womöglich geändert oder der Link ist unvollständig. Ihre gespeicherten Garage-Daten bleiben auf diesem Gerät.', primary: 'Felgen- & Reifenvergleich öffnen', primaryHref: '/de/fitment-studio/', tools: 'Alle Werkzeuge', toolsHref: '/de/tools/', tires: 'Reifengrößen', tiresHref: '/de/reifengroessen/', suggest: 'Meinten Sie die Reifengröße', home: '/de/' },
+        fr: { eyebrow: 'Erreur 404', title: 'Cette page n’est pas au garage.', lead: 'L’adresse a peut-être changé ou le lien est incomplet. Vos données de garage enregistrées restent sur cet appareil.', primary: 'Rechercher une taille de pneu', primaryHref: '/fr/', tools: 'Entraxes', toolsHref: '/fr/entraxes/', tires: 'Dimensions de pneus', tiresHref: '/fr/dimensions-pneus/', suggest: 'Vouliez-vous dire la taille', home: '/fr/' },
         es: { eyebrow: 'Error 404', title: 'Esta página no está en el garaje.', lead: 'Puede que la dirección haya cambiado o que el enlace esté incompleto. Los datos guardados de su garaje siguen en este dispositivo.', primary: 'Abrir el comparador de llantas y neumáticos', primaryHref: '/es/fitment-studio/', tools: 'Ver herramientas', toolsHref: '/es/tools/', tires: 'Medidas de neumáticos', tiresHref: '/es/medidas-neumaticos/', suggest: '¿Buscaba la medida', home: '/es/' },
       }[locale];
       document.documentElement.lang = locale;

@@ -69,7 +69,7 @@ const COPY = {
 function direction(value: number): Difference { return value > 0 ? 'larger' : value < 0 ? 'smaller' : 'same'; }
 
 export function guidedTireDecision(
-  locale: EntityLocale,
+  locale: Exclude<EntityLocale, 'fr'>,
   original: TireToolInput,
   proposed: TireToolInput,
   diameterDifferenceMm: number,

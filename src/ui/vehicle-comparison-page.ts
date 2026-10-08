@@ -15,7 +15,7 @@ const localeFor = (root: HTMLElement): EntityLocale => {
 
 function initializeComparison(root: HTMLElement): void {
   const locale = localeFor(root);
-  const catalog = vehicleFitmentData.filter((vehicle) => locale === 'en' ? vehicle.market === 'us' : vehicle.market === 'eu');
+  const catalog = vehicleFitmentData.slice();
   const form = root.querySelector<HTMLFormElement>('form[data-vehicle-comparison-form]');
   const first = form?.elements.namedItem('vehicleA') as HTMLSelectElement | null;
   const second = form?.elements.namedItem('vehicleB') as HTMLSelectElement | null;

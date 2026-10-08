@@ -1,13 +1,14 @@
 ---
 import ThemeControl from './ThemeControl.astro';
-import { uiStrings, platformCatalog, type ContentLocale } from '../localization/site-catalog';
+import { chromePrefix, chromeStrings, platformCatalog, type ChromeLocale } from '../localization/site-catalog';
 import { TOOL_CATEGORY_ORDER, type ToolCategory } from '../seo/tool-registry';
 import { referenceCopy, referenceLinks } from '../ui/reference-links';
-interface LocaleLink { readonly code: 'en' | 'de' | 'es'; readonly label: string; readonly href: string; }
-interface Props { locale?: ContentLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
+interface LocaleLink { readonly code: 'en' | 'de' | 'es' | 'fr'; readonly label: string; readonly href: string; }
+interface Props { locale?: ChromeLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
 const { locale, localeLinks } = Astro.props;
-const t = locale ? uiStrings[locale] : undefined;
-const prefix = locale ? `/${locale}` : '';
+const t = chromeStrings(locale);
+const prefix = chromePrefix(locale);
+const homeHref = locale ? `/${locale}/` : '/';
 const links: readonly LocaleLink[] = localeLinks ?? [
   { code: 'en', label: 'English', href: '/' },
   { code: 'de', label: 'Deutsch', href: '/de/' },
@@ -21,8 +22,12 @@ const chrome = {
   en: { open: 'Open menu', close: 'Close menu', dialog: 'Atlas menu', main: 'Main navigation', categories: 'Tool categories', reference: 'Reference data', diagnostics: 'Diagnostics', diagnosticsHelper: 'Look up OBD-II codes and next checks' },
   de: { open: 'Menü öffnen', close: 'Menü schließen', dialog: 'Atlas-Menü', main: 'Hauptnavigation', categories: 'Werkzeugkategorien', reference: 'Referenzdaten', diagnostics: 'Diagnose (Englisch)', diagnosticsHelper: 'OBD-II-Fehlercodes nachschlagen' },
   es: { open: 'Abrir menú', close: 'Cerrar menú', dialog: 'Menú de Atlas', main: 'Navegación principal', categories: 'Categorías de herramientas', reference: 'Datos de referencia', diagnostics: 'Diagnóstico (inglés)', diagnosticsHelper: 'Consultar códigos OBD-II' },
+  fr: { open: 'Ouvrir le menu', close: 'Fermer le menu', dialog: 'Menu Atlas', main: 'Navigation principale', categories: 'Catégories d’outils', reference: 'Données de référence', diagnostics: 'Diagnostic (anglais)', diagnosticsHelper: 'Consulter les codes OBD-II' },
 }[entityLocale];
-const categoryLabels: Readonly<Record<ToolCategory, string>> = locale
+const FR_CATEGORY_LABELS: Readonly<Record<ToolCategory, string>> = { 'Fuel & Trips': 'Carburant et trajets', 'Tires & Wheels': 'Pneus et jantes', Converters: 'Convertisseurs', Performance: 'Performances' };
+const categoryLabels: Readonly<Record<ToolCategory, string>> = locale === 'fr'
+  ? FR_CATEGORY_LABELS
+  : locale
   ? Object.fromEntries(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name])) as Record<ToolCategory, string>
   : FALLBACK_CATEGORY_LABELS;
 ---
@@ -30,11 +35,11 @@ const categoryLabels: Readonly<Record<ToolCategory, string>> = locale
 <dialog id="navigation-drawer" class="drawer-layer" data-drawer-layer aria-label={chrome.dialog}>
   <div class="navigation-drawer">
     <div class="drawer-shell">
-      <header><a href={`${prefix}/`} class="drawer-home"><span>ATLAS</span><small>GarageOS</small></a><button class="drawer-close" type="button" aria-label={chrome.close} data-menu-close>×</button></header>
+      <header><a href={homeHref} class="drawer-home"><span>ATLAS</span><small>GarageOS</small></a><button class="drawer-close" type="button" aria-label={chrome.close} data-menu-close>×</button></header>
       <div class="drawer-grid">
         <nav class="drawer-primary" aria-label={chrome.main}>
           <p>{t?.goStraightTo ?? 'GO STRAIGHT TO'}</p>
-          <a href={`${prefix}/`}><strong>{t?.navHome ?? 'Home'}</strong><span>{t?.navHomeHelper ?? 'Pick a job and get an answer'}</span><i>01</i></a>
+          <a href={homeHref}><strong>{t?.navHome ?? 'Home'}</strong><span>{t?.navHomeHelper ?? 'Pick a job and get an answer'}</span><i>01</i></a>
           <a href={`${prefix}/tools/`}><strong>{t?.allToolsTitle ?? 'All automotive tools'}</strong><span>{t?.allToolsHelper ?? 'Browse every calculator and converter'}</span><i>02</i></a>
           <a href="/obd-codes/" hreflang={locale ? 'en' : undefined}><strong>{chrome.diagnostics}</strong><span>{chrome.diagnosticsHelper}</span><i>03</i></a>
           <a href={`${prefix}/fitment-studio/`}><strong>{t?.navFitment ?? 'Wheel & Tire Compare'}</strong><span>{t?.fitmentHelper ?? 'Compare two setups visually'}</span><i>04</i></a>

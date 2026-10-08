@@ -74,9 +74,9 @@ describe('SEO tool registry', () => {
     // /de/fitment-studio/ and /es/fitment-studio/ — and the five platform pages include /contact/.
     const localizedPlatformPages = 5;
     const localizedTools = toolRegistry.filter((tool) => tool.indexable && tool.status === 'implemented').length;
-    // Vehicle pages: three localized index routes, three comparison hubs, plus one route per
-    // US vehicle and two (DE + ES) per non-US vehicle. Pair state stays query-only.
-    const vehicleRoutes = 6 + vehicleFitmentData.reduce((total, vehicle) => total + (vehicle.market === 'us' ? 1 : 2), 0);
+    // Vehicle pages: three comparison hubs, plus per entity locale one directory and one page
+    // per vehicle (every vehicle is published in every language). Pair state stays query-only.
+    const vehicleRoutes = 3 + entityLocales().length * (1 + vehicleFitmentData.length);
     // Entity pages: per published locale, one hub per family plus one detail page per catalog
     // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
@@ -85,7 +85,9 @@ describe('SEO tool registry', () => {
     // Diagnostics adds one directory plus exactly one page per record that passed the production
     // catalog publication gate. Draft fixtures and arbitrary input state never reach the sitemap.
     const diagnosticRoutes = 1 + dtcRecords.length;
-    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes;
+    // French publishes its reference families plus one French home (/fr/).
+    const frenchRoutes = 1;
+    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + frenchRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');

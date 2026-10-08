@@ -2,6 +2,12 @@
 
 Durable decisions are recorded with date, status, rationale, and evidence. Historical V3 decisions remain in `V3_MASTER_PLAN.md`.
 
+## 2026-10-08 — French reference families before French tools
+
+Status: `ACCEPTED`.
+
+Tire-size and bolt-pattern pages carry the site's search traffic, so French publishes those families (and a French home) first, with fully written French copy. Calculators, vehicle pages and policy pages stay English for French readers and are labelled "(anglais)". This supersedes "do not expose FR until the whole route set is translated" for the reference families only; `fr` remains unpublished for tools.
+
 ## 2026-10-08 — Traffic first: grow the tire-size long tail
 
 Status: `ACCEPTED`.
@@ -96,3 +102,6 @@ Current local Garage storage is not presented as durable account storage. Any fu
 
 - The V3 decision ledger remains authoritative for existing architecture, localization, SEO, trust, and visual principles unless a later dated decision explicitly supersedes a specific item.
 - Package notes 5.1–6.8 remain implementation evidence and historical context; they are not current roadmap priorities by themselves.
+
+- 2026-10-08 — Vehicles are published in every entity language instead of being split by market (US → EN only, EU → DE/ES only). The page states the market; this quadruples vehicle pages without new data and keeps every vehicle link in the reader's language.
+- 2026-10-08 — Stop automated collection from any site that serves a human-verification/bot check; switch source instead.

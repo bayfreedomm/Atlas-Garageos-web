@@ -1,7 +1,7 @@
 import type { VehicleFitment } from '../data/vehicle-fitment';
 import { torquePresentation } from '../ui/vehicle-torque';
 
-export type VehicleLocale = 'en' | 'de' | 'es';
+export type VehicleLocale = 'en' | 'de' | 'es' | 'fr';
 
 export interface VehiclePageText {
   readonly kicker: string;
@@ -44,6 +44,9 @@ export interface VehiclePageText {
   readonly hubEuMarket: string;
   readonly breadcrumbHome: string;
   readonly breadcrumbVehicles: string;
+  readonly title: (v: VehicleFitment) => string;
+  readonly description: (v: VehicleFitment) => string;
+  readonly market: string;
 }
 
 export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
@@ -93,6 +96,10 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'European market',
     breadcrumbHome: 'Home',
     breadcrumbVehicles: 'Vehicles',
+    // The audit counts '&' as '&amp;'; very long model labels fall back to the shorter 'PCD'.
+    title: (v) => `${v.make} ${v.model} Tire Size & Bolt Pattern`.length > 54 ? `${v.make} ${v.model} Tire Size & PCD` : `${v.make} ${v.model} Tire Size & Bolt Pattern`,
+    description: (v) => `Atlas tire size ${v.tireSize} and bolt pattern ${v.boltPattern} reference for the ${v.make} ${v.model} (${v.generation}), sourced and confidence-rated.`,
+    market: 'Market',
   },
   de: {
     kicker: 'Atlas-Fitment-Referenz',
@@ -140,6 +147,9 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Europäischer Markt',
     breadcrumbHome: 'Start',
     breadcrumbVehicles: 'Fahrzeuge',
+    title: (v) => `${v.make} ${v.model} Reifengröße & Lochkreis`,
+    description: (v) => `Atlas-Referenz für Reifengröße ${v.tireSize} und Lochkreis ${v.boltPattern} des ${v.make} ${v.model} (${v.generation}), mit Quellenangabe und Verlässlichkeitsbewertung.`,
+    market: 'Markt',
   },
   es: {
     kicker: 'Referencia de ajuste Atlas',
@@ -187,5 +197,58 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Mercado europeo',
     breadcrumbHome: 'Inicio',
     breadcrumbVehicles: 'Vehículos',
+    title: (v) => `${v.make} ${v.model}: Neumáticos y Birlos`,
+    description: (v) => `Referencia Atlas de neumático ${v.tireSize} y patrón de birlos ${v.boltPattern} para el ${v.make} ${v.model} (${v.generation}), con fuentes y nivel de confianza.`,
+    market: 'Mercado',
+  },
+  fr: {
+    kicker: 'Référence de montage Atlas',
+    h1: (v) => `${v.make} ${v.model} — taille de pneu et entraxe`,
+    intro: (v) => `Données de référence Atlas pour les jantes et pneus de la ${v.make} ${v.model} (${v.generation}), avec sources publiques et niveau de confiance. Vérifiez toujours l'étiquette de la portière ou le manuel du véhicule avant d'acheter des pièces.`,
+    tireSize: 'Taille de pneu de référence',
+    boltPattern: 'Entraxe (PCD)',
+    wheelSize: 'Taille de jante de référence',
+    centerBore: 'Alésage central',
+    torque: 'Couple de serrage',
+    fastener: 'Type de fixation',
+    lugNut: 'Écrou de roue',
+    wheelBolt: 'Boulon de roue',
+    generation: 'Génération / années',
+    confidence: { high: 'Confiance élevée', medium: 'Confiance moyenne — à vérifier avant usage', low: 'Confiance faible — à vérifier avant usage' },
+    confidenceNote: 'Notre niveau de certitude',
+    sourcesLabel: 'Sources',
+    notesLabel: 'Remarque',
+    disclaimer: "Ce sont des données de référence, pas un flux constructeur — vérifiez toujours le manuel ou l'étiquette de portière de votre véhicule avant d'acheter des pièces ou de serrer les roues.",
+    toolsHeading: 'Utiliser ces valeurs dans un calculateur',
+    openTireTool: 'Vérifier cette taille dans le calculateur de pneus',
+    openBoltTool: 'Vérifier cet entraxe dans le calculateur',
+    openTorqueTool: 'Convertir ce couple (Nm ↔ lb-ft)',
+    fuelHeading: 'Carburant et coût des trajets',
+    fuelCardTitle: 'Prix du carburant',
+    fuelCardCopy: 'Moyenne actuelle de l’essence et du diesel.',
+    tripCardTitle: 'Estimer le coût d’un trajet',
+    tripCardCopy: 'Utilisez ce prix pour estimer le coût par trajet ou par an.',
+    faqHeading: 'Questions fréquentes',
+    faqTireQ: (v) => `Quelle taille de pneu pour une ${v.make} ${v.model} ?`,
+    faqTireA: (v) => `Une ${v.make} ${v.model} (${v.generation}) est généralement équipée de pneus ${v.tireSize.replace(/R(\d)/, ' R$1')} sur une jante ${v.wheelSize}. Selon la finition, cela peut varier — vérifiez l'étiquette de portière de votre véhicule.${v.optionalTireSizes?.length ? ` Tailles optionnelles d'origine pour cette génération : ${v.optionalTireSizes.map((size) => size.replace(/R(\d)/, ' R$1')).join(', ')}.` : ''}`,
+    faqBoltQ: (v) => `Quel est l'entraxe d'une ${v.make} ${v.model} ?`,
+    faqBoltA: (v) => `La ${v.make} ${v.model} utilise un entraxe ${v.boltPattern} (${v.lugCount} ${v.fastenerType === 'lug-nut' ? 'écrous de roue' : 'boulons de roue'}).`,
+    faqTorqueQ: (v) => `Quel est le couple de serrage des roues d'une ${v.make} ${v.model} ?`,
+    faqTorqueA: (v) => {
+      const torque = torquePresentation(v, 'fr');
+      return v.torqueNm === undefined
+        ? `Atlas n'a pas encore de couple de serrage documenté pour la ${v.make} ${v.model} — consultez le manuel du véhicule.`
+        : `Atlas indique ${torque.value} comme couple de référence pour la ${v.make} ${v.model}. ${torque.qualifier ?? 'Confirmez la valeur dans le manuel avant de serrer les roues.'}`;
+    },
+    hubTitle: 'Référence de montage par véhicule',
+    hubDescription: 'Taille de pneu, entraxe, alésage et couple de serrage de référence pour les véhicules courants, avec sources et niveau de confiance.',
+    hubLead: 'Choisissez un véhicule pour voir sa taille de pneu, son entraxe, sa taille de jante et son couple de serrage de référence — chaque valeur avec sa source et son niveau de confiance.',
+    hubUsMarket: 'Marché américain',
+    hubEuMarket: 'Marché européen',
+    breadcrumbHome: 'Accueil',
+    breadcrumbVehicles: 'Véhicules',
+    title: (v) => `${v.make} ${v.model} : taille de pneu et entraxe`,
+    description: (v) => `Référence Atlas : pneu ${v.tireSize.replace(/R(\d)/, ' R$1')} et entraxe ${v.boltPattern} pour la ${v.make} ${v.model} (${v.generation}), avec sources et niveau de confiance.`,
+    market: 'Marché',
   },
 };

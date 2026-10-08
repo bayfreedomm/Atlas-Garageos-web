@@ -1543,3 +1543,22 @@ body.has-expanded-3d{overflow:hidden}
 }
 .entity-spec tbody th{overflow-wrap:anywhere;hyphens:auto}
 @media(max-width:23.99rem){.entity-spec{font-size:var(--text-xs)}.entity-spec th,.entity-spec td{padding:.5rem .3rem}}
+.entity-answer--vehicle strong{font-size:clamp(1rem,4vw,1.35rem)}
+.entity-answer strong a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.entity-spec__wrap{white-space:normal!important;text-align:right}
+
+/* 2026-10 calculator pages: denser results on phones, matching the tire-size reference pages. */
+@media(max-width:47.99rem){
+  .tool-results{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem!important}
+  .tool-results>div{min-width:0;margin:0!important;padding:.55rem .65rem!important}
+  .tool-results dt{font-size:.62rem!important;letter-spacing:.04em}
+  .tool-results dd{font-size:1rem!important;overflow-wrap:anywhere}
+  .near-sizes__list{gap:0;border:1px solid var(--color-line);border-radius:.6rem;overflow:hidden}
+  .near-sizes__list li{border:0;border-bottom:1px solid var(--color-line);border-radius:0}
+  .near-sizes__list li:last-child{border-bottom:0}
+  .near-sizes__link{grid-template-columns:3.6rem minmax(0,1fr) auto!important;gap:.5rem;padding:.5rem .65rem;border-radius:0}
+  .near-sizes__rim{grid-column:auto!important;font-size:.7rem}
+  .tool-faqs__item{padding:.7rem .8rem}
+}
+.tool-faqs__item dd,.tool-faqs__item dt{font-family:var(--font-sans)!important}
+p>.entity-confidence{white-space:normal;max-width:100%}
