@@ -1,0 +1,22 @@
+---
+// Tire-size lookup box. Works as a plain link list without JavaScript (the shortcut chips the
+// host renders next to it); with JavaScript it parses any spelling of a size, suggests
+// published sizes while typing and opens the matching page.
+import { tireSizePageText } from '../content/entity-page-text';
+import { entityHubPath, type EntityLocale } from '../seo/entity-routes';
+
+interface Props { readonly locale: EntityLocale; readonly id: string; readonly variant?: 'hero' | 'panel'; readonly showHeading?: boolean; }
+const { locale, id, variant = 'panel', showHeading = false } = Astro.props;
+const t = tireSizePageText[locale].lookup;
+---
+<form class={`size-lookup size-lookup--${variant}`} role="search" data-size-lookup data-base={entityHubPath('tire-size', locale)} data-display={locale === 'en' ? 'compact' : 'spaced'} action={entityHubPath('tire-size', locale)}>
+  {showHeading && <p class="size-lookup__heading">{t.heading}</p>}
+  <label class="size-lookup__label" for={id}>{t.label}</label>
+  <div class="size-lookup__row">
+    <input id={id} name="q" type="search" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder={t.placeholder} />
+    <button type="submit">{t.button}</button>
+  </div>
+  <ul class="size-lookup__list" data-size-lookup-list aria-live="polite"></ul>
+  <p class="size-lookup__message" data-size-lookup-message hidden>{t.notFound}</p>
+</form>
+<script>import { initializeTireSizeLookups } from '../ui/tire-size-lookup'; initializeTireSizeLookups();</script>

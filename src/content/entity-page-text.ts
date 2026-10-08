@@ -109,6 +109,12 @@ export interface TireSizeText {
   readonly sizeFaqs: (notation: string, f: TireFaqFigures, flotation: boolean) => readonly { readonly q: string; readonly a: string }[];
   readonly flotationKicker: string;
   readonly flotationNote: string;
+  /** Compact mobile-first layout: section jump links, spec-table column heads, lookup box. */
+  readonly pageNav: { readonly label: string; readonly specs: string; readonly alternatives: string; readonly vehicles: string; readonly code: string; readonly faq: string };
+  readonly specCols: { readonly measure: string; readonly metric: string; readonly imperial: string };
+  readonly revsLabel: string;
+  readonly answerLabels: { readonly diameter: string; readonly width: string; readonly sidewall: string; readonly circumference: string };
+  readonly lookup: { readonly label: string; readonly placeholder: string; readonly button: string; readonly notFound: string; readonly heading: string; readonly intro: string };
   readonly flotationLead: (diameter: string, width: string, rim: string) => string;
   readonly flotationParts: (diameter: string, width: string, rim: string) => readonly { readonly token: string; readonly label: string; readonly detail: string }[];
   readonly breadcrumbHome: string;
@@ -364,6 +370,11 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
         ? { q: `What is ${notation} in metric?`, a: `${notation} is ${f.diameterMm} mm (${f.diameterIn} in) tall and ${f.widthIn} in wide with a ${f.sidewallIn}-inch sidewall.${f.metricEquivalents ? ` The closest metric sizes on the same rim are ${f.metricEquivalents}.` : ''}` }
         : { q: `How tall is a ${notation} tire in inches?`, a: `${f.diameterIn} inches (${f.diameterMm} mm) overall, ${f.widthIn} inches wide, with a ${f.sidewallIn}-inch sidewall.${f.inchClass ? ` That makes it a ${f.inchClass} tire.` : ''}` },
     ],
+    pageNav: { label: 'On this page', specs: 'Dimensions', alternatives: 'Alternatives', vehicles: 'Vehicles', code: 'Code', faq: 'FAQ' },
+    specCols: { measure: 'Measure', metric: 'Metric', imperial: 'Inches' },
+    revsLabel: 'Revolutions',
+    answerLabels: { diameter: 'Height', width: 'Width', sidewall: 'Sidewall', circumference: 'Circumference' },
+    lookup: { label: 'Tire size', placeholder: 'e.g. 265/70R17', button: 'Show size', notFound: 'That size is not in the reference yet. Check the format, e.g. 225/45R17.', heading: 'Look up any tire size', intro: 'Type the size from your sidewall to get its height, width and alternatives instantly.' },
     flotationKicker: 'High-flotation tire size',
     flotationNote: 'A flotation size states its overall diameter and section width directly in inches, then the rim. It is the usual notation for off-road and light-truck tires in North America.',
     flotationLead: (diameter, width, rim) => `A ${diameter}-inch-tall tire, ${width} inches wide, mounted on a ${rim}-inch rim.`,
@@ -418,7 +429,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     searchPlaceholder: 'z. B. 205/55 oder R17',
     searchEmpty: 'Keine Reifengröße in der Referenz passt zu diesem Filter.',
     countLabel: (n) => `${n} ${plural(n, 'Größe', 'Größen')}`,
-    groupHeading: (rim) => `${rim}-Zoll-Felgen`,
+    groupHeading: (rim) => `${String(rim).replace('.', ',')}-Zoll-Felgen`,
     jumpLabel: 'Zur Felgengröße springen',
     listedAs: (vehicles) => vehicles > 0 ? `${vehicles} ${plural(vehicles, 'Fahrzeug', 'Fahrzeuge')}` : 'Referenzgröße',
     toolsHeading: 'Mit diesen Größen rechnen',
@@ -513,6 +524,11 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
         ? { q: `Welche metrische Größe entspricht ${notation}?`, a: `${notation} ist ${f.diameterMm} mm (${f.diameterIn} Zoll) hoch und ${f.widthIn} Zoll breit, mit ${f.sidewallIn} Zoll Flankenhöhe.${f.metricEquivalents ? ` Die nächsten metrischen Größen auf derselben Felge sind ${f.metricEquivalents}.` : ''}` }
         : { q: `Wie groß ist ein ${notation} Reifen in Zoll?`, a: `${f.diameterIn} Zoll (${f.diameterMm} mm) Gesamtdurchmesser, ${f.widthIn} Zoll Breite und ${f.sidewallIn} Zoll Flankenhöhe.${f.inchClass ? ` Damit ist er ein ${f.inchClass}-Reifen.` : ''}` },
     ],
+    pageNav: { label: 'Auf dieser Seite', specs: 'Maße', alternatives: 'Alternativen', vehicles: 'Fahrzeuge', code: 'Code', faq: 'FAQ' },
+    specCols: { measure: 'Maß', metric: 'Metrisch', imperial: 'Zoll' },
+    revsLabel: 'Umdrehungen',
+    answerLabels: { diameter: 'Durchmesser', width: 'Breite', sidewall: 'Flanke', circumference: 'Abrollumfang' },
+    lookup: { label: 'Reifengröße', placeholder: 'z. B. 205/55 R16', button: 'Anzeigen', notFound: 'Diese Größe ist noch nicht in der Referenz. Prüfen Sie das Format, z. B. 205/55 R16.', heading: 'Reifengröße nachschlagen', intro: 'Größe von der Reifenflanke eingeben und sofort Durchmesser, Abrollumfang und Alternativen sehen.' },
     flotationKicker: 'Reifengröße in Zoll (Flotation)',
     flotationNote: 'Eine Flotation-Größe nennt Gesamtdurchmesser und Breite direkt in Zoll, danach den Felgendurchmesser. Diese Schreibweise ist bei Offroad- und Pick-up-Reifen aus Nordamerika üblich.',
     flotationLead: (diameter, width, rim) => `Ein ${diameter} Zoll hoher und ${width} Zoll breiter Reifen auf einer ${rim}-Zoll-Felge.`,
@@ -567,7 +583,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     searchPlaceholder: 'p. ej. 205/55 o R17',
     searchEmpty: 'Ninguna medida de la referencia coincide con ese filtro.',
     countLabel: (n) => `${n} ${plural(n, 'medida', 'medidas')}`,
-    groupHeading: (rim) => `Llantas de ${rim} pulgadas`,
+    groupHeading: (rim) => `Llantas de ${String(rim).replace('.', ',')} pulgadas`,
     jumpLabel: 'Ir a un tamaño de llanta',
     listedAs: (vehicles) => vehicles > 0 ? `${vehicles} ${plural(vehicles, 'vehículo', 'vehículos')}` : 'Medida de referencia',
     toolsHeading: 'Calcular con estas medidas',
@@ -662,6 +678,11 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
         ? { q: `¿Cuál es la equivalencia métrica de ${notation}?`, a: `${notation} mide ${f.diameterMm} mm (${f.diameterIn} pulgadas) de alto y ${f.widthIn} pulgadas de ancho, con un flanco de ${f.sidewallIn} pulgadas.${f.metricEquivalents ? ` Las medidas métricas más cercanas en el mismo rin son ${f.metricEquivalents}.` : ''}` }
         : { q: `¿Cuánto mide una llanta ${notation} en pulgadas?`, a: `${f.diameterIn} pulgadas (${f.diameterMm} mm) de diámetro total, ${f.widthIn} pulgadas de ancho y ${f.sidewallIn} pulgadas de flanco.${f.inchClass ? ` Es decir, una llanta de ${f.inchClass}.` : ''}` },
     ],
+    pageNav: { label: 'En esta página', specs: 'Medidas', alternatives: 'Equivalencias', vehicles: 'Vehículos', code: 'Código', faq: 'Preguntas' },
+    specCols: { measure: 'Medida', metric: 'Métrico', imperial: 'Pulgadas' },
+    revsLabel: 'Vueltas',
+    answerLabels: { diameter: 'Diámetro', width: 'Ancho', sidewall: 'Flanco', circumference: 'Circunferencia' },
+    lookup: { label: 'Medida de llanta', placeholder: 'p. ej. 205/55 R16', button: 'Ver medida', notFound: 'Esa medida aún no está en la referencia. Revise el formato, p. ej. 205/55 R16.', heading: 'Busca cualquier medida', intro: 'Escribe la medida del costado de tu llanta y ve al instante su diámetro, ancho y equivalencias.' },
     flotationKicker: 'Medida en pulgadas (flotación)',
     flotationNote: 'Una medida de flotación indica directamente el diámetro total y el ancho en pulgadas, y después el rin. Es la nomenclatura habitual de las llantas todoterreno y de camioneta en América.',
     flotationLead: (diameter, width, rim) => `Una llanta de ${diameter} pulgadas de alto y ${width} pulgadas de ancho, para rin de ${rim} pulgadas.`,

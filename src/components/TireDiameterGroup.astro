@@ -69,7 +69,7 @@ const nearby = allGroups.slice(Math.max(0, index - 4), index + 5).filter((candid
   <h2 id="diameter-table">{d.tableHeading(n)}</h2>
   <div class="entity-table-scroll">
     <table class="entity-table">
-      <thead><tr><th scope="col">{d.colSize}</th><th scope="col">{d.colDiameter}</th><th scope="col">{d.colWidth}</th><th scope="col">{d.colSidewall}</th></tr></thead>
+      <thead><tr><th scope="col">{d.colSize}</th><th scope="col">{d.colDiameter}</th><th scope="col">{d.colWidth}</th><th scope="col" class="is-optional">{d.colSidewall}</th></tr></thead>
       {rims.map((rim) => (
         <tbody>
           <tr class="entity-table__group"><th scope="rowgroup" colspan="4">{d.rimGroup(formatPlain(rim, locale))}</th></tr>
@@ -78,7 +78,7 @@ const nearby = allGroups.slice(Math.max(0, index - 4), index + 5).filter((candid
               <th scope="row"><a href={row.href}>{row.notation}</a>{row.flotation && <span class="entity-card__meta"> · {d.flotationTag}</span>}</th>
               <td>{row.diameter}</td>
               <td>{row.width}</td>
-              <td>{row.sidewall}</td>
+              <td class="is-optional">{row.sidewall}</td>
             </tr>
           ))}
         </tbody>

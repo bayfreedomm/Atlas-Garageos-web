@@ -6,6 +6,7 @@ import { localizedToolPath } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
 import { normalizeFuelStatus } from '../data/fuel-prices-types';
 import { referenceCopy, referenceLinks, tireSizeShortcuts } from '../ui/reference-links';
+import TireSizeLookup from './TireSizeLookup.astro';
 
 // The hero capability badges (Tires & wheels / Fuel & trips / EV tools /
 // Performance) must route to a real, already-existing destination. Three of
@@ -116,6 +117,7 @@ const categories = home
       <h1 id="home-heading">{home?.h1 ?? 'Smarter tools for every drive.'}</h1>
       <p class="home-lead">{home?.lead ?? 'Calculate tire fitment, wheel offset, fuel cost, road trips and EV charging with clear answers built for real-world ownership.'}</p>
 
+      <TireSizeLookup locale={entityLocale} id="tire-lookup-home" variant="hero" />
       <div class="home-v7-actions" aria-label="Primary actions">
         <a class="home-v7-cta home-v7-cta--primary" href={`${prefix}/tools/`}>{home?.ctaExplore ?? 'Explore tools'} <span aria-hidden="true">→</span></a>
         <a class="home-v7-cta home-v7-cta--secondary" href={`${prefix}/fitment-studio/`}>{home?.ctaCompare ?? 'Compare fitment'}</a>

@@ -37,12 +37,27 @@ export function initializeEntityFilters(): void {
       // A group heading with nothing left under it would read as a broken section.
       for (const group of groups) {
         group.hidden = [...group.querySelectorAll<HTMLElement>('[data-entity-card]')].every((card) => card.hidden);
+        // Folded hub groups (<details>) open while a search is active so matches are visible,
+        // and fold back to their default state when the search is cleared.
+        if (group instanceof HTMLDetailsElement) group.open = query !== '' ? !group.hidden : group.dataset.defaultOpen === 'true';
       }
       if (empty) empty.hidden = visible !== 0;
       if (count) count.textContent = visible === 1 && countOne ? countOne : countOther.replace('{n}', String(visible));
     };
 
     input.addEventListener('input', apply);
+    // Jump links target a folded group: open it before the browser scrolls to it.
+    const openTarget = (): void => {
+      const target = window.location.hash ? panel.querySelector<HTMLElement>(window.location.hash) : null;
+      const details = target?.closest('details');
+      if (details) details.open = true;
+    };
+    window.addEventListener('hashchange', openTarget);
+    panel.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => link.addEventListener('click', () => {
+      const details = panel.querySelector<HTMLElement>(link.getAttribute('href')!)?.closest('details');
+      if (details) details.open = true;
+    }));
+    openTarget();
     form?.addEventListener('submit', (event) => {
       event.preventDefault();
       apply();
