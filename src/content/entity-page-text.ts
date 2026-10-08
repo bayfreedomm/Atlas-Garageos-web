@@ -105,8 +105,15 @@ export interface TireSizeText {
   readonly backToHub: string;
   readonly faqHeading: string;
   readonly faqs: (input: { readonly notation: string; readonly vehicles: number; readonly makes: string; readonly rim: number }) => readonly { readonly q: string; readonly a: string }[];
+  /** Extra FAQ answered with this size's own inch figures, placed first. */
+  readonly sizeFaqs: (notation: string, f: TireFaqFigures, flotation: boolean) => readonly { readonly q: string; readonly a: string }[];
+  readonly flotationKicker: string;
+  readonly flotationNote: string;
+  readonly flotationLead: (diameter: string, width: string, rim: string) => string;
+  readonly flotationParts: (diameter: string, width: string, rim: string) => readonly { readonly token: string; readonly label: string; readonly detail: string }[];
   readonly breadcrumbHome: string;
   readonly breadcrumbHub: string;
+  readonly diameter: TireDiameterGroupText;
 }
 
 /** Pre-formatted, locale-correct figures used in a tire-size page title and description. */
@@ -114,8 +121,50 @@ export interface TireTitleFigures {
   readonly diameterMm: string;
   readonly circumferenceMm: string;
   readonly diameterIn: string;
+  readonly widthIn: string;
+  readonly sidewallIn: string;
   readonly sidewallMm: string;
+  readonly rim: string;
   readonly commercial: boolean;
+  readonly flotation: boolean;
+}
+
+/** Inch figures used by the "how tall is it" FAQ answer. */
+export interface TireFaqFigures {
+  readonly diameterIn: string;
+  readonly diameterMm: string;
+  readonly widthIn: string;
+  readonly sidewallIn: string;
+  /** Closest metric sizes on the same rim, already formatted ("285/75R16, 305/70R16"). */
+  readonly metricEquivalents: string;
+  /** e.g. "33-inch" group label and link text; empty when the size has no diameter group page. */
+  readonly inchClass: string;
+}
+
+/** Copy for one "N-inch tires" group page (all sizes with that rounded overall diameter). */
+export interface TireDiameterGroupText {
+  readonly title: (inches: number) => string;
+  readonly description: (inches: number, count: number, examples: string) => string;
+  readonly kicker: string;
+  readonly h1: (inches: number) => string;
+  readonly lead: (inches: number, count: number) => string;
+  readonly ruleNote: (inches: number) => string;
+  readonly tableHeading: (inches: number) => string;
+  readonly rimGroup: (rim: string) => string;
+  readonly colSize: string;
+  readonly colDiameter: string;
+  readonly colWidth: string;
+  readonly colSidewall: string;
+  readonly flotationTag: string;
+  readonly popularHeading: (inches: number) => string;
+  readonly popularIntro: string;
+  readonly neighboursHeading: string;
+  readonly groupLink: (inches: number) => string;
+  readonly hubHeading: string;
+  readonly hubIntro: string;
+  readonly sizeLink: (inches: number) => string;
+  readonly faqs: (inches: number, examples: string, flotation: string) => readonly { readonly q: string; readonly a: string }[];
+  readonly breadcrumb: (inches: number) => string;
 }
 
 export interface BoltPatternText {
@@ -207,7 +256,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     hubDescription: 'Browse manufactured metric tire sizes with calculated sidewall, diameter and circumference plus documented Atlas vehicle matches where available.',
     hubKicker: 'Tire size reference',
     hubH1: 'Tire sizes in the Atlas fitment reference',
-    hubLead: (count, vehicles) => `${count} manufactured metric tire ${plural(count, 'size', 'sizes')} are documented in the Atlas reference, including the OEM sizes on ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')}. Every page calculates its own geometry and real near-diameter alternatives; vehicle matches appear only where Atlas has a sourced fitment row.`,
+    hubLead: (count, vehicles) => `${count} manufactured tire ${plural(count, 'size', 'sizes')} are documented in the Atlas reference, including the OEM sizes on ${vehicles} sourced ${plural(vehicles, 'vehicle', 'vehicles')}. Every page calculates its own geometry and real near-diameter alternatives; vehicle matches appear only where Atlas has a sourced fitment row.`,
     notationHeading: 'How to read a tire size',
     notationIntro: 'A metric tire code such as 205/55R16 packs three separate measurements plus a construction letter into one string:',
     notationParts: [
@@ -236,8 +285,12 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     detailKicker: 'Tire size',
     detailTitle: (notation, f) => f.commercial
       ? `${notation} Van Tire Size: Dimensions & Alternatives`
-      : `${notation} Tire Size: ${f.diameterIn}″ Diameter & Alternatives`,
-    detailDescription: (notation, f, vehicles) => `${notation} is ${f.diameterMm} mm (${f.diameterIn}″) tall with a ${f.sidewallMm} mm sidewall. Circumference, revs per mile, plus/minus sizes with speedometer error${vehicles > 0 ? ` and ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}` : ''}.`,
+      : f.flotation
+        ? `${notation} Tire Size in mm & Metric Equivalent`
+        : `${notation} Tire Size in Inches: ${f.diameterIn}″ × ${f.widthIn}″`,
+    detailDescription: (notation, f, vehicles) => f.flotation
+      ? `${notation} in metric: ${f.diameterMm} mm tall, ${f.sidewallIn}″ sidewall on a ${f.rim}-inch rim. Closest metric sizes, speedometer change${vehicles > 0 ? ` and ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}` : ''}.`
+      : `How big is a ${notation} tire? ${f.diameterIn} in tall (${f.diameterMm} mm), ${f.widthIn} in wide, ${f.sidewallIn} in sidewall. Equivalent sizes and speedometer change${vehicles > 0 ? `, ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}` : ''}.`,
     detailH1: (notation) => `${notation} tire size`,
     commercialKicker: 'Light-commercial (C) tire size',
     commercialNote: 'The "C" marks a reinforced light-commercial tire for vans and light trucks. Its nominal dimensions match the passenger size with the same numbers, but it is built for higher loads and usually runs at higher inflation pressure. A passenger tire is not a load-rated substitute for a C tire.',
@@ -306,6 +359,45 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
       { q: `What does the ${rim} in ${notation} mean?`, a: `It is the rim diameter in inches: this tire mounts on a ${rim}-inch wheel. The first two numbers are metric (millimetres and a percentage), so a tire code deliberately mixes unit systems.` },
     ],
     breadcrumbHome: 'Home', breadcrumbHub: 'Tire sizes',
+    sizeFaqs: (notation, f, flotation) => [
+      flotation
+        ? { q: `What is ${notation} in metric?`, a: `${notation} is ${f.diameterMm} mm (${f.diameterIn} in) tall and ${f.widthIn} in wide with a ${f.sidewallIn}-inch sidewall.${f.metricEquivalents ? ` The closest metric sizes on the same rim are ${f.metricEquivalents}.` : ''}` }
+        : { q: `How tall is a ${notation} tire in inches?`, a: `${f.diameterIn} inches (${f.diameterMm} mm) overall, ${f.widthIn} inches wide, with a ${f.sidewallIn}-inch sidewall.${f.inchClass ? ` That makes it a ${f.inchClass} tire.` : ''}` },
+    ],
+    flotationKicker: 'High-flotation tire size',
+    flotationNote: 'A flotation size states its overall diameter and section width directly in inches, then the rim. It is the usual notation for off-road and light-truck tires in North America.',
+    flotationLead: (diameter, width, rim) => `A ${diameter}-inch-tall tire, ${width} inches wide, mounted on a ${rim}-inch rim.`,
+    flotationParts: (diameter, width, rim) => [
+      { token: diameter, label: 'Overall diameter', detail: `${diameter} inches tall, measured inflated and unloaded.` },
+      { token: width, label: 'Section width', detail: `${width} inches from sidewall to sidewall.` },
+      { token: 'R', label: 'Radial construction', detail: 'The casing plies run radially.' },
+      { token: rim, label: 'Rim diameter', detail: `Mounts on a ${rim}-inch wheel.` },
+    ],
+    diameter: {
+      title: (n) => `${n}-Inch Tires: Every Metric Size That Equals ${n}″`,
+      description: (n, count, ex) => `Which metric tire sizes are ${n} inches tall? ${count} sizes by rim, with exact height in inches and mm — e.g. ${ex}.`,
+      kicker: 'Tire sizes by height',
+      h1: (n) => `${n}-inch tire sizes`,
+      lead: (n, count) => `${count} manufactured sizes in the Atlas reference come out at about ${n} inches tall. They are listed by rim with the exact calculated diameter, width and sidewall.`,
+      ruleNote: (n) => `"${n}-inch" here means an overall diameter that rounds to ${n} in (${n - 0.5} to just under ${n + 0.5} in). Real tires vary slightly by brand and tread.`,
+      tableHeading: (n) => `${n}-inch sizes by rim`,
+      rimGroup: (rim) => `${rim}″ rim`,
+      colSize: 'Size', colDiameter: 'Exact diameter', colWidth: 'Width', colSidewall: 'Sidewall',
+      flotationTag: 'flotation',
+      popularHeading: (n) => `The ${n}-inch size closest to exact on each rim`,
+      popularIntro: 'For each rim, the size whose calculated diameter is nearest the whole number:',
+      neighboursHeading: 'Other tire heights',
+      groupLink: (n) => `${n}″ tires`,
+      hubHeading: 'Browse by tire height',
+      hubIntro: 'Every size grouped by its overall diameter in inches — the way off-road and truck tires are usually described:',
+      sizeLink: (n) => `All ${n}-inch tire sizes`,
+      faqs: (n, ex, flot) => [
+        { q: `What size is a ${n} inch tire in metric?`, a: `There is no single size: any metric size about ${n} inches tall counts. The closest on common rims are ${ex}.` },
+        ...(flot ? [{ q: `What are the flotation ${n}-inch sizes?`, a: `In flotation notation the height is the first number: ${flot}.` }] : []),
+        { q: `Can I swap my tires for a ${n}-inch size?`, a: 'A taller tire changes speedometer reading, gearing and clearance. The tables are geometry only; check wheel width, load index, clearance and the vehicle manufacturer’s approved sizes first.' },
+      ],
+      breadcrumb: (n) => `${n}-inch tires`,
+    },
   },
 
   de: {
@@ -313,7 +405,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     hubDescription: 'Metrische Reifengrößen mit berechneter Flanke, Durchmesser und Umfang sowie belegten Atlas-Fahrzeugzuordnungen, soweit vorhanden.',
     hubKicker: 'Reifengrößen-Referenz',
     hubH1: 'Reifengrößen in der Atlas-Fitment-Referenz',
-    hubLead: (count, vehicles) => `${count} hergestellte metrische ${plural(count, 'Reifengröße ist', 'Reifengrößen sind')} in der Atlas-Referenz dokumentiert, einschließlich der Werksgrößen von ${vehicles} belegten Fahrzeugen. Jede Seite berechnet Geometrie und echte Alternativen; Fahrzeugtreffer erscheinen nur bei belegter Zuordnung.`,
+    hubLead: (count, vehicles) => `${count} hergestellte ${plural(count, 'Reifengröße ist', 'Reifengrößen sind')} in der Atlas-Referenz dokumentiert, einschließlich der Werksgrößen von ${vehicles} belegten Fahrzeugen. Jede Seite berechnet Geometrie und echte Alternativen; Fahrzeugtreffer erscheinen nur bei belegter Zuordnung.`,
     notationHeading: 'So lesen Sie eine Reifengröße',
     notationIntro: 'Ein metrischer Reifencode wie 205/55R16 fasst drei getrennte Maße und einen Bauart-Buchstaben in einer Zeichenfolge zusammen:',
     notationParts: [
@@ -342,7 +434,11 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     detailKicker: 'Reifengröße',
     detailTitle: (notation, f) => f.commercial
       ? `${notation} Transporterreifen: Maße & Alternativen`
-      : `${notation} Reifen: Abrollumfang ${f.circumferenceMm} mm & Alternativen`,
+      : f.flotation
+        ? `${notation} Reifen: Maße in mm & metrische Größe`
+        : notation.length > 11
+          ? `${notation} Reifen: Abrollumfang ${f.circumferenceMm} mm & Maße`
+          : `${notation} Reifen: Abrollumfang ${f.circumferenceMm} mm & Alternativen`,
     detailDescription: (notation, f, vehicles) => `${notation}: ${f.diameterMm} mm Durchmesser, ${f.circumferenceMm} mm Abrollumfang, ${f.sidewallMm} mm Flanke. Mit Umrüstgrößen und Tachoabweichung${vehicles > 0 ? ` sowie ${vehicles} ${plural(vehicles, 'Fahrzeug', 'Fahrzeugen')}` : ''}.`,
     detailH1: (notation) => `Reifengröße ${notation}`,
     commercialKicker: 'Transporter-Reifengröße (C)',
@@ -412,6 +508,45 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
       { q: `Wofür steht die ${rim} in ${notation}?`, a: `Für den Felgendurchmesser in Zoll: Dieser Reifen wird auf eine ${rim}-Zoll-Felge montiert. Die ersten beiden Zahlen sind metrisch (Millimeter und Prozent) — ein Reifencode mischt also bewusst die Einheitensysteme.` },
     ],
     breadcrumbHome: 'Startseite', breadcrumbHub: 'Reifengrößen',
+    sizeFaqs: (notation, f, flotation) => [
+      flotation
+        ? { q: `Welche metrische Größe entspricht ${notation}?`, a: `${notation} ist ${f.diameterMm} mm (${f.diameterIn} Zoll) hoch und ${f.widthIn} Zoll breit, mit ${f.sidewallIn} Zoll Flankenhöhe.${f.metricEquivalents ? ` Die nächsten metrischen Größen auf derselben Felge sind ${f.metricEquivalents}.` : ''}` }
+        : { q: `Wie groß ist ein ${notation} Reifen in Zoll?`, a: `${f.diameterIn} Zoll (${f.diameterMm} mm) Gesamtdurchmesser, ${f.widthIn} Zoll Breite und ${f.sidewallIn} Zoll Flankenhöhe.${f.inchClass ? ` Damit ist er ein ${f.inchClass}-Reifen.` : ''}` },
+    ],
+    flotationKicker: 'Reifengröße in Zoll (Flotation)',
+    flotationNote: 'Eine Flotation-Größe nennt Gesamtdurchmesser und Breite direkt in Zoll, danach den Felgendurchmesser. Diese Schreibweise ist bei Offroad- und Pick-up-Reifen aus Nordamerika üblich.',
+    flotationLead: (diameter, width, rim) => `Ein ${diameter} Zoll hoher und ${width} Zoll breiter Reifen auf einer ${rim}-Zoll-Felge.`,
+    flotationParts: (diameter, width, rim) => [
+      { token: diameter, label: 'Gesamtdurchmesser', detail: `${diameter} Zoll hoch, aufgepumpt und unbelastet.` },
+      { token: width, label: 'Querschnittsbreite', detail: `${width} Zoll von Flanke zu Flanke.` },
+      { token: 'R', label: 'Radialbauweise', detail: 'Die Karkassenlagen verlaufen radial.' },
+      { token: rim, label: 'Felgendurchmesser', detail: `Montage auf einer ${rim}-Zoll-Felge.` },
+    ],
+    diameter: {
+      title: (n) => `${n} Zoll Reifen: alle metrischen Größen mit ${n}″`,
+      description: (n, count, ex) => `Welche Reifengrößen sind ${n} Zoll hoch? ${count} Größen nach Felge, mit exaktem Durchmesser in Zoll und mm — z. B. ${ex}.`,
+      kicker: 'Reifengrößen nach Höhe',
+      h1: (n) => `${n}-Zoll-Reifengrößen`,
+      lead: (n, count) => `${count} hergestellte Größen der Atlas-Referenz sind rund ${n} Zoll hoch. Sie stehen hier nach Felge sortiert, mit exakt berechnetem Durchmesser, Breite und Flanke.`,
+      ruleNote: (n) => `„${n} Zoll“ heißt hier: ein Gesamtdurchmesser, der auf ${n} Zoll gerundet wird (${String(n - 0.5).replace('.', ',')} bis knapp ${String(n + 0.5).replace('.', ',')} Zoll). Echte Reifen weichen je nach Hersteller leicht ab.`,
+      tableHeading: (n) => `${n}-Zoll-Größen nach Felge`,
+      rimGroup: (rim) => `${rim}-Zoll-Felge`,
+      colSize: 'Größe', colDiameter: 'Exakter Durchmesser', colWidth: 'Breite', colSidewall: 'Flanke',
+      flotationTag: 'Flotation',
+      popularHeading: (n) => `Die ${n}-Zoll-Größe, die je Felge am genauesten passt`,
+      popularIntro: 'Je Felge die Größe, deren berechneter Durchmesser am nächsten an der ganzen Zahl liegt:',
+      neighboursHeading: 'Andere Reifenhöhen',
+      groupLink: (n) => `${n}″ Reifen`,
+      hubHeading: 'Nach Reifenhöhe suchen',
+      hubIntro: 'Alle Größen nach Gesamtdurchmesser in Zoll gruppiert — so werden Offroad- und Pick-up-Reifen meist beschrieben:',
+      sizeLink: (n) => `Alle ${n}-Zoll-Reifengrößen`,
+      faqs: (n, ex, flot) => [
+        { q: `Welche Reifengröße hat ${n} Zoll?`, a: `Es gibt nicht die eine Größe: Jede metrische Größe mit rund ${n} Zoll Durchmesser zählt. Auf gängigen Felgen am nächsten liegen ${ex}.` },
+        ...(flot ? [{ q: `Welche Flotation-Größen haben ${n} Zoll?`, a: `In der Flotation-Schreibweise ist die Höhe die erste Zahl: ${flot}.` }] : []),
+        { q: `Kann ich auf eine ${n}-Zoll-Größe umrüsten?`, a: 'Ein höherer Reifen verändert Tachoanzeige, Übersetzung und Freigang. Die Tabellen zeigen nur Geometrie; Felgenbreite, Tragfähigkeit, Freigang und die Herstellerfreigabe bzw. Eintragung müssen zuerst passen.' },
+      ],
+      breadcrumb: (n) => `${n} Zoll Reifen`,
+    },
   },
 
   es: {
@@ -419,7 +554,7 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     hubDescription: 'Medidas métricas fabricadas con flanco, diámetro y circunferencia calculados, más vehículos documentados por Atlas cuando existen.',
     hubKicker: 'Referencia de medidas',
     hubH1: 'Medidas de neumático en la referencia Atlas',
-    hubLead: (count, vehicles) => `${count} ${plural(count, 'medida métrica fabricada está documentada', 'medidas métricas fabricadas están documentadas')} en la referencia Atlas, incluidas las medidas de origen de ${vehicles} vehículos documentados. Cada página calcula su geometría y alternativas reales; solo muestra vehículos cuando existe una relación respaldada.`,
+    hubLead: (count, vehicles) => `${count} ${plural(count, 'medida fabricada está documentada', 'medidas fabricadas están documentadas')} en la referencia Atlas, incluidas las medidas de origen de ${vehicles} vehículos documentados. Cada página calcula su geometría y alternativas reales; solo muestra vehículos cuando existe una relación respaldada.`,
     notationHeading: 'Cómo se lee una medida de neumático',
     notationIntro: 'Un código métrico como 205/55R16 reúne tres medidas distintas y una letra de construcción en una sola cadena:',
     notationParts: [
@@ -448,8 +583,12 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     detailKicker: 'Medida de neumático',
     detailTitle: (notation, f) => f.commercial
       ? `${notation} de furgoneta: medidas y equivalencias`
-      : `Neumático ${notation}: diámetro ${f.diameterMm} mm y equivalencias`,
-    detailDescription: (notation, f, vehicles) => `${notation}: ${f.diameterMm} mm de diámetro, ${f.sidewallMm} mm de flanco y ${f.circumferenceMm} mm de circunferencia. Equivalencias en otras llantas y error de velocímetro${vehicles > 0 ? `, con ${vehicles} ${plural(vehicles, 'vehículo', 'vehículos')}` : ''}.`,
+      : f.flotation
+        ? `Llanta ${notation}: medida en mm y equivalencia métrica`
+        : `Neumático ${notation} en pulgadas: ${f.diameterIn}″ y equivalencias`,
+    detailDescription: (notation, f, vehicles) => f.flotation
+      ? `${notation} en milímetros: ${f.diameterMm} mm de diámetro y flanco de ${f.sidewallIn}″ en rin de ${f.rim}. Medidas métricas equivalentes y error de velocímetro${vehicles > 0 ? `, con ${vehicles} ${plural(vehicles, 'vehículo', 'vehículos')}` : ''}.`
+      : `¿Cuánto mide una llanta ${notation}? ${f.diameterIn} pulgadas (${f.diameterMm} mm) de diámetro y ${f.widthIn}″ de ancho. Equivalencias en otras llantas y error de velocímetro${vehicles > 0 ? `, con ${vehicles} ${plural(vehicles, 'vehículo', 'vehículos')}` : ''}.`,
     detailH1: (notation) => `Medida de neumático ${notation}`,
     commercialKicker: 'Medida de neumático de furgoneta (C)',
     commercialNote: 'La «C» indica un neumático reforzado para vehículos comerciales ligeros, como furgonetas. Sus medidas nominales coinciden con las del turismo con los mismos números, pero está construido para más carga y suele llevar más presión de inflado. Un neumático de turismo no sustituye a un neumático C en capacidad de carga.',
@@ -518,6 +657,45 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
       { q: `¿Qué significa el ${rim} de ${notation}?`, a: `Es el diámetro de llanta en pulgadas: este neumático se monta en una llanta de ${rim} pulgadas. Los dos primeros números son métricos (milímetros y porcentaje), así que un código de neumático mezcla sistemas de unidades a propósito.` },
     ],
     breadcrumbHome: 'Inicio', breadcrumbHub: 'Medidas de neumáticos',
+    sizeFaqs: (notation, f, flotation) => [
+      flotation
+        ? { q: `¿Cuál es la equivalencia métrica de ${notation}?`, a: `${notation} mide ${f.diameterMm} mm (${f.diameterIn} pulgadas) de alto y ${f.widthIn} pulgadas de ancho, con un flanco de ${f.sidewallIn} pulgadas.${f.metricEquivalents ? ` Las medidas métricas más cercanas en el mismo rin son ${f.metricEquivalents}.` : ''}` }
+        : { q: `¿Cuánto mide una llanta ${notation} en pulgadas?`, a: `${f.diameterIn} pulgadas (${f.diameterMm} mm) de diámetro total, ${f.widthIn} pulgadas de ancho y ${f.sidewallIn} pulgadas de flanco.${f.inchClass ? ` Es decir, una llanta de ${f.inchClass}.` : ''}` },
+    ],
+    flotationKicker: 'Medida en pulgadas (flotación)',
+    flotationNote: 'Una medida de flotación indica directamente el diámetro total y el ancho en pulgadas, y después el rin. Es la nomenclatura habitual de las llantas todoterreno y de camioneta en América.',
+    flotationLead: (diameter, width, rim) => `Una llanta de ${diameter} pulgadas de alto y ${width} pulgadas de ancho, para rin de ${rim} pulgadas.`,
+    flotationParts: (diameter, width, rim) => [
+      { token: diameter, label: 'Diámetro total', detail: `${diameter} pulgadas de alto, inflada y sin carga.` },
+      { token: width, label: 'Ancho de sección', detail: `${width} pulgadas de flanco a flanco.` },
+      { token: 'R', label: 'Construcción radial', detail: 'Las lonas de la carcasa van en radial.' },
+      { token: rim, label: 'Diámetro de rin', detail: `Se monta en un rin de ${rim} pulgadas.` },
+    ],
+    diameter: {
+      title: (n) => `Llantas de ${n} pulgadas: equivalencias en medida métrica`,
+      description: (n, count, ex) => `¿Qué medida es una llanta de ${n} pulgadas? ${count} medidas métricas por rin, con el diámetro exacto en pulgadas y mm; por ejemplo ${ex}.`,
+      kicker: 'Medidas por altura',
+      h1: (n) => `Llantas de ${n} pulgadas`,
+      lead: (n, count) => `${count} medidas fabricadas de la referencia Atlas miden unas ${n} pulgadas de alto. Aquí están por rin, con el diámetro, el ancho y el flanco calculados.`,
+      ruleNote: (n) => `«${n} pulgadas» significa aquí un diámetro total que se redondea a ${n} (de ${String(n - 0.5).replace('.', ',')} a poco menos de ${String(n + 0.5).replace('.', ',')} pulgadas). Las llantas reales varían un poco según la marca.`,
+      tableHeading: (n) => `Medidas de ${n} pulgadas por rin`,
+      rimGroup: (rim) => `Rin ${rim}`,
+      colSize: 'Medida', colDiameter: 'Diámetro exacto', colWidth: 'Ancho', colSidewall: 'Flanco',
+      flotationTag: 'flotación',
+      popularHeading: (n) => `La medida de ${n} pulgadas más exacta en cada rin`,
+      popularIntro: 'En cada rin, la medida cuyo diámetro calculado queda más cerca del número entero:',
+      neighboursHeading: 'Otras alturas de llanta',
+      groupLink: (n) => `Llantas ${n}″`,
+      hubHeading: 'Buscar por altura de llanta',
+      hubIntro: 'Todas las medidas agrupadas por su diámetro total en pulgadas, como se suelen pedir las llantas todoterreno y de camioneta:',
+      sizeLink: (n) => `Todas las llantas de ${n} pulgadas`,
+      faqs: (n, ex, flot) => [
+        { q: `¿Qué medida es una llanta de ${n} pulgadas?`, a: `No hay una sola: cuenta cualquier medida métrica de unas ${n} pulgadas de alto. Las más cercanas en los rines habituales son ${ex}.` },
+        ...(flot ? [{ q: `¿Qué medidas de flotación son de ${n} pulgadas?`, a: `En la nomenclatura de flotación la altura es el primer número: ${flot}.` }] : []),
+        { q: `¿Puedo cambiar a una llanta de ${n} pulgadas?`, a: 'Una llanta más alta cambia la lectura del velocímetro, la relación final y la holgura. Las tablas son solo geometría; revise antes el ancho del rin, el índice de carga, la holgura y las medidas aprobadas por el fabricante.' },
+      ],
+      breadcrumb: (n) => `Llantas ${n} pulgadas`,
+    },
   },
 });
 

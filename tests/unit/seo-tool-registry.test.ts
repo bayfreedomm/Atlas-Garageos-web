@@ -6,6 +6,7 @@ import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
 import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
 import { entityLocales } from '../../src/seo/entity-routes';
 import { dtcRecords } from '../../src/data/dtc-records';
+import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 
 const intendedRoutes = [
   '/',
@@ -80,7 +81,7 @@ describe('SEO tool registry', () => {
     // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
     // hand-maintained page count.
-    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
+    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
     // Diagnostics adds one directory plus exactly one page per record that passed the production
     // catalog publication gate. Draft fixtures and arbitrary input state never reach the sitemap.
     const diagnosticRoutes = 1 + dtcRecords.length;

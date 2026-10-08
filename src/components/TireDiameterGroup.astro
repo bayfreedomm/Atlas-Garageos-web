@@ -1,0 +1,110 @@
+---
+// One "N-inch tires" page: every catalog size whose calculated overall diameter rounds to N
+// inches, grouped by rim. Rendered by the same three tire-size route files as the size pages.
+import { tireSizePageText } from '../content/entity-page-text';
+import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
+import {
+  displayTireNotation, homePath, tireDiameterGroupHighlights, tireDiameterGroupPath, tireDiameterGroups,
+  tireSizeMetrics, type TireDiameterGroup,
+} from '../ui/entity-page-model';
+import { formatDecimal, formatPlain } from '../ui/locale-format';
+
+interface Props { readonly group: TireDiameterGroup; readonly locale: EntityLocale; }
+const { group, locale } = Astro.props;
+
+const t = tireSizePageText[locale];
+const d = t.diameter;
+const n = group.inches;
+const hubHref = entityHubPath('tire-size', locale);
+
+const rows = group.members.map((member) => {
+  const metrics = tireSizeMetrics(member.entry);
+  return {
+    rim: member.entry.rimDiameterInches,
+    href: entityDetailPath('tire-size', locale, member.entry.slug),
+    notation: displayTireNotation(member.entry.notation, locale),
+    flotation: Boolean(member.entry.flotation),
+    diameter: `${formatDecimal(member.diameterIn, 1, locale)}″ · ${formatDecimal(metrics.overallDiameterMm, 0, locale)} mm`,
+    width: `${formatDecimal(metrics.sectionWidthMm / 25.4, 1, locale)}″`,
+    sidewall: `${formatDecimal(metrics.sidewallHeightMm / 25.4, 1, locale)}″`,
+  };
+});
+const rims = [...new Set(rows.map((row) => row.rim))];
+const highlights = tireDiameterGroupHighlights(group);
+const examples = highlights.filter((member) => !member.entry.flotation).slice(0, 5)
+  .map((member) => `${displayTireNotation(member.entry.notation, locale)} (${formatDecimal(member.diameterIn, 1, locale)}″)`).join(', ');
+const flotationList = group.members.filter((member) => member.entry.flotation).slice(0, 6)
+  .map((member) => displayTireNotation(member.entry.notation, locale)).join(', ');
+const faqs = d.faqs(n, examples, flotationList);
+const allGroups = tireDiameterGroups();
+const index = allGroups.findIndex((candidate) => candidate.inches === n);
+const nearby = allGroups.slice(Math.max(0, index - 4), index + 5).filter((candidate) => candidate.inches !== n);
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <a href={hubHref}>{t.breadcrumbHub}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{d.breadcrumb(n)}</span>
+</nav>
+
+<header class="entity-hero">
+  <p class="eyebrow">{d.kicker}</p>
+  <h1 class="entity-hero__title">{d.h1(n)}</h1>
+  <p class="entity-hero__lead">{d.lead(n, group.members.length)}</p>
+  <p class="entity-note">{d.ruleNote(n)}</p>
+</header>
+
+{highlights.length > 0 && (
+  <section class="entity-section" aria-labelledby="diameter-popular">
+    <h2 id="diameter-popular">{d.popularHeading(n)}</h2>
+    <p class="entity-note">{d.popularIntro}</p>
+    <ul class="entity-chiplist">
+      {highlights.map((member) => (
+        <li><a class="entity-chip" href={entityDetailPath('tire-size', locale, member.entry.slug)}>{displayTireNotation(member.entry.notation, locale)} · {formatDecimal(member.diameterIn, 1, locale)}″</a></li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<section class="entity-section" aria-labelledby="diameter-table">
+  <h2 id="diameter-table">{d.tableHeading(n)}</h2>
+  <div class="entity-table-scroll">
+    <table class="entity-table">
+      <thead><tr><th scope="col">{d.colSize}</th><th scope="col">{d.colDiameter}</th><th scope="col">{d.colWidth}</th><th scope="col">{d.colSidewall}</th></tr></thead>
+      {rims.map((rim) => (
+        <tbody>
+          <tr class="entity-table__group"><th scope="rowgroup" colspan="4">{d.rimGroup(formatPlain(rim, locale))}</th></tr>
+          {rows.filter((row) => row.rim === rim).map((row) => (
+            <tr>
+              <th scope="row"><a href={row.href}>{row.notation}</a>{row.flotation && <span class="entity-card__meta"> · {d.flotationTag}</span>}</th>
+              <td>{row.diameter}</td>
+              <td>{row.width}</td>
+              <td>{row.sidewall}</td>
+            </tr>
+          ))}
+        </tbody>
+      ))}
+    </table>
+  </div>
+  <p class="entity-caveat"><strong>⚠</strong> {t.compareCaveat}</p>
+</section>
+
+{nearby.length > 0 && (
+  <section class="entity-section" aria-labelledby="diameter-nearby">
+    <h2 id="diameter-nearby">{d.neighboursHeading}</h2>
+    <ul class="entity-chiplist">
+      {nearby.map((candidate) => <li><a class="entity-chip" href={tireDiameterGroupPath(candidate.inches, locale)}>{d.groupLink(candidate.inches)}</a></li>)}
+    </ul>
+  </section>
+)}
+
+<section class="entity-section" aria-labelledby="diameter-faq">
+  <h2 id="diameter-faq">{t.faqHeading}</h2>
+  {faqs.map((faq) => <details class="entity-faq"><summary>{faq.q}</summary><p>{faq.a}</p></details>)}
+</section>
+
+<section class="entity-section" aria-labelledby="diameter-related">
+  <h2 id="diameter-related">{t.relatedHeading}</h2>
+  <div class="entity-links">
+    <a class="entity-link-card" href={hubHref}><strong>{t.backToHub}</strong><span>{t.hubKicker}</span><i aria-hidden="true">›</i></a>
+  </div>
+</section>

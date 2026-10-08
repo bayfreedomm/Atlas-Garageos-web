@@ -6,7 +6,7 @@
  * .astro files never do arithmetic of their own. Keeping it in a .ts module also means it is
  * covered by tsc and by unit tests, which .astro frontmatter is not.
  */
-import { calculateTireSizeTool, compareTireSizesTool } from '../features/tools/calculator-tools';
+import { calculateTireSizeTool } from '../features/tools/calculator-tools';
 import { inchesToMillimeters } from '../core/units/conversion';
 import { tireSizeCatalog, vehiclesForTireSize, type TireSizeEntry } from '../data/tire-size-catalog';
 import { boltPatternCatalog, vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
@@ -35,7 +35,37 @@ export interface TireSizeMetrics {
  * every catalog entry has already passed geometry validation, so a failure here means the
  * validator and the calculator disagree, which is a bug worth failing the build over.
  */
+const metricsCache = new WeakMap<TireSizeEntry, TireSizeMetrics>();
+
 export function tireSizeMetrics(entry: TireSizeEntry): TireSizeMetrics {
+  const cached = metricsCache.get(entry);
+  if (cached) return cached;
+  const metrics = computeTireSizeMetrics(entry);
+  metricsCache.set(entry, metrics);
+  return metrics;
+}
+
+function computeTireSizeMetrics(entry: TireSizeEntry): TireSizeMetrics {
+  if (entry.flotation) {
+    // A flotation size states its overall diameter and section width directly, in inches, so
+    // its geometry is read from the notation rather than derived from a metric aspect ratio.
+    const overallDiameterMm = entry.flotation.overallDiameterIn * 25.4;
+    const sectionWidthMm = entry.flotation.sectionWidthIn * 25.4;
+    const rimDiameterMm = inchesToMillimeters(entry.rimDiameterInches);
+    const sidewallHeightMm = (overallDiameterMm - rimDiameterMm) / 2;
+    const circumferenceMm = overallDiameterMm * Math.PI;
+    return Object.freeze({
+      sectionWidthMm,
+      aspectRatio: (sidewallHeightMm / sectionWidthMm) * 100,
+      sidewallHeightMm,
+      rimDiameterInches: entry.rimDiameterInches,
+      rimDiameterMm,
+      overallDiameterMm,
+      circumferenceMm,
+      revolutionsPerKilometer: 1_000_000 / circumferenceMm,
+      revolutionsPerMile: 1_609_344 / circumferenceMm,
+    });
+  }
   const result = calculateTireSizeTool({ widthMm: entry.widthMm, aspectRatio: entry.aspectRatio, rimDiameterInches: entry.rimDiameterInches });
   if (!result.ok) throw new Error(`Tire geometry rejected catalog entry ${entry.notation}: ${result.issues.map((issue) => issue.message).join('; ')}`);
   return Object.freeze({
@@ -69,7 +99,7 @@ export interface FormattedTireMetrics {
  */
 export function formatTireMetrics(metrics: TireSizeMetrics, locale: NumberLocale = 'en'): FormattedTireMetrics {
   return Object.freeze({
-    sectionWidth: `${metrics.sectionWidthMm} mm`,
+    sectionWidth: formatMm(metrics.sectionWidthMm, Number.isInteger(metrics.sectionWidthMm) ? 0 : 1, locale),
     aspectRatio: formatPercent(metrics.aspectRatio, 0, locale),
     sidewallHeight: formatMm(metrics.sidewallHeightMm, 1, locale),
     rimDiameterIn: `${formatPlain(metrics.rimDiameterInches, locale)}″`,
@@ -100,13 +130,15 @@ export function tireInchView(metrics: TireSizeMetrics): TireInchView {
 
 /** Flotation-style shorthand, e.g. "24.9 × 8.1 R16" (diameter × width, rim). */
 export function inchShorthand(entry: TireSizeEntry, metrics: TireSizeMetrics, locale: NumberLocale = 'en'): string {
+  if (entry.flotation) return `${formatPlain(entry.flotation.overallDiameterIn, locale)} × ${formatDecimal(entry.flotation.sectionWidthIn, 2, locale)} R${formatPlain(entry.rimDiameterInches, locale)}`;
   const view = tireInchView(metrics);
   return `${formatDecimal(view.overallDiameterIn, 1, locale)} × ${formatDecimal(view.sectionWidthIn, 1, locale)} R${formatPlain(entry.rimDiameterInches, locale)}`;
 }
 
 /** German/Spanish write "205/55 R16"; English keeps the compact "205/55R16". */
 export function displayTireNotation(notation: string, locale: NumberLocale): string {
-  return locale === 'en' ? notation : notation.replace(/R(\d)/, ' R$1');
+  // German and Spanish also write a half-inch rim with a decimal comma: "315/80 R22,5".
+  return locale === 'en' ? notation : notation.replace(/R(\d)/, ' R$1').replace(/R(\d{2})\.5/, 'R$1,5');
 }
 
 /* ---------------------------------------------------------------------------------------
@@ -181,7 +213,18 @@ export function tireAlternatives(
 export function sameRimNeighbours(entry: TireSizeEntry, catalog: readonly TireSizeEntry[] = tireSizeCatalog, limit = 8): readonly TireSizeEntry[] {
   const pool = catalog.filter((candidate) => candidate.rimDiameterInches === entry.rimDiameterInches
     && Boolean(candidate.commercial) === Boolean(entry.commercial)
+    && Boolean(candidate.flotation) === Boolean(entry.flotation)
     && candidate.notation !== entry.notation);
+  if (entry.flotation) {
+    // Flotation neighbours: the same rim, nearest overall diameter first, then width.
+    const self = entry.flotation;
+    return Object.freeze(pool
+      .map((candidate) => ({ candidate, d: Math.abs(candidate.flotation!.overallDiameterIn - self.overallDiameterIn), w: Math.abs(candidate.flotation!.sectionWidthIn - self.sectionWidthIn) }))
+      .filter((item) => item.d <= 4)
+      .sort((a, b) => a.d - b.d || a.w - b.w)
+      .slice(0, limit)
+      .map((item) => item.candidate));
+  }
   const scored = pool
     .map((candidate) => {
       const dw = Math.abs(candidate.widthMm - entry.widthMm);
@@ -213,19 +256,15 @@ export const SIMILAR_DIAMETER_TOLERANCE_PERCENT = 3;
  * Real sizes only — nothing invented, and never the entry itself.
  */
 export function similarTireSizes(entry: TireSizeEntry, catalog: readonly TireSizeEntry[] = tireSizeCatalog, limit = 6): readonly SimilarTireSize[] {
-  const base = { widthMm: entry.widthMm, aspectRatio: entry.aspectRatio, rimDiameterInches: entry.rimDiameterInches };
+  const baseDiameter = tireSizeMetrics(entry).overallDiameterMm;
   const matches: SimilarTireSize[] = [];
   for (const candidate of catalog) {
     if (candidate.notation === entry.notation) continue;
-    const comparison = compareTireSizesTool(base, { widthMm: candidate.widthMm, aspectRatio: candidate.aspectRatio, rimDiameterInches: candidate.rimDiameterInches });
-    if (!comparison.ok) continue;
-    if (Math.abs(comparison.value.diameterDifferencePercent) > SIMILAR_DIAMETER_TOLERANCE_PERCENT) continue;
-    matches.push(Object.freeze({
-      entry: candidate,
-      overallDiameterMm: comparison.value.proposed.overallDiameterMm,
-      differenceMm: comparison.value.diameterDifferenceMm,
-      differencePercent: comparison.value.diameterDifferencePercent,
-    }));
+    const overallDiameterMm = tireSizeMetrics(candidate).overallDiameterMm;
+    const differenceMm = overallDiameterMm - baseDiameter;
+    const differencePercent = (differenceMm / baseDiameter) * 100;
+    if (Math.abs(differencePercent) > SIMILAR_DIAMETER_TOLERANCE_PERCENT) continue;
+    matches.push(Object.freeze({ entry: candidate, overallDiameterMm, differenceMm, differencePercent }));
   }
   matches.sort((a, b) => Math.abs(a.differencePercent) - Math.abs(b.differencePercent));
   return Object.freeze(matches.slice(0, limit));
@@ -244,6 +283,7 @@ export const signed = (value: number, digits: number, unit: string, locale: Numb
  * ------------------------------------------------------------------------------------ */
 
 export function tireCalculatorHref(locale: EntityLocale, entry: TireSizeEntry): string {
+  if (entry.flotation) return localizedToolPath(locale, 'tire-size-calculator', 'tool');
   const size = `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
   return `${localizedToolPath(locale, 'tire-size-calculator', 'tool')}?size=${size}`;
 }
@@ -251,6 +291,8 @@ export function tireCalculatorHref(locale: EntityLocale, entry: TireSizeEntry): 
 export function tireComparisonHref(locale: EntityLocale, current: TireSizeEntry, next?: TireSizeEntry): string {
   const token = (entry: TireSizeEntry): string => `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
   const base = localizedToolPath(locale, 'tire-size-comparison', 'tool');
+  if (current.flotation) return base;
+  if (next?.flotation) return `${base}?current=${token(current)}`;
   return next === undefined ? `${base}?current=${token(current)}` : `${base}?current=${token(current)}&new=${token(next)}`;
 }
 
@@ -331,7 +373,7 @@ export function splitHeadingAroundKey(heading: string, key: string): HeadingPart
  * Built here rather than in each .astro file so the six route files stay thin wrappers and
  * the title/description/canonical/hreflang rules are written once and typechecked.
  * ------------------------------------------------------------------------------------ */
-import { entityAlternates, entityDetailPath, entityHubPath, type HreflangAlternate } from '../seo/entity-routes';
+import { entityAlternates, entityDetailPath, entityHubPath, entityLocales, type HreflangAlternate } from '../seo/entity-routes';
 import { boltPatternPageText, tireSizePageText } from '../content/entity-page-text';
 
 export interface EntityBreadcrumb { readonly name: string; readonly href: string; }
@@ -363,8 +405,12 @@ export function tireSizeDetailMeta(entry: TireSizeEntry, locale: EntityLocale): 
     diameterMm: formatDecimal(metrics.overallDiameterMm, 1, locale),
     circumferenceMm: formatDecimal(metrics.circumferenceMm, 0, locale),
     diameterIn: formatDecimal(metrics.overallDiameterMm / 25.4, 1, locale),
+    widthIn: formatDecimal(metrics.sectionWidthMm / 25.4, 1, locale),
+    sidewallIn: formatDecimal(metrics.sidewallHeightMm / 25.4, 1, locale),
     sidewallMm: formatDecimal(metrics.sidewallHeightMm, 1, locale),
+    rim: formatPlain(entry.rimDiameterInches, locale),
     commercial: Boolean(entry.commercial),
+    flotation: Boolean(entry.flotation),
   };
   return Object.freeze({
     title: t.detailTitle(shown, figures),
@@ -416,4 +462,108 @@ export function boltPatternsForTireSize(notation: string): readonly BoltPatternE
 export function tireSizesForBoltPattern(notation: string): readonly TireSizeEntry[] {
   const used = new Set(vehiclesForBoltPattern(notation).map((vehicle) => vehicle.tireSize));
   return Object.freeze(tireSizeCatalog.filter((entry) => used.has(entry.notation)));
+}
+
+/* ---------------------------------------------------------------------------------------
+ * Tire-height groups ("33-inch tires")
+ *
+ * Off-road and truck buyers describe tires by overall height. Every catalog size is grouped
+ * by its calculated overall diameter rounded to the nearest inch, and each group with enough
+ * sizes gets its own page in every locale. The group is computed, never hand-listed.
+ * ------------------------------------------------------------------------------------ */
+
+export const TIRE_DIAMETER_GROUP_MIN_SIZES = 4;
+export const TIRE_DIAMETER_GROUP_RANGE = Object.freeze({ min: 22, max: 42 });
+
+export interface TireDiameterGroupMember { readonly entry: TireSizeEntry; readonly diameterIn: number; }
+export interface TireDiameterGroup { readonly inches: number; readonly members: readonly TireDiameterGroupMember[]; }
+
+const DIAMETER_SLUG_SUFFIX: Readonly<Record<EntityLocale, string>> = Object.freeze({ en: 'inch', de: 'zoll', es: 'pulgadas' });
+
+export function tireDiameterGroupSlug(inches: number, locale: EntityLocale): string {
+  return `${inches}-${DIAMETER_SLUG_SUFFIX[locale]}`;
+}
+
+export function tireDiameterGroupPath(inches: number, locale: EntityLocale): string {
+  return entityDetailPath('tire-size', locale, tireDiameterGroupSlug(inches, locale));
+}
+
+let diameterGroupCache: readonly TireDiameterGroup[] | undefined;
+
+export function tireDiameterGroups(catalog: readonly TireSizeEntry[] = tireSizeCatalog): readonly TireDiameterGroup[] {
+  if (catalog === tireSizeCatalog && diameterGroupCache) return diameterGroupCache;
+  const buckets = new Map<number, TireDiameterGroupMember[]>();
+  for (const entry of catalog) {
+    const diameterIn = tireSizeMetrics(entry).overallDiameterMm / 25.4;
+    const inches = Math.round(diameterIn);
+    if (inches < TIRE_DIAMETER_GROUP_RANGE.min || inches > TIRE_DIAMETER_GROUP_RANGE.max) continue;
+    const bucket = buckets.get(inches);
+    if (bucket) bucket.push({ entry, diameterIn });
+    else buckets.set(inches, [{ entry, diameterIn }]);
+  }
+  const groups = [...buckets.entries()]
+    .filter(([, members]) => members.length >= TIRE_DIAMETER_GROUP_MIN_SIZES)
+    .sort((a, b) => a[0] - b[0])
+    .map(([inches, members]) => Object.freeze({
+      inches,
+      members: Object.freeze(members.sort((a, b) => a.entry.rimDiameterInches - b.entry.rimDiameterInches || a.diameterIn - b.diameterIn)),
+    }));
+  const frozen = Object.freeze(groups);
+  if (catalog === tireSizeCatalog) diameterGroupCache = frozen;
+  return frozen;
+}
+
+export function tireDiameterGroupFor(entry: TireSizeEntry): TireDiameterGroup | undefined {
+  const inches = Math.round(tireSizeMetrics(entry).overallDiameterMm / 25.4);
+  return tireDiameterGroups().find((group) => group.inches === inches);
+}
+
+/** Per rim, the member whose diameter is closest to the whole number — the "classic" size. */
+export function tireDiameterGroupHighlights(group: TireDiameterGroup): readonly TireDiameterGroupMember[] {
+  const byRim = new Map<number, TireDiameterGroupMember>();
+  for (const member of group.members) {
+    // Highlights answer "what is N inches in metric", so only metric passenger sizes qualify.
+    if (member.entry.commercial || member.entry.flotation) continue;
+    const best = byRim.get(member.entry.rimDiameterInches);
+    if (!best || Math.abs(member.diameterIn - group.inches) < Math.abs(best.diameterIn - group.inches)) byRim.set(member.entry.rimDiameterInches, member);
+  }
+  return Object.freeze([...byRim.values()].sort((a, b) => a.entry.rimDiameterInches - b.entry.rimDiameterInches));
+}
+
+export function tireDiameterGroupAlternates(inches: number): readonly HreflangAlternate[] {
+  const href = (locale: EntityLocale): string => `https://atlasgarageos.com${tireDiameterGroupPath(inches, locale)}`;
+  return Object.freeze([
+    ...entityLocales().map((locale) => ({ hreflang: locale, href: href(locale) })),
+    { hreflang: 'x-default', href: href('en') },
+  ]);
+}
+
+export function tireDiameterGroupMeta(group: TireDiameterGroup, locale: EntityLocale): EntityPageMeta {
+  const t = tireSizePageText[locale];
+  const pathname = tireDiameterGroupPath(group.inches, locale);
+  const examples = tireDiameterGroupHighlights(group).filter((member) => !member.entry.flotation).slice(0, 3)
+    .map((member) => displayTireNotation(member.entry.notation, locale)).join(', ');
+  return Object.freeze({
+    title: t.diameter.title(group.inches),
+    description: t.diameter.description(group.inches, group.members.length, examples),
+    pathname,
+    alternates: tireDiameterGroupAlternates(group.inches),
+    breadcrumbs: Object.freeze([
+      { name: t.breadcrumbHome, href: homePath(locale) },
+      { name: t.breadcrumbHub, href: entityHubPath('tire-size', locale) },
+      { name: t.diameter.breadcrumb(group.inches), href: pathname },
+    ]),
+  });
+}
+
+/** Closest non-flotation, non-C metric sizes on the same rim, for a flotation size's FAQ. */
+export function metricEquivalents(entry: TireSizeEntry, limit = 3): readonly TireSizeEntry[] {
+  const base = tireSizeMetrics(entry).overallDiameterMm;
+  return Object.freeze(tireSizeCatalog
+    .filter((candidate) => !candidate.flotation && !candidate.commercial && candidate.rimDiameterInches === entry.rimDiameterInches)
+    .map((candidate) => ({ candidate, diff: Math.abs(tireSizeMetrics(candidate).overallDiameterMm - base) / base, width: Math.abs(candidate.widthMm - tireSizeMetrics(entry).sectionWidthMm) }))
+    .filter((item) => item.diff <= 0.02)
+    .sort((a, b) => (a.diff + a.width / 2000) - (b.diff + b.width / 2000))
+    .slice(0, limit)
+    .map((item) => item.candidate));
 }

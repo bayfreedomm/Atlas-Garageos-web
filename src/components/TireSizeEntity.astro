@@ -17,8 +17,8 @@ import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import {
   boltPatternsForTireSize, displayTireNotation, formatTireMetrics, homePath, inchShorthand,
-  sameRimNeighbours, signed, splitHeadingAroundKey, tireAlternatives, tireComparisonHref,
-  tireInchView, tireSizeMetrics, vehicleHubPath, vehicleLink, vehicleNames,
+  metricEquivalents, sameRimNeighbours, signed, splitHeadingAroundKey, tireAlternatives, tireComparisonHref,
+  tireDiameterGroupFor, tireDiameterGroupPath, tireInchView, tireSizeMetrics, vehicleHubPath, vehicleLink, vehicleNames,
 } from '../ui/entity-page-model';
 import { formatDecimal, formatMm, formatPlain } from '../ui/locale-format';
 import { tireDecisionGraph } from '../ui/decision-graph';
@@ -38,9 +38,28 @@ const twin = commercialTwin(entry);
 const relatedPatterns = boltPatternsForTireSize(entry.notation);
 const hubHref = entityHubPath('tire-size', locale);
 const boltHubHref = entityHubPath('bolt-pattern', locale);
-const faqs = t.faqs({ notation: shownNotation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
+const flotation = entry.flotation;
+const rimText = formatPlain(entry.rimDiameterInches, locale);
+const diameterGroup = tireDiameterGroupFor(entry);
+const inchClass = diameterGroup ? (locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : `${diameterGroup.inches} pulgadas`) : '';
+const generalFaqs = t.faqs({ notation: shownNotation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
+const faqs = [
+  ...t.sizeFaqs(shownNotation, {
+    diameterIn: formatDecimal(metrics.overallDiameterMm / 25.4, 1, locale),
+    diameterMm: formatDecimal(metrics.overallDiameterMm, 0, locale),
+    widthIn: formatDecimal(metrics.sectionWidthMm / 25.4, 1, locale),
+    sidewallIn: formatDecimal(metrics.sidewallHeightMm / 25.4, 1, locale),
+    metricEquivalents: flotation ? metricEquivalents(entry).map((candidate) => displayTireNotation(candidate.notation, locale)).join(', ') : '',
+    inchClass,
+  }, Boolean(flotation)),
+  // The last generic answer explains the metric/inch mix of a metric code; it does not apply
+  // to a flotation size, which is all inches.
+  ...(flotation ? generalFaqs.slice(0, 3) : generalFaqs),
+];
 const breakdown = [
-  ...t.breakdownParts(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches),
+  ...(flotation
+    ? t.flotationParts(formatPlain(flotation.overallDiameterIn, locale), formatDecimal(flotation.sectionWidthIn, 2, locale), rimText)
+    : t.breakdownParts(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches)),
   ...(entry.commercial ? [{ token: 'C', label: t.commercialBreakdown.label, detail: t.commercialBreakdown.detail }] : []),
 ];
 // The <h1> carries the full semantic phrase ("235/45R18 tire size" / "Reifengröße 235/45 R18"),
@@ -75,10 +94,16 @@ const decisions = tireDecisionGraph(entry, locale);
 </nav>
 
 <header class="entity-hero">
-  <p class="eyebrow">{entry.commercial ? t.commercialKicker : t.detailKicker}</p>
+  <p class="eyebrow">{entry.commercial ? t.commercialKicker : flotation ? t.flotationKicker : t.detailKicker}</p>
   <h1 class="entity-hero__title">{heading.before}<span class="entity-hero__key">{heading.key}</span>{heading.after}</h1>
-  <p class="entity-hero__lead">{t.detailLead(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches)}</p>
+  <p class="entity-hero__lead">{flotation
+    ? t.flotationLead(formatPlain(flotation.overallDiameterIn, locale), formatDecimal(flotation.sectionWidthIn, 2, locale), rimText)
+    : t.detailLead(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches)}</p>
   {entry.commercial && <p class="entity-note">{t.commercialNote}</p>}
+  {flotation && <p class="entity-note">{t.flotationNote}</p>}
+  {diameterGroup && (
+    <p class="entity-note"><a class="entity-inline-link" href={tireDiameterGroupPath(diameterGroup.inches, locale)}>{t.diameter.sizeLink(diameterGroup.inches)} ›</a></p>
+  )}
   {twin && (
     <p class="entity-note"><a class="entity-inline-link" href={entityDetailPath('tire-size', locale, twin.slug)}>{entry.commercial ? t.commercialTwinLink(displayTireNotation(twin.notation, locale)) : t.passengerTwinLink(displayTireNotation(twin.notation, locale))} ›</a></p>
   )}

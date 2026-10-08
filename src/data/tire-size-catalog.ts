@@ -15,7 +15,7 @@
  *     `excludedTireSizes` with a reason, so it never reaches getStaticPaths() or the sitemap.
  */
 import { vehicleFitmentData, type VehicleFitment } from './vehicle-fitment';
-import { productionCommercialTireSizeNotations, productionTireSizeNotations } from './production-tire-sizes';
+import { PRODUCTION_FLOTATION_TIRE_SIZES, productionCommercialTireSizeNotations, productionTireSizeNotations } from './production-tire-sizes';
 
 export interface TireSizeEntry {
   /** e.g. "205/55R16" — exactly as written in vehicleFitmentData */
@@ -31,6 +31,18 @@ export interface TireSizeEntry {
    * so a C size is its own catalog entry and its own page.
    */
   readonly commercial?: true;
+  /**
+   * Present for a high-flotation light-truck size written in inches, e.g. "33x12.50R15".
+   * Its geometry is defined directly by the overall diameter and section width; widthMm and
+   * aspectRatio above are the nearest metric equivalents, used only for sorting and for
+   * finding neighbouring sizes.
+   */
+  readonly flotation?: FlotationGeometry;
+}
+
+export interface FlotationGeometry {
+  readonly overallDiameterIn: number;
+  readonly sectionWidthIn: number;
 }
 
 export interface ExcludedEntry {
@@ -43,6 +55,9 @@ export interface ExcludedEntry {
  * light-commercial (van) tire. Half-inch rims (R17.5) are accepted.
  */
 const TIRE_NOTATION = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)(C)?$/;
+
+/** High-flotation notation: {diameter}x{width}R{rim} in inches, e.g. "33x12.50R15". */
+const FLOTATION_NOTATION = /^(\d{2})x(\d{1,2}\.\d{2})R(\d{2}(?:\.5)?)$/;
 
 /**
  * Sane physical bounds for a publishable tire size. Outside these, we do not publish.
@@ -61,7 +76,7 @@ const TIRE_NOTATION = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)(C)?$/;
  * still hard-fails in parseTireNotation() and throws at catalog build time.
  */
 export const TIRE_GEOMETRY_BOUNDS = Object.freeze({
-  widthMm: Object.freeze({ min: 80, max: 420 }),
+  widthMm: Object.freeze({ min: 80, max: 460 }),
   aspectRatio: Object.freeze({ min: 20, max: 95 }),
   rimDiameterInches: Object.freeze({ min: 10, max: 30 }),
 });
@@ -72,10 +87,28 @@ export interface ParsedTireNotation {
   readonly rimDiameterInches: number;
   /** Present (and true) only for a light-commercial "C" size. */
   readonly commercial?: true;
+  readonly flotation?: FlotationGeometry;
 }
 
-/** Parse "205/55R16" into its three numbers. Returns null for anything that is not that shape. */
+/**
+ * Parse "205/55R16" (or a flotation size such as "33x12.50R15") into its numbers. Returns null
+ * for anything that is not one of those shapes.
+ */
 export function parseTireNotation(notation: string): ParsedTireNotation | null {
+  const flotation = FLOTATION_NOTATION.exec(notation.trim());
+  if (flotation) {
+    const overallDiameterIn = Number(flotation[1]);
+    const sectionWidthIn = Number(flotation[2]);
+    const rimDiameterInches = Number(flotation[3]);
+    if (!(overallDiameterIn > rimDiameterInches) || !(sectionWidthIn > 0)) return null;
+    const sidewallIn = (overallDiameterIn - rimDiameterInches) / 2;
+    return {
+      widthMm: Math.round(sectionWidthIn * 25.4),
+      aspectRatio: Math.round((sidewallIn / sectionWidthIn) * 100),
+      rimDiameterInches,
+      flotation: Object.freeze({ overallDiameterIn, sectionWidthIn }),
+    };
+  }
   const match = TIRE_NOTATION.exec(notation.trim());
   if (!match) return null;
   const widthMm = Number(match[1]);
@@ -97,6 +130,7 @@ export function tireSizeSlug(notation: string): string {
   const parsed = parseTireNotation(notation);
   if (!parsed) throw new Error(`Cannot build a tire-size slug from malformed notation: ${JSON.stringify(notation)}`);
   const rim = String(parsed.rimDiameterInches).replace('.', '-');
+  if (parsed.flotation) return `${parsed.flotation.overallDiameterIn}x${parsed.flotation.sectionWidthIn.toFixed(2).replace('.', '-')}-r${rim}`;
   return `${parsed.widthMm}-${parsed.aspectRatio}-r${rim}${parsed.commercial ? 'c' : ''}`;
 }
 
@@ -160,11 +194,14 @@ export function buildTireSizeCatalog(
     vehiclesByNotation.set(notation, Object.freeze([...matched]));
   }
 
-  entries.sort((a, b) => a.rimDiameterInches - b.rimDiameterInches || a.widthMm - b.widthMm || a.aspectRatio - b.aspectRatio || Number(Boolean(a.commercial)) - Number(Boolean(b.commercial)));
+  entries.sort((a, b) => a.rimDiameterInches - b.rimDiameterInches
+    || Number(Boolean(a.flotation)) - Number(Boolean(b.flotation))
+    || (a.flotation && b.flotation ? a.flotation.overallDiameterIn - b.flotation.overallDiameterIn || a.flotation.sectionWidthIn - b.flotation.sectionWidthIn : 0)
+    || a.widthMm - b.widthMm || a.aspectRatio - b.aspectRatio || Number(Boolean(a.commercial)) - Number(Boolean(b.commercial)));
   return Object.freeze({ entries: Object.freeze(entries), excluded: Object.freeze(excluded), vehiclesByNotation });
 }
 
-const build = buildTireSizeCatalog(vehicleFitmentData, [...productionTireSizeNotations(), ...productionCommercialTireSizeNotations()]);
+const build = buildTireSizeCatalog(vehicleFitmentData, [...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(), ...PRODUCTION_FLOTATION_TIRE_SIZES]);
 
 /** Every publishable tire size, sorted by rim diameter then width then aspect ratio. */
 export const tireSizeCatalog: readonly TireSizeEntry[] = build.entries;
@@ -194,7 +231,8 @@ export function vehicleFitsAsStandard(vehicle: VehicleFitment, notation: string)
 
 /** The passenger ↔ light-commercial twin of a size (205/65R16 ↔ 205/65R16C), when published. */
 export function commercialTwin(entry: TireSizeEntry): TireSizeEntry | undefined {
-  return tireSizeCatalog.find((candidate) => candidate.widthMm === entry.widthMm
+  if (entry.flotation) return undefined;
+  return tireSizeCatalog.find((candidate) => !candidate.flotation && candidate.widthMm === entry.widthMm
     && candidate.aspectRatio === entry.aspectRatio
     && candidate.rimDiameterInches === entry.rimDiameterInches
     && Boolean(candidate.commercial) !== Boolean(entry.commercial));

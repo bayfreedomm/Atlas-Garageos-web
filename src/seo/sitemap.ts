@@ -5,6 +5,7 @@ import { tireSizeCatalog } from '../data/tire-size-catalog';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 import { dtcRecords } from '../data/dtc-records';
+import { tireDiameterGroupPath, tireDiameterGroups } from '../ui/entity-page-model';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
@@ -60,6 +61,7 @@ function entityPageRoutes(): readonly string[] {
   for (const locale of entityLocales()) {
     routes.push(entityHubPath('tire-size', locale));
     for (const entry of tireSizeCatalog) routes.push(entityDetailPath('tire-size', locale, entry.slug));
+    for (const group of tireDiameterGroups()) routes.push(tireDiameterGroupPath(group.inches, locale));
     routes.push(entityHubPath('bolt-pattern', locale));
     for (const entry of boltPatternCatalog) routes.push(entityDetailPath('bolt-pattern', locale, entry.slug));
   }

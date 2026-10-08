@@ -2,6 +2,12 @@
 
 Durable decisions are recorded with date, status, rationale, and evidence. Historical V3 decisions remain in `V3_MASTER_PLAN.md`.
 
+## 2026-10-08 — Traffic first: grow the tire-size long tail
+
+Status: `ACCEPTED`.
+
+28-day Search Console data (83 clicks, 6.86k impressions) showed tire-size detail pages carry almost all impressions and clicks; Google indexed 1,780 pages and rejected only 2 as low quality. The next growth lever is therefore more real tire-size pages (every OE/production size from two public size lists, flotation and truck sizes) and tire-height group pages, before comparison pages, vehicle growth or a new language. Sizes are only added from a published size list and validated by geometry; nothing is invented.
+
 ## 2026-10-08 — Spanish uses "birlos" for bolt patterns
 
 Status: `ACCEPTED`.

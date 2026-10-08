@@ -7,7 +7,8 @@
  */
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { tireSizeByNotation } from '../data/tire-size-catalog';
-import { vehicleHubPath } from './entity-page-model';
+import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath } from './entity-page-model';
+import { tireSizePageText } from '../content/entity-page-text';
 
 export interface ReferenceLink { readonly href: string; readonly title: string; readonly helper: string; }
 
@@ -63,12 +64,21 @@ const SHORTCUTS: Readonly<Record<EntityLocale, readonly string[]>> = {
   es: ['205/55R16', '195/65R15', '225/45R17', '205/60R16', '215/65R16', '185/65R15', '215/60R17', '225/40R18', '195/55R16', '215/55R17'],
 };
 
+/** Tire heights people shop by in the Americas ("33-inch tires"); EN and ES only. */
+const HEIGHT_SHORTCUTS: Readonly<Record<EntityLocale, readonly number[]>> = { en: [31, 33, 35, 37], de: [], es: [31, 33, 35] };
+
 export function tireSizeShortcuts(locale: EntityLocale): readonly { readonly href: string; readonly label: string }[] {
-  return Object.freeze(SHORTCUTS[locale]
-    .map((notation) => tireSizeByNotation(notation))
-    .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined)
-    .map((entry) => ({
-      href: entityDetailPath('tire-size', locale, entry.slug),
-      label: locale === 'en' ? entry.notation : entry.notation.replace(/R(\d)/, ' R$1'),
-    })));
+  const published = new Set(tireDiameterGroups().map((group) => group.inches));
+  return Object.freeze([
+    ...SHORTCUTS[locale]
+      .map((notation) => tireSizeByNotation(notation))
+      .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined)
+      .map((entry) => ({
+        href: entityDetailPath('tire-size', locale, entry.slug),
+        label: locale === 'en' ? entry.notation : entry.notation.replace(/R(\d)/, ' R$1'),
+      })),
+    ...HEIGHT_SHORTCUTS[locale]
+      .filter((inches) => published.has(inches))
+      .map((inches) => ({ href: tireDiameterGroupPath(inches, locale), label: tireSizePageText[locale].diameter.groupLink(inches) })),
+  ]);
 }

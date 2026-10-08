@@ -9,7 +9,7 @@ import { tireSizeCatalog, tireSizesByRimDiameter, vehiclesForTireSize } from '..
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
-import { displayTireNotation, formatTireMetrics, homePath, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
+import { displayTireNotation, formatTireMetrics, homePath, tireDiameterGroupPath, tireDiameterGroups, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
 import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
 
@@ -64,6 +64,14 @@ const groupCards = groups.map(([rim, entries]) => ({
       </li>
     ))}
   </ol>
+</section>
+
+<section class="entity-section" aria-labelledby="hub-heights">
+  <h2 id="hub-heights">{t.diameter.hubHeading}</h2>
+  <p class="entity-note">{t.diameter.hubIntro}</p>
+  <ul class="entity-chiplist">
+    {tireDiameterGroups().map((group) => <li><a class="entity-chip" href={tireDiameterGroupPath(group.inches, locale)}>{t.diameter.groupLink(group.inches)}</a></li>)}
+  </ul>
 </section>
 
 <section class="entity-section" aria-labelledby="hub-list" data-entity-filter>

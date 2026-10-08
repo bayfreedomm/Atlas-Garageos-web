@@ -19,7 +19,9 @@ Updated: 2026-10-08. Priority combines user value, organic opportunity, differen
 - `VERIFIED DONE` — 2026-10-08 tire-entity upgrade: C sizes, inch view, alternatives with speedometer reading, localized numbers/titles, hub links site-wide, 84 re-checked vehicle rows.
 - `PLANNED` — Confirm Nissan Rogue/Altima and Toyota Corolla against a second source (no OE rows on wheel-size for those generations).
 - `PLANNED` — Grow vehicle rows toward the top EU/US models per make, one verified generation page each; add Fiat Ducato as two rows (5x118 / 5x130 Maxi) once each variant's OE size is confirmed.
-- `PLANNED` — Watch GSC CTR on the new DE/ES tire titles for 2–4 weeks before further title changes.
+- `VERIFIED DONE` — Part 1: ~1,000-size tire catalog, flotation sizes, tire-height group pages, "in inches"/"pulgadas" titles.
+- `PLANNED` — Part 2: vehicle growth + make pages; Part 3: wheel/rim compatibility pages; Part 4: French entity pages; Part 5: IndexNow, OG images, internal-link and performance pass.
+- `PLANNED` — Watch GSC impressions/CTR on the new tire titles and height pages for 2–4 weeks before further title changes.
 
 ## P1 — controlled language expansion
 

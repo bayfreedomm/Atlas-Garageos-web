@@ -19,9 +19,10 @@ import {
   splitHeadingAroundKey, tireSizeMetrics, torqueIsUnconfirmed,
 } from '../../src/ui/entity-page-model';
 import { vehicleFitmentData, type VehicleFitment } from '../../src/data/vehicle-fitment';
-import { productionCommercialTireSizeNotations, productionTireSizeNotations } from '../../src/data/production-tire-sizes';
+import { PRODUCTION_FLOTATION_TIRE_SIZES, productionCommercialTireSizeNotations, productionTireSizeNotations } from '../../src/data/production-tire-sizes';
 import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
+import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 
 /** A syntactically complete vehicle row, so a test can vary exactly one field. */
 const fakeVehicle = (overrides: Partial<VehicleFitment>): VehicleFitment => ({
@@ -55,7 +56,7 @@ describe('tire-size catalog', () => {
 
   it('derives exactly the production reference plus vehicle-only OEM sizes', () => {
     const unique = new Set([
-      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(),
+      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(), ...PRODUCTION_FLOTATION_TIRE_SIZES,
       ...vehicleFitmentData.flatMap((vehicle) => [vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])]),
     ]);
     expect(tireSizeCatalog).toHaveLength(unique.size);
@@ -66,7 +67,7 @@ describe('tire-size catalog', () => {
   it('publishes only sourced production or OEM sizes and preserves vehicle relationships where known', () => {
     expect(excludedTireSizes).toEqual([]);
     const known = new Set([
-      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(),
+      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(), ...PRODUCTION_FLOTATION_TIRE_SIZES,
       ...vehicleFitmentData.flatMap((vehicle) => [vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])]),
     ]);
     for (const entry of tireSizeCatalog) expect(known.has(entry.notation)).toBe(true);
@@ -186,7 +187,7 @@ describe('entity routing and sitemap', () => {
 
   it('lists every generated entity page in the sitemap exactly once', () => {
     const entries = sitemapEntries();
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
     const entityUrls = entries.filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos)\//.test(url));
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls).size).toBe(expected);

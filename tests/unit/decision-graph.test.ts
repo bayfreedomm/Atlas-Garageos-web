@@ -12,6 +12,7 @@ import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
 import { entityLocales } from '../../src/seo/entity-routes';
 import { sitemapEntries } from '../../src/seo/sitemap';
 import { boltDecisionGraph, fuelDecisionGraph, tireDecisionGraph, vehicleDecisionGraph } from '../../src/ui/decision-graph';
+import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 
 describe('shared automotive decision graph', () => {
   it('connects a vehicle to reference entities and every required calculator without inventing consumption', () => {
@@ -92,10 +93,10 @@ describe('decision graph route-count guard', () => {
     // Growth is expected (more sourced vehicles, C sizes); shrinking below the published
     // baseline is not. The URL count must always equal the catalog size in every locale.
     expect(vehicleFitmentData.length).toBeGreaterThanOrEqual(30);
-    expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(582);
+    expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(950);
     expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
     const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos)\//.test(url));
-    const expected = 3 * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
+    const expected = 3 * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
     expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls)).toHaveLength(expected);
