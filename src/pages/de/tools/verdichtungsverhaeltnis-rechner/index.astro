@@ -15,7 +15,7 @@ const c = localizedTool('compression-ratio-calculator', 'de');
       <label>Brennraumvolumen · cc<input name="chamber" type="number" value="48" min="0" step="any" inputmode="decimal" /></label>
       <label>Weiteres Volumen · cc<input name="otherVolume" type="number" value="4" step="any" inputmode="decimal" /></label>
     </div>
-    <UtilityResultStandard primaryLabel="Statisches Verdichtungsverhältnis" pending="Geben Sie Bohrung, Hub und Brennraumvolumen ein." visualTitle="Hubvolumen + Verdichtungsvolumen ÷ Verdichtungsvolumen" visualNote="Statisches geometrisches Verhältnis, keine dynamische Verdichtung" />
+    <UtilityResultStandard locale="de" primaryLabel="Statisches Verdichtungsverhältnis" pending="Geben Sie Bohrung, Hub und Brennraumvolumen ein." visualTitle="Hubvolumen + Verdichtungsvolumen ÷ Verdichtungsvolumen" visualNote="Statisches geometrisches Verhältnis, keine dynamische Verdichtung" />
     <Parametric3DPanel mode="compression" locale="de" />
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>

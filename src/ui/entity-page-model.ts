@@ -14,9 +14,9 @@ import { adjacentHoleSpacingMm } from '../data/bolt-pattern-geometry';
 import { localizedToolPath } from '../localization/locales';
 import type { EntityLocale } from '../seo/entity-routes';
 import type { VehicleFitment } from '../data/vehicle-fitment';
+import { formatDecimal, formatMm, formatPercent, formatPlain, formatSigned, type NumberLocale } from './locale-format';
 export { torqueIsUnconfirmed } from './vehicle-torque';
 
-const fixed = (value: number, digits: number): string => value.toFixed(digits);
 
 export interface TireSizeMetrics {
   readonly sectionWidthMm: number;
@@ -63,19 +63,138 @@ export interface FormattedTireMetrics {
   readonly revsPerMile: string;
 }
 
-/** Locale-independent number formatting — the figures are identical on EN, DE and ES pages. */
-export function formatTireMetrics(metrics: TireSizeMetrics): FormattedTireMetrics {
+/**
+ * The figures are identical on EN, DE and ES pages; only the decimal separator and percent
+ * spacing follow the reader's locale ("631,9 mm" / "55 %" in German and Spanish).
+ */
+export function formatTireMetrics(metrics: TireSizeMetrics, locale: NumberLocale = 'en'): FormattedTireMetrics {
   return Object.freeze({
     sectionWidth: `${metrics.sectionWidthMm} mm`,
-    aspectRatio: `${metrics.aspectRatio}%`,
-    sidewallHeight: `${fixed(metrics.sidewallHeightMm, 1)} mm`,
-    rimDiameterIn: `${metrics.rimDiameterInches}″`,
-    rimDiameterMm: `${fixed(metrics.rimDiameterMm, 1)} mm`,
-    overallDiameter: `${fixed(metrics.overallDiameterMm, 1)} mm`,
-    circumference: `${fixed(metrics.circumferenceMm, 1)} mm`,
-    revsPerKm: fixed(metrics.revolutionsPerKilometer, 1),
-    revsPerMile: fixed(metrics.revolutionsPerMile, 1),
+    aspectRatio: formatPercent(metrics.aspectRatio, 0, locale),
+    sidewallHeight: formatMm(metrics.sidewallHeightMm, 1, locale),
+    rimDiameterIn: `${formatPlain(metrics.rimDiameterInches, locale)}″`,
+    rimDiameterMm: formatMm(metrics.rimDiameterMm, 1, locale),
+    overallDiameter: formatMm(metrics.overallDiameterMm, 1, locale),
+    circumference: formatMm(metrics.circumferenceMm, 1, locale),
+    revsPerKm: formatDecimal(metrics.revolutionsPerKilometer, 1, locale),
+    revsPerMile: formatDecimal(metrics.revolutionsPerMile, 1, locale),
   });
+}
+
+/** Imperial view of the same geometry — "how big is 265/70R17 in inches". */
+export interface TireInchView {
+  readonly overallDiameterIn: number;
+  readonly sectionWidthIn: number;
+  readonly sidewallIn: number;
+  readonly circumferenceIn: number;
+}
+
+export function tireInchView(metrics: TireSizeMetrics): TireInchView {
+  return Object.freeze({
+    overallDiameterIn: metrics.overallDiameterMm / 25.4,
+    sectionWidthIn: metrics.sectionWidthMm / 25.4,
+    sidewallIn: metrics.sidewallHeightMm / 25.4,
+    circumferenceIn: metrics.circumferenceMm / 25.4,
+  });
+}
+
+/** Flotation-style shorthand, e.g. "24.9 × 8.1 R16" (diameter × width, rim). */
+export function inchShorthand(entry: TireSizeEntry, metrics: TireSizeMetrics, locale: NumberLocale = 'en'): string {
+  const view = tireInchView(metrics);
+  return `${formatDecimal(view.overallDiameterIn, 1, locale)} × ${formatDecimal(view.sectionWidthIn, 1, locale)} R${formatPlain(entry.rimDiameterInches, locale)}`;
+}
+
+/** German/Spanish write "205/55 R16"; English keeps the compact "205/55R16". */
+export function displayTireNotation(notation: string, locale: NumberLocale): string {
+  return locale === 'en' ? notation : notation.replace(/R(\d)/, ' R$1');
+}
+
+/* ---------------------------------------------------------------------------------------
+ * Real-world alternatives
+ *
+ * The naive "anything within 3% of the diameter" list happily pairs 215/65R16 with
+ * 305/25R21 or a 155/90R16 space-saver. The alternative table below instead follows the same
+ * plus/minus-sizing rule as the calculator (features/tools/tire-availability.ts): one inch
+ * down to two inches up, a sensible width window per rim step, and a ranking that trades
+ * diameter error against width change. A light-commercial "C" size is only ever compared with
+ * other C sizes, because a passenger tire is not a load-rated substitute for one.
+ * ------------------------------------------------------------------------------------ */
+
+export interface TireAlternative {
+  readonly entry: TireSizeEntry;
+  readonly overallDiameterMm: number;
+  readonly differenceMm: number;
+  readonly differencePercent: number;
+  /** True speed when the speedometer (calibrated for the original size) shows 100. */
+  readonly trueSpeedAtIndicated100: number;
+}
+
+export interface TireAlternativeRow {
+  readonly rimDiameterInches: number;
+  readonly rimDelta: number;
+  readonly options: readonly TireAlternative[];
+}
+
+const ALTERNATIVE_RIM_DELTAS = [-1, 0, 1, 2] as const;
+const ALTERNATIVE_WIDTH_PENALTY_PER_MM = 0.05;
+
+export function tireAlternatives(
+  entry: TireSizeEntry,
+  catalog: readonly TireSizeEntry[] = tireSizeCatalog,
+  tolerancePercent = SIMILAR_DIAMETER_TOLERANCE_PERCENT,
+  perRim = 3,
+): readonly TireAlternativeRow[] {
+  const base = tireSizeMetrics(entry);
+  const pool = catalog.filter((candidate) => Boolean(candidate.commercial) === Boolean(entry.commercial) && candidate.notation !== entry.notation);
+  const rows: TireAlternativeRow[] = [];
+  for (const delta of ALTERNATIVE_RIM_DELTAS) {
+    const rim = entry.rimDiameterInches + delta;
+    const [below, above] = delta < 0 ? [30, 10] : delta === 0 ? [20, 20] : [10, 20 + 20 * delta];
+    const options = pool
+      .filter((candidate) => candidate.rimDiameterInches === rim && candidate.widthMm >= entry.widthMm - below && candidate.widthMm <= entry.widthMm + above)
+      .map((candidate) => {
+        const metrics = tireSizeMetrics(candidate);
+        const differenceMm = metrics.overallDiameterMm - base.overallDiameterMm;
+        return Object.freeze({
+          entry: candidate,
+          overallDiameterMm: metrics.overallDiameterMm,
+          differenceMm,
+          differencePercent: (differenceMm / base.overallDiameterMm) * 100,
+          trueSpeedAtIndicated100: 100 * (metrics.overallDiameterMm / base.overallDiameterMm),
+        });
+      })
+      .filter((option) => Math.abs(option.differencePercent) <= tolerancePercent)
+      .sort((a, b) => (Math.abs(a.differencePercent) + ALTERNATIVE_WIDTH_PENALTY_PER_MM * Math.abs(a.entry.widthMm - entry.widthMm))
+        - (Math.abs(b.differencePercent) + ALTERNATIVE_WIDTH_PENALTY_PER_MM * Math.abs(b.entry.widthMm - entry.widthMm))
+        || a.entry.widthMm - b.entry.widthMm)
+      .slice(0, perRim);
+    if (options.length > 0) rows.push(Object.freeze({ rimDiameterInches: rim, rimDelta: delta, options: Object.freeze(options) }));
+  }
+  return Object.freeze(rows);
+}
+
+/**
+ * Neighbouring sizes on the same rim: one width step either side at the same profile, and one
+ * or two profile steps either side at the same width. These are the sizes a reader typing
+ * "205/55 R16" most often also means, so they double as the page's sibling navigation.
+ */
+export function sameRimNeighbours(entry: TireSizeEntry, catalog: readonly TireSizeEntry[] = tireSizeCatalog, limit = 8): readonly TireSizeEntry[] {
+  const pool = catalog.filter((candidate) => candidate.rimDiameterInches === entry.rimDiameterInches
+    && Boolean(candidate.commercial) === Boolean(entry.commercial)
+    && candidate.notation !== entry.notation);
+  const scored = pool
+    .map((candidate) => {
+      const dw = Math.abs(candidate.widthMm - entry.widthMm);
+      const da = Math.abs(candidate.aspectRatio - entry.aspectRatio);
+      const sameProfile = da === 0 && dw <= 20;
+      const sameWidth = dw === 0 && da <= 10;
+      const diagonal = dw === 10 && da === 5;
+      if (!sameProfile && !sameWidth && !diagonal) return null;
+      return { candidate, score: dw / 10 + da / 5 + (diagonal ? 0.5 : 0) };
+    })
+    .filter((item): item is { candidate: TireSizeEntry; score: number } => item !== null)
+    .sort((a, b) => a.score - b.score || a.candidate.widthMm - b.candidate.widthMm || a.candidate.aspectRatio - b.candidate.aspectRatio);
+  return Object.freeze(scored.slice(0, limit).map((item) => item.candidate));
 }
 
 export interface SimilarTireSize {
@@ -112,8 +231,8 @@ export function similarTireSizes(entry: TireSizeEntry, catalog: readonly TireSiz
   return Object.freeze(matches.slice(0, limit));
 }
 
-export const signed = (value: number, digits: number, unit: string): string =>
-  `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value).toFixed(digits)} ${unit}`;
+export const signed = (value: number, digits: number, unit: string, locale: NumberLocale = 'en'): string =>
+  formatSigned(value, digits, unit, locale);
 
 /* ---------------------------------------------------------------------------------------
  * Tool hand-off links
@@ -189,8 +308,8 @@ export function distinctCenterBores(vehicles: readonly VehicleFitment[]): readon
 }
 
 /** "57.1 / 66.5 / 66.6 mm", or an em dash when no vehicle in the set reports a bore. */
-export function formatCenterBores(bores: readonly number[]): string {
-  return bores.length === 0 ? '—' : `${bores.join(' / ')} mm`;
+export function formatCenterBores(bores: readonly number[], locale: NumberLocale = 'en'): string {
+  return bores.length === 0 ? '—' : `${bores.map((bore) => formatPlain(bore, locale)).join(' / ')} mm`;
 }
 
 /**
@@ -239,9 +358,17 @@ export function tireSizeDetailMeta(entry: TireSizeEntry, locale: EntityLocale): 
   const pathname = entityDetailPath('tire-size', locale, entry.slug);
   const metrics = tireSizeMetrics(entry);
   const vehicles = vehiclesForTireSize(entry.notation).length;
+  const shown = displayTireNotation(entry.notation, locale);
+  const figures = {
+    diameterMm: formatDecimal(metrics.overallDiameterMm, 1, locale),
+    circumferenceMm: formatDecimal(metrics.circumferenceMm, 0, locale),
+    diameterIn: formatDecimal(metrics.overallDiameterMm / 25.4, 1, locale),
+    sidewallMm: formatDecimal(metrics.sidewallHeightMm, 1, locale),
+    commercial: Boolean(entry.commercial),
+  };
   return Object.freeze({
-    title: t.detailTitle(entry.notation),
-    description: t.detailDescription(entry.notation, metrics.overallDiameterMm.toFixed(1), vehicles),
+    title: t.detailTitle(shown, figures),
+    description: t.detailDescription(shown, figures, vehicles),
     pathname,
     alternates: entityAlternates('tire-size', entry.slug),
     breadcrumbs: Object.freeze([

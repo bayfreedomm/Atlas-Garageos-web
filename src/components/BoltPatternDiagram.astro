@@ -15,8 +15,10 @@ interface Props {
   readonly pcdLabel: string;
   readonly spacingLabel: string;
   readonly spacingValue: string;
+  /** Locale-formatted PCD label, e.g. "114,3 mm". Defaults to the raw value. */
+  readonly pcdText?: string | undefined;
 }
-const { entry, ariaLabel, pcdLabel, spacingLabel, spacingValue } = Astro.props;
+const { entry, ariaLabel, pcdLabel, spacingLabel, spacingValue, pcdText } = Astro.props;
 
 const SIZE = 260;
 const C = SIZE / 2;
@@ -43,7 +45,7 @@ const chordLabel = { x: C + ((chordMid.x - C) / outward) * (PCD_R + holeR + 8), 
     {holes.map((hole) => <circle class="entity-pcd__stud" cx={hole.x.toFixed(1)} cy={hole.y.toFixed(1)} r={(holeR * 0.42).toFixed(1)} />)}
     <path class="entity-pcd__diameter" d={`M${C - PCD_R} ${C}H${C + PCD_R}`} />
     <text class="entity-pcd__label" x={C} y={C - 6} text-anchor="middle">{pcdLabel}</text>
-    <text class="entity-pcd__value" x={C} y={C + 12} text-anchor="middle">{`${entry.pcdMm} mm`}</text>
+    <text class="entity-pcd__value" x={C} y={C + 12} text-anchor="middle">{pcdText ?? `${entry.pcdMm} mm`}</text>
     <text class="entity-pcd__chord-label" x={chordLabel.x.toFixed(1)} y={chordLabel.y.toFixed(1)} text-anchor="middle">{spacingValue}</text>
   </svg>
   <figcaption><strong>{entry.notation}</strong><span>{spacingLabel}: {spacingValue}</span></figcaption>

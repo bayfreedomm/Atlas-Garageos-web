@@ -19,7 +19,7 @@ import {
   splitHeadingAroundKey, tireSizeMetrics, torqueIsUnconfirmed,
 } from '../../src/ui/entity-page-model';
 import { vehicleFitmentData, type VehicleFitment } from '../../src/data/vehicle-fitment';
-import { productionTireSizeNotations } from '../../src/data/production-tire-sizes';
+import { productionCommercialTireSizeNotations, productionTireSizeNotations } from '../../src/data/production-tire-sizes';
 import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
 
@@ -54,7 +54,10 @@ describe('tire-size catalog', () => {
   });
 
   it('derives exactly the production reference plus vehicle-only OEM sizes', () => {
-    const unique = new Set([...productionTireSizeNotations(), ...vehicleFitmentData.map((vehicle) => vehicle.tireSize)]);
+    const unique = new Set([
+      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(),
+      ...vehicleFitmentData.flatMap((vehicle) => [vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])]),
+    ]);
     expect(tireSizeCatalog).toHaveLength(unique.size);
     expect(new Set(tireSizeCatalog.map((entry) => entry.notation))).toEqual(unique);
     expect(new Set(tireSizeCatalog.map((entry) => entry.slug)).size).toBe(tireSizeCatalog.length);
@@ -62,9 +65,15 @@ describe('tire-size catalog', () => {
 
   it('publishes only sourced production or OEM sizes and preserves vehicle relationships where known', () => {
     expect(excludedTireSizes).toEqual([]);
-    const known = new Set([...productionTireSizeNotations(), ...vehicleFitmentData.map((vehicle) => vehicle.tireSize)]);
+    const known = new Set([
+      ...productionTireSizeNotations(), ...productionCommercialTireSizeNotations(),
+      ...vehicleFitmentData.flatMap((vehicle) => [vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])]),
+    ]);
     for (const entry of tireSizeCatalog) expect(known.has(entry.notation)).toBe(true);
-    for (const vehicle of vehicleFitmentData) expect(vehiclesForTireSize(vehicle.tireSize).length).toBeGreaterThan(0);
+    for (const vehicle of vehicleFitmentData) {
+      expect(vehiclesForTireSize(vehicle.tireSize)).toContain(vehicle);
+      for (const option of vehicle.optionalTireSizes ?? []) expect(vehiclesForTireSize(option)).toContain(vehicle);
+    }
   });
 
   it('computes geometry from the shared tire functions, not per-page constants', () => {
@@ -370,15 +379,15 @@ describe('validation bounds cover the stated scope without letting garbage throu
 });
 
 describe('per-row confidence is surfaced instead of a uniform claim', () => {
-  it('mutes a torque figure that is low-confidence or noted as extrapolated', () => {
+  it('mutes a torque figure that is not high-confidence documented evidence', () => {
     const audiA3 = vehicleFitmentData.find((vehicle) => vehicle.id === 'audi-a3')!;
     const teslaModel3 = vehicleFitmentData.find((vehicle) => vehicle.id === 'tesla-model-3')!;
-    const skoda = vehicleFitmentData.find((vehicle) => vehicle.id === 'skoda-octavia')!;
-    const mercedes = vehicleFitmentData.find((vehicle) => vehicle.id === 'mercedes-c-class')!;
-    expect(torqueIsUnconfirmed(audiA3)).toBe(true);      // confidence: 'low'
-    expect(torqueIsUnconfirmed(mercedes)).toBe(true);    // 'not independently confirmed' in notes
+    const extrapolated: VehicleFitment = { ...audiA3, id: 'extrapolated-row', confidence: 'low', torqueTrust: { confidence: 'low', evidence: 'extrapolated', note: 'Extrapolated from the platform.' } };
+    const { torqueNm: _nm, torqueLbFt: _lb, torqueTrust: _trust, ...withoutTorque } = audiA3;
+    expect(torqueIsUnconfirmed(audiA3)).toBe(true);       // medium-confidence reference
+    expect(torqueIsUnconfirmed(extrapolated)).toBe(true); // extrapolated evidence
     expect(torqueIsUnconfirmed(teslaModel3)).toBe(false); // high confidence, service manual
-    expect(torqueIsUnconfirmed(skoda)).toBe(false);       // no torque at all — shows an em dash
+    expect(torqueIsUnconfirmed({ ...withoutTorque, id: 'no-torque' })).toBe(false); // no torque — em dash
   });
 
   it('gives every locale a localized confidence label and renders it in both tables', () => {
@@ -414,7 +423,9 @@ describe('field-level wheel torque trust', () => {
     expect(torquePresentation(tesla, 'en').qualified).toBe(false);
     expect(torqueIsTrusted(audi)).toBe(false);
     expect(torquePresentation(audi, 'en')).toMatchObject({ qualified: true });
-    expect(torquePresentation(audi, 'en').qualifier).toMatch(/Extrapolated reference/);
+    expect(torquePresentation(audi, 'en').qualifier).toMatch(/Medium-confidence reference/);
+    const extrapolated: VehicleFitment = { ...audi, id: 'extrapolated-row', torqueTrust: { confidence: 'low', evidence: 'extrapolated' } };
+    expect(torquePresentation(extrapolated, 'en').qualifier).toMatch(/Extrapolated reference/);
   });
 
   it('excludes insufficient torque evidence from structured data', () => {
@@ -427,7 +438,9 @@ describe('field-level wheel torque trust', () => {
   });
 
   it('qualifies uncertain torque in every localized FAQ answer', () => {
-    const vehicle = vehicleFitmentData.find((candidate) => candidate.id === 'audi-a3')!;
+    const audi = vehicleFitmentData.find((candidate) => candidate.id === 'audi-a3')!;
+    const vehicle: VehicleFitment = { ...audi, id: 'extrapolated-row', torqueTrust: { confidence: 'low', evidence: 'extrapolated' } };
+    expect(vehiclePageText.en.faqTorqueA(audi)).toMatch(/Medium-confidence reference/);
     expect(vehiclePageText.en.faqTorqueA(vehicle)).toMatch(/Extrapolated reference/);
     expect(vehiclePageText.de.faqTorqueA(vehicle)).toMatch(/Übertragener Referenzwert/);
     expect(vehiclePageText.es.faqTorqueA(vehicle)).toMatch(/Referencia extrapolada/);

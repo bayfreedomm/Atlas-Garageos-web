@@ -22,7 +22,7 @@ const livePrice = fuelPrices.de.status !== 'pending' ? e5?.value : undefined;
       <div class="fuel-primary-result__fuel"><span>Kraftstoffbedarf</span><strong data-fuel-primary-fuel>—</strong><small data-fuel-primary-rate>Kosten pro Strecke erscheinen hier.</small></div>
     </div>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Ihre Kraftstoffschätzung erscheint hier.</p>
-    <FuelCostTechnicalVisual />
+    <FuelCostTechnicalVisual locale="de" />
     <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Kraftstoff- und Kostenaufschlüsselung</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
     <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>

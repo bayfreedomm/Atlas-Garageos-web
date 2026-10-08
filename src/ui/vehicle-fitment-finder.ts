@@ -1,8 +1,9 @@
-import { vehicleFitmentData, vehicleMakes, vehiclesByMake, vehicleById, type VehicleFitment } from '../data/vehicle-fitment';
+import { vehicleFitmentData, vehicleMakes, vehiclesByMake, vehicleById, vehicleNote, type VehicleFitment } from '../data/vehicle-fitment';
 import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model-index';
 import { boltPatternSpacingMm } from '../data/bolt-pattern-geometry';
 import { setSummary, renderMetrics } from './standard-answer-helpers';
 import { getPageLocale } from './page-locale';
+import { formatPlain } from './locale-format';
 import { torquePresentation, type TorqueLocale } from './vehicle-torque';
 
 const UNVERIFIED_PREFIX = 'name:';
@@ -17,6 +18,7 @@ interface VehicleFinderText {
   readonly boltPattern: string;
   readonly wheelSize: string;
   readonly centerBore: string;
+  readonly optionalSizes: string;
   readonly torque: string;
   readonly fastener: string;
   readonly lugNut: string;
@@ -44,6 +46,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     boltPattern: 'Bolt pattern',
     wheelSize: 'Referenced wheel size',
     centerBore: 'Center bore',
+    optionalSizes: 'Factory option sizes',
     torque: 'Wheel torque',
     fastener: 'Fastener type',
     lugNut: 'Lug nut',
@@ -69,6 +72,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     boltPattern: 'Lochkreis',
     wheelSize: 'Werksseitige Felgengröße',
     centerBore: 'Nabenbohrung',
+    optionalSizes: 'Werksoptionale Größen',
     torque: 'Anzugsdrehmoment',
     fastener: 'Befestigungsart',
     lugNut: 'Radmutter',
@@ -94,6 +98,7 @@ const TEXT: Record<'en' | 'de' | 'es', VehicleFinderText> = {
     boltPattern: 'Patrón de birlos',
     wheelSize: 'Medida de llanta de referencia',
     centerBore: 'Diámetro de buje',
+    optionalSizes: 'Medidas opcionales',
     torque: 'Par de apriete',
     fastener: 'Tipo de fijación',
     lugNut: 'Tuerca de rueda',
@@ -171,14 +176,16 @@ export function initializeVehicleFitmentFinder(): void {
         [t.tireSize, vehicle.tireSize],
         [t.boltPattern, vehicle.boltPattern],
         [t.wheelSize, vehicle.wheelSize],
-        ...(vehicle.centerBoreMm !== undefined ? [[t.centerBore, `${vehicle.centerBoreMm} mm`] as const] : []),
+        ...(vehicle.centerBoreMm !== undefined ? [[t.centerBore, `${formatPlain(vehicle.centerBoreMm, locale)} mm`] as const] : []),
+        ...(vehicle.optionalTireSizes && vehicle.optionalTireSizes.length > 0 ? [[t.optionalSizes, vehicle.optionalTireSizes.join(', ')] as const] : []),
         [t.torque, formatTorque(vehicle, locale)],
         [t.fastener, vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt],
       ]);
       if (confidenceEl) { confidenceEl.textContent = t.confidence[vehicle.confidence]; confidenceEl.dataset.confidence = vehicle.confidence; }
       if (sourcesEl) sourcesEl.textContent = `${t.sourcesLabel} ${vehicle.sources.join(', ')}`;
       if (notesEl) {
-        if (vehicle.notes) { notesEl.hidden = false; notesEl.textContent = `${t.notesLabel} ${vehicle.notes}`; }
+        const note = vehicleNote(vehicle, locale);
+        if (note) { notesEl.hidden = false; notesEl.textContent = `${t.notesLabel} ${note}`; }
         else notesEl.hidden = true;
       }
       if (meta) meta.hidden = false;

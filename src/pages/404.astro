@@ -30,11 +30,54 @@ import ThemeControl from '../components/ThemeControl.astro';
         <p class="eyebrow">Error 404</p>
         <h1 id="error-heading">That page is not in the garage.</h1>
         <p class="hero-copy">The address may have changed, or the link may be incomplete. Your saved Garage data remains on this device.</p>
+        <p class="hero-copy" data-error-suggestion hidden><a class="entity-inline-link" data-error-suggestion-link href="/tire-sizes/"></a></p>
         <div class="error-actions">
-          <a class="button" href="/fitment-studio/">Open Wheel & Tire Compare</a>
-          <a class="button secondary" href="/tools/">Browse tools</a>
+          <a class="button" href="/fitment-studio/" data-error-primary>Open Wheel & Tire Compare</a>
+          <a class="button secondary" href="/tools/" data-error-tools>Browse tools</a>
+          <a class="button secondary" href="/tire-sizes/" data-error-tires>Tire sizes</a>
         </div>
       </section>
     </main>
+    <script>
+      // One static 404 page serves every locale (Cloudflare not_found_handling), so the copy is
+      // switched to German or Spanish from the requested path, and a mistyped tire-size address
+      // (e.g. /de/reifengroessen/205-55-16) is offered its canonical form.
+      const path = window.location.pathname.toLowerCase();
+      const locale = path.startsWith('/de/') ? 'de' : path.startsWith('/es/') ? 'es' : 'en';
+      const copy = {
+        en: { eyebrow: 'Error 404', title: 'That page is not in the garage.', lead: 'The address may have changed, or the link may be incomplete. Your saved Garage data remains on this device.', primary: 'Open Wheel & Tire Compare', primaryHref: '/fitment-studio/', tools: 'Browse tools', toolsHref: '/tools/', tires: 'Tire sizes', tiresHref: '/tire-sizes/', suggest: 'Did you mean tire size', home: '/' },
+        de: { eyebrow: 'Fehler 404', title: 'Diese Seite ist nicht in der Garage.', lead: 'Die Adresse hat sich womöglich geändert oder der Link ist unvollständig. Ihre gespeicherten Garage-Daten bleiben auf diesem Gerät.', primary: 'Felgen- & Reifenvergleich öffnen', primaryHref: '/de/fitment-studio/', tools: 'Alle Werkzeuge', toolsHref: '/de/tools/', tires: 'Reifengrößen', tiresHref: '/de/reifengroessen/', suggest: 'Meinten Sie die Reifengröße', home: '/de/' },
+        es: { eyebrow: 'Error 404', title: 'Esta página no está en el garaje.', lead: 'Puede que la dirección haya cambiado o que el enlace esté incompleto. Los datos guardados de su garaje siguen en este dispositivo.', primary: 'Abrir el comparador de llantas y neumáticos', primaryHref: '/es/fitment-studio/', tools: 'Ver herramientas', toolsHref: '/es/tools/', tires: 'Medidas de neumáticos', tiresHref: '/es/medidas-neumaticos/', suggest: '¿Buscaba la medida', home: '/es/' },
+      }[locale];
+      document.documentElement.lang = locale;
+      const set = (selector: string, text: string, href?: string) => {
+        const node = document.querySelector<HTMLElement>(selector);
+        if (!node) return;
+        node.textContent = text;
+        if (href && node instanceof HTMLAnchorElement) node.href = href;
+      };
+      set('.error-panel .eyebrow', copy.eyebrow);
+      set('#error-heading', copy.title);
+      set('.error-panel .hero-copy:not([data-error-suggestion])', copy.lead);
+      set('[data-error-primary]', copy.primary, copy.primaryHref);
+      set('[data-error-tools]', copy.tools, copy.toolsHref);
+      set('[data-error-tires]', copy.tires, copy.tiresHref);
+      const brand = document.querySelector<HTMLAnchorElement>('.app-header .brand');
+      if (brand) brand.href = copy.home;
+      const chip = document.querySelector('.locale-chip');
+      if (chip) chip.textContent = locale.toUpperCase();
+      const match = /(\d{3})[^\d]{1,3}(\d{2})[^\d]{1,4}(\d{2})(c?)\/?$/.exec(path);
+      if (match) {
+        const slug = `${match[1]}-${match[2]}-r${match[3]}${match[4] ?? ''}`;
+        const notation = `${match[1]}/${match[2]}${locale === 'en' ? '' : ' '}R${match[3]}${match[4] ? 'C' : ''}`;
+        const link = document.querySelector<HTMLAnchorElement>('[data-error-suggestion-link]');
+        const wrapper = document.querySelector<HTMLElement>('[data-error-suggestion]');
+        if (link && wrapper) {
+          link.href = `${copy.tiresHref}${slug}/`;
+          link.textContent = `${copy.suggest} ${notation}?`;
+          wrapper.hidden = false;
+        }
+      }
+    </script>
   </body>
 </html>

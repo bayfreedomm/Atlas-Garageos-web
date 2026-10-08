@@ -1,6 +1,15 @@
 # Atlas GarageOS — Session Handoff
 
-Updated: 2026-09-26.
+Updated: 2026-10-08.
+
+## 2026-10-08 session
+
+- Full audit of the live version: fixed English leftovers on DE/ES pages (drawer, footer, fitment studio, tool visuals, utility results, home, 404, tool search label), decimal commas, unrealistic "similar sizes", hreflang x-default on ES vehicle pages, unstyled vehicle FAQ, missing hub links.
+- Added C van tire sizes, inch view, alternatives table with speedometer reading, same-rim neighbours, shorter CTR-oriented tire titles.
+- Re-checked vehicle data against wheel-size.com; 84 rows (Berlingo III added).
+- Gate: 42 files / 291 tests, astro check 0 errors, 2,145 pages, SEO audit passed with 0 long titles/descriptions.
+
+## Earlier
 
 ## What was done
 

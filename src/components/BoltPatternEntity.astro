@@ -18,20 +18,21 @@ import { boltPatternPageText } from '../content/entity-page-text';
 import { millimetersToInches } from '../core/units/conversion';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import {
-  distinctCenterBores, formatCenterBores, homePath, splitHeadingAroundKey,
+  displayTireNotation, distinctCenterBores, formatCenterBores, homePath, splitHeadingAroundKey,
   tireSizesForBoltPattern, vehicleHubPath, vehicleLink, vehicleNames,
 } from '../ui/entity-page-model';
 import { torquePresentation } from '../ui/vehicle-torque';
+import { formatDecimal, formatPlain } from '../ui/locale-format';
 import { boltDecisionGraph } from '../ui/decision-graph';
 
 interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocale; }
 const { entry, locale } = Astro.props;
 
 const t = boltPatternPageText[locale];
-const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de pernos 3D interactivo' }[locale];
+const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo' }[locale];
 const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
-const spacingValue = `${spacingMm.toFixed(2)} mm`;
+const spacingValue = `${formatDecimal(spacingMm, 2, locale)} mm`;
 const bores = distinctCenterBores(vehicles);
 const singleCenterBore = bores.length === 1 ? bores[0] : undefined;
 const relatedTires = tireSizesForBoltPattern(entry.notation);
@@ -42,11 +43,11 @@ const heading = splitHeadingAroundKey(t.detailH1(entry.notation), entry.notation
 
 // The discrete bores actually present, not a min–max range: "57.1 / 66.5 / 66.6 mm" is true,
 // "57.1–66.6 mm" would claim every bore in between is a real fitment on this pattern.
-const boreLabel = formatCenterBores(bores);
+const boreLabel = formatCenterBores(bores, locale);
 const metricRows = [
   { label: t.metrics.lugCount, value: String(entry.lugCount) },
-  { label: t.metrics.pcdMm, value: `${entry.pcdMm} mm` },
-  { label: t.metrics.pcdIn, value: `${millimetersToInches(entry.pcdMm).toFixed(3)}″` },
+  { label: t.metrics.pcdMm, value: `${formatPlain(entry.pcdMm, locale)} mm` },
+  { label: t.metrics.pcdIn, value: `${formatDecimal(millimetersToInches(entry.pcdMm), 3, locale)}″` },
   { label: t.metrics.holeSpacing, value: spacingValue },
   { label: t.metrics.vehicleCount, value: String(vehicles.length) },
   { label: t.metrics.centerBore, value: boreLabel },
@@ -80,6 +81,7 @@ const decisions = boltDecisionGraph(entry, locale);
     entry={entry}
     ariaLabel={t.diagramAria(entry.lugCount, entry.pcdMm)}
     pcdLabel={t.pcdLabel}
+    pcdText={`${formatPlain(entry.pcdMm, locale)} mm`}
     spacingLabel={t.metrics.holeSpacing}
     spacingValue={spacingValue}
   />
@@ -115,7 +117,7 @@ const decisions = boltDecisionGraph(entry, locale);
                 <tr>
                   <th scope="row"><a href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{vehicle.make} {vehicle.model}</a></th>
                   <td><a href={entityDetailPath('tire-size', locale, tireSizeSlug(vehicle.tireSize))}>{vehicle.tireSize}</a></td>
-                  <td>{vehicle.centerBoreMm === undefined ? '—' : `${vehicle.centerBoreMm} mm`}</td>
+                  <td>{vehicle.centerBoreMm === undefined ? '—' : `${formatPlain(vehicle.centerBoreMm, locale)} mm`}</td>
                   <td>{vehicle.wheelSize}</td>
                   <td class={torque.qualified ? 'entity-soft' : undefined} title={torque.qualifier ?? undefined}>
                     {torque.value}
@@ -156,7 +158,7 @@ const decisions = boltDecisionGraph(entry, locale);
     <>
       <p class="entity-note">{t.relatedTireIntro}</p>
       <ul class="entity-chiplist">
-        {relatedTires.map((tire) => <li><a class="entity-chip" href={entityDetailPath('tire-size', locale, tire.slug)}>{tire.notation}</a></li>)}
+        {relatedTires.map((tire) => <li><a class="entity-chip" href={entityDetailPath('tire-size', locale, tire.slug)}>{displayTireNotation(tire.notation, locale)}</a></li>)}
       </ul>
     </>
   )}

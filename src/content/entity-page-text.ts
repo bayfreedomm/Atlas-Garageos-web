@@ -33,9 +33,29 @@ export interface TireSizeText {
   readonly boltHubCtaDetail: string;
 
   readonly detailKicker: string;
-  readonly detailTitle: (notation: string) => string;
-  readonly detailDescription: (notation: string, diameterMm: string, vehicles: number) => string;
+  readonly detailTitle: (notation: string, figures: TireTitleFigures) => string;
+  readonly detailDescription: (notation: string, figures: TireTitleFigures, vehicles: number) => string;
   readonly detailH1: (notation: string) => string;
+  readonly commercialKicker: string;
+  readonly commercialNote: string;
+  readonly commercialBreakdown: { readonly label: string; readonly detail: string };
+  readonly commercialTwinLink: (twin: string) => string;
+  readonly passengerTwinLink: (twin: string) => string;
+  readonly inchHeading: string;
+  readonly inchIntro: (shorthand: string) => string;
+  readonly inchLabels: { readonly diameter: string; readonly width: string; readonly sidewall: string; readonly circumference: string };
+  readonly alternativesHeading: string;
+  readonly alternativesIntro: string;
+  readonly alternativesEmpty: string;
+  readonly rimRowLabel: (rim: string, delta: number) => string;
+  readonly colSpeed: string;
+  /** Unit system of the speedometer column: km/h at 100 or mph at 60. */
+  readonly speedBase: { readonly indicated: number; readonly unit: string };
+  readonly neighboursHeading: string;
+  readonly neighboursIntro: string;
+  readonly colFitment: string;
+  readonly fitmentStandard: string;
+  readonly fitmentOption: string;
   readonly detailLead: (width: number, aspect: number, rim: number) => string;
   readonly metricsHeading: string;
   readonly metrics: {
@@ -87,6 +107,15 @@ export interface TireSizeText {
   readonly faqs: (input: { readonly notation: string; readonly vehicles: number; readonly makes: string; readonly rim: number }) => readonly { readonly q: string; readonly a: string }[];
   readonly breadcrumbHome: string;
   readonly breadcrumbHub: string;
+}
+
+/** Pre-formatted, locale-correct figures used in a tire-size page title and description. */
+export interface TireTitleFigures {
+  readonly diameterMm: string;
+  readonly circumferenceMm: string;
+  readonly diameterIn: string;
+  readonly sidewallMm: string;
+  readonly commercial: boolean;
 }
 
 export interface BoltPatternText {
@@ -169,6 +198,8 @@ export interface BoltPatternText {
 }
 
 const plural = (n: number, one: string, many: string): string => (n === 1 ? one : many);
+/** German/Spanish decimal comma for a PCD such as 114.3 → "114,3". */
+const dec = (n: number): string => String(n).replace('.', ',');
 
 export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Object.freeze({
   en: {
@@ -203,11 +234,30 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     boltHubCtaDetail: 'The PCD side of the same fitment data',
 
     detailKicker: 'Tire size',
-    detailTitle: (notation) => `${notation} Tire Size: Dimensions & Diameter`,
-    detailDescription: (notation, diameterMm, vehicles) => vehicles > 0
-      ? `${notation} has a calculated diameter of ${diameterMm} mm. See sidewall, circumference, alternatives and ${vehicles} documented vehicle ${plural(vehicles, 'match', 'matches')}.`
-      : `${notation} has a calculated diameter of ${diameterMm} mm. See sidewall, circumference, revolutions and manufactured alternatives within 3%.`,
+    detailTitle: (notation, f) => f.commercial
+      ? `${notation} Van Tire Size: Dimensions & Alternatives`
+      : `${notation} Tire Size: ${f.diameterIn}″ Diameter & Alternatives`,
+    detailDescription: (notation, f, vehicles) => `${notation} is ${f.diameterMm} mm (${f.diameterIn}″) tall with a ${f.sidewallMm} mm sidewall. Circumference, revs per mile, plus/minus sizes with speedometer error${vehicles > 0 ? ` and ${vehicles} ${plural(vehicles, 'vehicle', 'vehicles')}` : ''}.`,
     detailH1: (notation) => `${notation} tire size`,
+    commercialKicker: 'Light-commercial (C) tire size',
+    commercialNote: 'The "C" marks a reinforced light-commercial tire for vans and light trucks. Its nominal dimensions match the passenger size with the same numbers, but it is built for higher loads and usually runs at higher inflation pressure. A passenger tire is not a load-rated substitute for a C tire.',
+    commercialBreakdown: { label: 'Light commercial', detail: 'Reinforced construction for vans: higher load capacity, usually higher pressure.' },
+    commercialTwinLink: (twin) => `Passenger-car version: ${twin}`,
+    passengerTwinLink: (twin) => `Van (C) version: ${twin}`,
+    inchHeading: 'Size in inches',
+    inchIntro: (shorthand) => `In inch terms this size is roughly ${shorthand} — overall diameter × section width, on the given rim.`,
+    inchLabels: { diameter: 'Overall diameter', width: 'Section width', sidewall: 'Sidewall height', circumference: 'Circumference' },
+    alternativesHeading: 'Alternative sizes on other rims',
+    alternativesIntro: 'Manufactured sizes that keep the overall diameter within 3%, one inch smaller to two inches larger, with a sensible width for each rim step. The speedometer column shows your true speed when the speedometer reads 60 mph.',
+    alternativesEmpty: 'No manufactured size in the reference keeps this diameter within 3% at a sensible width on a neighbouring rim.',
+    rimRowLabel: (rim, delta) => delta === 0 ? `${rim}″ (same rim)` : `${rim}″ (${delta > 0 ? '+' : '−'}${Math.abs(delta)} in)`,
+    colSpeed: 'True speed at 60 mph',
+    speedBase: { indicated: 60, unit: 'mph' },
+    neighboursHeading: 'Neighbouring sizes on the same rim',
+    neighboursIntro: 'One step wider or narrower, or one profile step taller or lower:',
+    colFitment: 'Fitment',
+    fitmentStandard: 'Standard',
+    fitmentOption: 'Factory option',
     detailLead: (width, aspect, rim) => `A ${width} mm wide tire with a sidewall ${aspect}% of that width, mounted on a ${rim}-inch rim.`,
     metricsHeading: 'Calculated dimensions',
     metrics: {
@@ -287,14 +337,33 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     vehiclesCta: 'Fahrzeug-Fitment-Referenz',
     vehiclesCtaDetail: 'Werksreifengröße, Lochkreis und Drehmoment je Fahrzeug',
     boltHubCta: 'Lochkreise',
-    boltHubCtaDetail: 'Die Lochkreis-Seite derselben Fitment-Daten',
+    boltHubCtaDetail: 'Lochkreis und Nabenbohrung derselben Fahrzeugdaten',
 
     detailKicker: 'Reifengröße',
-    detailTitle: (notation) => `Reifengröße ${notation}: Maße & Durchmesser`,
-    detailDescription: (notation, diameterMm, vehicles) => vehicles > 0
-      ? `${notation} hat ${diameterMm} mm berechneten Durchmesser. Dazu: Flanke, Umfang, Alternativen und ${vehicles} belegte Fahrzeugzuordnung${vehicles === 1 ? '' : 'en'}.`
-      : `${notation} hat ${diameterMm} mm berechneten Durchmesser. Dazu: Flanke, Umfang, Umdrehungen und hergestellte Alternativen innerhalb von 3 %.`,
+    detailTitle: (notation, f) => f.commercial
+      ? `${notation} Transporterreifen: Maße & Alternativen`
+      : `${notation} Reifen: Abrollumfang ${f.circumferenceMm} mm & Alternativen`,
+    detailDescription: (notation, f, vehicles) => `${notation}: ${f.diameterMm} mm Durchmesser, ${f.circumferenceMm} mm Abrollumfang, ${f.sidewallMm} mm Flanke. Mit Umrüstgrößen und Tachoabweichung${vehicles > 0 ? ` sowie ${vehicles} ${plural(vehicles, 'Fahrzeug', 'Fahrzeugen')}` : ''}.`,
     detailH1: (notation) => `Reifengröße ${notation}`,
+    commercialKicker: 'Transporter-Reifengröße (C)',
+    commercialNote: 'Das „C“ steht für einen verstärkten Leicht-Lkw-Reifen (Commercial) für Transporter und Kleinbusse. Die Nennmaße entsprechen der Pkw-Größe mit denselben Zahlen, der Reifen ist aber für höhere Lasten gebaut und wird meist mit höherem Luftdruck gefahren. Ein Pkw-Reifen ist kein tragfähiger Ersatz für einen C-Reifen.',
+    commercialBreakdown: { label: 'Commercial (Transporter)', detail: 'Verstärkte Bauweise für Transporter: höhere Tragfähigkeit, meist höherer Luftdruck.' },
+    commercialTwinLink: (twin) => `Pkw-Ausführung: ${twin}`,
+    passengerTwinLink: (twin) => `Transporter-Ausführung (C): ${twin}`,
+    inchHeading: 'Maße in Zoll',
+    inchIntro: (shorthand) => `In Zoll entspricht diese Größe etwa ${shorthand} — Gesamtdurchmesser × Breite auf der angegebenen Felge.`,
+    inchLabels: { diameter: 'Gesamtdurchmesser', width: 'Querschnittsbreite', sidewall: 'Flankenhöhe', circumference: 'Abrollumfang' },
+    alternativesHeading: 'Umrüstgrößen auf anderen Felgen',
+    alternativesIntro: 'Hergestellte Größen, deren Gesamtdurchmesser höchstens 3 % abweicht — von einem Zoll kleiner bis zwei Zoll größer, jeweils mit passender Breite. Die Tacho-Spalte zeigt die tatsächliche Geschwindigkeit, wenn der Tacho 100 km/h anzeigt.',
+    alternativesEmpty: 'Keine hergestellte Größe der Referenz hält diesen Durchmesser auf einer Nachbarfelge mit sinnvoller Breite innerhalb von 3 %.',
+    rimRowLabel: (rim, delta) => delta === 0 ? `${rim} Zoll (gleiche Felge)` : `${rim} Zoll (${delta > 0 ? '+' : '−'}${Math.abs(delta)} Zoll)`,
+    colSpeed: 'Real bei Tacho 100',
+    speedBase: { indicated: 100, unit: 'km/h' },
+    neighboursHeading: 'Benachbarte Größen auf derselben Felge',
+    neighboursIntro: 'Eine Stufe breiter oder schmaler bzw. eine Querschnittsstufe höher oder flacher:',
+    colFitment: 'Bereifung',
+    fitmentStandard: 'Serie',
+    fitmentOption: 'Werksoption',
     detailLead: (width, aspect, rim) => `Ein ${width} mm breiter Reifen mit einer Flanke von ${aspect} % dieser Breite, montiert auf einer ${rim}-Zoll-Felge.`,
     metricsHeading: 'Berechnete Maße',
     metrics: {
@@ -374,14 +443,33 @@ export const tireSizePageText: Readonly<Record<EntityLocale, TireSizeText>> = Ob
     vehiclesCta: 'Referencia de vehículos',
     vehiclesCtaDetail: 'Medida de origen, patrón de birlos y par por vehículo',
     boltHubCta: 'Patrones de birlos',
-    boltHubCtaDetail: 'La cara del PCD de los mismos datos de fitment',
+    boltHubCtaDetail: 'El PCD y el buje de los mismos vehículos',
 
     detailKicker: 'Medida de neumático',
-    detailTitle: (notation) => `Medida ${notation}: dimensiones y diámetro`,
-    detailDescription: (notation, diameterMm, vehicles) => vehicles > 0
-      ? `${notation} tiene ${diameterMm} mm de diámetro calculado. Consulte flanco, circunferencia, alternativas y ${vehicles} ${plural(vehicles, 'vehículo documentado', 'vehículos documentados')}.`
-      : `${notation} tiene ${diameterMm} mm de diámetro calculado. Consulte flanco, circunferencia, vueltas y alternativas fabricadas dentro del 3 %.`,
+    detailTitle: (notation, f) => f.commercial
+      ? `${notation} de furgoneta: medidas y equivalencias`
+      : `Neumático ${notation}: diámetro ${f.diameterMm} mm y equivalencias`,
+    detailDescription: (notation, f, vehicles) => `${notation}: ${f.diameterMm} mm de diámetro, ${f.sidewallMm} mm de flanco y ${f.circumferenceMm} mm de circunferencia. Equivalencias en otras llantas y error de velocímetro${vehicles > 0 ? `, con ${vehicles} ${plural(vehicles, 'vehículo', 'vehículos')}` : ''}.`,
     detailH1: (notation) => `Medida de neumático ${notation}`,
+    commercialKicker: 'Medida de neumático de furgoneta (C)',
+    commercialNote: 'La «C» indica un neumático reforzado para vehículos comerciales ligeros, como furgonetas. Sus medidas nominales coinciden con las del turismo con los mismos números, pero está construido para más carga y suele llevar más presión de inflado. Un neumático de turismo no sustituye a un neumático C en capacidad de carga.',
+    commercialBreakdown: { label: 'Comercial ligero', detail: 'Construcción reforzada para furgonetas: más capacidad de carga y normalmente más presión.' },
+    commercialTwinLink: (twin) => `Versión de turismo: ${twin}`,
+    passengerTwinLink: (twin) => `Versión de furgoneta (C): ${twin}`,
+    inchHeading: 'Medidas en pulgadas',
+    inchIntro: (shorthand) => `En pulgadas, esta medida equivale aproximadamente a ${shorthand}: diámetro total × ancho sobre la llanta indicada.`,
+    inchLabels: { diameter: 'Diámetro total', width: 'Ancho de sección', sidewall: 'Altura del flanco', circumference: 'Circunferencia' },
+    alternativesHeading: 'Equivalencias en otras llantas',
+    alternativesIntro: 'Medidas fabricadas cuyo diámetro total no se desvía más de un 3 %, desde una pulgada menos hasta dos pulgadas más y con un ancho razonable en cada caso. La columna del velocímetro indica la velocidad real cuando el velocímetro marca 100 km/h.',
+    alternativesEmpty: 'Ninguna medida fabricada de la referencia mantiene este diámetro dentro del 3 % con un ancho razonable en una llanta vecina.',
+    rimRowLabel: (rim, delta) => delta === 0 ? `${rim}″ (misma llanta)` : `${rim}″ (${delta > 0 ? '+' : '−'}${Math.abs(delta)} pulg.)`,
+    colSpeed: 'Real a 100 indicados',
+    speedBase: { indicated: 100, unit: 'km/h' },
+    neighboursHeading: 'Medidas cercanas en la misma llanta',
+    neighboursIntro: 'Un paso más ancho o más estrecho, o un paso de perfil más alto o más bajo:',
+    colFitment: 'Montaje',
+    fitmentStandard: 'De serie',
+    fitmentOption: 'Opción de fábrica',
     detailLead: (width, aspect, rim) => `Un neumático de ${width} mm de ancho con un flanco del ${aspect} % de ese ancho, montado sobre una llanta de ${rim} pulgadas.`,
     metricsHeading: 'Dimensiones calculadas',
     metrics: {
@@ -520,7 +608,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     hubH1: 'Lochkreise in der Atlas-Fitment-Referenz',
     hubLead: (count, vehicles) => `${count} ${plural(count, 'Lochkreis kommt', 'Lochkreise kommen')} bei den ${vehicles} belegten Fahrzeugen der Atlas-Referenz vor. Jeder Lochkreis hat eine eigene Seite mit den gelisteten Fahrzeugen, ihren Mittenlochwerten und den Werksreifengrößen, die sie fahren.`,
     notationHeading: 'So lesen Sie einen Lochkreis',
-    notationIntro: (example, lugs, pcd) => `Ein Lochkreis wie ${example} besteht aus zwei Zahlen: der Lochzahl und dem Lochkreisdurchmesser (LK). ${example} bedeutet ${lugs} gleichmäßig verteilte Radbohrungen auf einem gedachten Kreis mit ${pcd} mm Durchmesser, gemessen durch die Radmitte.`,
+    notationIntro: (example, lugs, pcd) => `Ein Lochkreis wie ${example} besteht aus zwei Zahlen: der Lochzahl und dem Lochkreisdurchmesser (LK). ${example} bedeutet ${lugs} gleichmäßig verteilte Radbohrungen auf einem gedachten Kreis mit ${dec(pcd)} mm Durchmesser, gemessen durch die Radmitte.`,
     notationParts: [
       { label: 'Lochzahl', detail: 'Wie viele Bolzen oder Schrauben das Rad halten — die erste Zahl.' },
       { label: 'Lochkreisdurchmesser (LK)', detail: 'Der Durchmesser in Millimetern des Kreises, auf dem die Bohrungen liegen — die zweite Zahl.' },
@@ -541,20 +629,20 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     vehiclesCta: 'Fahrzeug-Fitment-Referenz',
     vehiclesCtaDetail: 'Werksreifengröße, Lochkreis und Drehmoment je Fahrzeug',
     tireHubCta: 'Reifengrößen',
-    tireHubCtaDetail: 'Die Reifenseite derselben Fitment-Daten',
+    tireHubCtaDetail: 'Reifengrößen derselben Fahrzeugdaten',
 
     detailKicker: 'Lochkreis',
     detailTitle: (notation) => `Lochkreis ${notation}: Maße & Fahrzeuge`,
-    detailDescription: (notation, lugs, pcd, vehicles) => `${notation} bedeutet ${lugs} Bohrungen auf ${pcd} mm Lochkreis. Dazu: Lochabstand, Mittenlöcher und ${vehicles} belegte Atlas-Fahrzeuge.`,
+    detailDescription: (notation, lugs, pcd, vehicles) => `${notation} bedeutet ${lugs} Bohrungen auf ${dec(pcd)} mm Lochkreis. Dazu: Lochabstand, Mittenlöcher und ${vehicles} belegte Atlas-Fahrzeuge.`,
     detailH1: (notation) => `Lochkreis ${notation}`,
-    detailLead: (lugs, pcd) => `${lugs} gleichmäßig verteilte Radbohrungen auf einem Lochkreis von ${pcd} mm.`,
+    detailLead: (lugs, pcd) => `${lugs} gleichmäßig verteilte Radbohrungen auf einem Lochkreis von ${dec(pcd)} mm.`,
     metricsHeading: 'Maße des Lochkreises',
     metrics: { lugCount: 'Lochzahl', pcdMm: 'Lochkreisdurchmesser', pcdIn: 'LK in Zoll', holeSpacing: 'Lochabstand', vehicleCount: 'Gelistete Fahrzeuge', centerBore: 'Mittenlochmaße in der Atlas-Referenz' },
     metricNote: 'Lochkreisdurchmesser und Lochzahl stammen direkt aus den Fahrzeugeinträgen unten. Der Lochabstand wird daraus berechnet und nicht separat recherchiert.',
     holeSpacingNote: 'Sehne zwischen zwei benachbarten Bohrungen, berechnet als LK × sin(180° ÷ Lochzahl) — der Abstand, den Sie an der Nabe messen.',
     diagramHeading: 'Anordnung der Bohrungen',
-    diagramNote: (lugs, pcd) => `${lugs} Bohrungen im echten Winkelabstand auf einem Lochkreis von ${pcd} mm. Die Winkel stimmen exakt; die Zeichnung ist eingepasst skaliert — messen Sie also kein echtes Rad am Bildschirm ab.`,
-    diagramAria: (lugs, pcd) => `Diagramm mit ${lugs} gleichmäßig verteilten Radbohrungen auf einem Lochkreis von ${pcd} Millimetern`,
+    diagramNote: (lugs, pcd) => `${lugs} Bohrungen im echten Winkelabstand auf einem Lochkreis von ${dec(pcd)} mm. Die Winkel stimmen exakt; die Zeichnung ist eingepasst skaliert — messen Sie also kein echtes Rad am Bildschirm ab.`,
+    diagramAria: (lugs, pcd) => `Diagramm mit ${lugs} gleichmäßig verteilten Radbohrungen auf einem Lochkreis von ${dec(pcd)} Millimetern`,
     pcdLabel: 'LK',
     vehiclesHeading: 'Fahrzeuge mit diesem Lochkreis',
     vehiclesIntro: (n) => `Atlas führt ${n} ${plural(n, 'belegtes Fahrzeug', 'belegte Fahrzeuge')} mit diesem Lochkreis. Mittenloch, Felgengröße und Drehmoment unterscheiden sich dabei — genau deshalb bedeutet ein gleicher Lochkreis noch keine Austauschbarkeit.`,
@@ -584,7 +672,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     backToHub: 'Alle Lochkreise',
     faqHeading: 'Häufige Fragen',
     faqs: ({ notation, lugs, pcd, vehicles, makes }) => [
-      { q: `Was bedeutet ${notation}?`, a: `${lugs} gleichmäßig verteilte Radbohrungen auf einem Kreis mit ${pcd} mm Durchmesser. Die erste Zahl ist die Lochzahl, die zweite der Lochkreisdurchmesser in Millimetern.` },
+      { q: `Was bedeutet ${notation}?`, a: `${lugs} gleichmäßig verteilte Radbohrungen auf einem Kreis mit ${dec(pcd)} mm Durchmesser. Die erste Zahl ist die Lochzahl, die zweite der Lochkreisdurchmesser in Millimetern.` },
       { q: `Welche Fahrzeuge haben ${notation}?`, a: vehicles > 0 ? `In der Atlas-Referenz: ${makes}. Jedes verlinkt auf seine eigene Fitment-Seite mit Werksreifengröße, Felgengröße und Anzugsdrehmoment.` : 'Atlas hat für diesen Lochkreis noch keine belegte Fahrzeugzuordnung.' },
       { q: `Passt eine ${notation}-Felge von einem dieser Autos an ein anderes?`, a: 'Nicht zwangsläufig — und das liegt nicht am Lochkreis. Mittenloch, Einpresstiefe, Felgenbreite, Bremsenfreigang, Sitzform und Tragfähigkeit müssen ebenfalls passen. Der Lochkreis sagt nur, dass die Bohrungen fluchten.' },
       { q: 'Wie messe ich diesen Lochkreis selbst?', a: `Messen Sie den Abstand zwischen zwei benachbarten Bohrungen von Mitte zu Mitte und rechnen Sie ihn in den Lochkreisdurchmesser um. Für ${notation} ergibt sich der oben angegebene Lochabstand. Der Lochkreis-Rechner übernimmt die Umrechnung für jede Lochzahl.` },
@@ -599,7 +687,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     hubH1: 'Patrones de birlos en la referencia Atlas',
     hubLead: (count, vehicles) => `${count} ${plural(count, 'patrón aparece', 'patrones aparecen')} entre los ${vehicles} ${plural(vehicles, 'vehículo documentado', 'vehículos documentados')} de la referencia Atlas. Cada patrón tiene su propia página con los vehículos en los que figura, sus valores de centro de rueda y las medidas de neumático de origen que montan.`,
     notationHeading: 'Cómo se lee un patrón de birlos',
-    notationIntro: (example, lugs, pcd) => `Un patrón como ${example} son dos números: el número de birlos y el diámetro del círculo de paso (PCD). ${example} significa ${lugs} agujeros repartidos por igual sobre un círculo imaginario de ${pcd} mm de diámetro, medido por el centro de la rueda.`,
+    notationIntro: (example, lugs, pcd) => `Un patrón como ${example} son dos números: el número de birlos y el diámetro del círculo de paso (PCD). ${example} significa ${lugs} agujeros repartidos por igual sobre un círculo imaginario de ${dec(pcd)} mm de diámetro, medido por el centro de la rueda.`,
     notationParts: [
       { label: 'Número de birlos', detail: 'Cuántos espárragos o tornillos sujetan la rueda — el primer número.' },
       { label: 'Diámetro del círculo de paso (PCD)', detail: 'El diámetro en milímetros del círculo sobre el que se sitúan los agujeros — el segundo número.' },
@@ -620,20 +708,20 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     vehiclesCta: 'Referencia de vehículos',
     vehiclesCtaDetail: 'Medida de origen, patrón de birlos y par por vehículo',
     tireHubCta: 'Medidas de neumáticos',
-    tireHubCtaDetail: 'La cara del neumático de los mismos datos de fitment',
+    tireHubCtaDetail: 'Las medidas de neumático de los mismos vehículos',
 
     detailKicker: 'Patrón de birlos',
     detailTitle: (notation) => `Patrón ${notation}: PCD y vehículos`,
-    detailDescription: (notation, lugs, pcd, vehicles) => `${notation} significa ${lugs} birlos sobre un PCD de ${pcd} mm. Consulte separación, centros y ${vehicles} ${plural(vehicles, 'vehículo Atlas', 'vehículos Atlas')}.`,
+    detailDescription: (notation, lugs, pcd, vehicles) => `${notation} significa ${lugs} birlos sobre un PCD de ${dec(pcd)} mm. Consulte separación, centros y ${vehicles} ${plural(vehicles, 'vehículo Atlas', 'vehículos Atlas')}.`,
     detailH1: (notation) => `Patrón de birlos ${notation}`,
-    detailLead: (lugs, pcd) => `${lugs} agujeros repartidos por igual sobre un círculo de paso de ${pcd} mm.`,
+    detailLead: (lugs, pcd) => `${lugs} agujeros repartidos por igual sobre un círculo de paso de ${dec(pcd)} mm.`,
     metricsHeading: 'Dimensiones del patrón',
     metrics: { lugCount: 'Número de birlos', pcdMm: 'Diámetro del círculo de paso', pcdIn: 'PCD en pulgadas', holeSpacing: 'Separación entre agujeros', vehicleCount: 'Vehículos documentados', centerBore: 'Centros de rueda en la referencia Atlas' },
     metricNote: 'El PCD y el número de birlos salen directamente de las fichas de vehículo de abajo. La separación entre agujeros se calcula a partir de ellos, no se documenta aparte.',
     holeSpacingNote: 'Cuerda entre dos agujeros contiguos, calculada como PCD × sen(180° ÷ número de birlos) — la distancia que se mide en el buje.',
     diagramHeading: 'Disposición de los agujeros',
-    diagramNote: (lugs, pcd) => `${lugs} agujeros dibujados con su separación angular real sobre un círculo de paso de ${pcd} mm. Los ángulos son exactos; el dibujo está escalado para encajar, así que no mida una rueda real sobre la pantalla.`,
-    diagramAria: (lugs, pcd) => `Diagrama de ${lugs} agujeros repartidos por igual sobre un círculo de paso de ${pcd} milímetros`,
+    diagramNote: (lugs, pcd) => `${lugs} agujeros dibujados con su separación angular real sobre un círculo de paso de ${dec(pcd)} mm. Los ángulos son exactos; el dibujo está escalado para encajar, así que no mida una rueda real sobre la pantalla.`,
+    diagramAria: (lugs, pcd) => `Diagrama de ${lugs} agujeros repartidos por igual sobre un círculo de paso de ${dec(pcd)} milímetros`,
     pcdLabel: 'PCD',
     vehiclesHeading: 'Vehículos con este patrón',
     vehiclesIntro: (n) => `Atlas documenta ${n} ${plural(n, 'vehículo', 'vehículos')} con este patrón. El centro de rueda, el tamaño de llanta y el par varían entre ellos — justo por eso compartir patrón no es intercambiabilidad.`,
@@ -663,7 +751,7 @@ export const boltPatternPageText: Readonly<Record<EntityLocale, BoltPatternText>
     backToHub: 'Todos los patrones',
     faqHeading: 'Preguntas frecuentes',
     faqs: ({ notation, lugs, pcd, vehicles, makes }) => [
-      { q: `¿Qué significa ${notation}?`, a: `${lugs} agujeros repartidos por igual sobre un círculo de ${pcd} mm de diámetro. El primer número es el número de birlos y el segundo, el diámetro del círculo de paso en milímetros.` },
+      { q: `¿Qué significa ${notation}?`, a: `${lugs} agujeros repartidos por igual sobre un círculo de ${dec(pcd)} mm de diámetro. El primer número es el número de birlos y el segundo, el diámetro del círculo de paso en milímetros.` },
       { q: `¿Qué vehículos usan ${notation}?`, a: vehicles > 0 ? `En la referencia Atlas: ${makes}. Cada uno enlaza con su ficha, con la medida de origen, el tamaño de llanta y el par de apriete.` : 'Ningún vehículo de la referencia de equipo original de Atlas figura actualmente con este patrón.' },
       { q: `¿Una llanta ${notation} de uno de estos coches vale para otro?`, a: 'No necesariamente, y no por el patrón. El centro de rueda, el offset, el ancho de llanta, la holgura de frenos, el tipo de asiento y la capacidad de carga también tienen que coincidir: el patrón solo indica que los agujeros encajan.' },
       { q: '¿Cómo mido yo mismo este patrón?', a: `Mida la distancia entre dos agujeros contiguos, de centro a centro, y conviértala en diámetro del círculo de paso. Para ${notation} esa distancia es la indicada arriba. La Calculadora de patrón de birlos hace la conversión para cualquier número de birlos.` },

@@ -22,7 +22,7 @@ const livePrice = fuelPrices.es.status !== 'pending' ? e5?.value : undefined;
       <div class="fuel-primary-result__fuel"><span>Combustible necesario</span><strong data-fuel-primary-fuel>—</strong><small data-fuel-primary-rate>El coste por distancia aparecerá aquí.</small></div>
     </div>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Su estimación de combustible aparecerá aquí.</p>
-    <FuelCostTechnicalVisual />
+    <FuelCostTechnicalVisual locale="es" />
     <div class="fuel-detail-heading" aria-hidden="true"><span>Detalles</span><small>Desglose de combustible y coste</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
     <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>

@@ -3,7 +3,9 @@ import SiteLayout from '../../../components/SiteLayout.astro';
 import DecisionGraph from '../../../components/DecisionGraph.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
 import { vehiclePageText } from '../../../content/vehicle-page-text';
-import { vehicleFitmentData, type VehicleFitment } from '../../../data/vehicle-fitment';
+import { vehicleFitmentData, vehicleNote, type VehicleFitment } from '../../../data/vehicle-fitment';
+import { formatPlain } from '../../../ui/locale-format';
+import { displayTireNotation } from '../../../ui/entity-page-model';
 import { tireSizeSlug } from '../../../data/tire-size-catalog';
 import { boltPatternSlug } from '../../../data/bolt-pattern-catalog';
 import { entityDetailPath, type EntityLocale } from '../../../seo/entity-routes';
@@ -65,11 +67,12 @@ const vehicleJsonLd = serializeJsonLd({
   </header>
 
   <div class="methodology-grid">
-    <section><h2>{t.tireSize}</h2><p><strong><a href={entityDetailPath('tire-size', LOCALE, tireSizeSlug(vehicle.tireSize))}>{vehicle.tireSize}</a></strong></p></section>
+    <section><h2>{t.tireSize}</h2><p><strong><a href={entityDetailPath('tire-size', LOCALE, tireSizeSlug(vehicle.tireSize))}>{displayTireNotation(vehicle.tireSize, LOCALE)}</a></strong></p></section>
     <section><h2>{t.boltPattern}</h2><p><strong><a href={entityDetailPath('bolt-pattern', LOCALE, boltPatternSlug(vehicle.boltPattern))}>{vehicle.boltPattern}</a></strong> ({vehicle.lugCount} {vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt})</p></section>
     <section><h2>{t.wheelSize}</h2><p><strong>{vehicle.wheelSize}</strong></p></section>
     <section><h2>{t.torque}</h2><p><strong class={torque.qualified ? 'entity-soft' : undefined}>{torque.value}</strong>{torque.qualifier && <><br /><small>{torque.qualifier}</small></>}</p></section>
-    {vehicle.centerBoreMm !== undefined && <section><h2>{t.centerBore}</h2><p><strong>{vehicle.centerBoreMm} mm</strong></p></section>}
+    {vehicle.centerBoreMm !== undefined && <section><h2>{t.centerBore}</h2><p><strong>{formatPlain(vehicle.centerBoreMm, LOCALE)} mm</strong></p></section>}
+    {vehicle.optionalTireSizes && vehicle.optionalTireSizes.length > 0 && <section><h2>Werksoptionale Reifengrößen</h2><p>{vehicle.optionalTireSizes.map((size, index) => <>{index > 0 && ', '}<a href={entityDetailPath('tire-size', LOCALE, tireSizeSlug(size))}>{displayTireNotation(size, LOCALE)}</a></>)}</p></section>}
     <section><h2>{t.generation}</h2><p><strong>{vehicle.generation}</strong></p></section>
   </div>
 
@@ -77,13 +80,13 @@ const vehicleJsonLd = serializeJsonLd({
     <p class="eyebrow">{t.confidenceNote}</p>
     <h2 id="vehicle-confidence-heading"><span class="vehicle-confidence" data-confidence={vehicle.confidence}>{t.confidence[vehicle.confidence]}</span></h2>
     <p>{t.sourcesLabel}: {vehicle.sources.join(', ')}</p>
-    {vehicle.notes && <p>{t.notesLabel}: {vehicle.notes}</p>}
+    {vehicleNote(vehicle, LOCALE) && <p>{t.notesLabel}: {vehicleNote(vehicle, LOCALE)}</p>}
     <p>{t.disclaimer}</p>
   </section>
 
-  <section aria-labelledby="vehicle-faq-heading">
+  <section class="entity-section" aria-labelledby="vehicle-faq-heading">
     <h2 id="vehicle-faq-heading">{t.faqHeading}</h2>
-    {faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+    {faqs.map((f) => <details class="entity-faq"><summary>{f.q}</summary><p>{f.a}</p></details>)}
   </section>
 
   <DecisionGraph model={decisions} locale={LOCALE} id="vehicle-decisions" />

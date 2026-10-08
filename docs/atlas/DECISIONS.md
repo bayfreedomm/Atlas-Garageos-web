@@ -2,6 +2,18 @@
 
 Durable decisions are recorded with date, status, rationale, and evidence. Historical V3 decisions remain in `V3_MASTER_PLAN.md`.
 
+## 2026-10-08 — Spanish uses "birlos" for bolt patterns
+
+Status: `ACCEPTED`.
+
+The Spanish bolt-pattern route family is already indexed as `/es/patrones-birlos/`, so all Spanish copy uses "birlos" consistently (stray "pernos" removed). Switching to Spain-style "tornillos" would need new URLs plus redirects; revisit only if Search Console country data shows Spain dominates and the slug change is worth the reindex cost.
+
+## 2026-10-08 — Vehicle reference rows follow one generation page
+
+Status: `VERIFIED DONE`.
+
+Each vehicle row cites the exact wheel-size.com generation/market page it was checked against. Base size = the smallest-rim OE size fitted on at least 30 % of trims; other OE sizes become `optionalTireSizes`. Torque is published only when the page lists one value; vehicles with split hubs (Fiat Ducato 5x118/5x130) or no OE rows (Transit Custom) are left out rather than guessed. All re-checked rows are `medium` confidence.
+
 ## 2026-09-25 — Canonical project memory
 
 Status: `VERIFIED DONE`.

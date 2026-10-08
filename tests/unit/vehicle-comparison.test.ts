@@ -42,9 +42,10 @@ describe('vehicle comparison model', () => {
   });
 
   it('keeps low-confidence torque visibly qualified', () => {
-    const low = vehicleFitmentData.find(({ id }) => id === 'audi-a3')!;
+    const audi = vehicleFitmentData.find(({ id }) => id === 'audi-a3')!;
+    const low: VehicleFitment = { ...audi, id: 'extrapolated-row', torqueTrust: { confidence: 'low', evidence: 'extrapolated' } };
     const other = vehicleFitmentData.find(({ id }) => id === 'vw-tiguan')!;
-    const result = compareVehicleIds(low.id, other.id, 'de');
+    const result = compareVehicleIds(low.id, other.id, 'de', [low, other]);
     const row = result.rows.find(({ id }) => id === 'torque')!;
     const lowSide = result.vehicleA?.id === low.id ? row.aNote : row.bNote;
     expect(lowSide).toMatch(/Übertragener Referenzwert/);

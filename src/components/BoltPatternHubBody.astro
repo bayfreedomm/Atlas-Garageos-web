@@ -9,6 +9,7 @@ import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entit
 import { homePath, vehicleHubPath } from '../ui/entity-page-model';
 import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
+import { formatDecimal } from '../ui/locale-format';
 
 interface Props { readonly locale: EntityLocale; }
 const { locale } = Astro.props;
@@ -31,7 +32,7 @@ const groupCards = groups.map(([lugs, entries]) => ({
     return {
       notation: entry.notation,
       href: entityDetailPath('bolt-pattern', locale, entry.slug),
-      spacing: `${adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount).toFixed(2)} mm`,
+      spacing: `${formatDecimal(adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount), 2, locale)} mm`,
       vehicles: vehicles.length,
       // Normalized with the same function the live filter applies to the query, so a
       // reader typing any separator spelling of this entity still matches it.

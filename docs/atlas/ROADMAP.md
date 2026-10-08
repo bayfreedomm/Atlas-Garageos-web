@@ -1,6 +1,6 @@
 # Atlas GarageOS — Reconciled Roadmap
 
-Updated: 2026-09-26. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
+Updated: 2026-10-08. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
 
 ## P0 — protect and measure the current foundation
 
@@ -13,6 +13,13 @@ Updated: 2026-09-26. Priority combines user value, organic opportunity, differen
 - `VERIFIED DONE` — Optional 3D studio post-mount synchronization was repaired. The shared 3D controller now locates the calculator rendered as the studio's sibling instead of searching only its ancestors, reads current form data at mount, and refreshes on `input`, `change`, and `submit`. Regression coverage compares two valid states across all twelve input-driven additional scenes; the two intentionally static measurement/map explainers remain static.
 - `PLANNED` — Keep the current data contracts and tests green while consolidating the canonical project memory.
 - `PLANNED` — Select a licensed/permissioned automotive data strategy before adding safety-relevant specifications or large vehicle coverage.
+
+## P0.5 — reference-data growth (Search Console proven demand)
+
+- `VERIFIED DONE` — 2026-10-08 tire-entity upgrade: C sizes, inch view, alternatives with speedometer reading, localized numbers/titles, hub links site-wide, 84 re-checked vehicle rows.
+- `PLANNED` — Confirm Nissan Rogue/Altima and Toyota Corolla against a second source (no OE rows on wheel-size for those generations).
+- `PLANNED` — Grow vehicle rows toward the top EU/US models per make, one verified generation page each; add Fiat Ducato as two rows (5x118 / 5x130 Maxi) once each variant's OE size is confirmed.
+- `PLANNED` — Watch GSC CTR on the new DE/ES tire titles for 2–4 weeks before further title changes.
 
 ## P1 — controlled language expansion
 

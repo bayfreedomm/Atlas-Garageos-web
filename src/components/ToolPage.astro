@@ -5,6 +5,8 @@ import { uiStrings, type ContentLocale } from '../localization/site-catalog';
 import { localizedToolPath } from '../localization/locales';
 import ToolIcon from './ToolIcon.astro';
 import ToolVisual from './ToolVisual.astro';
+import { referenceCopy, referenceLinks, tireSizeShortcuts } from '../ui/reference-links';
+import { entityHubPath } from '../seo/entity-routes';
 import ToolVisualStudio from './ToolVisualStudio.astro';
 import ToolInsights from './ToolInsights.astro';
 import DecisionGraph from './DecisionGraph.astro';
@@ -35,6 +37,13 @@ const hasEmbeddedStudio = ['tire-size-calculator', 'speedometer-error-calculator
 // claimed the English homepage/tools-hub as its ancestors even though the page's own visible
 // breadcrumb (backHref, above) and content are correctly localized.
 const homeHref = locale ? `/${locale}/` : '/';
+// Tire tools hand the reader straight into the per-size reference pages.
+const TIRE_REFERENCE_TOOLS = ['tire-size-calculator', 'tire-size-comparison', 'speedometer-error-calculator', 'tire-fit-check', 'tire-load-speed-rating'];
+const showTireReference = TIRE_REFERENCE_TOOLS.includes(definition.id);
+const refCopy = referenceCopy(journeyLocale);
+const tireShortcuts = showTireReference ? tireSizeShortcuts(journeyLocale) : [];
+const FITMENT_REFERENCE_TOOLS = ['bolt-pattern-calculator', 'wheel-offset-calculator', 'vehicle-fitment-finder', 'fitment-map', 'measure-my-car'];
+const fitmentReference = FITMENT_REFERENCE_TOOLS.includes(definition.id) ? referenceLinks(journeyLocale) : [];
 const breadcrumbs = [
   { name: t?.navHome ?? 'Home', href: homeHref },
   { name: t?.allToolsBack ? t.allToolsBack.replace(/^\W+/, '') : 'Tools', href: backHref },
@@ -51,8 +60,8 @@ const breadcrumbs = [
     </header>
 
     <div class:list={['tool-stage', { 'tool-stage--single': !visual || hasToolVisualStudio || hasEmbeddedStudio }]}> 
-      <section class="tool-workspace" aria-label={`${displayTitle} calculator`}><slot name="tool" /></section>
-      {visual && !hasToolVisualStudio && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={`${displayTitle} visual explanation`}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} /></aside>}
+      <section class="tool-workspace" aria-label={locale === 'de' ? `Rechner: ${displayTitle}` : locale === 'es' ? `Calculadora: ${displayTitle}` : `${displayTitle} calculator`}><slot name="tool" /></section>
+      {visual && !hasToolVisualStudio && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={locale === 'de' ? `Visuelle Erklärung: ${displayTitle}` : locale === 'es' ? `Explicación visual: ${displayTitle}` : `${displayTitle} visual explanation`}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} locale={locale} title={displayTitle} /></aside>}
     </div>
   </article>
 
@@ -62,6 +71,8 @@ const breadcrumbs = [
   <ToolInsights id={definition.id} locale={locale} />
   {!explanationBeforeInsights && <section class="tool-explanation"><div><p class="eyebrow">{t?.howItWorks ?? 'How it works'}</p><slot name="explanation" /></div><aside class="limitation-card"><strong>{t?.keepInMind ?? 'Keep in mind'}</strong><p>{limitation}</p></aside></section>}
   {studioCta && <a class="studio-cta studio-cta--row" href={resolvedStudioHref}><span><small>{t?.advancedWheelTireTool ?? 'Advanced wheel & tire tool'}</small><strong>{studioCta}</strong></span><i aria-hidden="true">›</i></a>}
+  {fitmentReference.length > 0 && <section class="entity-section tool-reference" aria-label={refCopy.group}><p class="eyebrow">{refCopy.group}</p><div class="entity-links">{fitmentReference.map((link) => <a class="entity-link-card" href={link.href}><strong>{link.title}</strong><span>{link.helper}</span><i aria-hidden="true">›</i></a>)}</div></section>}
+  {showTireReference && <section class="entity-section tool-reference" aria-labelledby="tool-reference-heading"><p class="eyebrow">{refCopy.popularKicker}</p><h2 id="tool-reference-heading">{refCopy.popularHeading}</h2><p class="entity-note">{refCopy.popularLead}</p><ul class="entity-chiplist">{tireShortcuts.map((shortcut) => <li><a class="entity-chip" href={shortcut.href}>{shortcut.label}</a></li>)}</ul><p><a class="entity-inline-link" href={entityHubPath('tire-size', journeyLocale)}>{refCopy.allSizes} ›</a></p></section>}
   {definition.id !== 'tire-size-comparison' && <section class="tool-decision-area" aria-label={t?.relatedTools ?? 'Related tools'}><DecisionGraph model={nextDecision} locale={journeyLocale} id="tool-next-decision" /></section>}
 </SiteLayout>
 <script>import { initializeToolVisualMotion } from '../ui/tool-visual-motion'; import { initializeShareableToolState } from '../ui/shareable-tool-state'; import { initializeToolHandoff } from '../ui/tool-handoff'; initializeToolVisualMotion(); initializeToolHandoff(); window.setTimeout(initializeShareableToolState, 0);</script>

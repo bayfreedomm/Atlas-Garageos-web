@@ -89,11 +89,15 @@ describe('shared automotive decision graph', () => {
 
 describe('decision graph route-count guard', () => {
   it('preserves the expanded sourced record and entity URL counts', () => {
-    expect(vehicleFitmentData).toHaveLength(30);
-    expect(tireSizeCatalog).toHaveLength(582);
-    expect(boltPatternCatalog).toHaveLength(10);
+    // Growth is expected (more sourced vehicles, C sizes); shrinking below the published
+    // baseline is not. The URL count must always equal the catalog size in every locale.
+    expect(vehicleFitmentData.length).toBeGreaterThanOrEqual(30);
+    expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(582);
+    expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
     const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos)\//.test(url));
-    expect(entityUrls).toHaveLength(1782);
-    expect(new Set(entityUrls)).toHaveLength(1782);
+    const expected = 3 * (2 + tireSizeCatalog.length + boltPatternCatalog.length);
+    expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
+    expect(entityUrls).toHaveLength(expected);
+    expect(new Set(entityUrls)).toHaveLength(expected);
   });
 });

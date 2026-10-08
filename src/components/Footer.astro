@@ -1,10 +1,14 @@
 ---
 import { uiStrings, type ContentLocale } from '../localization/site-catalog';
+import { referenceLinks } from '../ui/reference-links';
 interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
 const t = locale ? uiStrings[locale] : undefined;
 const prefix = locale ? `/${locale}` : '';
 const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
+const reference = referenceLinks(locale ?? 'en');
+const footerAria = locale === 'de' ? 'Fußzeile' : locale === 'es' ? 'Pie de página' : 'Footer';
+const diagnosticsLabel = locale === 'de' ? 'OBD-Diagnose (Englisch)' : locale === 'es' ? 'Diagnóstico OBD (inglés)' : 'OBD Diagnostics';
 const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are estimates — verify anything safety-critical with your vehicle\'s manual.').replace('{year}', String(new Date().getFullYear()));
 ---
 <footer class="site-footer">
@@ -13,9 +17,10 @@ const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are e
       <span class="brand-wordmark"><span class="brand-wordmark__kicker">Atlas</span><strong>Garage<span class="brand-wordmark__os">OS</span></strong></span>
       <p>{t?.footerTagline ?? 'Fast, honest automotive calculators. No account, no clutter.'}</p>
     </div>
-    <nav class="site-footer__links" aria-label="Footer">
+    <nav class="site-footer__links" aria-label={footerAria}>
       <a href={`${prefix}/tools/`}>{t?.footerToolbox ?? 'Toolbox'}</a>
-      <a href="/obd-codes/">OBD Diagnostics</a>
+      {reference.map((link) => <a href={link.href}>{link.title}</a>)}
+      <a href="/obd-codes/" hreflang={locale ? 'en' : undefined}>{diagnosticsLabel}</a>
       <a href={`${prefix}/fitment-studio/`}>{t?.footerFitment ?? 'Wheel & Tire Compare'}</a>
       <a href={`${prefix}/methodology/`}>{t?.footerMethodology ?? 'Accuracy & Methodology'}</a>
       <a href={`${prefix}/privacy-policy/`}>{t?.footerPrivacy ?? 'Privacy Policy'}</a>

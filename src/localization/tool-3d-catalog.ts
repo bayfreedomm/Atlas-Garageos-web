@@ -64,7 +64,7 @@ const copy = {
     'tire-date-code-decoder': ['Fecha DOT en el flanco', 'El código de semana y año elegido se señala en el flanco del neumático.'],
     'towing-capacity-calculator': ['Vehículo cargado y remolque', 'La carga del vehículo se resta del GCWR antes de estimar el remolque.'],
     'quarter-mile-calculator': ['Pista de cuarto de milla', 'Potencia y peso alimentan la estimación; no simula la aceleración.'],
-    'vehicle-fitment-finder': ['Geometría de referencia', 'Neumático y círculo de pernos representan datos documentados, no una garantía de ajuste.'],
+    'vehicle-fitment-finder': ['Geometría de referencia', 'Neumático y patrón de birlos representan datos documentados, no una garantía de ajuste.'],
   },
 } as const;
 

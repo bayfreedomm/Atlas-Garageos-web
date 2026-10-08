@@ -5,6 +5,7 @@ import { localizedTool, platformCatalog, type ContentLocale } from '../localizat
 import { localizedToolPath } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
 import { normalizeFuelStatus } from '../data/fuel-prices-types';
+import { referenceCopy, referenceLinks, tireSizeShortcuts } from '../ui/reference-links';
 
 // The hero capability badges (Tires & wheels / Fuel & trips / EV tools /
 // Performance) must route to a real, already-existing destination. Three of
@@ -17,6 +18,15 @@ import { normalizeFuelStatus } from '../data/fuel-prices-types';
 
 interface Props { locale?: ContentLocale | undefined; }
 const { locale } = Astro.props;
+const entityLocale = locale ?? 'en';
+const reference = referenceLinks(entityLocale);
+const refCopy = referenceCopy(entityLocale);
+const shortcuts = tireSizeShortcuts(entityLocale);
+const homeChrome = {
+  en: { search: 'Search automotive tools', empty: 'No matching tool. Try a simpler word.', findAria: 'Find a calculator', categoriesAria: 'Tool categories', obdBadge: 'ATLAS DIAGNOSTICS', obdTitle: 'OBD-II Code Lookup', obdCopy: 'Enter a scanner code, understand what the monitor detected, and see what to check before replacing a part.' },
+  de: { search: 'Kfz-Werkzeuge durchsuchen', empty: 'Kein passendes Werkzeug. Versuchen Sie ein einfacheres Wort.', findAria: 'Rechner finden', categoriesAria: 'Werkzeugkategorien', obdBadge: 'ATLAS DIAGNOSE · ENGLISCH', obdTitle: 'OBD-II-Fehlercodes nachschlagen', obdCopy: 'Code aus dem Diagnosegerät eingeben, verstehen, was erkannt wurde, und sehen, was vor einem Teiletausch zu prüfen ist (Inhalte auf Englisch).' },
+  es: { search: 'Buscar herramientas', empty: 'Ninguna herramienta coincide. Pruebe con una palabra más sencilla.', findAria: 'Buscar una calculadora', categoriesAria: 'Categorías de herramientas', obdBadge: 'ATLAS DIAGNÓSTICO · INGLÉS', obdTitle: 'Consulta de códigos OBD-II', obdCopy: 'Introduzca el código del escáner, entienda qué detectó el sistema y vea qué comprobar antes de cambiar una pieza (contenido en inglés).' },
+}[entityLocale];
 const prefix = locale ? `/${locale}` : '';
 const home = locale ? platformCatalog[locale].home : undefined;
 
@@ -122,16 +132,16 @@ const categories = home
   </section>
 
   <section class="home-v4-surface">
-    <section class="home-v7-search-panel" aria-label="Find a calculator">
+    <section class="home-v7-search-panel" aria-label={homeChrome.findAria}>
       <div><p>{home?.findToolLabel ?? 'FIND A TOOL'}</p><h2>{home?.findToolQuestion ?? 'What do you want to calculate?'}</h2></div>
       <form class="home-search" data-tool-search-form>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
-        <label class="sr-only" for="tool-search-home">Search automotive tools</label>
+        <label class="sr-only" for="tool-search-home">{homeChrome.search}</label>
         <input id="tool-search-home" type="search" placeholder={home?.searchPlaceholder ?? 'Tire size, fuel cost, wheel offset...'} autocomplete="off" data-tool-search />
         <button type="submit">{home?.searchButton ?? 'Find'}</button>
       </form>
     </section>
-    <div class="home-category-grid" aria-label="Tool categories">
+    <div class="home-category-grid" aria-label={homeChrome.categoriesAria}>
       {categories.map(([name, copy]) => (
         <a href={`${prefix}/tools/?category=${encodeURIComponent(name)}`}>
           <span>{name}</span><small>{copy}</small><i aria-hidden="true">›</i>
@@ -147,11 +157,22 @@ const categories = home
           <ToolIcon id={tool.id} category={tool.category}/><span><strong>{displayTitle}</strong>{displayHelper && <small>{displayHelper}</small>}</span><i aria-hidden="true">›</i>
         </a>); })}
       </div>
-      <p class="toolbox-empty" data-tool-empty hidden>No matching tool. Try a simpler word.</p>
+      <p class="toolbox-empty" data-tool-empty hidden>{homeChrome.empty}</p>
+    </section>
+
+    <section class="home-popular home-reference" aria-labelledby="reference-heading">
+      <div class="home-section-heading"><div><p>{refCopy.popularKicker}</p><h2 id="reference-heading">{refCopy.popularHeading}</h2></div><a href={reference[0]!.href}>{refCopy.allSizes} <span aria-hidden="true">→</span></a></div>
+      <p class="entity-note">{refCopy.popularLead}</p>
+      <ul class="entity-chiplist">
+        {shortcuts.map((shortcut) => <li><a class="entity-chip" href={shortcut.href}>{shortcut.label}</a></li>)}
+      </ul>
+      <div class="entity-links">
+        {reference.map((link) => <a class="entity-link-card" href={link.href}><strong>{link.title}</strong><span>{link.helper}</span><i aria-hidden="true">›</i></a>)}
+      </div>
     </section>
 
     <a class="home-fuel-feature" href={fuelPricesPath}><span class:list={['home-fuel-feature__badge', fuelBadgeModifier]}><i aria-hidden="true"></i>{fuelBadgeText}</span><span class="home-fuel-feature__copy"><strong>{home?.fuelTitle ?? 'Gas Prices Today'}</strong><small>{home?.fuelCopy ?? 'Weekly US average for regular, midgrade, premium and diesel, with price history.'}</small></span><span class="home-fuel-feature__arrow" aria-hidden="true">→</span></a>
-    <a class="home-diagnostics-feature" href="/obd-codes/"><span class="home-diagnostics-feature__badge">ATLAS DIAGNOSTICS</span><span class="home-diagnostics-feature__copy"><strong>OBD-II Code Lookup</strong><small>Enter a scanner code, understand what the monitor detected, and see what to check before replacing a part.</small></span><span class="home-diagnostics-feature__code" aria-hidden="true">P0420</span><span class="home-diagnostics-feature__arrow" aria-hidden="true">→</span></a>
+    <a class="home-diagnostics-feature" href="/obd-codes/" hreflang={locale ? 'en' : undefined}><span class="home-diagnostics-feature__badge">{homeChrome.obdBadge}</span><span class="home-diagnostics-feature__copy"><strong>{homeChrome.obdTitle}</strong><small>{homeChrome.obdCopy}</small></span><span class="home-diagnostics-feature__code" aria-hidden="true">P0420</span><span class="home-diagnostics-feature__arrow" aria-hidden="true">→</span></a>
     <a class="home-fitment-feature" href={`${prefix}/fitment-studio/`}><span class="home-fitment-feature__badge">{home?.fitmentBadge ?? 'ADVANCED VISUAL TOOL'}</span><span class="home-fitment-feature__copy"><strong>{home?.fitmentTitle ?? 'Wheel & Tire Fitment Compare'}</strong><small>{home?.fitmentCopy ?? 'See how a new setup changes diameter, inner position and outer stance before you buy.'}</small></span><span class="home-fitment-feature__arrow" aria-hidden="true">→</span></a>
   </section>
 </section>

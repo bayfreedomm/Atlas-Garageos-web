@@ -40,7 +40,7 @@ const t = fitmentStudioText.es;
     <header class="app-header">
       <div class="app-header__inner">
         <a class="brand" href="/es/" aria-label={t.homeAriaLabel}><Brand subtitle={t.brandSubtitle} /></a>
-        <div class="app-header__actions"><nav class="desktop-nav" aria-label={t.primaryNavAria}><a href="/es/">{t.navHome}</a><a href="/es/tools/">{t.navTools}</a><a href="/es/fitment-studio/" aria-current="page">{t.navCompare}</a></nav><ThemeQuickToggle /><NavigationDrawer /></div>
+        <div class="app-header__actions"><nav class="desktop-nav" aria-label={t.primaryNavAria}><a href="/es/">{t.navHome}</a><a href="/es/tools/">{t.navTools}</a><a href="/es/fitment-studio/" aria-current="page">{t.navCompare}</a></nav><ThemeQuickToggle /><NavigationDrawer locale="es" localeLinks={[{ code: 'en', label: 'English', href: '/fitment-studio/' }, { code: 'de', label: 'Deutsch', href: '/de/fitment-studio/' }, { code: 'es', label: 'Español', href: '/es/fitment-studio/' }]} /></div>
       </div>
     </header>
 
@@ -184,7 +184,7 @@ const t = fitmentStudioText.es;
     </main>
 
 
-    <Footer />
+    <Footer locale="es" />
     <script>
       import { initializeFitmentPage } from '../../../ui/fitment-page';
       void initializeFitmentPage();

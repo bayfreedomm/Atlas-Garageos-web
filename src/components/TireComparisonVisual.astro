@@ -1,13 +1,66 @@
+---
+import type { Visualization3DLocale } from '../localization/visualization-3d';
+
+interface Props { readonly locale?: Visualization3DLocale | undefined; }
+const { locale = 'en' } = Astro.props;
+const copy = {
+  en: {
+    kicker: 'Live geometry', title: 'See the difference, not just the numbers',
+    intro: 'Blue is the current tire. Orange is the new tire. The engineering views keep the entered dimensions proportional; the difference lens deliberately magnifies small changes.',
+    overlayAria: 'True-scale side-view tire comparison', overlay: 'Side overlay', trueScale: 'TRUE SCALE', overlaySvgAria: 'Current and new tire diameters drawn at the same scale',
+    current: 'CURRENT', next: 'NEW', sideCaption: 'The new tire is shown over the current tire at the same scale.',
+    frontAria: 'True-scale front-view nominal tire width comparison', front: 'Front width', nominalWidth: 'NOMINAL WIDTH', frontSvgAria: 'Current and new tire widths shown from the front',
+    widthCaption: 'Nominal section width is drawn proportionally so width changes are easy to see.',
+    vehicleAria: 'Tire size effect shown on a vehicle silhouette', vehicle: 'On vehicle', staticGeometry: 'STATIC GEOMETRY', vehicleSvgAria: 'Current and new tire shown under the same stylized vehicle body',
+    vehicleCaption: 'The larger radius raises the hub and body by half of the diameter change in this static geometry view.',
+    lensAria: 'Magnified tire dimension differences', lens: 'Difference lens', magnified: 'SMALL CHANGES MAGNIFIED',
+    diameter: 'Overall diameter', width: 'Nominal width', sidewall: 'Sidewall', ride: 'Static ride height',
+    lensCaption: 'Bars intentionally magnify the difference. The engineering drawings keep the dimensions proportional.',
+    surfaceAria: 'Road surface context', dry: 'Dry road', dryText: 'Width alone does not predict grip. Compound, construction, pressure and vehicle setup matter.',
+    wet: 'Wet road', wetText: 'A wider tire is not automatically safer in water. Tread design, depth, compound and water depth matter.',
+  },
+  de: {
+    kicker: 'Live-Geometrie', title: 'Den Unterschied sehen, nicht nur die Zahlen',
+    intro: 'Blau ist der aktuelle Reifen, Orange der neue. Die technischen Ansichten bleiben maßstabsgetreu; die Differenzlupe vergrößert kleine Änderungen bewusst.',
+    overlayAria: 'Maßstabsgetreuer Reifenvergleich in der Seitenansicht', overlay: 'Seitenansicht', trueScale: 'MASSSTABSGETREU', overlaySvgAria: 'Durchmesser des aktuellen und des neuen Reifens im gleichen Maßstab',
+    current: 'AKTUELL', next: 'NEU', sideCaption: 'Der neue Reifen liegt im gleichen Maßstab über dem aktuellen Reifen.',
+    frontAria: 'Maßstabsgetreuer Vergleich der Nennbreite in der Frontansicht', front: 'Breite von vorn', nominalWidth: 'NENNBREITE', frontSvgAria: 'Breite des aktuellen und des neuen Reifens von vorn',
+    widthCaption: 'Die Nennbreite ist proportional gezeichnet, damit Breitenänderungen sofort sichtbar sind.',
+    vehicleAria: 'Wirkung der Reifengröße an einer Fahrzeugsilhouette', vehicle: 'Am Fahrzeug', staticGeometry: 'STATISCHE GEOMETRIE', vehicleSvgAria: 'Aktueller und neuer Reifen unter derselben stilisierten Karosserie',
+    vehicleCaption: 'Ein größerer Radius hebt Nabe und Karosserie in dieser statischen Ansicht um die halbe Durchmesseränderung an.',
+    lensAria: 'Vergrößerte Unterschiede der Reifenmaße', lens: 'Differenzlupe', magnified: 'KLEINE ÄNDERUNGEN VERGRÖSSERT',
+    diameter: 'Gesamtdurchmesser', width: 'Nennbreite', sidewall: 'Flankenhöhe', ride: 'Statische Bodenfreiheit',
+    lensCaption: 'Die Balken vergrößern den Unterschied bewusst. Die technischen Zeichnungen bleiben maßstabsgetreu.',
+    surfaceAria: 'Fahrbahnzustand', dry: 'Trockene Fahrbahn', dryText: 'Die Breite allein sagt nichts über den Grip. Mischung, Aufbau, Luftdruck und Fahrzeugabstimmung zählen.',
+    wet: 'Nasse Fahrbahn', wetText: 'Ein breiterer Reifen ist bei Nässe nicht automatisch sicherer. Profil, Profiltiefe, Mischung und Wasserhöhe zählen.',
+  },
+  es: {
+    kicker: 'Geometría en vivo', title: 'Vea la diferencia, no solo los números',
+    intro: 'El azul es el neumático actual y el naranja el nuevo. Las vistas técnicas mantienen las medidas a escala; la lupa de diferencias amplía a propósito los cambios pequeños.',
+    overlayAria: 'Comparación lateral de neumáticos a escala real', overlay: 'Vista lateral', trueScale: 'ESCALA REAL', overlaySvgAria: 'Diámetros del neumático actual y del nuevo dibujados a la misma escala',
+    current: 'ACTUAL', next: 'NUEVO', sideCaption: 'El neumático nuevo se superpone al actual a la misma escala.',
+    frontAria: 'Comparación frontal del ancho nominal a escala real', front: 'Ancho frontal', nominalWidth: 'ANCHO NOMINAL', frontSvgAria: 'Ancho del neumático actual y del nuevo vistos de frente',
+    widthCaption: 'El ancho de sección nominal se dibuja proporcional para que los cambios se vean fácilmente.',
+    vehicleAria: 'Efecto de la medida sobre la silueta de un vehículo', vehicle: 'En el vehículo', staticGeometry: 'GEOMETRÍA ESTÁTICA', vehicleSvgAria: 'Neumático actual y nuevo bajo la misma carrocería estilizada',
+    vehicleCaption: 'Un radio mayor eleva el buje y la carrocería la mitad del cambio de diámetro en esta vista estática.',
+    lensAria: 'Diferencias de medidas ampliadas', lens: 'Lupa de diferencias', magnified: 'CAMBIOS PEQUEÑOS AMPLIADOS',
+    diameter: 'Diámetro total', width: 'Ancho nominal', sidewall: 'Flanco', ride: 'Altura estática',
+    lensCaption: 'Las barras amplían la diferencia a propósito. Los dibujos técnicos mantienen las proporciones.',
+    surfaceAria: 'Contexto de la calzada', dry: 'Calzada seca', dryText: 'El ancho por sí solo no predice el agarre. Influyen el compuesto, la construcción, la presión y la puesta a punto.',
+    wet: 'Calzada mojada', wetText: 'Un neumático más ancho no es automáticamente más seguro con agua. Influyen el dibujo, la profundidad, el compuesto y la altura del agua.',
+  },
+}[locale];
+---
 <figure class="tire-tech-visual" data-tire-tech-visual aria-labelledby="tire-tech-title">
   <figcaption>
-    <div><span class="visual-kicker">Live geometry</span><strong id="tire-tech-title">See the difference, not just the numbers</strong></div>
-    <p>Blue is the current tire. Orange is the new tire. The engineering views keep the entered dimensions proportional; the difference lens deliberately magnifies small changes.</p>
+    <div><span class="visual-kicker">{copy.kicker}</span><strong id="tire-tech-title">{copy.title}</strong></div>
+    <p>{copy.intro}</p>
   </figcaption>
 
   <div class="tire-tech-grid">
-    <section class="tire-tech-card tire-tech-card--overlay" aria-label="True-scale side-view tire comparison">
-      <header><strong>Side overlay</strong><span>TRUE SCALE</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label="Current and new tire diameters drawn at the same scale">
+    <section class="tire-tech-card tire-tech-card--overlay" aria-label={copy.overlayAria}>
+      <header><strong>{copy.overlay}</strong><span>{copy.trueScale}</span></header>
+      <svg viewBox="0 0 360 250" role="img" aria-label={copy.overlaySvgAria}>
         <defs>
           <radialGradient id="tireShadeCurrent" cx="35%" cy="28%" r="76%"><stop offset="0" stop-color="#52636f"/><stop offset=".5" stop-color="#27333b"/><stop offset="1" stop-color="#11181d"/></radialGradient>
           <filter id="tireShadow"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-opacity=".32"/></filter>
@@ -28,14 +81,14 @@
         </g>
         <g class="tech-measure tech-measure--current"><path data-current-diameter-line d="M76 40V192"/><path d="M68 40h16M68 192h16"/><text data-current-diameter-text x="51" y="119" text-anchor="middle">659.7 mm</text></g>
         <g class="tech-measure tech-measure--new"><path data-new-diameter-line d="M284 43V189"/><path d="M276 43h16M276 189h16"/><text data-new-diameter-text x="309" y="119" text-anchor="middle">670.6 mm</text></g>
-        <g class="tech-legend-inline"><circle cx="122" cy="230" r="5" class="tech-dot-current"/><text x="133" y="234">CURRENT</text><circle cx="219" cy="230" r="5" class="tech-dot-new"/><text x="230" y="234">NEW</text></g>
+        <g class="tech-legend-inline"><circle cx="122" cy="230" r="5" class="tech-dot-current"/><text x="133" y="234">{copy.current}</text><circle cx="219" cy="230" r="5" class="tech-dot-new"/><text x="230" y="234">{copy.next}</text></g>
       </svg>
-      <p class="tire-tech-caption" data-side-meaning>The new tire is shown over the current tire at the same scale.</p>
+      <p class="tire-tech-caption" data-side-meaning>{copy.sideCaption}</p>
     </section>
 
-    <section class="tire-tech-card tire-tech-card--front" aria-label="True-scale front-view nominal tire width comparison">
-      <header><strong>Front width</strong><span>NOMINAL WIDTH</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label="Current and new tire widths shown from the front">
+    <section class="tire-tech-card tire-tech-card--front" aria-label={copy.frontAria}>
+      <header><strong>{copy.front}</strong><span>{copy.nominalWidth}</span></header>
+      <svg viewBox="0 0 360 250" role="img" aria-label={copy.frontSvgAria}>
         <defs>
           <linearGradient id="frontTireCurrent" x1="0" x2="1"><stop offset="0" stop-color="#12191e"/><stop offset=".5" stop-color="#45535d"/><stop offset="1" stop-color="#11171c"/></linearGradient>
           <linearGradient id="frontTireNew" x1="0" x2="1"><stop offset="0" stop-color="#18120f"/><stop offset=".5" stop-color="#714b36"/><stop offset="1" stop-color="#18120f"/></linearGradient>
@@ -58,12 +111,12 @@
         <text class="tech-front-label tech-front-label--current" x="105" y="232" text-anchor="middle" data-current-size-label>225/45 R18</text>
         <text class="tech-front-label tech-front-label--new" x="255" y="232" text-anchor="middle" data-new-size-label>235/40 R19</text>
       </svg>
-      <p class="tire-tech-caption" data-width-meaning>Nominal section width is drawn proportionally so width changes are easy to see.</p>
+      <p class="tire-tech-caption" data-width-meaning>{copy.widthCaption}</p>
     </section>
 
-    <section class="tire-tech-card tire-tech-card--vehicle" aria-label="Tire size effect shown on a vehicle silhouette">
-      <header><strong>On vehicle</strong><span>STATIC GEOMETRY</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label="Current and new tire shown under the same stylized vehicle body">
+    <section class="tire-tech-card tire-tech-card--vehicle" aria-label={copy.vehicleAria}>
+      <header><strong>{copy.vehicle}</strong><span>{copy.staticGeometry}</span></header>
+      <svg viewBox="0 0 360 250" role="img" aria-label={copy.vehicleSvgAria}>
         <defs>
           <linearGradient id="vehiclePanel" x1="0" x2="1"><stop offset="0" stop-color="#182a38"/><stop offset=".55" stop-color="#31546c"/><stop offset="1" stop-color="#12202a"/></linearGradient>
         </defs>
@@ -82,27 +135,27 @@
           <circle class="vehicle-rim vehicle-rim--new" data-new-vehicle-rim r="34"/>
           <path class="vehicle-spokes vehicle-spokes--new" d="M0-26V26M-26 0H26M-18-18 18 18M18-18-18 18"/>
         </g>
-        <text class="vehicle-label vehicle-label--current" x="94" y="232" text-anchor="middle">CURRENT</text>
-        <text class="vehicle-label vehicle-label--new" x="266" y="232" text-anchor="middle">NEW</text>
+        <text class="vehicle-label vehicle-label--current" x="94" y="232" text-anchor="middle">{copy.current}</text>
+        <text class="vehicle-label vehicle-label--new" x="266" y="232" text-anchor="middle">{copy.next}</text>
         <g class="vehicle-ride-callout"><path data-vehicle-ride-arrow d="M173 141H183M178 141V145M173 145H183"/><text data-vehicle-ride-text x="178" y="130" text-anchor="middle">+5.5 mm</text></g>
       </svg>
-      <p class="tire-tech-caption" data-vehicle-meaning>The larger radius raises the hub and body by half of the diameter change in this static geometry view.</p>
+      <p class="tire-tech-caption" data-vehicle-meaning>{copy.vehicleCaption}</p>
     </section>
 
-    <section class="tire-tech-card tire-tech-card--magnify" aria-label="Magnified tire dimension differences">
-      <header><strong>Difference lens</strong><span>SMALL CHANGES MAGNIFIED</span></header>
+    <section class="tire-tech-card tire-tech-card--magnify" aria-label={copy.lensAria}>
+      <header><strong>{copy.lens}</strong><span>{copy.magnified}</span></header>
       <div class="difference-lens">
-        <div class="difference-lens__row"><span>Overall diameter</span><strong data-diff-diameter>+10.9 mm</strong><div class="difference-track"><i data-diff-diameter-bar></i></div></div>
-        <div class="difference-lens__row"><span>Nominal width</span><strong data-diff-width>+10 mm</strong><div class="difference-track"><i data-diff-width-bar></i></div></div>
-        <div class="difference-lens__row"><span>Sidewall</span><strong data-diff-sidewall>-7.3 mm</strong><div class="difference-track"><i data-diff-sidewall-bar></i></div></div>
-        <div class="difference-lens__row"><span>Static ride height</span><strong data-diff-ride>+5.45 mm</strong><div class="difference-track"><i data-diff-ride-bar></i></div></div>
+        <div class="difference-lens__row"><span>{copy.diameter}</span><strong data-diff-diameter>+10.9 mm</strong><div class="difference-track"><i data-diff-diameter-bar></i></div></div>
+        <div class="difference-lens__row"><span>{copy.width}</span><strong data-diff-width>+10 mm</strong><div class="difference-track"><i data-diff-width-bar></i></div></div>
+        <div class="difference-lens__row"><span>{copy.sidewall}</span><strong data-diff-sidewall>-7.3 mm</strong><div class="difference-track"><i data-diff-sidewall-bar></i></div></div>
+        <div class="difference-lens__row"><span>{copy.ride}</span><strong data-diff-ride>+5.45 mm</strong><div class="difference-track"><i data-diff-ride-bar></i></div></div>
       </div>
-      <p class="tire-tech-caption">Bars intentionally magnify the difference. The engineering drawings keep the dimensions proportional.</p>
+      <p class="tire-tech-caption">{copy.lensCaption}</p>
     </section>
   </div>
 
-  <aside class="surface-context" aria-label="Road surface context">
-    <div><span class="surface-context__icon" aria-hidden="true">☀</span><p><strong>Dry road</strong>Width alone does not predict grip. Compound, construction, pressure and vehicle setup matter.</p></div>
-    <div><span class="surface-context__icon" aria-hidden="true">◌</span><p><strong>Wet road</strong>A wider tire is not automatically safer in water. Tread design, depth, compound and water depth matter.</p></div>
+  <aside class="surface-context" aria-label={copy.surfaceAria}>
+    <div><span class="surface-context__icon" aria-hidden="true">☀</span><p><strong>{copy.dry}</strong>{copy.dryText}</p></div>
+    <div><span class="surface-context__icon" aria-hidden="true">◌</span><p><strong>{copy.wet}</strong>{copy.wetText}</p></div>
   </aside>
 </figure>

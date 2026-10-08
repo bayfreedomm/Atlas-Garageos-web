@@ -7,7 +7,7 @@ const t = vehiclePageText.es;
 const pathname = '/es/vehiculos/';
 const vehicles = vehicleFitmentData.filter((v) => v.market === 'eu').slice().sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
 ---
-<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" locale="es" alternates={[{ hreflang: 'de', href: 'https://atlasgarageos.com/de/fahrzeuge/' }, { hreflang: 'es', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }]} breadcrumbs={[{ name: t.breadcrumbHome, href: '/es/' }, { name: t.breadcrumbVehicles, href: pathname }]}>
+<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" locale="es" alternates={[{ hreflang: 'de', href: 'https://atlasgarageos.com/de/fahrzeuge/' }, { hreflang: 'es', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/de/fahrzeuge/' }]} breadcrumbs={[{ name: t.breadcrumbHome, href: '/es/' }, { name: t.breadcrumbVehicles, href: pathname }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">{t.breadcrumbHome}</a><span aria-hidden="true">/</span><span aria-current="page">{t.breadcrumbVehicles}</span></nav>
   <header class="directory-identity methodology-hero">
     <p class="eyebrow">{t.hubEuMarket}</p>

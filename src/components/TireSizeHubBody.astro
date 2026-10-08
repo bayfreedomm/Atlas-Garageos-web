@@ -9,7 +9,7 @@ import { tireSizeCatalog, tireSizesByRimDiameter, vehiclesForTireSize } from '..
 import { vehicleFitmentData } from '../data/vehicle-fitment';
 import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
-import { formatTireMetrics, homePath, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
+import { displayTireNotation, formatTireMetrics, homePath, tireSizeMetrics, vehicleHubPath } from '../ui/entity-page-model';
 import { entitySearchText } from '../ui/entity-search';
 import { localizedToolPath } from '../localization/locales';
 
@@ -29,14 +29,14 @@ const groupCards = groups.map(([rim, entries]) => ({
     const vehicles = vehiclesForTireSize(entry.notation);
     const makes = [...new Set(vehicles.map((vehicle) => vehicle.make))];
     return {
-      notation: entry.notation,
+      notation: displayTireNotation(entry.notation, locale),
       href: entityDetailPath('tire-size', locale, entry.slug),
-      diameter: formatTireMetrics(tireSizeMetrics(entry)).overallDiameter,
+      diameter: formatTireMetrics(tireSizeMetrics(entry), locale).overallDiameter,
       vehicles: vehicles.length,
       // Everything a reader might type: the code itself, the slug form, and the makes.
       // Normalized with the same function the live filter applies to the query, so a
       // reader typing any separator spelling of this entity still matches it.
-      search: entitySearchText([entry.notation, entry.slug, ...makes]),
+      search: entitySearchText([entry.notation, entry.slug, displayTireNotation(entry.notation, locale), ...makes]),
     };
   }),
 }));
@@ -76,7 +76,7 @@ const groupCards = groups.map(([rim, entries]) => ({
 
   <nav class="entity-jump" aria-label={t.jumpLabel}>
     <span>{t.jumpLabel}</span>
-    {groupCards.map((group) => <a href={`#${group.anchor}`}>{group.rim}″</a>)}
+    {groupCards.map((group) => <a href={`#${group.anchor}`}>{String(group.rim).replace('.', locale === 'en' ? '.' : ',')}″</a>)}
   </nav>
 
   {groupCards.map((group) => (

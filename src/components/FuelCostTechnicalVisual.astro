@@ -1,9 +1,18 @@
-<figure class="fuel-technical-visual" data-fuel-technical-visual aria-label="Fuel cost visual summary">
+---
+interface Props { readonly locale?: 'en' | 'de' | 'es' | undefined; }
+const { locale = 'en' } = Astro.props;
+const copy = {
+  en: { aria: 'Fuel cost visual summary', flow: 'TRIP → FUEL → COST', live: 'Input changes update the whole picture', svgAria: 'Trip distance, fuel required, and estimated cost', distance: 'DISTANCE', fuel: 'FUEL REQUIRED', cost: 'EST. COST' },
+  de: { aria: 'Visuelle Übersicht der Kraftstoffkosten', flow: 'STRECKE → KRAFTSTOFF → KOSTEN', live: 'Jede Eingabe aktualisiert das ganze Bild', svgAria: 'Strecke, benötigter Kraftstoff und geschätzte Kosten', distance: 'STRECKE', fuel: 'KRAFTSTOFFBEDARF', cost: 'KOSTEN (CA.)' },
+  es: { aria: 'Resumen visual del coste de combustible', flow: 'TRAYECTO → COMBUSTIBLE → COSTE', live: 'Cada cambio actualiza todo el gráfico', svgAria: 'Distancia del trayecto, combustible necesario y coste estimado', distance: 'DISTANCIA', fuel: 'COMBUSTIBLE', cost: 'COSTE EST.' },
+}[locale];
+---
+<figure class="fuel-technical-visual" data-fuel-technical-visual aria-label={copy.aria}>
   <div class="fuel-technical-visual__head">
-    <span>TRIP → FUEL → COST</span>
-    <small>Input changes update the whole picture</small>
+    <span>{copy.flow}</span>
+    <small>{copy.live}</small>
   </div>
-  <svg viewBox="0 0 720 260" role="img" aria-label="Trip distance, fuel required, and estimated cost">
+  <svg viewBox="0 0 720 260" role="img" aria-label={copy.svgAria}>
     <defs>
       <linearGradient id="fuel-road" x1="0" x2="1">
         <stop offset="0" stop-color="currentColor" stop-opacity=".12"/>
@@ -24,15 +33,15 @@
     </g>
 
     <g class="fuel-v-callout fuel-v-callout--distance">
-      <text x="44" y="42">DISTANCE</text>
+      <text x="44" y="42">{copy.distance}</text>
       <text class="fuel-v-value" data-fuel-visual-distance x="44" y="69">—</text>
     </g>
     <g class="fuel-v-callout fuel-v-callout--fuel">
-      <text x="410" y="42">FUEL REQUIRED</text>
+      <text x="410" y="42">{copy.fuel}</text>
       <text class="fuel-v-value" data-fuel-visual-fuel x="410" y="69">—</text>
     </g>
     <g class="fuel-v-callout fuel-v-callout--cost">
-      <text x="570" y="42">EST. COST</text>
+      <text x="570" y="42">{copy.cost}</text>
       <text class="fuel-v-value" data-fuel-visual-cost x="570" y="69">—</text>
     </g>
   </svg>

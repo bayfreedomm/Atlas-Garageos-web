@@ -1,6 +1,6 @@
 # Atlas GarageOS — Verified Project State
 
-Snapshot date: 2026-09-26. This file records what the repository proves today; it is not a wishlist.
+Snapshot date: 2026-10-08. This file records what the repository proves today; it is not a wishlist.
 
 ## Build and architecture
 
@@ -8,7 +8,7 @@ Snapshot date: 2026-09-26. This file records what the repository proves today; i
 - `VERIFIED DONE` — `src/core` contains pure TypeScript calculation domains for tire geometry, wheel position, fitment clearance/search, drivetrain, EV energy, and units.
 - `VERIFIED DONE` — UI, localization, SEO, browser state, visualization, and storage live outside `src/core`.
 - `VERIFIED DONE` — Quality scripts are `pnpm test`, `pnpm typecheck`, and `pnpm build`.
-- `VERIFIED DONE` — Current workspace build generated 1,927 static pages during the latest successful production build; the normal Vite large-chunk note remains non-fatal.
+- `VERIFIED DONE` — Current workspace build generated 2,145 static pages (2026-10-08; 42 test files / 291 tests, 0 check errors) during the latest successful production build; the normal Vite large-chunk note remains non-fatal.
 
 ## Published product surface
 
@@ -23,13 +23,15 @@ Snapshot date: 2026-09-26. This file records what the repository proves today; i
 ## Search and indexability
 
 - `VERIFIED DONE` — `scripts/audit-seo-build.mjs` now enforces the rendered-output SEO contract across all generated HTML: unique non-empty titles and descriptions per language, one indexable H1, route-matching canonical URLs, sitemap membership, valid JSON-LD, reciprocal self-referencing hreflang clusters with `x-default`, and no query/fragment URLs.
-- `VERIFIED DONE` — The latest production output contains 1,927 HTML files, 1,923 indexable canonical pages and exactly 1,923 sitemap URLs. The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
+- `VERIFIED DONE` — The latest production output (2026-10-08) contains 2,145 HTML files, 2,141 indexable canonical pages and exactly 2,141 sitemap URLs. The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
 - `VERIFIED DONE` — The latest length review reports zero titles over 75 characters and zero descriptions over 180 characters. Shared EN/DE/ES tire/bolt templates and the remaining page-specific outliers were shortened without changing route identity or page purpose.
 - `PARTIAL` — Local technical SEO is verified, but Google indexing, search-result rewrites, ranking, deployed Core Web Vitals and crawl behavior remain external outcomes requiring Search Console and production monitoring.
 
 ## Data and evidence
 
-- `VERIFIED DONE` — `src/data/vehicle-fitment.ts` contains a curated 30-vehicle starter reference with per-row source and confidence fields. It is not a licensed exhaustive OEM feed.
+- `VERIFIED DONE` — `src/data/vehicle-fitment.ts` contains 84 curated vehicle rows (15 US, 69 EU) with per-row source, confidence, optional factory sizes and EN/DE/ES notes. 2026-10-08: every row except Toyota Corolla, Nissan Rogue/Altima and Tesla Model 3/Y was re-checked against its wheel-size.com generation page (OE size, PCD, bore, wheel, torque); several earlier rows were corrected (Tiguan, Passat, Octavia, Clio, GLC, CR-V, Camry, Leon, Captur, Trafic, MG ZS). It is not a licensed exhaustive OEM feed.
+- `VERIFIED DONE` — Commercial (C) van sizes are first-class tire entities (`215-65-r16c` etc.) with passenger-twin links; tire pages add inch view, near-diameter alternatives by rim with speedometer reading, same-rim neighbours and Standard/Option vehicle labels; DE/ES pages use decimal commas and `205/55 R16` notation.
+- `VERIFIED DONE` — Tire/bolt/vehicle hubs are linked from home, navigation drawer, footer and tire tools in all three locales.
 - `VERIFIED DONE` — Production tire reference data and OEM merge generate 582 tire-size entities in the current source state.
 - `VERIFIED DONE` — Tire-size and bolt-pattern route families generate 1,782 localized entity URLs in the current build state; the older 20/96 counts are historical.
 - `VERIFIED DONE` — Bolt-pattern geometry is derived from canonical PCD/lug data; adjacent-hole spacing is not duplicated as hand-entered data.

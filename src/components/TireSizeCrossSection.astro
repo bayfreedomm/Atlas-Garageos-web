@@ -8,6 +8,7 @@
 // calculator's client-side JS, which does not run on a static entity page), so it cannot show
 // a different size correctly. Nothing about the geometry engine is duplicated.
 import { computeTireCrossSection, CROSS_SECTION_VIEWBOX } from '../ui/tire-cross-section';
+import { formatMm, formatPlain, type NumberLocale } from '../ui/locale-format';
 
 interface Props {
   readonly widthMm: number;
@@ -19,13 +20,14 @@ interface Props {
   readonly sidewallLabel: string;
   readonly beadLabel: string;
   readonly rimCaption: string;
+  readonly locale?: NumberLocale | undefined;
 }
-const { widthMm, sidewallHeightMm, rimDiameterInches, notation, ariaLabel, treadLabel, sidewallLabel, beadLabel, rimCaption } = Astro.props;
+const { widthMm, sidewallHeightMm, rimDiameterInches, notation, ariaLabel, treadLabel, sidewallLabel, beadLabel, rimCaption, locale = 'en' } = Astro.props;
 
 const cs = computeTireCrossSection(widthMm, sidewallHeightMm);
 const crownTreadTicks = [-0.32, -0.16, 0, 0.16, 0.32].map((f) => cs.hw * 0.5 * f);
 const widthText = `${widthMm} mm`;
-const sidewallText = `${sidewallHeightMm.toFixed(1)} mm`;
+const sidewallText = formatMm(sidewallHeightMm, 1, locale);
 ---
 <figure class="entity-cross" aria-label={ariaLabel}>
   <svg viewBox={`0 0 ${CROSS_SECTION_VIEWBOX.width} ${CROSS_SECTION_VIEWBOX.height}`} role="img" aria-label={ariaLabel}>
@@ -59,7 +61,7 @@ const sidewallText = `${sidewallHeightMm.toFixed(1)} mm`;
       <text x={cs.legendX.toFixed(1)} y={cs.sidewallLabelY.toFixed(1)} text-anchor="end">{sidewallLabel}</text>
       <text x={cs.legendX.toFixed(1)} y={cs.beadLabelY.toFixed(1)} text-anchor="end">{beadLabel}</text>
     </g>
-    <text class="entity-cross__rim-label" x={cs.originX} y={cs.rimLabelY.toFixed(1)} text-anchor="middle">{`⌀ ${rimDiameterInches}″ · ${rimCaption}`}</text>
+    <text class="entity-cross__rim-label" x={cs.originX} y={cs.rimLabelY.toFixed(1)} text-anchor="middle">{`⌀ ${formatPlain(rimDiameterInches, locale)}″ · ${rimCaption}`}</text>
   </svg>
   <figcaption>{notation}</figcaption>
 </figure>

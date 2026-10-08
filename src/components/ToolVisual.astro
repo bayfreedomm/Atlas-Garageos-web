@@ -2,9 +2,9 @@
 import type { ToolDefinition } from '../seo/tool-registry';
 import ToolIcon from './ToolIcon.astro';
 
-interface Props { definition: ToolDefinition; compact?: boolean; }
-const { definition, compact = false } = Astro.props;
-const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
+interface Props { definition: ToolDefinition; compact?: boolean; locale?: 'de' | 'es' | undefined; title?: string | undefined; }
+const { definition, compact = false, locale, title: pageTitle } = Astro.props;
+const enLabels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'fitment-studio': ['Wheel, tire, and body', 'One connected workspace'],
   'tire-fit-check': ['One question, every check', 'Number, shape, meaning, decision'],
   'fuel-cost-calculator': ['Distance meets consumption', 'See fuel and cost together'],
@@ -31,9 +31,69 @@ const labels: Record<ToolDefinition['id'], readonly [string, string]> = {
   'vehicle-fitment-finder': ['Make and model, decoded', 'Sourced tire size and bolt pattern'],
   'gas-prices-today': ['Fuel prices, tracked', 'Board, trend, and calculator hand-off'],
 };
+const deLabels: Record<ToolDefinition['id'], readonly [string, string]> = {
+  'fitment-studio': ['Felge, Reifen und Karosserie', 'Ein verbundener Arbeitsbereich'],
+  'tire-fit-check': ['Eine Frage, jede Prüfung', 'Zahl, Form, Bedeutung, Entscheidung'],
+  'fuel-cost-calculator': ['Strecke trifft Verbrauch', 'Kraftstoff und Kosten zusammen sehen'],
+  'road-trip-cost-calculator': ['Die ganze Fahrt planen', 'Kraftstoff, Extras und Mitfahrer'],
+  'tire-size-calculator': ['Das Reifenprofil lesen', 'Breite · Flanke · Felge'],
+  'tire-size-comparison': ['Beide Größen sehen', 'Nicht nur die Prozentzahl'],
+  'wheel-offset-calculator': ['Sehen, wie die Felge wandert', 'Innenlage · Außenkante'],
+  'speedometer-error-calculator': ['Angezeigt vs. tatsächlich', 'Ein klarerer Geschwindigkeitsvergleich'],
+  'gear-ratio-calculator': ['Reifen trifft Antrieb', 'Effektive Übersetzung · Drehzahl'],
+  'fitment-map': ['Die Geometrie erkunden', 'Breite und ET zusammen'],
+  'measure-my-car': ['Das eigene Auto vermessen', 'Echte Abstände, sauber notiert'],
+  'mpg-l100km-converter': ['Zwei Arten, Verbrauch zu lesen', 'Strecke pro Kraftstoff · Kraftstoff pro Strecke'],
+  'psi-bar-converter': ['Druck auf einen Blick', 'PSI · bar · kPa'],
+  'hp-kw-converter': ['Eine Leistung, zwei Einheiten', 'Mechanische hp · Kilowatt'],
+  'nm-lb-ft-converter': ['Drehmoment übersetzt', 'Newtonmeter · Pound-feet'],
+  'power-to-weight-calculator': ['Leistung trifft Masse', 'Ein vergleichbares Verhältnis'],
+  'ev-charging-cost-calculator': ['Akku trifft Strompreis', 'Energie, Kosten und Zeit'],
+  'bolt-pattern-calculator': ['Bohrungen treffen Geometrie', 'Lochkreis aus zwei Punkten'],
+  'towing-capacity-calculator': ['Gewicht trifft Zulassung', 'Zuggesamtgewicht, Leergewicht und Zuladung'],
+  'quarter-mile-calculator': ['Gewicht trifft Leistung', 'Laufzeit und Endgeschwindigkeit'],
+  'tire-load-speed-rating': ['Code trifft Tragfähigkeit', 'Lastindex und Geschwindigkeitsindex'],
+  'compression-ratio-calculator': ['Volumen im Verhältnis', 'Hubraum und Verdichtungsraum'],
+  'tire-date-code-decoder': ['Flanke trifft Kalender', 'Herstellungswoche und -jahr'],
+  'vehicle-fitment-finder': ['Marke und Modell entschlüsselt', 'Belegte Reifengröße und Lochkreis'],
+  'gas-prices-today': ['Kraftstoffpreise im Blick', 'Übersicht, Verlauf und Rechner'],
+};
+const esLabels: Record<ToolDefinition['id'], readonly [string, string]> = {
+  'fitment-studio': ['Llanta, neumático y carrocería', 'Un espacio de trabajo conectado'],
+  'tire-fit-check': ['Una pregunta, todas las comprobaciones', 'Número, forma, significado, decisión'],
+  'fuel-cost-calculator': ['Distancia y consumo', 'Combustible y coste a la vez'],
+  'road-trip-cost-calculator': ['Planifique todo el viaje', 'Combustible, extras y pasajeros'],
+  'tire-size-calculator': ['Lea el perfil del neumático', 'Ancho · flanco · llanta'],
+  'tire-size-comparison': ['Vea ambas medidas', 'No solo el porcentaje'],
+  'wheel-offset-calculator': ['Vea cómo se mueve la llanta', 'Posición interior · cara exterior'],
+  'speedometer-error-calculator': ['Indicada frente a real', 'Una comparación de velocidad más clara'],
+  'gear-ratio-calculator': ['Neumático y transmisión', 'Relación efectiva · rpm en carretera'],
+  'fitment-map': ['Explore la geometría', 'Ancho y offset juntos'],
+  'measure-my-car': ['Mida su propio coche', 'Huecos reales, bien anotados'],
+  'mpg-l100km-converter': ['Dos formas de leer el consumo', 'Distancia por combustible · combustible por distancia'],
+  'psi-bar-converter': ['La presión de un vistazo', 'PSI · bar · kPa'],
+  'hp-kw-converter': ['Una potencia, dos unidades', 'hp mecánicos · kilovatios'],
+  'nm-lb-ft-converter': ['El par, traducido', 'Newton-metro · libra-pie'],
+  'power-to-weight-calculator': ['Potencia y masa', 'Una relación comparable'],
+  'ev-charging-cost-calculator': ['Batería y precio', 'Energía, coste y tiempo'],
+  'bolt-pattern-calculator': ['Agujeros y geometría', 'Círculo de paso a partir de dos puntos'],
+  'towing-capacity-calculator': ['Peso frente a homologación', 'MMA del conjunto, peso en vacío y carga'],
+  'quarter-mile-calculator': ['Peso y potencia', 'Tiempo y velocidad final'],
+  'tire-load-speed-rating': ['Código y capacidad', 'Índice de carga y de velocidad'],
+  'compression-ratio-calculator': ['Volúmenes en relación', 'Cilindrada unitaria y cámara'],
+  'tire-date-code-decoder': ['El flanco y el calendario', 'Semana y año de fabricación'],
+  'vehicle-fitment-finder': ['Marca y modelo, descifrados', 'Medida y patrón documentados'],
+  'gas-prices-today': ['Precios de combustible', 'Tablero, tendencia y calculadora'],
+};
+const words = {
+  en: { diameter: 'DIAMETER', inner: 'INNER', outer: 'OUTER', gcwr: 'GCWR', load: 'LOAD', tire: 'TIRE', gear: 'GEAR', quarter: '1/4 MILE', swept: 'SWEPT : CLEARANCE', loadSpeed: 'LOAD · SPEED', visual: 'visual' },
+  de: { diameter: 'DURCHMESSER', inner: 'INNEN', outer: 'AUSSEN', gcwr: 'ZGG', load: 'LAST', tire: 'REIFEN', gear: 'GETRIEBE', quarter: '1/4 MEILE', swept: 'HUB : KAMMER', loadSpeed: 'LAST · TEMPO', visual: 'Grafik' },
+  es: { diameter: 'DIÁMETRO', inner: 'INTERIOR', outer: 'EXTERIOR', gcwr: 'MMA', load: 'CARGA', tire: 'NEUMÁTICO', gear: 'MARCHA', quarter: '1/4 MILLA', swept: 'BARRIDO : CÁMARA', loadSpeed: 'CARGA · VELOC.', visual: 'gráfico' },
+}[locale ?? 'en'];
+const labels = locale === 'de' ? deLabels : locale === 'es' ? esLabels : enLabels;
 const [title, copy] = labels[definition.id];
 ---
-<figure class:list={['tool-visual', `tool-visual--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, { 'tool-visual--compact': compact }]} data-tool-visual data-tool-id={definition.id} aria-label={`${definition.title} visual`}>
+<figure class:list={['tool-visual', `tool-visual--${definition.category.toLowerCase().replaceAll(' & ', '-').replaceAll(' ', '-')}`, { 'tool-visual--compact': compact }]} data-tool-visual data-tool-id={definition.id} aria-label={`${pageTitle ?? definition.title} — ${words.visual}`}>
   {!compact && <div class="tool-visual__top"><ToolIcon id={definition.id} category={definition.category}/><span><strong>{title}</strong><small>{copy}</small></span></div>}
   <svg class="tool-visual__scene" viewBox="0 0 360 180" role="img" aria-label={title}>
     {(definition.id === 'fuel-cost-calculator' || definition.id === 'road-trip-cost-calculator' || definition.id === 'mpg-l100km-converter') && <>
@@ -50,9 +110,9 @@ const [title, copy] = labels[definition.id];
       <circle class="scene-hub" cx={definition.id === 'tire-size-comparison' ? '126' : '178'} cy="98" r="7"/>
       {definition.id === 'tire-size-comparison' && <><circle class="scene-tire scene-tire--accent" cx="235" cy="104" r="48"/><circle class="scene-rim" cx="235" cy="104" r="27"/><circle class="scene-hub" cx="235" cy="104" r="6"/></>}
       {definition.id === 'psi-bar-converter' && <><path class="scene-accent" d="M236 68a44 44 0 0 1 51 44"/><path class="scene-needle" data-gauge-needle d="M261 112l18-27"/><text class="scene-text scene-text--large" data-gauge-value x="250" y="137">32</text><text class="scene-text" data-gauge-unit x="292" y="137">PSI</text><text class="scene-sidewall" x="151" y="45">225/45 R18</text></>}
-      {definition.id === 'tire-size-calculator' && <><path class="scene-dimension" d="M92 28v140M82 39l10-11 10 11M82 157l10 11 10-11"/><text class="scene-text" x="32" y="103">DIAMETER</text><path class="scene-accent" d="M178 33v130"/></>}
+      {definition.id === 'tire-size-calculator' && <><path class="scene-dimension" d="M92 28v140M82 39l10-11 10 11M82 157l10 11 10-11"/><text class="scene-text" x="32" y="103">{words.diameter}</text><path class="scene-accent" d="M178 33v130"/></>}
       {definition.id === 'bolt-pattern-calculator' && <><circle class="scene-accent-fill" cx="178" cy="55" r="6"/><circle class="scene-accent-fill" cx="218" cy="98" r="6"/><circle class="scene-accent-fill" cx="203" cy="144" r="6"/><circle class="scene-accent-fill" cx="153" cy="144" r="6"/><circle class="scene-accent-fill" cx="138" cy="98" r="6"/><path class="scene-dash" d="M178 55 218 98"/><text class="scene-text" x="222" y="70">PCD</text></>}
-      {definition.id === 'tire-load-speed-rating' && <><text class="scene-text scene-text--large" data-gauge-value x="151" y="95">91</text><text class="scene-text" x="140" y="118">V</text><text class="scene-sidewall" x="151" y="45">LOAD · SPEED</text></>}
+      {definition.id === 'tire-load-speed-rating' && <><text class="scene-text scene-text--large" data-gauge-value x="151" y="95">91</text><text class="scene-text" x="140" y="118">V</text><text class="scene-sidewall" x="151" y="45">{words.loadSpeed}</text></>}
       {definition.id === 'tire-date-code-decoder' && <><text class="scene-text scene-text--large" data-gauge-value x="140" y="102">2219</text><text class="scene-sidewall" x="151" y="45">DOT ⋯ WWYY</text></>}
     </>}
     {(definition.id === 'wheel-offset-calculator' || definition.id === 'fitment-map' || definition.id === 'measure-my-car' || definition.id === 'fitment-studio' || definition.id === 'towing-capacity-calculator') && <>
@@ -60,7 +120,7 @@ const [title, copy] = labels[definition.id];
       <path class="scene-center" d="M180 35v120"/>
       <rect class="scene-wheel-block" x="112" y="68" width="39" height="67" rx="8"/><rect class="scene-wheel-block scene-wheel-block--accent" x="202" y="68" width="49" height="67" rx="8"/>
       <path class="scene-accent" d="M151 48h51M151 42l-9 6 9 6M202 42l9 6-9 6"/>
-      {definition.id === 'towing-capacity-calculator' ? <><text class="scene-text" x="145" y="164">GCWR</text><text class="scene-text" x="219" y="164">LOAD</text></> : <><text class="scene-text" x="139" y="164">INNER</text><text class="scene-text" x="213" y="164">OUTER</text></>}
+      {definition.id === 'towing-capacity-calculator' ? <><text class="scene-text" x="145" y="164">{words.gcwr}</text><text class="scene-text" x="219" y="164">{words.load}</text></> : <><text class="scene-text" x="139" y="164">{words.inner}</text><text class="scene-text" x="213" y="164">{words.outer}</text></>}
     </>}
     {definition.id === 'speedometer-error-calculator' && <>
       <path class="scene-gauge" d="M72 139a108 108 0 0 1 216 0"/><path class="scene-ticks" d="M84 127l17-4M105 82l15 11M148 51l6 18M201 48l-4 19M248 72l-13 14M280 112l-17 7"/>
@@ -71,9 +131,9 @@ const [title, copy] = labels[definition.id];
       {definition.id === 'hp-kw-converter' && <path class="scene-bolt" data-power-pulse d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/>}
       {definition.id === 'nm-lb-ft-converter' && <><path class="scene-accent" data-torque-ring d="M148 41a62 62 0 1 1-25 95M148 41h-31m31 0V12"/><circle class="scene-accent-fill" cx="180" cy="99" r="12"/></>}
       {definition.id === 'power-to-weight-calculator' && <><g data-power-scale><path class="scene-scale" d="M53 153h254M180 36v117M119 65h122M85 65l-28 54h56L85 65Zm190 0-28 54h56l-28-54Z"/><path class="scene-bolt" d="m184 72-18 29h15l-6 25 23-36h-16l2-18Z"/></g></>}
-      {definition.id === 'gear-ratio-calculator' && <><circle class="scene-tire" cx="145" cy="103" r="43"/><circle class="scene-rim" cx="145" cy="103" r="21"/><circle class="scene-accent" cx="224" cy="103" r="29"/><circle class="scene-hub" cx="224" cy="103" r="7"/><path class="scene-dash" d="M174 103h21M145 60V44M224 74V51"/><text class="scene-text" x="124" y="164">TIRE</text><text class="scene-text" x="204" y="164">GEAR</text></>}
-      {definition.id === 'quarter-mile-calculator' && <><path class="scene-dash" d="M60 150h240"/><text class="scene-text" x="120" y="170">1/4 MILE</text><path class="scene-bolt" d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/></>}
-      {definition.id === 'compression-ratio-calculator' && <><path class="scene-dimension" d="M180 33v130"/><text class="scene-text" x="150" y="170">SWEPT : CLEARANCE</text></>}
+      {definition.id === 'gear-ratio-calculator' && <><circle class="scene-tire" cx="145" cy="103" r="43"/><circle class="scene-rim" cx="145" cy="103" r="21"/><circle class="scene-accent" cx="224" cy="103" r="29"/><circle class="scene-hub" cx="224" cy="103" r="7"/><path class="scene-dash" d="M174 103h21M145 60V44M224 74V51"/><text class="scene-text" x="124" y="164">{words.tire}</text><text class="scene-text" x="204" y="164">{words.gear}</text></>}
+      {definition.id === 'quarter-mile-calculator' && <><path class="scene-dash" d="M60 150h240"/><text class="scene-text" x="120" y="170">{words.quarter}</text><path class="scene-bolt" d="m190 31-39 62h31l-11 56 45-72h-32l6-46Z"/></>}
+      {definition.id === 'compression-ratio-calculator' && <><path class="scene-dimension" d="M180 33v130"/><text class="scene-text" x="150" y="170">{words.swept}</text></>}
     </>}
   </svg>
 </figure>

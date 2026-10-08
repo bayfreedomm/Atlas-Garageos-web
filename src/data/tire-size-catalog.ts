@@ -15,7 +15,7 @@
  *     `excludedTireSizes` with a reason, so it never reaches getStaticPaths() or the sitemap.
  */
 import { vehicleFitmentData, type VehicleFitment } from './vehicle-fitment';
-import { productionTireSizeNotations } from './production-tire-sizes';
+import { productionCommercialTireSizeNotations, productionTireSizeNotations } from './production-tire-sizes';
 
 export interface TireSizeEntry {
   /** e.g. "205/55R16" — exactly as written in vehicleFitmentData */
@@ -25,6 +25,12 @@ export interface TireSizeEntry {
   readonly widthMm: number;
   readonly aspectRatio: number;
   readonly rimDiameterInches: number;
+  /**
+   * True for a reinforced light-commercial ("C") van tire such as 215/65R16C. The nominal
+   * geometry is identical to the passenger size; the construction and load rating are not,
+   * so a C size is its own catalog entry and its own page.
+   */
+  readonly commercial?: true;
 }
 
 export interface ExcludedEntry {
@@ -32,8 +38,11 @@ export interface ExcludedEntry {
   readonly reason: string;
 }
 
-/** Metric tire notation: {width}/{aspect}R{rim}. Half-inch rims (R17.5) are accepted. */
-const TIRE_NOTATION = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)$/;
+/**
+ * Metric tire notation: {width}/{aspect}R{rim}, optionally followed by "C" for a reinforced
+ * light-commercial (van) tire. Half-inch rims (R17.5) are accepted.
+ */
+const TIRE_NOTATION = /^(\d{2,3})\/(\d{2})R(\d{2}(?:\.5)?)(C)?$/;
 
 /**
  * Sane physical bounds for a publishable tire size. Outside these, we do not publish.
@@ -61,6 +70,8 @@ export interface ParsedTireNotation {
   readonly widthMm: number;
   readonly aspectRatio: number;
   readonly rimDiameterInches: number;
+  /** Present (and true) only for a light-commercial "C" size. */
+  readonly commercial?: true;
 }
 
 /** Parse "205/55R16" into its three numbers. Returns null for anything that is not that shape. */
@@ -71,7 +82,7 @@ export function parseTireNotation(notation: string): ParsedTireNotation | null {
   const aspectRatio = Number(match[2]);
   const rimDiameterInches = Number(match[3]);
   if (!Number.isFinite(widthMm) || !Number.isFinite(aspectRatio) || !Number.isFinite(rimDiameterInches)) return null;
-  return { widthMm, aspectRatio, rimDiameterInches };
+  return match[4] === 'C' ? { widthMm, aspectRatio, rimDiameterInches, commercial: true } : { widthMm, aspectRatio, rimDiameterInches };
 }
 
 /**
@@ -86,7 +97,7 @@ export function tireSizeSlug(notation: string): string {
   const parsed = parseTireNotation(notation);
   if (!parsed) throw new Error(`Cannot build a tire-size slug from malformed notation: ${JSON.stringify(notation)}`);
   const rim = String(parsed.rimDiameterInches).replace('.', '-');
-  return `${parsed.widthMm}-${parsed.aspectRatio}-r${rim}`;
+  return `${parsed.widthMm}-${parsed.aspectRatio}-r${rim}${parsed.commercial ? 'c' : ''}`;
 }
 
 /** Returns a human-readable reason the geometry is unpublishable, or null when it is fine. */
@@ -116,12 +127,16 @@ export function buildTireSizeCatalog(
 ): TireSizeCatalogBuild {
   const byNotation = new Map<string, VehicleFitment[]>();
   for (const vehicle of vehicles) {
-    if (parseTireNotation(vehicle.tireSize) === null) {
-      throw new Error(`Malformed tire size ${JSON.stringify(vehicle.tireSize)} on vehicle "${vehicle.id}". Expected {width}/{aspect}R{rim}, e.g. "205/55R16". Fix src/data/vehicle-fitment.ts — a malformed size must not become a published URL.`);
+    // The standard size and every factory-option size are all real OEM fitments, so each one
+    // links the vehicle to its tire-size page. A vehicle is listed once per size.
+    for (const size of new Set([vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])])) {
+      if (parseTireNotation(size) === null) {
+        throw new Error(`Malformed tire size ${JSON.stringify(size)} on vehicle "${vehicle.id}". Expected {width}/{aspect}R{rim}, e.g. "205/55R16". Fix src/data/vehicle-fitment.ts — a malformed size must not become a published URL.`);
+      }
+      const bucket = byNotation.get(size);
+      if (bucket) bucket.push(vehicle);
+      else byNotation.set(size, [vehicle]);
     }
-    const bucket = byNotation.get(vehicle.tireSize);
-    if (bucket) bucket.push(vehicle);
-    else byNotation.set(vehicle.tireSize, [vehicle]);
   }
 
   const catalogNotations = new Set(byNotation.keys());
@@ -145,11 +160,11 @@ export function buildTireSizeCatalog(
     vehiclesByNotation.set(notation, Object.freeze([...matched]));
   }
 
-  entries.sort((a, b) => a.rimDiameterInches - b.rimDiameterInches || a.widthMm - b.widthMm || a.aspectRatio - b.aspectRatio);
+  entries.sort((a, b) => a.rimDiameterInches - b.rimDiameterInches || a.widthMm - b.widthMm || a.aspectRatio - b.aspectRatio || Number(Boolean(a.commercial)) - Number(Boolean(b.commercial)));
   return Object.freeze({ entries: Object.freeze(entries), excluded: Object.freeze(excluded), vehiclesByNotation });
 }
 
-const build = buildTireSizeCatalog(vehicleFitmentData, productionTireSizeNotations());
+const build = buildTireSizeCatalog(vehicleFitmentData, [...productionTireSizeNotations(), ...productionCommercialTireSizeNotations()]);
 
 /** Every publishable tire size, sorted by rim diameter then width then aspect ratio. */
 export const tireSizeCatalog: readonly TireSizeEntry[] = build.entries;
@@ -163,6 +178,26 @@ export function vehiclesForTireSize(notation: string): readonly VehicleFitment[]
 
 export function tireSizeBySlug(slug: string): TireSizeEntry | undefined {
   return tireSizeCatalog.find((entry) => entry.slug === slug);
+}
+
+export function tireSizeByNotation(notation: string): TireSizeEntry | undefined {
+  return tireSizeCatalog.find((entry) => entry.notation === notation);
+}
+
+/**
+ * Whether a vehicle lists this size as its standard fitment or as a factory option. Used to
+ * label vehicle rows honestly ("standard" vs "option") on the tire-size page.
+ */
+export function vehicleFitsAsStandard(vehicle: VehicleFitment, notation: string): boolean {
+  return vehicle.tireSize === notation;
+}
+
+/** The passenger ↔ light-commercial twin of a size (205/65R16 ↔ 205/65R16C), when published. */
+export function commercialTwin(entry: TireSizeEntry): TireSizeEntry | undefined {
+  return tireSizeCatalog.find((candidate) => candidate.widthMm === entry.widthMm
+    && candidate.aspectRatio === entry.aspectRatio
+    && candidate.rimDiameterInches === entry.rimDiameterInches
+    && Boolean(candidate.commercial) !== Boolean(entry.commercial));
 }
 
 /** Rim-diameter groupings for the hub page, largest group of sizes first by rim size order. */

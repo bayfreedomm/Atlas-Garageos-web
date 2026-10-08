@@ -34,6 +34,7 @@ const fuelFeature = FUEL_FEATURE_TEXT[locale ?? 'en'];
 const categoryLabels = locale ? new Map(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name] as const)) : undefined;
 const allLabel = locale === 'de' ? 'Alle' : locale === 'es' ? 'Todo' : 'All';
 const searchPlaceholder = locale ? platformCatalog[locale].home.searchPlaceholder : 'Search automotive tools...';
+const searchLabel = locale === 'de' ? 'Kfz-Werkzeuge durchsuchen' : locale === 'es' ? 'Buscar herramientas' : 'Search automotive tools';
 const allToolsHeading = locale === 'de' ? 'Alle Kfz-Werkzeuge' : locale === 'es' ? 'Todas las herramientas' : 'All automotive tools';
 const quickToolsHeading = locale === 'de' ? 'Schnellwerkzeuge' : locale === 'es' ? 'Herramientas rápidas' : 'Quick tools';
 const allToolsLink = locale === 'de' ? 'Alle Werkzeuge' : locale === 'es' ? 'Todas' : 'All tools';
@@ -62,7 +63,7 @@ const helper = new Map<ToolId, string>([
 ]);
 ---
 <section class:list={['toolbox', { 'toolbox--home': mode === 'home' }]} data-toolbox data-mode={mode} aria-labelledby="toolbox-heading">
-  <div class="toolbox-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for={`tool-search-${mode}`}>Search automotive tools</label><input id={`tool-search-${mode}`} type="search" placeholder={searchPlaceholder} autocomplete="off" data-tool-search /></div>
+  <div class="toolbox-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><label class="sr-only" for={`tool-search-${mode}`}>{searchLabel}</label><input id={`tool-search-${mode}`} type="search" placeholder={searchPlaceholder} autocomplete="off" data-tool-search /></div>
   {mode === 'all' && <div class="category-filters" role="group" aria-label="Filter tools by category">
     <button type="button" aria-pressed="true" data-tool-category="All">{allLabel}</button>
     {TOOL_CATEGORY_ORDER.map((category) => <button type="button" aria-pressed="false" data-tool-category={category}>{categoryLabels?.get(category) ?? category}</button>)}

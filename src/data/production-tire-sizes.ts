@@ -51,3 +51,32 @@ export function productionTireSizeNotations(): readonly string[] {
   }
   return Object.freeze(notations);
 }
+
+/**
+ * Light-commercial ("C") van sizes, published as their own entity pages (e.g. 215/65R16C).
+ *
+ * Only the long-established European van sizes are listed — the sizes fitted as original
+ * equipment on vans such as the VW Transporter, Mercedes-Benz Vito/Sprinter, Ford Transit,
+ * Renault Trafic and Fiat Ducato families and carried in every major van-tire range. Like the
+ * passenger list, this is a reference of manufactured sizes, not a stock check.
+ */
+export const PRODUCTION_COMMERCIAL_TIRE_SIZES_BY_RIM: Readonly<Record<number, string>> = {
+  15: '195/70 205/65 205/70 215/70 225/70',
+  16: '185/75 195/60 195/65 195/75 205/65 205/75 215/60 215/65 215/75 225/65 225/75 235/65',
+  17: '215/60 225/55 235/60',
+};
+
+export function productionCommercialTireSizeNotations(): readonly string[] {
+  const notations: string[] = [];
+  for (const [rimText, pairs] of Object.entries(PRODUCTION_COMMERCIAL_TIRE_SIZES_BY_RIM)) {
+    const rim = Number(rimText);
+    if (!Number.isFinite(rim)) throw new Error(`Invalid commercial tire rim key: ${JSON.stringify(rimText)}`);
+    for (const pair of pairs.split(/\s+/)) {
+      if (!pair) continue;
+      const match = /^(\d{2,3})\/(\d{2})$/.exec(pair);
+      if (!match) throw new Error(`Invalid commercial tire size pair: ${JSON.stringify(pair)} on rim ${rimText}`);
+      notations.push(`${match[1]}/${match[2]}R${rim}C`);
+    }
+  }
+  return Object.freeze(notations);
+}
