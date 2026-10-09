@@ -1,0 +1,35 @@
+---
+// One page per car model and EPA model year (2000 onward). See src/data/cars.ts.
+import SiteLayout from '../../../../../components/SiteLayout.astro';
+import CarYearBody from '../../../../../components/CarYearBody.astro';
+import { serializeJsonLd } from '../../../../../seo/safe-json-ld';
+import { type CarModel, annualFuelCost, carMakePath, carModelPath, carModels, carYearPath, frequent, mpgSummary, wheelRowsForYear, yearPageYears } from '../../../../../data/cars';
+import { carName, carYearDescription, carYearTitle, usd } from '../../../../../ui/car-pages';
+
+export function getStaticPaths() {
+  return carModels.flatMap((model) => yearPageYears(model).map((year) => ({ params: { make: model.makeSlug, model: model.modelSlug, year: String(year) }, props: { model, year } })));
+}
+
+interface Props { model: CarModel; year: number; }
+const { model, year } = Astro.props as Props;
+const variants = model.epa[String(year)] ?? [];
+const wheels = wheelRowsForYear(model, year);
+const pcd = frequent(wheels.map((row) => row[4]))[0];
+const bore = frequent(wheels.map((row) => row[5]))[0];
+const name = carName(model);
+const s = mpgSummary(variants);
+const costs = variants.map((v) => annualFuelCost(v)).filter((n): n is number => n !== null);
+const pathname = carYearPath(model, year);
+const faqs = [
+  { q: `What is the gas mileage of a ${year} ${name}?`, a: s.best === null ? `The EPA lists ${variants.length} versions of the ${year} ${name}; combined ratings are shown in the table above.` : `The EPA rates the ${year} ${name} at ${s.best === s.worst ? s.best : `${s.worst} to ${s.best}`} ${s.electric ? 'MPGe' : 'MPG'} combined, with up to ${s.bestCity ?? '—'} city and ${s.bestHighway ?? '—'} highway, depending on engine and drivetrain.` },
+  ...(costs.length ? [{ q: `How much does it cost to fuel a ${year} ${name} for a year?`, a: `At today's U.S. average price and 15,000 miles a year, about ${usd(Math.min(...costs))}${costs.length > 1 ? ` to ${usd(Math.max(...costs))}` : ''} depending on the version. Your cost depends on your mileage, driving and local fuel price.` }] : []),
+  ...(pcd ? [{ q: `What is the bolt pattern of a ${year} ${name}?`, a: `${pcd}${bore ? `, with a ${bore} mm center bore` : ''}, according to the ANKUSI wheel fitment data. Confirm against the vehicle before buying wheels.` }] : []),
+];
+const faqJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
+const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+---
+<SiteLayout title={carYearTitle(model, year, wheels.length > 0)} description={carYearDescription(model, year, variants, pcd)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: carModelPath(model) }, { name: String(year), href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/cars/">Cars</a><span aria-hidden="true">/</span><a href={carMakePath(model.makeSlug)}>{model.make}</a><span aria-hidden="true">/</span><a href={carModelPath(model)}>{model.model}</a><span aria-hidden="true">/</span><span aria-current="page">{year}</span></nav>
+  <CarYearBody model={model} year={year} faqs={faqs} />
+</SiteLayout>

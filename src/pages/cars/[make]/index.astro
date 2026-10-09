@@ -1,0 +1,51 @@
+---
+// One page per make: every model with its model-year range, best recent MPG and bolt pattern.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { type CarMake, carMakePath, carMakes, carModelPath, epaYears, frequent, mpgSummary } from '../../../data/cars';
+import { boltHref } from '../../../ui/car-pages';
+import { boltMakeBySlug, boltMakePath } from '../../../ui/bolt-make';
+
+export function getStaticPaths() {
+  return carMakes.map((make) => ({ params: { make: make.makeSlug }, props: { make } }));
+}
+
+interface Props { make: CarMake; }
+const { make } = Astro.props as Props;
+const pathname = carMakePath(make.makeSlug);
+const rows = make.models.map((model) => {
+  const years = epaYears(model);
+  const wheelYears = model.wheels.map((w) => w[1]).filter((y): y is number => y !== null);
+  const all = [...years, ...wheelYears];
+  const latest = years[years.length - 1];
+  return {
+    model,
+    span: all.length ? `${Math.min(...all)}–${Math.max(...all)}` : '—',
+    mpg: latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []).best : null,
+    pcd: frequent(model.wheels.map((w) => w[4]))[0],
+  };
+});
+const title = `${make.make} Models: MPG, Bolt Pattern and Wheel Size`.length <= 58 ? `${make.make} Models: MPG, Bolt Pattern and Wheel Size` : `${make.make} MPG and Bolt Patterns`;
+const description = `All ${make.models.length} ${make.make} models in the Atlas reference with EPA fuel economy by year, bolt pattern, center bore and wheel sizes from open data.`;
+const hasBoltChart = boltMakeBySlug(make.makeSlug) !== undefined;
+const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: make.make, href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/cars/">Cars</a><span aria-hidden="true">/</span><span aria-current="page">{make.make}</span></nav>
+  <header class="entity-hero">
+    <p class="eyebrow">{make.models.length} models</p>
+    <h1 class="entity-hero__title">{make.make}: MPG, bolt pattern and wheel size by model</h1>
+    <p class="entity-hero__lead">Pick a model for EPA fuel economy by year and its wheel fitment record. {hasBoltChart && <a href={boltMakePath('en', make.makeSlug)}>{make.make} bolt pattern chart</a>}</p>
+  </header>
+  <section class="entity-section" aria-label={`${make.make} models`}>
+    <div class="entity-table-scroll">
+      <table class="entity-table">
+        <thead><tr><th scope="col">Model</th><th scope="col">Years</th><th scope="col">Best MPG</th><th scope="col">Bolt pattern</th></tr></thead>
+        <tbody>
+          {rows.map((row) => { const href = boltHref(row.pcd); return (
+            <tr><th scope="row"><a href={carModelPath(row.model)}>{row.model.model}</a></th><td>{row.span}</td><td>{row.mpg ?? '—'}</td><td>{href ? <a href={href}>{row.pcd}</a> : row.pcd ?? '—'}</td></tr>
+          ); })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</SiteLayout>

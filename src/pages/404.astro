@@ -43,14 +43,19 @@ import ThemeControl from '../components/ThemeControl.astro';
       // switched to German or Spanish from the requested path, and a mistyped tire-size address
       // (e.g. /de/reifengroessen/205-55-16) is offered its canonical form.
       const path = window.location.pathname.toLowerCase();
-      const locale = path.startsWith('/de/') ? 'de' : path.startsWith('/es/') ? 'es' : path.startsWith('/fr/') ? 'fr' : 'en';
+      const locale = (['de', 'es', 'fr', 'it', 'pt-br', 'pl', 'nl', 'tr'] as const).find((code) => path.startsWith(`/${code}/`)) ?? 'en';
       const copy = {
         en: { eyebrow: 'Error 404', title: 'That page is not in the garage.', lead: 'The address may have changed, or the link may be incomplete. Your saved Garage data remains on this device.', primary: 'Open Wheel & Tire Compare', primaryHref: '/fitment-studio/', tools: 'Browse tools', toolsHref: '/tools/', tires: 'Tire sizes', tiresHref: '/tire-sizes/', suggest: 'Did you mean tire size', home: '/' },
         de: { eyebrow: 'Fehler 404', title: 'Diese Seite ist nicht in der Garage.', lead: 'Die Adresse hat sich womöglich geändert oder der Link ist unvollständig. Ihre gespeicherten Garage-Daten bleiben auf diesem Gerät.', primary: 'Felgen- & Reifenvergleich öffnen', primaryHref: '/de/fitment-studio/', tools: 'Alle Werkzeuge', toolsHref: '/de/tools/', tires: 'Reifengrößen', tiresHref: '/de/reifengroessen/', suggest: 'Meinten Sie die Reifengröße', home: '/de/' },
         fr: { eyebrow: 'Erreur 404', title: 'Cette page n’est pas au garage.', lead: 'L’adresse a peut-être changé ou le lien est incomplet. Vos données de garage enregistrées restent sur cet appareil.', primary: 'Rechercher une taille de pneu', primaryHref: '/fr/', tools: 'Entraxes', toolsHref: '/fr/entraxes/', tires: 'Dimensions de pneus', tiresHref: '/fr/dimensions-pneus/', suggest: 'Vouliez-vous dire la taille', home: '/fr/' },
+        'it': { eyebrow: 'Errore 404', title: 'Questa pagina non è in garage.', lead: 'L’indirizzo potrebbe essere cambiato o il link potrebbe essere incompleto. I dati salvati nel garage restano su questo dispositivo.', primary: 'Cerca una misura pneumatico', primaryHref: '/it/', tools: 'Forature cerchi', toolsHref: '/it/foratura-cerchi/', tires: 'Misure pneumatici', tiresHref: '/it/misure-pneumatici/', suggest: 'Forse cercavi la misura', home: '/it/' },
+        'pt-br': { eyebrow: 'Erro 404', title: 'Esta página não está na garagem.', lead: 'O endereço pode ter mudado ou o link pode estar incompleto. Os dados salvos da sua garagem continuam neste dispositivo.', primary: 'Buscar uma medida de pneu', primaryHref: '/pt-br/', tools: 'Furação de rodas', toolsHref: '/pt-br/furacao-rodas/', tires: 'Medidas de pneus', tiresHref: '/pt-br/medidas-pneus/', suggest: 'Você quis dizer a medida', home: '/pt-br/' },
+        'pl': { eyebrow: 'Błąd 404', title: 'Tej strony nie ma w garażu.', lead: 'Adres mógł się zmienić lub link jest niekompletny. Zapisane dane garażu pozostają na tym urządzeniu.', primary: 'Wyszukaj rozmiar opony', primaryHref: '/pl/', tools: 'Rozstawy śrub', toolsHref: '/pl/rozstaw-srub/', tires: 'Rozmiary opon', tiresHref: '/pl/rozmiary-opon/', suggest: 'Czy chodziło o rozmiar', home: '/pl/' },
+        'nl': { eyebrow: 'Fout 404', title: 'Niet te vinden in de garage.', lead: 'Het adres is mogelijk gewijzigd of de link is onvolledig. Uw opgeslagen garagegegevens blijven op dit apparaat.', primary: 'Bandenmaat opzoeken', primaryHref: '/nl/', tools: 'Steekmaten', toolsHref: '/nl/steekmaten/', tires: 'Bandenmaten', tiresHref: '/nl/bandenmaten/', suggest: 'Bedoelde u de bandenmaat', home: '/nl/' },
+        'tr': { eyebrow: 'Hata 404', title: 'Bu sayfa garajda yok.', lead: 'Adres değişmiş ya da bağlantı eksik olabilir. Kayıtlı garaj verileriniz bu cihazda kalmaya devam eder.', primary: 'Lastik ebadı arayın', primaryHref: '/tr/', tools: 'Bijon aralıkları', toolsHref: '/tr/bijon-araligi/', tires: 'Lastik ebatları', tiresHref: '/tr/lastik-ebatlari/', suggest: 'Şu lastik ebadını mı kastettiniz:', home: '/tr/' },
         es: { eyebrow: 'Error 404', title: 'Esta página no está en el garaje.', lead: 'Puede que la dirección haya cambiado o que el enlace esté incompleto. Los datos guardados de su garaje siguen en este dispositivo.', primary: 'Abrir el comparador de llantas y neumáticos', primaryHref: '/es/fitment-studio/', tools: 'Ver herramientas', toolsHref: '/es/tools/', tires: 'Medidas de neumáticos', tiresHref: '/es/medidas-neumaticos/', suggest: '¿Buscaba la medida', home: '/es/' },
       }[locale];
-      document.documentElement.lang = locale;
+      document.documentElement.lang = locale === 'pt-br' ? 'pt-BR' : locale;
       const set = (selector: string, text: string, href?: string) => {
         const node = document.querySelector<HTMLElement>(selector);
         if (!node) return;
@@ -66,7 +71,7 @@ import ThemeControl from '../components/ThemeControl.astro';
       const brand = document.querySelector<HTMLAnchorElement>('.app-header .brand');
       if (brand) brand.href = copy.home;
       const chip = document.querySelector('.locale-chip');
-      if (chip) chip.textContent = locale.toUpperCase();
+      if (chip) chip.textContent = locale === 'pt-br' ? 'PT' : locale.toUpperCase();
       const match = /(\d{3})[^\d]{1,3}(\d{2})[^\d]{1,4}(\d{2})(c?)\/?$/.exec(path);
       if (match) {
         const slug = `${match[1]}-${match[2]}-r${match[3]}${match[4] ?? ''}`;

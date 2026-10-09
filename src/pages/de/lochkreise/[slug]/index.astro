@@ -8,17 +8,22 @@ import SiteLayout from '../../../../components/SiteLayout.astro';
 import BoltPatternEntity from '../../../../components/BoltPatternEntity.astro';
 import { boltPatternCatalog, type BoltPatternEntry } from '../../../../data/bolt-pattern-catalog';
 import { boltPatternDetailMeta } from '../../../../ui/entity-page-model';
+import BoltMakeBody from '../../../../components/BoltMakeBody.astro';
+import { boltMakeMeta, boltMakes, type BoltMake } from '../../../../ui/bolt-make';
 
 export function getStaticPaths() {
   // boltPatternCatalog has already had malformed and vehicle-less entries excluded, so anything
   // reaching this point is a page with real, validated data behind it.
-  return boltPatternCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+  return [
+    ...boltPatternCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry, make: undefined } })),
+    ...boltMakes.map((make) => ({ params: { slug: make.makeSlug }, props: { entry: undefined, make } })),
+  ];
 }
 
-interface Props { entry: BoltPatternEntry; }
-const { entry } = Astro.props as Props;
-const meta = boltPatternDetailMeta(entry, 'de');
+interface Props { entry: BoltPatternEntry | undefined; make: BoltMake | undefined; }
+const { entry, make } = Astro.props as Props;
+const meta = entry ? boltPatternDetailMeta(entry, 'de') : boltMakeMeta(make!, 'de');
 ---
 <SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="de" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
-  <BoltPatternEntity entry={entry} locale="de" />
+  {entry ? <BoltPatternEntity entry={entry} locale="de" /> : <BoltMakeBody make={make!} locale="de" />}
 </SiteLayout>

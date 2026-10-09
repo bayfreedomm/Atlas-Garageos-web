@@ -1,10 +1,5 @@
 ---
-// Localized tire-size detail pages (FR).
-//
-// One route file generates every page in this locale: one page per row of tireSizeCatalog
-// (production-size reference, flotation sizes and documented vehicle-only OEM sizes), plus one
-// "N-inch tires" page per tire-height group. Adding a sourced size publishes its page and
-// updates its height group on the next build with no new file.
+// Localized tire-size detail pages (fr): one page per catalog size plus one page per tire-height group.
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import TireSizeEntity from '../../../../components/TireSizeEntity.astro';
 import TireDiameterGroup from '../../../../components/TireDiameterGroup.astro';
@@ -12,8 +7,6 @@ import { tireSizeCatalog, type TireSizeEntry } from '../../../../data/tire-size-
 import { tireDiameterGroupMeta, tireDiameterGroupSlug, tireDiameterGroups, tireSizeDetailMeta, type TireDiameterGroup as DiameterGroup } from '../../../../ui/entity-page-model';
 
 export function getStaticPaths() {
-  // tireSizeCatalog has already rejected malformed/out-of-range source data, so anything reaching
-  // this point is a page with real, validated reference data behind it.
   return [
     ...tireSizeCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry, group: undefined } })),
     ...tireDiameterGroups().map((group) => ({ params: { slug: tireDiameterGroupSlug(group.inches, 'fr') }, props: { entry: undefined, group } })),

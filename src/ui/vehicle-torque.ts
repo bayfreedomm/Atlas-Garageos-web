@@ -1,6 +1,8 @@
 import type { VehicleFitment, WheelTorqueTrust } from '../data/vehicle-fitment';
 
-export type TorqueLocale = 'en' | 'de' | 'es' | 'fr';
+import type { EntityLocale } from '../seo/entity-routes';
+
+export type TorqueLocale = EntityLocale;
 
 const QUALIFIERS: Readonly<Record<TorqueLocale, Readonly<Record<WheelTorqueTrust['evidence'] | 'medium' | 'low', string>>>> = {
   en: {
@@ -30,6 +32,41 @@ const QUALIFIERS: Readonly<Record<TorqueLocale, Readonly<Record<WheelTorqueTrust
     low: 'Référence peu fiable — ne pas utiliser sans vérifier le manuel du véhicule.',
     unconfirmed: 'Référence non confirmée — ne pas utiliser sans vérifier le manuel du véhicule.',
     extrapolated: 'Référence extrapolée — non confirmée pour cette génération précise.',
+  },
+  'it': {
+    documented: 'Valore di riferimento documentato — da confermare per il veicolo esatto prima dell’uso.',
+    medium: 'Riferimento di affidabilità media — da confermare nel manuale prima dell’uso.',
+    low: 'Riferimento poco affidabile — non usare senza verificare il manuale del veicolo.',
+    unconfirmed: 'Riferimento non confermato — non usare senza verificare il manuale del veicolo.',
+    extrapolated: 'Riferimento estrapolato — non confermato per questa generazione specifica.',
+  },
+  'pt-br': {
+    documented: 'Valor de referência documentado — confirme para o veículo exato antes de usar.',
+    medium: 'Referência de confiabilidade média — confirme no manual antes de usar.',
+    low: 'Referência pouco confiável — não use sem verificar o manual do veículo.',
+    unconfirmed: 'Referência não confirmada — não use sem verificar o manual do veículo.',
+    extrapolated: 'Referência extrapolada — não confirmada para esta geração específica.',
+  },
+  'pl': {
+    documented: 'Udokumentowana wartość referencyjna — przed użyciem potwierdzić dla konkretnego pojazdu.',
+    medium: 'Wartość o średniej wiarygodności — przed użyciem potwierdzić w instrukcji.',
+    low: 'Wartość o niskiej wiarygodności — nie używać bez sprawdzenia instrukcji pojazdu.',
+    unconfirmed: 'Wartość niepotwierdzona — nie używać bez sprawdzenia instrukcji pojazdu.',
+    extrapolated: 'Wartość ekstrapolowana — niepotwierdzona dla tej konkretnej generacji.',
+  },
+  'nl': {
+    documented: 'Gedocumenteerde referentiewaarde — bevestig voor het exacte voertuig vóór gebruik.',
+    medium: 'Referentie met gemiddelde betrouwbaarheid — bevestig in het instructieboekje vóór gebruik.',
+    low: 'Weinig betrouwbare referentie — niet gebruiken zonder het instructieboekje te controleren.',
+    unconfirmed: 'Niet-bevestigde referentie — niet gebruiken zonder het instructieboekje te controleren.',
+    extrapolated: 'Geëxtrapoleerde referentie — niet bevestigd voor deze specifieke generatie.',
+  },
+  'tr': {
+    documented: 'Belgelenmiş referans değer — kullanmadan önce tam araç için doğrulayın.',
+    medium: 'Orta güvenilirlikte referans — kullanmadan önce kullanım kılavuzunda doğrulayın.',
+    low: 'Düşük güvenilirlikte referans — aracın kullanım kılavuzunu kontrol etmeden kullanmayın.',
+    unconfirmed: 'Doğrulanmamış referans — aracın kullanım kılavuzunu kontrol etmeden kullanmayın.',
+    extrapolated: 'Tahmini referans — bu nesil için ayrıca doğrulanmamıştır.',
   },
 };
 

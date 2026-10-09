@@ -1,0 +1,56 @@
+---
+import SiteLayout from '../../../components/SiteLayout.astro';
+import VehicleEntityBody from '../../../components/VehicleEntityBody.astro';
+import { serializeJsonLd } from '../../../seo/safe-json-ld';
+import { vehiclePageText } from '../../../content/vehicle-page-text';
+import { vehicleFitmentData, type VehicleFitment } from '../../../data/vehicle-fitment';
+import { homePath, vehicleAlternates, vehicleHubPath, vehiclePagePath } from '../../../ui/entity-page-model';
+import { torqueJsonLdProperty } from '../../../ui/vehicle-torque';
+
+// Every vehicle has a page in every language; the market its data describes is shown on the page.
+const LOCALE = 'tr' as const;
+
+export function getStaticPaths() {
+  return vehicleFitmentData.map((vehicle) => ({ params: { id: vehicle.id }, props: { vehicle } }));
+}
+
+interface Props { vehicle: VehicleFitment; }
+const { vehicle } = Astro.props as Props;
+const t = vehiclePageText[LOCALE];
+const pathname = vehiclePagePath(LOCALE, vehicle.id);
+const hub = vehicleHubPath(LOCALE);
+const home = homePath(LOCALE);
+const title = t.title(vehicle);
+const description = t.description(vehicle);
+const faqs = [
+  { q: t.faqTireQ(vehicle), a: t.faqTireA(vehicle) },
+  { q: t.faqBoltQ(vehicle), a: t.faqBoltA(vehicle) },
+  { q: t.faqTorqueQ(vehicle), a: t.faqTorqueA(vehicle) },
+];
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const vehicleJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Vehicle',
+  name: `${vehicle.make} ${vehicle.model}`,
+  brand: { '@type': 'Brand', name: vehicle.make },
+  model: vehicle.model,
+  vehicleModelDate: vehicle.generation,
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: t.tireSize, value: vehicle.tireSize },
+    { '@type': 'PropertyValue', name: t.boltPattern, value: vehicle.boltPattern },
+    { '@type': 'PropertyValue', name: t.wheelSize, value: vehicle.wheelSize },
+    ...torqueJsonLdProperty(vehicle, `${t.torque} (Nm)`),
+  ],
+});
+---
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="tr" alternates={vehicleAlternates(vehicle.id)} breadcrumbs={[{ name: t.breadcrumbHome, href: home }, { name: t.breadcrumbVehicles, href: hub }, { name: `${vehicle.make} ${vehicle.model}`, href: pathname }]}>
+  <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+  <script is:inline type="application/ld+json" set:html={vehicleJsonLd}></script>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={home}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span><a href={hub}>{t.breadcrumbVehicles}</a><span aria-hidden="true">/</span><span aria-current="page">{vehicle.make} {vehicle.model}</span></nav>
+
+  <VehicleEntityBody vehicle={vehicle} locale={LOCALE} faqs={faqs} />
+</SiteLayout>

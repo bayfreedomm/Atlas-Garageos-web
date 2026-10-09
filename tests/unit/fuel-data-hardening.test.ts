@@ -102,7 +102,7 @@ describe('fuel SEO and update delivery', () => {
       expect(page).toContain('const alternates: readonly [] = [];');
       expect(page).toContain('alternates={alternates}');
     }
-    expect(entityAlternates('tire-size', '205-55-r16').map(({ hreflang }) => hreflang)).toEqual(['en', 'de', 'es', 'fr', 'x-default']);
+    expect(entityAlternates('tire-size', '205-55-r16').map(({ hreflang }) => hreflang)).toEqual(['en', 'de', 'es', 'fr', 'it', 'pt-BR', 'pl', 'nl', 'tr', 'x-default']);
   });
 
   it('publishes data through one rolling PR instead of pushing the development branch', () => {

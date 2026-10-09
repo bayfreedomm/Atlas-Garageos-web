@@ -1,6 +1,6 @@
 ---
-import type { EntityLocale } from '../seo/entity-routes';
-interface Props { readonly locale: Exclude<EntityLocale, 'fr'>; }
+import type { ToolEntityLocale } from '../seo/entity-routes';
+interface Props { readonly locale: ToolEntityLocale; }
 const { locale } = Astro.props;
 const copy = {
   en: { eyebrow: 'Your next decision', heading: 'What should I check next?', intro: 'Atlas follows the change you just made. These are checks, not a fitment verdict.', next: 'Next check', detail: 'Inspect this size', setup: 'Complete setup', final: 'Before fitment' },

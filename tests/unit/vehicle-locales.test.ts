@@ -4,7 +4,7 @@ import { vehiclePageText } from '../../src/content/vehicle-page-text';
 import { vehicleAlternates, vehicleHubPath, vehicleLink, vehiclePagePath } from '../../src/ui/entity-page-model';
 import { sitemapEntries } from '../../src/seo/sitemap';
 
-const LOCALES = ['en', 'de', 'es', 'fr'] as const;
+const LOCALES = ['en', 'de', 'es', 'fr', 'it', 'pt-br', 'pl', 'nl', 'tr'] as const;
 
 describe('vehicles in every language', () => {
   it('publishes every vehicle in EN, DE, ES and FR with reciprocal hreflang', () => {
@@ -12,7 +12,7 @@ describe('vehicles in every language', () => {
     for (const vehicle of vehicleFitmentData) {
       for (const locale of LOCALES) expect(urls.has(`https://atlasgarageos.com${vehiclePagePath(locale, vehicle.id)}`), `${vehicle.id} ${locale}`).toBe(true);
     }
-    expect(vehicleAlternates('vw-golf').map((alt) => alt.hreflang)).toEqual(['en', 'de', 'es', 'fr', 'x-default']);
+    expect(vehicleAlternates('vw-golf').map((alt) => alt.hreflang)).toEqual(['en', 'de', 'es', 'fr', 'it', 'pt-BR', 'pl', 'nl', 'tr', 'x-default']);
     expect(vehicleHubPath('fr')).toBe('/fr/vehicules/');
     expect(urls.has('https://atlasgarageos.com/fr/vehicules/')).toBe(true);
   });

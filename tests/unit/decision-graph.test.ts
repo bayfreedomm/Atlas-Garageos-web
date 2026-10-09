@@ -14,6 +14,7 @@ import { entityLocales } from '../../src/seo/entity-routes';
 import { sitemapEntries } from '../../src/seo/sitemap';
 import { boltDecisionGraph, fuelDecisionGraph, tireDecisionGraph, vehicleDecisionGraph } from '../../src/ui/decision-graph';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
+import { boltMakes } from '../../src/ui/bolt-make';
 
 describe('shared automotive decision graph', () => {
   it('connects a vehicle to reference entities and every required calculator without inventing consumption', () => {
@@ -97,8 +98,8 @@ describe('decision graph route-count guard', () => {
     expect(vehicleFitmentData.length).toBeGreaterThanOrEqual(30);
     expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(950);
     expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
-    const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes)\//.test(url));
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
+    const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
     expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls)).toHaveLength(expected);

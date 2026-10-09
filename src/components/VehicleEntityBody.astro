@@ -1,7 +1,9 @@
 ---
+import { carModelForVehicle, carModelPath, epaYears } from '../data/cars';
 // Shared mobile-first body for vehicle reference pages (EN/DE/ES/FR), matching the tire-size page:
 // answer strip → spec table → same-pattern vehicles → sources → FAQ → next decisions.
 import DecisionGraph from './DecisionGraph.astro';
+import { isReferenceLocale } from '../localization/reference-locales';
 import { vehiclePageText, type VehicleLocale } from '../content/vehicle-page-text';
 import { vehicleFitmentData, vehicleNote, type VehicleFitment } from '../data/vehicle-fitment';
 import { tireSizeBySlug, tireSizeSlug } from '../data/tire-size-catalog';
@@ -20,6 +22,11 @@ const L = {
   de: { specs: 'Rad- und Reifendaten', options: 'Werksoptionale Reifengrößen', fastener: 'Befestigung', sameHeading: 'Weitere Fahrzeuge mit gleichem Lochkreis', sameIntro: (p: string) => `Ebenfalls ${p} in der Atlas-Referenz. Gleiche Bohrungen – Nabenbohrung, ET und Felgengröße können trotzdem abweichen:`, tireHeight: 'Reifendurchmesser', sources: 'Quellen und Verlässlichkeit', nav: { specs: 'Daten', same: 'Gleicher Lochkreis', faq: 'FAQ' } },
   es: { specs: 'Datos de llanta y neumático', options: 'Medidas opcionales de fábrica', fastener: 'Fijación', sameHeading: 'Otros vehículos con el mismo patrón', sameIntro: (p: string) => `También con ${p} en la referencia Atlas. Mismos agujeros, pero el centro de rueda, el offset y la llanta pueden variar:`, tireHeight: 'Diámetro del neumático', sources: 'Fuentes y confianza', nav: { specs: 'Datos', same: 'Mismo patrón', faq: 'Preguntas' } },
   fr: { specs: 'Données jante et pneu', options: "Tailles optionnelles d'origine", fastener: 'Fixation', sameHeading: 'Autres véhicules avec le même entraxe', sameIntro: (p: string) => `Également en ${p} dans la référence Atlas. Mêmes trous, mais l'alésage, le déport et la taille de jante peuvent différer :`, tireHeight: 'Diamètre du pneu', sources: 'Sources et confiance', nav: { specs: 'Données', same: 'Même entraxe', faq: 'FAQ' } },
+  'it': { specs: 'Dati cerchio e pneumatico', options: 'Misure opzionali di fabbrica', fastener: 'Fissaggio', sameHeading: 'Altri veicoli con la stessa foratura', sameIntro: (p: string) => `Anche con foratura ${p} nel riferimento Atlas. Stessi fori, ma foro centrale, offset e misura del cerchio possono differire:`, tireHeight: 'Diametro dello pneumatico', sources: 'Fonti e affidabilità', nav: { specs: 'Dati', same: 'Stessa foratura', faq: 'FAQ' } },
+  'pt-br': { specs: 'Dados de roda e pneu', options: 'Medidas opcionais de fábrica', fastener: 'Fixação', sameHeading: 'Outros veículos com a mesma furação', sameIntro: (p: string) => `Também com ${p} na referência Atlas. Mesmos furos, mas o furo central, o offset e a medida da roda podem ser diferentes:`, tireHeight: 'Diâmetro do pneu', sources: 'Fontes e confiança', nav: { specs: 'Dados', same: 'Mesma furação', faq: 'FAQ' } },
+  'pl': { specs: 'Dane felg i opon', options: 'Fabryczne rozmiary opcjonalne', fastener: 'Mocowanie', sameHeading: 'Inne pojazdy z tym samym rozstawem śrub', sameIntro: (p: string) => `Również z rozstawem ${p} w bazie Atlas. Te same otwory, ale otwór centralny, odsadzenie i rozmiar felgi mogą się różnić:`, tireHeight: 'Średnica opony', sources: 'Źródła i pewność', nav: { specs: 'Dane', same: 'Ten sam rozstaw', faq: 'FAQ' } },
+  'nl': { specs: 'Velg- en bandgegevens', options: "Optionele fabrieksmaten", fastener: 'Bevestiging', sameHeading: 'Andere voertuigen met dezelfde steekmaat', sameIntro: (p: string) => `Ook met ${p} in de Atlas-referentie. Dezelfde gaten, maar naafgat, inpersdiepte en velgmaat kunnen verschillen:`, tireHeight: 'Banddiameter', sources: 'Bronnen en betrouwbaarheid', nav: { specs: 'Gegevens', same: 'Zelfde steekmaat', faq: 'FAQ' } },
+  'tr': { specs: 'Jant ve lastik verileri', options: 'Fabrika opsiyonu ebatlar', fastener: 'Bağlantı', sameHeading: 'Aynı bijon aralığına sahip diğer araçlar', sameIntro: (p: string) => `Atlas referansında bijon aralığı ${p} olan diğer araçlar. Delikler aynı, ancak göbek çapı, ofset ve jant ölçüsü farklı olabilir:`, tireHeight: 'Lastik çapı', sources: 'Kaynaklar ve güven', nav: { specs: 'Veriler', same: 'Aynı bijon aralığı', faq: 'SSS' } },
 }[locale];
 const torque = torquePresentation(vehicle, locale);
 const decisions = vehicleDecisionGraph(vehicle, locale);
@@ -28,7 +35,7 @@ const boltHref = entityDetailPath('bolt-pattern', locale, boltPatternSlug(vehicl
 const tireEntry = tireSizeBySlug(tireSizeSlug(vehicle.tireSize));
 const tireMetrics = tireEntry ? tireSizeMetrics(tireEntry) : undefined;
 const fastener = vehicle.fastenerType === 'lug-nut' ? t.lugNut : t.wheelBolt;
-const note = locale === 'fr' ? undefined : locale === 'en' ? vehicle.notes : vehicleNote(vehicle, locale);
+const note = isReferenceLocale(locale) ? undefined : locale === 'en' ? vehicle.notes : vehicleNote(vehicle, locale);
 const samePattern = vehicleFitmentData
   .filter((other) => other.id !== vehicle.id && other.boltPattern === vehicle.boltPattern)
   .sort((a, b) => Number(b.centerBoreMm === vehicle.centerBoreMm) - Number(a.centerBoreMm === vehicle.centerBoreMm) || a.make.localeCompare(b.make))
@@ -39,6 +46,8 @@ const answer = [
   { label: t.torque, value: torque.value === '—' ? '—' : torque.value.replace(/\s*\(.*\)$/, ''), href: undefined },
   { label: t.centerBore, value: vehicle.centerBoreMm !== undefined ? `${formatPlain(vehicle.centerBoreMm, locale)} mm` : '—', href: undefined },
 ];
+const carModel = locale === 'en' ? carModelForVehicle(vehicle) : undefined;
+const carYears = carModel ? epaYears(carModel) : [];
 ---
 <header class="entity-hero entity-hero--tire">
   <p class="eyebrow">{t.kicker}</p>
@@ -91,6 +100,15 @@ const answer = [
         return <li><a class="entity-chip" href={link.href} hreflang={link.crossLocale ? link.locale : undefined}>{other.make} {other.model}{other.centerBoreMm !== undefined ? ` · ${formatPlain(other.centerBoreMm, locale)} mm` : ''}</a></li>;
       })}
     </ul>
+  </section>
+)}
+
+{carModel && (
+  <section class="entity-section" aria-labelledby="vehicle-cars">
+    <h2 id="vehicle-cars">{carModel.make} {carModel.model}: MPG and wheel data by year</h2>
+    <div class="entity-links">
+      <a class="entity-link-card" href={carModelPath(carModel)}><strong>{carModel.make} {carModel.model} MPG by year{carModel.wheels.length ? ', bolt pattern and wheel sizes' : ''}</strong><span>{carYears.length ? `EPA fuel economy ${carYears[0]}–${carYears[carYears.length - 1]}` : 'Wheel fitment records'}{carModel.wheels.length ? ` · ${carModel.wheels.length} wheel records` : ''}</span><i aria-hidden="true">›</i></a>
+    </div>
   </section>
 )}
 

@@ -1,8 +1,8 @@
 ---
 import { vehicleFitmentData } from '../data/vehicle-fitment';
-import type { EntityLocale } from '../seo/entity-routes';
+import type { ToolEntityLocale } from '../seo/entity-routes';
 
-interface Props { readonly locale: Exclude<EntityLocale, 'fr'>; }
+interface Props { readonly locale: ToolEntityLocale; }
 const { locale } = Astro.props;
 const copy = {
   en: { a: 'Vehicle A', b: 'Vehicle B', choose: 'Choose a vehicle', compare: 'Compare vehicles', prompt: 'Choose two vehicles to see the differences Atlas can support.', summary: 'What is actually different', field: 'Reference field' },

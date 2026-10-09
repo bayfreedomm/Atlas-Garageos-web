@@ -287,7 +287,7 @@ export const signed = (value: number, digits: number, unit: string, locale: Numb
  * bolt patterns) link to the English tools, and say so in their copy.
  */
 export function toolLocale(locale: EntityLocale): 'en' | 'de' | 'es' {
-  return locale === 'fr' ? 'en' : locale;
+  return toolLocaleFor(locale);
 }
 
 export function tireCalculatorHref(locale: EntityLocale, entry: TireSizeEntry): string {
@@ -322,7 +322,7 @@ export function boltPatternCalculatorHref(locale: EntityLocale, entry: BoltPatte
 
 export interface VehicleLink { readonly href: string; readonly locale: EntityLocale; readonly crossLocale: boolean; }
 
-const VEHICLE_SEGMENT: Readonly<Record<EntityLocale, string>> = { en: '/vehicles/', de: '/de/fahrzeuge/', es: '/es/vehiculos/', fr: '/fr/vehicules/' };
+const VEHICLE_SEGMENT: Readonly<Record<EntityLocale, string>> = { en: '/vehicles/', de: '/de/fahrzeuge/', es: '/es/vehiculos/', fr: '/fr/vehicules/', it: '/it/veicoli/', 'pt-br': '/pt-br/veiculos/', pl: '/pl/pojazdy/', nl: '/nl/voertuigen/', tr: '/tr/araclar/' };
 
 /** The vehicle-directory index for this locale. */
 export function vehicleHubPath(locale: EntityLocale): string {
@@ -341,7 +341,7 @@ export function vehicleLink(vehicle: VehicleFitment, locale: EntityLocale): Vehi
 export function vehicleAlternates(id?: string): readonly { readonly hreflang: string; readonly href: string }[] {
   const path = (locale: EntityLocale): string => id === undefined ? vehicleHubPath(locale) : vehiclePagePath(locale, id);
   return Object.freeze([
-    ...entityLocales().map((locale) => ({ hreflang: locale, href: `https://atlasgarageos.com${path(locale)}` })),
+    ...entityLocales().map((locale) => ({ hreflang: entityHreflang(locale), href: `https://atlasgarageos.com${path(locale)}` })),
     { hreflang: 'x-default', href: `https://atlasgarageos.com${path('en')}` },
   ]);
 }
@@ -392,7 +392,7 @@ export function splitHeadingAroundKey(heading: string, key: string): HeadingPart
  * Built here rather than in each .astro file so the six route files stay thin wrappers and
  * the title/description/canonical/hreflang rules are written once and typechecked.
  * ------------------------------------------------------------------------------------ */
-import { entityAlternates, entityDetailPath, entityHubPath, entityLocales, type HreflangAlternate } from '../seo/entity-routes';
+import { entityAlternates, entityDetailPath, entityHreflang, entityHubPath, entityLocales, toolLocaleFor, type HreflangAlternate } from '../seo/entity-routes';
 import { boltPatternPageText, tireSizePageText } from '../content/entity-page-text';
 
 export interface EntityBreadcrumb { readonly name: string; readonly href: string; }
@@ -497,7 +497,7 @@ export const TIRE_DIAMETER_GROUP_RANGE = Object.freeze({ min: 22, max: 42 });
 export interface TireDiameterGroupMember { readonly entry: TireSizeEntry; readonly diameterIn: number; }
 export interface TireDiameterGroup { readonly inches: number; readonly members: readonly TireDiameterGroupMember[]; }
 
-const DIAMETER_SLUG_SUFFIX: Readonly<Record<EntityLocale, string>> = Object.freeze({ en: 'inch', de: 'zoll', es: 'pulgadas', fr: 'pouces' });
+const DIAMETER_SLUG_SUFFIX: Readonly<Record<EntityLocale, string>> = Object.freeze({ en: 'inch', de: 'zoll', es: 'pulgadas', fr: 'pouces', it: 'pollici', 'pt-br': 'polegadas', pl: 'cali', nl: 'inch', tr: 'inc' });
 
 export function tireDiameterGroupSlug(inches: number, locale: EntityLocale): string {
   return `${inches}-${DIAMETER_SLUG_SUFFIX[locale]}`;
@@ -552,7 +552,7 @@ export function tireDiameterGroupHighlights(group: TireDiameterGroup): readonly 
 export function tireDiameterGroupAlternates(inches: number): readonly HreflangAlternate[] {
   const href = (locale: EntityLocale): string => `https://atlasgarageos.com${tireDiameterGroupPath(inches, locale)}`;
   return Object.freeze([
-    ...entityLocales().map((locale) => ({ hreflang: locale, href: href(locale) })),
+    ...entityLocales().map((locale) => ({ hreflang: entityHreflang(locale), href: href(locale) })),
     { hreflang: 'x-default', href: href('en') },
   ]);
 }

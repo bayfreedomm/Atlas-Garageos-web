@@ -1,0 +1,11 @@
+---
+// Localized bolt-pattern hub (pt-br). The listing lives in BoltPatternHubBody.astro.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import BoltPatternHubBody from '../../../components/BoltPatternHubBody.astro';
+import { boltPatternHubMeta } from '../../../ui/entity-page-model';
+
+const meta = boltPatternHubMeta('pt-br');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="pt-br" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <BoltPatternHubBody locale="pt-br" />
+</SiteLayout>

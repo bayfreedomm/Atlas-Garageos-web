@@ -1,6 +1,6 @@
 import { localizedToolPath } from '../localization/locales';
 import type { TireToolInput } from '../features/tools/calculator-tools';
-import type { EntityLocale } from '../seo/entity-routes';
+import type { ToolEntityLocale } from '../seo/entity-routes';
 
 type Difference = 'same' | 'larger' | 'smaller';
 
@@ -69,7 +69,7 @@ const COPY = {
 function direction(value: number): Difference { return value > 0 ? 'larger' : value < 0 ? 'smaller' : 'same'; }
 
 export function guidedTireDecision(
-  locale: Exclude<EntityLocale, 'fr'>,
+  locale: ToolEntityLocale,
   original: TireToolInput,
   proposed: TireToolInput,
   diameterDifferenceMm: number,

@@ -84,3 +84,10 @@ Snapshot date: 2026-10-08. This file records what the repository proves today; i
 - Comparison and trip hand-off accept every vehicle in every language.
 - wheel-size.com is no longer used for automated collection: it answered with human-verification pages, and Atlas does not work around bot checks.
 - Build: 4,979 sitemap URLs; bolt-pattern pages 14 → 22 per locale.
+
+## Part 5 — five more languages, /cars/ (EPA + ANKUSI), bolt charts by make (2026-10-09)
+
+- Reference-only locales are now one list (src/localization/reference-locales.ts): fr, it, pt-br, pl, nl, tr. Each publishes tire sizes, tire heights, bolt patterns, bolt charts by make, vehicles and a home (ReferenceHome.astro); calculators stay English and say so. Chrome copy lives in src/content/reference-locale-text.ts.
+- /cars/: EPA fuel economy (fueleconomy.gov, 50,407 configurations 1984–2027) merged with the ANKUSI Wheel Fitment Dataset (CC BY 4.0, 9,701 records) into src/data/generated/cars.json by scripts/build-cars-data.py. Pages: directory, one per make, one per model (all years in a table), one per model year from 2000 (MPG by version, annual fuel cost at today's EIA price, wheel record). English only.
+- Bolt pattern chart per make in all nine languages (/bolt-patterns/{make}/ and localized equivalents); bolt-pattern pages list every make/model recorded with that pattern.
+- 14 vehicles gained wheel torque from checkfitment.com rows marked "verified" (medium confidence).

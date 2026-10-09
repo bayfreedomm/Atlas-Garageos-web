@@ -23,6 +23,7 @@ import { PRODUCTION_FLOTATION_TIRE_SIZES, productionCommercialTireSizeNotations,
 import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
+import { boltMakes } from '../../src/ui/bolt-make';
 
 /** A syntactically complete vehicle row, so a test can vary exactly one field. */
 const fakeVehicle = (overrides: Partial<VehicleFitment>): VehicleFitment => ({
@@ -167,7 +168,7 @@ describe('bolt-pattern catalog', () => {
 
 describe('entity routing and sitemap', () => {
   it('publishes en/de/es plus the French reference families, with the locale-prefix convention', () => {
-    expect(entityLocales()).toEqual(['en', 'de', 'es', 'fr']);
+    expect(entityLocales()).toEqual(['en', 'de', 'es', 'fr', 'it', 'pt-br', 'pl', 'nl', 'tr']);
     expect(entityHubPath('tire-size', 'fr')).toBe('/fr/dimensions-pneus/');
     expect(entityHubPath('bolt-pattern', 'fr')).toBe('/fr/entraxes/');
     expect(entityHubPath('tire-size', 'en')).toBe('/tire-sizes/');
@@ -182,15 +183,15 @@ describe('entity routing and sitemap', () => {
 
   it('cross-links every locale with hreflang plus an x-default', () => {
     const alternates = entityAlternates('tire-size', '205-55-r16');
-    expect(alternates.map((alternate) => alternate.hreflang)).toEqual(['en', 'de', 'es', 'fr', 'x-default']);
+    expect(alternates.map((alternate) => alternate.hreflang)).toEqual(['en', 'de', 'es', 'fr', 'it', 'pt-BR', 'pl', 'nl', 'tr', 'x-default']);
     expect(alternates.find((alternate) => alternate.hreflang === 'x-default')?.href).toBe('https://atlasgarageos.com/tire-sizes/205-55-r16/');
     expect(alternates.find((alternate) => alternate.hreflang === 'es')?.href).toBe('https://atlasgarageos.com/es/medidas-neumaticos/205-55-r16/');
   });
 
   it('lists every generated entity page in the sitemap exactly once', () => {
     const entries = sitemapEntries();
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
-    const entityUrls = entries.filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes)\//.test(url));
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
+    const entityUrls = entries.filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls).size).toBe(expected);
     expect(entries).toContain('https://atlasgarageos.com/tire-sizes/205-55-r16/');

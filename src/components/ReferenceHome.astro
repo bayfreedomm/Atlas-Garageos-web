@@ -1,0 +1,57 @@
+---
+// Home page of a reference-only locale (fr, it, pt-br, pl, nl, tr): size lookup first, then the
+// reference hubs (tire sizes, vehicles, bolt patterns) and the tire-height groups.
+import SiteLayout from './SiteLayout.astro';
+import TireSizeLookup from './TireSizeLookup.astro';
+import { entityHreflang, entityHubPath } from '../seo/entity-routes';
+import { tireSizeCatalog } from '../data/tire-size-catalog';
+import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
+import { vehicleFitmentData } from '../data/vehicle-fitment';
+import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath } from '../ui/entity-page-model';
+import { tireSizeShortcuts } from '../ui/reference-links';
+import { referenceChromeText } from '../content/reference-locale-text';
+import type { ReferenceLocale } from '../localization/reference-locales';
+
+interface Props { readonly locale: ReferenceLocale; }
+const { locale } = Astro.props;
+const h = referenceChromeText[locale].home;
+const shortcuts = tireSizeShortcuts(locale);
+const heights = tireDiameterGroups().filter((group) => group.inches >= 24 && group.inches <= 35);
+const tireHub = entityHubPath('tire-size', locale);
+const boltHub = entityHubPath('bolt-pattern', locale);
+const pathname = `/${locale}/`;
+const alternates = [{ hreflang: entityHreflang(locale), href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+---
+<SiteLayout title={h.title} description={h.description(tireSizeCatalog.length, boltPatternCatalog.length)} pathname={pathname} active="home" locale={locale} alternates={alternates} breadcrumbs={[{ name: h.breadcrumbHome, href: pathname }]}>
+  <header class="entity-hero">
+    <p class="eyebrow">{h.eyebrow}</p>
+    <h1 class="entity-hero__title">{h.h1}</h1>
+    <p class="entity-hero__lead">{h.lead(tireSizeCatalog.length)}</p>
+  </header>
+
+  <section class="entity-section" aria-labelledby="ref-lookup">
+    <h2 id="ref-lookup">{h.lookupHeading}</h2>
+    <TireSizeLookup locale={locale} id={`tire-lookup-${locale}-home`} />
+    <ul class="entity-chiplist">
+      {shortcuts.map((shortcut) => <li><a class="entity-chip" href={shortcut.href}>{shortcut.label}</a></li>)}
+    </ul>
+  </section>
+
+  <section class="entity-section" aria-labelledby="ref-reference">
+    <h2 id="ref-reference">{h.referenceHeading}</h2>
+    <div class="entity-links">
+      <a class="entity-link-card" href={tireHub}><strong>{h.allTiresTitle}</strong><span>{h.allTiresHelper(tireSizeCatalog.length)}</span><i aria-hidden="true">›</i></a>
+      <a class="entity-link-card" href={vehicleHubPath(locale)}><strong>{h.vehiclesTitle}</strong><span>{h.vehiclesHelper(vehicleFitmentData.length)}</span><i aria-hidden="true">›</i></a>
+      <a class="entity-link-card" href={boltHub}><strong>{h.boltsTitle}</strong><span>{h.boltsHelper(boltPatternCatalog.length)}</span><i aria-hidden="true">›</i></a>
+      <a class="entity-link-card" href="/tools/" hreflang="en"><strong>{h.toolsTitle}</strong><span>{h.toolsHelper}</span><i aria-hidden="true">›</i></a>
+    </div>
+  </section>
+
+  <section class="entity-section" aria-labelledby="ref-heights">
+    <h2 id="ref-heights">{h.heightsHeading}</h2>
+    <p class="entity-note">{h.heightsNote}</p>
+    <ul class="entity-chiplist">
+      {heights.map((group) => <li><a class="entity-chip" href={tireDiameterGroupPath(group.inches, locale)}>{h.heightChip(group.inches)}</a></li>)}
+    </ul>
+  </section>
+</SiteLayout>

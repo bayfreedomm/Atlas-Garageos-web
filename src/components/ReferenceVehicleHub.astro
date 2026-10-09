@@ -1,0 +1,41 @@
+---
+// Vehicle directory of a reference-only locale: every vehicle, grouped by the market its data describes.
+import SiteLayout from './SiteLayout.astro';
+import { vehiclePageText } from '../content/vehicle-page-text';
+import { vehicleFitmentData } from '../data/vehicle-fitment';
+import { displayTireNotation, homePath, vehicleAlternates, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
+import { entityHubPath } from '../seo/entity-routes';
+import { referenceChromeText } from '../content/reference-locale-text';
+import type { ReferenceLocale } from '../localization/reference-locales';
+
+interface Props { readonly locale: ReferenceLocale; }
+const { locale } = Astro.props;
+const t = vehiclePageText[locale];
+const c = referenceChromeText[locale].vehicleHub;
+const pathname = vehicleHubPath(locale);
+const home = homePath(locale);
+const sorted = vehicleFitmentData.slice().sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+const groups = (['eu', 'us'] as const).map((market) => ({ market, label: market === 'us' ? t.hubUsMarket : t.hubEuMarket, vehicles: sorted.filter((v) => v.market === market) }));
+---
+<SiteLayout title={t.hubTitle} description={t.hubDescription} pathname={pathname} active="tools" locale={locale} alternates={vehicleAlternates()} breadcrumbs={[{ name: t.breadcrumbHome, href: home }, { name: t.breadcrumbVehicles, href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={home}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span><span aria-current="page">{t.breadcrumbVehicles}</span></nav>
+  <header class="directory-identity methodology-hero">
+    <p class="eyebrow">{sorted.length} · {t.breadcrumbVehicles}</p>
+    <h1>{t.hubTitle}</h1>
+    <p>{t.hubLead}</p>
+  </header>
+  <section class="vehicle-fuel-journey" aria-label={c.cardsLabel}>
+    <div class="vehicle-fuel-journey__cards">
+      <a class="vehicle-fuel-card" href={entityHubPath('tire-size', locale)}><strong>{c.tiresTitle}</strong><span>{c.tiresHelper}</span><i aria-hidden="true">›</i></a>
+      <a class="vehicle-fuel-card" href={entityHubPath('bolt-pattern', locale)}><strong>{c.boltsTitle}</strong><span>{c.boltsHelper}</span><i aria-hidden="true">›</i></a>
+    </div>
+  </section>
+  {groups.map((group) => group.vehicles.length > 0 && (
+    <section class="entity-section" aria-label={group.label}>
+      <h2>{group.label} <span class="entity-card__meta">· {group.vehicles.length}</span></h2>
+      <div class="methodology-source-links">
+        {group.vehicles.map((v) => <a href={vehiclePagePath(locale, v.id)}>{v.make} {v.model} — {displayTireNotation(v.tireSize, locale)} · {v.boltPattern} <span>›</span></a>)}
+      </div>
+    </section>
+  ))}
+</SiteLayout>

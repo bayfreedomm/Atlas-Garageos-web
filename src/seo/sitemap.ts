@@ -6,6 +6,9 @@ import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 import { dtcRecords } from '../data/dtc-records';
 import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
+import { REFERENCE_LOCALES } from '../localization/reference-locales';
+import { boltMakePath, boltMakes } from '../ui/bolt-make';
+import { carMakePath, carMakes, carModelPath, carModels, carYearPath, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
@@ -58,15 +61,26 @@ function entityPageRoutes(): readonly string[] {
     for (const group of tireDiameterGroups()) routes.push(tireDiameterGroupPath(group.inches, locale));
     routes.push(entityHubPath('bolt-pattern', locale));
     for (const entry of boltPatternCatalog) routes.push(entityDetailPath('bolt-pattern', locale, entry.slug));
+    for (const make of boltMakes) routes.push(boltMakePath(locale, make.makeSlug));
   }
   return routes;
 }
 
+/** English /cars/ family: directory, one page per make, per model, and per EPA model year from 2000. */
+function carRoutes(): readonly string[] {
+  return [
+    '/cars/',
+    ...carMakes.map((make) => carMakePath(make.makeSlug)),
+    ...carModels.map((model) => carModelPath(model)),
+    ...carModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year))),
+  ];
+}
+
 export function sitemapEntries(): readonly string[] {
   const diagnosticRoutes = ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
-  // French publishes the reference families only; its home is the entry to them.
-  const frenchRoutes = ['/fr/'];
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...frenchRoutes].map(canonicalForPath));
+  // Reference-only locales publish the reference families; each has a localized home.
+  const referenceHomes = REFERENCE_LOCALES.map((locale) => `/${locale}/`);
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...referenceHomes, ...carRoutes()].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

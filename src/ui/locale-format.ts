@@ -7,7 +7,15 @@
  * added: four-digit engineering figures such as a 1985,2 mm circumference read cleanly
  * without them in all three languages, and it keeps every rendered value unambiguous.
  */
-export type NumberLocale = 'en' | 'de' | 'es' | 'fr';
+import type { EntityLocale } from '../seo/entity-routes';
+
+export type NumberLocale = EntityLocale;
+
+/** Percent sign placement: '55%' (EN, IT, PT, PL, NL), '55 %' (DE, ES, FR), '%55' (TR). */
+function percentText(number: string, locale: NumberLocale): string {
+  if (locale === 'tr') return `%${number}`;
+  return locale === 'de' || locale === 'es' || locale === 'fr' ? `${number} %` : `${number}%`;
+}
 
 /** Fixed-digit decimal with the locale's decimal separator. Minus is the typographic sign. */
 export function formatDecimal(value: number, digits: number, locale: NumberLocale): string {
@@ -29,7 +37,7 @@ export function formatMm(value: number, digits: number, locale: NumberLocale): s
 /** "55%" in English, "55 %" in German and Spanish. */
 export function formatPercent(value: number, digits: number, locale: NumberLocale): string {
   const number = formatDecimal(value, digits, locale);
-  return locale === 'en' ? `${number}%` : `${number} %`;
+  return percentText(number, locale);
 }
 
 /** Signed difference with an explicit plus sign, e.g. "+1,3 mm" or "−0,72 %". */
@@ -37,6 +45,6 @@ export function formatSigned(value: number, digits: number, unit: string, locale
   const rounded = Number(Math.abs(value).toFixed(digits));
   const sign = rounded === 0 ? '' : value > 0 ? '+' : '−';
   const number = formatDecimal(Math.abs(value), digits, locale);
-  if (unit === '%') return locale === 'en' ? `${sign}${number}%` : `${sign}${number} %`;
+  if (unit === '%') return locale === 'tr' ? `${sign}%${number}` : `${sign}${percentText(number, locale)}`;
   return `${sign}${number} ${unit}`;
 }

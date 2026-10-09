@@ -2,7 +2,7 @@ import { vehicleFitmentData, type VehicleFitment } from '../data/vehicle-fitment
 import { boltPatternSlug } from '../data/bolt-pattern-catalog';
 import { parseTireNotation, tireSizeSlug } from '../data/tire-size-catalog';
 import { localizedToolPath } from '../localization/locales';
-import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
+import { entityDetailPath, toolLocaleFor, type EntityLocale } from '../seo/entity-routes';
 import { tireComparisonHref, vehicleLink } from './entity-page-model';
 import { torquePresentation } from './vehicle-torque';
 
@@ -122,8 +122,8 @@ const BASE_COPY: Readonly<Record<'en' | 'de' | 'es', ComparisonCopy>> = {
     actions: { vehicleA: 'Abrir Vehículo A', vehicleB: 'Abrir Vehículo B', compareTires: 'Comparar estos neumáticos', fitment: 'Abrir comparación de llantas y neumáticos' },
   },
 };
-// French has no vehicle-comparison page; French entity pages link to the English one.
-const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = { ...BASE_COPY, fr: BASE_COPY.en };
+// Reference-only locales have no vehicle-comparison page; their entity pages link to the English one.
+const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = { ...BASE_COPY, fr: BASE_COPY.en, it: BASE_COPY.en, 'pt-br': BASE_COPY.en, pl: BASE_COPY.en, nl: BASE_COPY.en, tr: BASE_COPY.en };
 
 export const comparisonPath = (locale: EntityLocale): string => locale === 'de' ? '/de/fahrzeuge/vergleichen/' : locale === 'es' ? '/es/vehiculos/comparar/' : '/vehicles/compare/';
 
@@ -140,11 +140,11 @@ export function vehicleComparisonHref(locale: EntityLocale, firstId?: string, se
 }
 
 export function vehicleTripHref(locale: EntityLocale, vehicleId: string): string {
-  return `${localizedToolPath(locale === 'fr' ? 'en' : locale, 'road-trip-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
+  return `${localizedToolPath(toolLocaleFor(locale), 'road-trip-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
 }
 
 export function vehicleFuelHref(locale: EntityLocale, vehicleId: string): string {
-  return `${localizedToolPath(locale === 'fr' ? 'en' : locale, 'fuel-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
+  return `${localizedToolPath(toolLocaleFor(locale), 'fuel-cost-calculator', 'tool')}?vehicle=${encodeURIComponent(vehicleId)}`;
 }
 
 export function geometryForVehicle(vehicle: VehicleFitment): VehicleGeometry {

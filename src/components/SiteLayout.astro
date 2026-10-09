@@ -2,7 +2,10 @@
 import type { ToolDefinition } from '../seo/tool-registry';
 import { canonicalForPath, routeForTool, SITE_ORIGIN } from '../seo/tool-registry';
 import { serializeJsonLd } from '../seo/safe-json-ld';
-import { chromePrefix, chromeStrings, type ChromeLocale } from '../localization/site-catalog';
+import { chromeHtmlLang, chromePrefix, chromeStrings, type ChromeLocale } from '../localization/site-catalog';
+import { REFERENCE_LOCALE_META, REFERENCE_LOCALES, isReferenceLocale } from '../localization/reference-locales';
+import { referenceChromeText } from '../content/reference-locale-text';
+import { entityHubPath } from '../seo/entity-routes';
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
@@ -28,13 +31,19 @@ const locale = props.locale;
 const t = chromeStrings(locale);
 const prefix = chromePrefix(locale);
 const homeHref = locale ? `/${locale}/` : '/';
-const htmlLang = locale ?? definition?.locale ?? 'en';
+const htmlLang = locale ? chromeHtmlLang(locale) : definition?.locale ?? 'en';
 const alternates = props.alternates ?? [{ hreflang: 'en', href: canonical }, { hreflang: 'x-default', href: canonical }];
-const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES', fr: 'FR' };
-const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español', fr: 'Français' };
+// Keyed by hreflang value; reference locales come from their registry.
+const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES', ...Object.fromEntries(REFERENCE_LOCALES.map((code) => [REFERENCE_LOCALE_META[code].hreflang, REFERENCE_LOCALE_META[code].short])) };
+const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español', ...Object.fromEntries(REFERENCE_LOCALES.map((code) => [REFERENCE_LOCALE_META[code].hreflang, REFERENCE_LOCALE_META[code].full])) };
+const HREFLANG_TO_CODE: Readonly<Record<string, string>> = { en: 'en', de: 'de', es: 'es', ...Object.fromEntries(REFERENCE_LOCALES.map((code) => [REFERENCE_LOCALE_META[code].hreflang, code])) };
 const publishedLocaleAlternates = alternates.filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang in LOCALE_SHORT_LABELS);
-const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es' | 'fr', label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
-const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang as 'en' | 'de' | 'es' | 'fr', label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
+const headerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: alt.hreflang, label: LOCALE_SHORT_LABELS[alt.hreflang]!, href: alt.href }));
+const drawerLocaleLinks = publishedLocaleAlternates.map((alt) => ({ code: HREFLANG_TO_CODE[alt.hreflang] ?? alt.hreflang, label: LOCALE_FULL_LABELS[alt.hreflang]!, href: alt.href }));
+const refChrome = isReferenceLocale(locale) ? referenceChromeText[locale] : undefined;
+const navTiresHref = entityHubPath('tire-size', locale ?? 'en');
+const navTiresLabel = refChrome?.navTires ?? (locale === 'de' ? 'Reifengrößen' : locale === 'es' ? 'Medidas' : 'Tire sizes');
+const navObdLabel = refChrome?.navObd ?? (locale === 'de' ? 'OBD (Englisch)' : locale === 'es' ? 'OBD (inglés)' : 'Diagnostics');
 const websiteJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Atlas GarageOS', url: SITE_ORIGIN });
 const applicationJsonLd = definition && definition.kind === 'tool' ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebApplication', name: definition.title, description, url: canonical, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', browserRequirements: 'Requires a modern web browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }) : undefined;
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
@@ -77,7 +86,7 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
     <header class="app-header"><div class="app-header__inner">
       <a class="brand" href={homeHref} aria-label="Atlas GarageOS home"><Brand /></a>
       <div class="app-header__actions">
-        <nav class="desktop-nav" aria-label="Primary navigation"><a href={homeHref} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={`${prefix}/tools/`} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href={locale === 'de' ? '/de/reifengroessen/' : locale === 'es' ? '/es/medidas-neumaticos/' : locale === 'fr' ? '/fr/dimensions-pneus/' : '/tire-sizes/'}>{locale === 'de' ? 'Reifengrößen' : locale === 'es' ? 'Medidas' : locale === 'fr' ? 'Dimensions de pneus' : 'Tire sizes'}</a><a href="/obd-codes/" aria-current={active === 'diagnostics' ? 'page' : undefined}>{locale === 'de' ? 'OBD (Englisch)' : locale === 'es' ? 'OBD (inglés)' : locale === 'fr' ? 'OBD (anglais)' : 'Diagnostics'}</a><a href={`${prefix}/fitment-studio/`} aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a><a href={locale === 'de' || locale === 'es' ? `/${locale}/fitment-studio/#garage` : '/fitment-studio/#garage'} aria-current={active === 'garage' ? 'page' : undefined}>{t?.navGarage ?? 'My Garage'}</a></nav>
+        <nav class="desktop-nav" aria-label="Primary navigation"><a href={homeHref} aria-current={active === 'home' ? 'page' : undefined}>{t?.navHome ?? 'Home'}</a><a href={`${prefix}/tools/`} aria-current={active === 'tools' ? 'page' : undefined}>{t?.navTools ?? 'Tools'}</a><a href={navTiresHref}>{navTiresLabel}</a><a href="/obd-codes/" aria-current={active === 'diagnostics' ? 'page' : undefined}>{navObdLabel}</a><a href={`${prefix}/fitment-studio/`} aria-current={active === 'fitment' ? 'page' : undefined}>{t?.navFitment ?? 'Wheel & Tire Compare'}</a><a href={locale === 'de' || locale === 'es' ? `/${locale}/fitment-studio/#garage` : '/fitment-studio/#garage'} aria-current={active === 'garage' ? 'page' : undefined}>{t?.navGarage ?? 'My Garage'}</a></nav>
         <LanguageQuickToggle links={headerLocaleLinks} current={htmlLang} />
         <ThemeQuickToggle />
         <NavigationDrawer locale={locale} localeLinks={drawerLocaleLinks} />

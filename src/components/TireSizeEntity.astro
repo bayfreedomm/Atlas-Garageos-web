@@ -1,4 +1,6 @@
 ---
+import { isReferenceLocale } from '../localization/reference-locales';
+import { referenceChromeText } from '../content/reference-locale-text';
 // Shared body for every tire-size detail page, in every locale.
 //
 // The three route files (/tire-sizes/[slug]/, /de/reifengroessen/[slug]/,
@@ -42,7 +44,7 @@ const boltHubHref = entityHubPath('bolt-pattern', locale);
 const flotation = entry.flotation;
 const rimText = formatPlain(entry.rimDiameterInches, locale);
 const diameterGroup = tireDiameterGroupFor(entry);
-const inchClass = diameterGroup ? (locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : locale === 'fr' ? `${diameterGroup.inches} pouces` : `${diameterGroup.inches} pulgadas`) : '';
+const inchClass = diameterGroup ? (isReferenceLocale(locale) ? referenceChromeText[locale].inchClass(diameterGroup.inches) : locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : `${diameterGroup.inches} pulgadas`) : '';
 const generalFaqs = t.faqs({ notation: shownNotation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
 const faqs = [
   ...t.sizeFaqs(shownNotation, {

@@ -3,7 +3,9 @@ import ThemeControl from './ThemeControl.astro';
 import { chromePrefix, chromeStrings, platformCatalog, type ChromeLocale } from '../localization/site-catalog';
 import { TOOL_CATEGORY_ORDER, type ToolCategory } from '../seo/tool-registry';
 import { referenceCopy, referenceLinks } from '../ui/reference-links';
-interface LocaleLink { readonly code: 'en' | 'de' | 'es' | 'fr'; readonly label: string; readonly href: string; }
+import { isReferenceLocale } from '../localization/reference-locales';
+import { referenceChromeText } from '../content/reference-locale-text';
+interface LocaleLink { readonly code: string; readonly label: string; readonly href: string; }
 interface Props { locale?: ChromeLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
 const { locale, localeLinks } = Astro.props;
 const t = chromeStrings(locale);
@@ -18,15 +20,14 @@ const FALLBACK_CATEGORY_LABELS: Readonly<Record<ToolCategory, string>> = { 'Fuel
 const entityLocale = locale ?? 'en';
 const reference = referenceLinks(entityLocale);
 const refCopy = referenceCopy(entityLocale);
-const chrome = {
+const baseChrome = {
   en: { open: 'Open menu', close: 'Close menu', dialog: 'Atlas menu', main: 'Main navigation', categories: 'Tool categories', reference: 'Reference data', diagnostics: 'Diagnostics', diagnosticsHelper: 'Look up OBD-II codes and next checks' },
   de: { open: 'Menü öffnen', close: 'Menü schließen', dialog: 'Atlas-Menü', main: 'Hauptnavigation', categories: 'Werkzeugkategorien', reference: 'Referenzdaten', diagnostics: 'Diagnose (Englisch)', diagnosticsHelper: 'OBD-II-Fehlercodes nachschlagen' },
   es: { open: 'Abrir menú', close: 'Cerrar menú', dialog: 'Menú de Atlas', main: 'Navegación principal', categories: 'Categorías de herramientas', reference: 'Datos de referencia', diagnostics: 'Diagnóstico (inglés)', diagnosticsHelper: 'Consultar códigos OBD-II' },
-  fr: { open: 'Ouvrir le menu', close: 'Fermer le menu', dialog: 'Menu Atlas', main: 'Navigation principale', categories: 'Catégories d’outils', reference: 'Données de référence', diagnostics: 'Diagnostic (anglais)', diagnosticsHelper: 'Consulter les codes OBD-II' },
-}[entityLocale];
-const FR_CATEGORY_LABELS: Readonly<Record<ToolCategory, string>> = { 'Fuel & Trips': 'Carburant et trajets', 'Tires & Wheels': 'Pneus et jantes', Converters: 'Convertisseurs', Performance: 'Performances' };
-const categoryLabels: Readonly<Record<ToolCategory, string>> = locale === 'fr'
-  ? FR_CATEGORY_LABELS
+};
+const chrome = isReferenceLocale(entityLocale) ? referenceChromeText[entityLocale].drawer : baseChrome[entityLocale];
+const categoryLabels: Readonly<Record<ToolCategory, string>> = isReferenceLocale(locale)
+  ? referenceChromeText[locale].categories
   : locale
   ? Object.fromEntries(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name])) as Record<ToolCategory, string>
   : FALLBACK_CATEGORY_LABELS;

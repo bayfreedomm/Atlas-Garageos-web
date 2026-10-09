@@ -14,11 +14,19 @@
  * publishedLocales() rather than being redefined here, so unpublishing a locale removes its
  * entity pages too.
  */
-import { publishedLocales, type AtlasLocale } from '../localization/locales';
+import { publishedLocales } from '../localization/locales';
+import { REFERENCE_LOCALES, REFERENCE_LOCALE_META, isReferenceLocale, type ReferenceLocale } from '../localization/reference-locales';
 
 export type EntityFamily = 'tire-size' | 'bolt-pattern';
 /** The locales these families actually publish in. Narrower than AtlasLocale by design. */
-export type EntityLocale = 'en' | 'de' | 'es' | 'fr';
+export type EntityLocale = 'en' | 'de' | 'es' | ReferenceLocale;
+/** Locales with their own calculators and tool pages (the reference-only locales link to EN). */
+export type ToolEntityLocale = 'en' | 'de' | 'es';
+
+/** The tool-page locale to link to from an entity page: reference-only locales use English. */
+export function toolLocaleFor(locale: EntityLocale): ToolEntityLocale {
+  return isReferenceLocale(locale) ? 'en' : locale;
+}
 
 /**
  * One localized top-level path segment per family per locale. German follows the compound-noun
@@ -27,30 +35,24 @@ export type EntityLocale = 'en' | 'de' | 'es' | 'fr';
  * 'calculadora-patron-birlos'). Both use the same ASCII transliteration rules as those slugs.
  */
 const ENTITY_SEGMENTS: Readonly<Record<EntityFamily, Readonly<Record<EntityLocale, string>>>> = Object.freeze({
-  'tire-size': Object.freeze({ en: 'tire-sizes', de: 'reifengroessen', es: 'medidas-neumaticos', fr: 'dimensions-pneus' }),
-  'bolt-pattern': Object.freeze({ en: 'bolt-patterns', de: 'lochkreise', es: 'patrones-birlos', fr: 'entraxes' }),
+  'tire-size': Object.freeze({ en: 'tire-sizes', de: 'reifengroessen', es: 'medidas-neumaticos', fr: 'dimensions-pneus', it: 'misure-pneumatici', 'pt-br': 'medidas-pneus', pl: 'rozmiary-opon', nl: 'bandenmaten', tr: 'lastik-ebatlari' }),
+  'bolt-pattern': Object.freeze({ en: 'bolt-patterns', de: 'lochkreise', es: 'patrones-birlos', fr: 'entraxes', it: 'foratura-cerchi', 'pt-br': 'furacao-rodas', pl: 'rozstaw-srub', nl: 'steekmaten', tr: 'bijon-araligi' }),
 });
 
-const ENTITY_LOCALE_ORDER: readonly EntityLocale[] = Object.freeze(['en', 'de', 'es', 'fr']);
+const ENTITY_LOCALE_ORDER: readonly EntityLocale[] = Object.freeze(['en', 'de', 'es', ...REFERENCE_LOCALES]);
 
-function isEntityLocale(code: AtlasLocale): code is EntityLocale {
-  return code === 'en' || code === 'de' || code === 'es' || code === 'fr';
+/**
+ * Locales these families publish in: the published full-site locales (EN/DE/ES) plus every
+ * reference-only locale (see reference-locales.ts), whose calculators stay in English.
+ */
+export function entityLocales(): readonly EntityLocale[] {
+  const published = new Set<string>([...publishedLocales(), ...REFERENCE_LOCALES]);
+  return Object.freeze(ENTITY_LOCALE_ORDER.filter((code) => published.has(code)));
 }
 
-/**
- * Published locales that this route family has localized copy and a URL segment for.
- * Derived from publishedLocales() so pt-br/fr (published: false) can never leak in.
- */
-/**
- * Locales whose reference families (tire sizes, bolt patterns) are published ahead of the full
- * site translation. French has complete, reviewed copy for these two families and a French
- * home; its calculators stay unpublished (published: false in locales.ts) until translated.
- */
-const ENTITY_FAMILY_ONLY_LOCALES: readonly EntityLocale[] = Object.freeze(['fr']);
-
-export function entityLocales(): readonly EntityLocale[] {
-  const published = new Set<string>([...publishedLocales(), ...ENTITY_FAMILY_ONLY_LOCALES]);
-  return Object.freeze(ENTITY_LOCALE_ORDER.filter((code) => published.has(code) && isEntityLocale(code)));
+/** hreflang value for an entity locale (pt-br → pt-BR). */
+export function entityHreflang(locale: EntityLocale): string {
+  return isReferenceLocale(locale) ? REFERENCE_LOCALE_META[locale].hreflang : locale;
 }
 
 export function entitySegment(family: EntityFamily, locale: EntityLocale): string {
@@ -75,7 +77,7 @@ export function entityAlternates(family: EntityFamily, slug?: string): readonly 
   const href = (locale: EntityLocale): string =>
     `${SITE}${slug === undefined ? entityHubPath(family, locale) : entityDetailPath(family, locale, slug)}`;
   return Object.freeze([
-    ...entityLocales().map((locale) => ({ hreflang: locale, href: href(locale) })),
+    ...entityLocales().map((locale) => ({ hreflang: entityHreflang(locale), href: href(locale) })),
     { hreflang: 'x-default', href: href('en') },
   ]);
 }

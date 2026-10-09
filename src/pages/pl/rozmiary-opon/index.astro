@@ -1,0 +1,11 @@
+---
+// Localized tire-size hub (pl). The listing lives in TireSizeHubBody.astro.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import TireSizeHubBody from '../../../components/TireSizeHubBody.astro';
+import { tireSizeHubMeta } from '../../../ui/entity-page-model';
+
+const meta = tireSizeHubMeta('pl');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="pl" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <TireSizeHubBody locale="pl" />
+</SiteLayout>

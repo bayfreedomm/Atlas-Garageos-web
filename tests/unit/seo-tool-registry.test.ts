@@ -7,6 +7,8 @@ import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
 import { entityLocales } from '../../src/seo/entity-routes';
 import { dtcRecords } from '../../src/data/dtc-records';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
+import { boltMakes } from '../../src/ui/bolt-make';
+import { carMakes, carModels, yearPageYears } from '../../src/data/cars';
 
 const intendedRoutes = [
   '/',
@@ -81,13 +83,15 @@ describe('SEO tool registry', () => {
     // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
     // hand-maintained page count.
-    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length);
+    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
     // Diagnostics adds one directory plus exactly one page per record that passed the production
     // catalog publication gate. Draft fixtures and arbitrary input state never reach the sitemap.
     const diagnosticRoutes = 1 + dtcRecords.length;
-    // French publishes its reference families plus one French home (/fr/).
-    const frenchRoutes = 1;
-    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + frenchRoutes;
+    // Each reference-only locale (fr, it, pt-br, pl, nl, tr) publishes its reference families plus one home.
+    const frenchRoutes = 6;
+    // English /cars/ family: directory, makes, models and EPA model years from 2000.
+    const carRoutes = 1 + carMakes.length + carModels.length + carModels.reduce((total, model) => total + yearPageYears(model).length, 0);
+    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + frenchRoutes + carRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');

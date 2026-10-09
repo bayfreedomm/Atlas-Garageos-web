@@ -1,0 +1,23 @@
+---
+// Directory of every make in the /cars/ reference.
+import SiteLayout from '../../components/SiteLayout.astro';
+import { ANKUSI_SOURCE, EPA_SOURCE, carMakePath, carMakes, carModels } from '../../data/cars';
+
+const pathname = '/cars/';
+const yearPages = carModels.reduce((total, model) => total + Object.keys(model.epa).length, 0);
+const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+---
+<SiteLayout title="Car MPG, Bolt Patterns and Wheel Sizes by Make" description={`EPA fuel economy for ${carModels.length.toLocaleString('en-US')} car models and ${yearPages.toLocaleString('en-US')} model years, plus bolt pattern, center bore and wheel sizes — from open government and fitment data.`} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: pathname }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Cars</span></nav>
+  <header class="entity-hero">
+    <p class="eyebrow">{carMakes.length} makes · {carModels.length.toLocaleString('en-US')} models</p>
+    <h1 class="entity-hero__title">Car MPG, bolt patterns and wheel sizes</h1>
+    <p class="entity-hero__lead">EPA fuel economy for every version of each model year, annual fuel cost at today's gas price, and bolt pattern, center bore and wheel sizes per model.</p>
+  </header>
+  <section class="entity-section" aria-label="Makes">
+    <ul class="entity-chiplist">
+      {carMakes.map((make) => <li><a class="entity-chip" href={carMakePath(make.makeSlug)}>{make.make} · {make.models.length}</a></li>)}
+    </ul>
+    <p class="entity-note">Sources: <a href={EPA_SOURCE.url} rel="noopener">{EPA_SOURCE.name}</a>; <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a>.</p>
+  </section>
+</SiteLayout>

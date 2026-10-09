@@ -1562,3 +1562,13 @@ body.has-expanded-3d{overflow:hidden}
 }
 .tool-faqs__item dd,.tool-faqs__item dt{font-family:var(--font-sans)!important}
 p>.entity-confidence{white-space:normal;max-width:100%}
+/* Makes using a bolt pattern (ANKUSI data) */
+.entity-makelist{list-style:none;margin:.5rem 0 0;padding:0;display:grid;gap:.45rem}
+.entity-makelist li{line-height:1.45;font-size:var(--text-sm);color:var(--color-ink-muted);overflow-wrap:anywhere}
+.entity-makelist strong{color:var(--color-ink)}
+/* Car year table: city/highway shown under the combined figure only when their columns are hidden */
+.car-cityhwy{display:none}
+@media (max-width:47.99rem){.car-cityhwy{display:block;font-size:.72rem}}
+.car-mpg-table tbody th{white-space:normal}
+.car-mpg-table tbody th .entity-card__meta{display:block;font-weight:500}
+@media (max-width:47.99rem){.car-mpg-table{table-layout:auto;width:100%}.car-mpg-table tbody th{min-width:0}}

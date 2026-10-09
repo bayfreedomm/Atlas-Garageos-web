@@ -1,6 +1,8 @@
 import type { ToolId } from '../seo/tool-registry';
 import { deToolCatalog, type ToolCatalogEntry } from './catalogs/de.tool-catalog';
 import { esToolCatalog } from './catalogs/es.tool-catalog';
+import { REFERENCE_LOCALE_META, isReferenceLocale, type ReferenceLocale } from './reference-locales';
+import { referenceChromeText } from '../content/reference-locale-text';
 
 export type ContentLocale = 'de' | 'es';
 export const CONTENT_LOCALES: readonly ContentLocale[] = ['de', 'es'];
@@ -124,59 +126,25 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
 });
 
 /**
- * French publishes only the reference families (tire sizes, bolt patterns) plus a French home.
- * Its page chrome is French; links to calculators, the fitment studio and policy pages go to
- * the English pages and say so.
+ * Reference-only locales (fr, it, pt-br, pl, nl, tr) publish the reference families (tire
+ * sizes, bolt patterns, vehicles) plus a localized home. Their page chrome is localized; links
+ * to calculators, the fitment studio and policy pages go to the English pages and say so.
  */
-export type ChromeLocale = ContentLocale | 'fr';
-
-export const frUiStrings: UiStrings = Object.freeze({
-  skipToContent: 'Aller au contenu principal',
-  navHome: 'Accueil',
-  navTools: 'Outils (anglais)',
-  navFitment: 'Comparateur (anglais)',
-  navGarage: 'Mon garage (anglais)',
-  breadcrumbHome: 'Accueil',
-  breadcrumbTools: 'Outils',
-  allToolsBack: '← Tous les outils',
-  seeWhatNumbersLabel: 'CE QUE DISENT LES CHIFFRES',
-  howItWorks: 'Fonctionnement',
-  keepInMind: 'À retenir',
-  relatedTools: 'Outils associés',
-  advancedWheelTireTool: 'Outil avancé jantes et pneus',
-  quickUnderstanding: 'En bref',
-  whatMattersHere: 'Ce qui compte ici',
-  commonMistakeLabel: 'Erreur fréquente',
-  importantWarningLabel: 'Avertissement important',
-  faqHeading: 'Questions fréquentes',
-  footerTagline: 'Calculateurs auto rapides et honnêtes. Sans compte, sans superflu.',
-  footerToolbox: 'Boîte à outils (anglais)',
-  footerFitment: 'Comparateur jantes et pneus (anglais)',
-  footerMethodology: 'Précision et méthode (anglais)',
-  footerPrivacy: 'Confidentialité (anglais)',
-  footerFuelPrices: 'Prix des carburants (anglais)',
-  footerContact: 'Contact (anglais)',
-  footerCopy: '© {year} Atlas GarageOS. Tous les calculs sont des estimations — vérifiez toute valeur liée à la sécurité dans le manuel de votre véhicule.',
-  langLabel: 'Langue',
-  langSwitchAria: 'Changer de langue',
-  goStraightTo: 'ALLER DIRECTEMENT À',
-  navHomeHelper: 'Dimensions de pneus, entraxes et recherche de taille',
-  allToolsTitle: 'Tous les outils (anglais)',
-  allToolsHelper: 'Calculateurs et convertisseurs, en anglais',
-  fitmentHelper: 'Comparer deux montes visuellement',
-  garageHelper: 'Vos véhicules et montes enregistrés',
-  toolsByJob: 'OUTILS PAR BESOIN (ANGLAIS)',
-  displayLabel: 'AFFICHAGE',
-});
+export type ChromeLocale = ContentLocale | ReferenceLocale;
 
 export function chromeStrings(locale: ChromeLocale | undefined): UiStrings | undefined {
-  if (locale === 'fr') return frUiStrings;
+  if (isReferenceLocale(locale)) return referenceChromeText[locale].ui;
   return locale ? uiStrings[locale] : undefined;
 }
 
-/** Path prefix for pages that exist per locale (tools, fitment studio, policies): FR uses EN. */
+/** Path prefix for pages that exist per locale (tools, fitment studio, policies): reference locales use EN. */
 export function chromePrefix(locale: ChromeLocale | undefined): string {
   return locale === 'de' || locale === 'es' ? `/${locale}` : '';
+}
+
+/** <html lang> for a chrome locale (pt-br → pt-BR). */
+export function chromeHtmlLang(locale: ChromeLocale): string {
+  return isReferenceLocale(locale) ? REFERENCE_LOCALE_META[locale].htmlLang : locale;
 }
 
 export interface PlatformPageCopy {

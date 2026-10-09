@@ -1,4 +1,9 @@
 ---
+import { boltMakePath, makesUsingPattern } from '../ui/bolt-make';
+import { boltMakeText } from '../content/bolt-make-text';
+import { isReferenceLocale } from '../localization/reference-locales';
+import { referenceChromeText } from '../content/reference-locale-text';
+import { toolLocaleFor } from '../seo/entity-routes';
 // Shared body for every bolt-pattern detail page, in every locale. Same contract as
 // TireSizeEntity.astro: one copy of the markup, three thin getStaticPaths() route wrappers.
 //
@@ -29,7 +34,7 @@ interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocal
 const { entry, locale } = Astro.props;
 
 const t = boltPatternPageText[locale];
-const load3d = { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo', fr: 'Ouvrir l’entraxe en 3D interactif' }[locale];
+const load3d = isReferenceLocale(locale) ? referenceChromeText[locale].load3d : { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo' }[locale];
 const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
 const spacingValue = `${formatDecimal(spacingMm, 2, locale)} mm`;
@@ -53,6 +58,8 @@ const metricRows = [
   { label: t.metrics.centerBore, value: boreLabel },
 ];
 const decisions = boltDecisionGraph(entry, locale);
+const usedBy = makesUsingPattern(entry.notation);
+const makeText = boltMakeText[locale];
 ---
 <nav class="breadcrumbs" aria-label="Breadcrumb">
   <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
@@ -130,6 +137,16 @@ const decisions = boltDecisionGraph(entry, locale);
   )}
 </section>
 
+{usedBy.length > 0 && (
+  <section class="entity-section" aria-labelledby="entity-usedby">
+    <h2 id="entity-usedby">{makeText.usedByHeading(entry.notation)}</h2>
+    <p class="entity-note">{makeText.usedByIntro}</p>
+    <ul class="entity-makelist">
+      {usedBy.slice(0, 40).map((item) => <li><a href={boltMakePath(locale, item.make.makeSlug)}><strong>{item.make.make}</strong></a> <span>{item.models.slice(0, 12).join(', ')}{item.models.length > 12 ? ' …' : ''}</span></li>)}
+    </ul>
+  </section>
+)}
+
 <section class="entity-section" aria-labelledby="entity-diagram">
   <h2 id="entity-diagram">{t.diagramHeading}</h2>
   <BoltPatternDiagram
@@ -142,7 +159,7 @@ const decisions = boltDecisionGraph(entry, locale);
   />
   <details class="visual-on-demand">
     <summary>{load3d}</summary>
-    <Parametric3DPanel mode="pcd" locale={locale === 'fr' ? 'en' : locale} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
+    <Parametric3DPanel mode="pcd" locale={toolLocaleFor(locale)} lugCount={entry.lugCount} pcdMm={entry.pcdMm} centerBoreMm={singleCenterBore} />
   </details>
   <p class="entity-note">{t.diagramNote(entry.lugCount, entry.pcdMm)}</p>
 </section>

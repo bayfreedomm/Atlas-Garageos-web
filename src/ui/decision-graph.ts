@@ -2,7 +2,7 @@ import type { VehicleFitment } from '../data/vehicle-fitment';
 import { parseTireNotation, tireSizeSlug, type TireSizeEntry } from '../data/tire-size-catalog';
 import { boltPatternCatalog, boltPatternSlug, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
 import { localizedToolPath } from '../localization/locales';
-import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
+import { entityDetailPath, toolLocaleFor, type EntityLocale } from '../seo/entity-routes';
 import { boltPatternCalculatorHref, tireCalculatorHref, tireComparisonHref, toolLocale, vehicleHubPath } from './entity-page-model';
 import { vehicleComparisonHref, vehicleTripHref } from './vehicle-comparison';
 
@@ -182,13 +182,218 @@ const COPY: Readonly<Record<EntityLocale, DecisionCopy>> = {
       offset: ['Comparer largeur de jante et déport (en anglais)', 'Position intérieure et débord extérieur calculés séparément.'],
       setup: ['Comparer jante et pneu (en anglais)', 'Vérifier l’ensemble ; un même entraxe ne suffit pas.'],
       tires: ['Voir les tailles de pneus associées', 'Suivre les véhicules documentés vers leurs tailles d’origine.'],
-      directory: ['Ouvrir la référence véhicules (en anglais)', 'Partir d’une marque et d’un modèle documentés.'],
+      directory: ['Ouvrir la référence véhicules', 'Partir d’une marque et d’un modèle documentés.'],
       caution: 'Un entraxe identique ne prouve pas la compatibilité. Alésage, déport, largeur de jante, dégagement des freins, visserie et exigences du véhicule comptent aussi.',
     },
     fuel: {
       cost: ['Calculer le coût en carburant', 'Prix, consommation et distance en coût de trajet.'],
       trip: ['Calculer un trajet', 'Distance, extras et coût par personne.'],
       vehicles: ['Partir d’un véhicule documenté', 'Choisir une référence puis saisir sa consommation réelle.'],
+    },
+  },
+  'it': {
+    eyebrow: 'Passi successivi', heading: 'Cosa verificare dopo', support: 'Altre verifiche',
+    intros: {
+      vehicle: 'Passare dai dati di riferimento al calcolo che risponde alla prossima domanda.',
+      tire: 'Partire dalla geometria nota, poi confrontare prima di qualsiasi decisione di montaggio.',
+      bolt: 'Considerare la foratura come un elemento di una verifica più ampia del cerchio.',
+      fuel: 'Trasformare il prezzo pubblicato in un costo per il proprio viaggio.',
+    },
+    vehicle: {
+      tire: ['Apri la misura di riferimento', 'Diametro, spalla, circonferenza e veicoli che la usano.'],
+      bolt: ['Apri la foratura / PCD', 'Geometria dei fori, fori centrali e altri veicoli.'],
+      compare: ['Confronta con un altro veicolo (in inglese)', 'Differenze documentate di cerchi e pneumatici, senza classifiche.'],
+      setup: ['Confronta cerchio e pneumatico (in inglese)', 'Geometria di pneumatico, cerchio e spazio libero, senza promesse di compatibilità.'],
+      trip: ['Stima il costo di un viaggio (in inglese)', 'Distanza, consumi, extra e ripartizione tra passeggeri.'],
+      tireCalc: ['Calcola questa misura (in inglese)', 'Apre il calcolatore precompilato con la misura di riferimento.'],
+      tireCompare: ['Confronta questa misura (in inglese)', 'Precompila la misura attuale e ne prova un’altra.'],
+      boltCalc: ['Misura questa foratura (in inglese)', 'Precompila il numero di fori e la distanza tra due fori.'],
+      fuel: ['Calcola il costo del carburante (in inglese)', 'Inserire il consumo reale; Atlas non lo inventa.'],
+    },
+    tire: {
+      compare: ['Confronta questa misura (in inglese)', 'Diametro ed effetto sul tachimetro, misura precompilata.'],
+      calculate: ['Apri il calcolatore di misure (in inglese)', 'La stessa geometria nominale, in modo interattivo.'],
+      vehicles: ['Vedi i veicoli con questa misura', 'Vai ai veicoli documentati da Atlas qui sotto.'],
+      pcd: ['Vedi le forature correlate', 'Seguire i veicoli fino alle loro forature e ai fori centrali.'],
+      caution: 'Una misura geometricamente simile non è un montaggio omologato. Indice di carico, codice di velocità, larghezza del cerchio, spazio libero, omologazione del costruttore e normativa locale restano decisivi.',
+    },
+    bolt: {
+      vehicles: ['Vedi i veicoli con questa foratura', 'Veicoli documentati e fori centrali.'],
+      measure: ['Apri il calcolatore di foratura (in inglese)', 'Numero di fori e distanza tra i fori precompilati.'],
+      offset: ['Confronta larghezza del cerchio e offset (in inglese)', 'Posizione interna e sporgenza esterna calcolate separatamente.'],
+      setup: ['Confronta cerchio e pneumatico (in inglese)', 'Verificare l’insieme; la stessa foratura non basta.'],
+      tires: ['Vedi le misure di pneumatici correlate', 'Seguire i veicoli documentati fino alle loro misure di serie.'],
+      directory: ['Apri il riferimento veicoli', 'Partire da una marca e un modello documentati.'],
+      caution: 'Una foratura identica non dimostra la compatibilità. Contano anche foro centrale, offset, larghezza del cerchio, spazio per i freni, bulloneria e requisiti del veicolo.',
+    },
+    fuel: {
+      cost: ['Calcola il costo del carburante', 'Prezzo, consumo e distanza trasformati in costo del viaggio.'],
+      trip: ['Calcola un viaggio', 'Distanza, extra e costo a persona.'],
+      vehicles: ['Parti da un veicolo documentato', 'Scegliere un riferimento, poi inserire il suo consumo reale.'],
+    },
+  },
+  'pt-br': {
+    eyebrow: 'Próximos passos', heading: 'O que verificar em seguida', support: 'Outras verificações',
+    intros: {
+      vehicle: 'Passe dos dados de referência ao cálculo que responde à sua próxima pergunta.',
+      tire: 'Parta da geometria conhecida e compare antes de qualquer decisão de montagem.',
+      bolt: 'Trate a furação como um item de uma verificação de roda mais ampla.',
+      fuel: 'Transforme o preço publicado em custo para a sua viagem.',
+    },
+    vehicle: {
+      tire: ['Abrir a medida de referência', 'Diâmetro, flanco, circunferência e veículos que a usam.'],
+      bolt: ['Abrir a furação / PCD', 'Geometria dos furos, furos centrais e outros veículos.'],
+      compare: ['Comparar com outro veículo (em inglês)', 'Diferenças documentadas de rodas e pneus, sem ranking.'],
+      setup: ['Comparar roda e pneu (em inglês)', 'Geometria de pneu, roda e folga, sem promessa de compatibilidade.'],
+      trip: ['Estimar o custo de uma viagem (em inglês)', 'Distância, consumo, extras e divisão entre passageiros.'],
+      tireCalc: ['Calcular esta medida (em inglês)', 'Abrir a calculadora já preenchida com a medida de referência.'],
+      tireCompare: ['Comparar esta medida (em inglês)', 'Preencher a medida atual e testar outra.'],
+      boltCalc: ['Medir esta furação (em inglês)', 'Preencher o número de furos e a distância entre dois furos.'],
+      fuel: ['Calcular o custo de combustível (em inglês)', 'Informe seu consumo real; a Atlas não o inventa.'],
+    },
+    tire: {
+      compare: ['Comparar esta medida (em inglês)', 'Diâmetro e efeito no velocímetro, com a medida já preenchida.'],
+      calculate: ['Abrir a calculadora de medida (em inglês)', 'A mesma geometria nominal, de forma interativa.'],
+      vehicles: ['Ver os veículos com esta medida', 'Ir aos veículos documentados pela Atlas abaixo.'],
+      pcd: ['Ver as furações relacionadas', 'Seguir os veículos até suas furações e furos centrais.'],
+      caution: 'Uma medida geometricamente próxima não é uma montagem homologada. Índice de carga, índice de velocidade, largura da roda, folga, homologação do fabricante e legislação local continuam decisivos.',
+    },
+    bolt: {
+      vehicles: ['Ver os veículos com esta furação', 'Veículos documentados e furos centrais.'],
+      measure: ['Abrir a calculadora de furação (em inglês)', 'Número de furos e distância entre furos já preenchidos.'],
+      offset: ['Comparar largura da roda e offset (em inglês)', 'Posição interna e projeção externa calculadas separadamente.'],
+      setup: ['Comparar roda e pneu (em inglês)', 'Verificar o conjunto; a mesma furação não basta.'],
+      tires: ['Ver as medidas de pneus relacionadas', 'Seguir os veículos documentados até suas medidas originais.'],
+      directory: ['Abrir a referência de veículos', 'Partir de uma marca e um modelo documentados.'],
+      caution: 'Uma furação idêntica não prova compatibilidade. Furo central, offset, largura da roda, folga dos freios, fixadores e exigências do veículo também importam.',
+    },
+    fuel: {
+      cost: ['Calcular o custo de combustível', 'Preço, consumo e distância convertidos em custo da viagem.'],
+      trip: ['Calcular uma viagem', 'Distância, extras e custo por pessoa.'],
+      vehicles: ['Partir de um veículo documentado', 'Escolher uma referência e informar seu consumo real.'],
+    },
+  },
+  'pl': {
+    eyebrow: 'Kolejne kroki', heading: 'Co sprawdzić dalej', support: 'Inne sprawdzenia',
+    intros: {
+      vehicle: 'Przejdź od danych referencyjnych do obliczenia, które odpowie na kolejne pytanie.',
+      tire: 'Zacznij od znanej geometrii, a przed decyzją o montażu porównaj rozmiary.',
+      bolt: 'Rozstaw śrub to tylko jeden element szerszej weryfikacji felgi.',
+      fuel: 'Przelicz opublikowaną cenę na koszt przejazdu.',
+    },
+    vehicle: {
+      tire: ['Otwórz rozmiar referencyjny', 'Średnica, bok, obwód i pojazdy z tym rozmiarem.'],
+      bolt: ['Otwórz rozstaw śrub / PCD', 'Geometria otworów, otwory centralne i inne pojazdy.'],
+      compare: ['Porównaj z innym pojazdem (po angielsku)', 'Udokumentowane różnice kół i opon, bez rankingu.'],
+      setup: ['Porównaj felgę i oponę (po angielsku)', 'Geometria opony, felgi i luzów, bez obietnicy zgodności.'],
+      trip: ['Oszacuj koszt przejazdu (po angielsku)', 'Dystans, zużycie, dodatki i podział między pasażerów.'],
+      tireCalc: ['Oblicz ten rozmiar (po angielsku)', 'Kalkulator z wpisanym rozmiarem referencyjnym.'],
+      tireCompare: ['Porównaj ten rozmiar (po angielsku)', 'Obecny rozmiar już wpisany — przetestuj inny.'],
+      boltCalc: ['Zmierz ten rozstaw (po angielsku)', 'Liczba otworów i odstęp między dwoma otworami już wpisane.'],
+      fuel: ['Oblicz koszt paliwa (po angielsku)', 'Wpisz rzeczywiste zużycie; Atlas go nie wymyśla.'],
+    },
+    tire: {
+      compare: ['Porównaj ten rozmiar (po angielsku)', 'Średnica i wpływ na prędkościomierz, rozmiar już wpisany.'],
+      calculate: ['Otwórz kalkulator rozmiaru (po angielsku)', 'Ta sama geometria nominalna, interaktywnie.'],
+      vehicles: ['Zobacz pojazdy z tym rozmiarem', 'Przejdź do pojazdów udokumentowanych przez Atlas poniżej.'],
+      pcd: ['Zobacz powiązane rozstawy śrub', 'Od pojazdów do ich rozstawów i otworów centralnych.'],
+      caution: 'Rozmiar geometrycznie zbliżony nie jest homologowanym zamiennikiem. Indeks nośności, indeks prędkości, szerokość felgi, luzy, homologacja producenta i lokalne przepisy pozostają decydujące.',
+    },
+    bolt: {
+      vehicles: ['Zobacz pojazdy z tym rozstawem', 'Udokumentowane pojazdy i otwory centralne.'],
+      measure: ['Otwórz kalkulator rozstawu śrub (po angielsku)', 'Liczba otworów i odstęp między nimi już wpisane.'],
+      offset: ['Porównaj szerokość felgi i odsadzenie (po angielsku)', 'Położenie wewnętrzne i wysunięcie na zewnątrz liczone osobno.'],
+      setup: ['Porównaj felgę i oponę (po angielsku)', 'Sprawdź całość; ten sam rozstaw nie wystarczy.'],
+      tires: ['Zobacz powiązane rozmiary opon', 'Od udokumentowanych pojazdów do ich fabrycznych rozmiarów.'],
+      directory: ['Otwórz bazę pojazdów', 'Zacznij od udokumentowanej marki i modelu.'],
+      caution: 'Identyczny rozstaw śrub nie dowodzi zgodności. Liczą się też otwór centralny, odsadzenie, szerokość felgi, luz dla hamulców, elementy mocujące i wymagania pojazdu.',
+    },
+    fuel: {
+      cost: ['Oblicz koszt paliwa', 'Cena, zużycie i dystans przeliczone na koszt przejazdu.'],
+      trip: ['Oblicz przejazd', 'Dystans, dodatki i koszt na osobę.'],
+      vehicles: ['Zacznij od udokumentowanego pojazdu', 'Wybierz pojazd referencyjny, a potem wpisz jego rzeczywiste zużycie.'],
+    },
+  },
+  'nl': {
+    eyebrow: 'Volgende stappen', heading: 'Wat u hierna controleert', support: 'Meer controles',
+    intros: {
+      vehicle: 'Ga van referentiegegevens naar de berekening die uw volgende vraag beantwoordt.',
+      tire: 'Begin bij de bekende geometrie en vergelijk vóór elke montagebeslissing.',
+      bolt: 'Zie de steekmaat als één onderdeel van een bredere velgcontrole.',
+      fuel: 'Zet de gepubliceerde prijs om in kosten voor uw rit.',
+    },
+    vehicle: {
+      tire: ['Referentiemaat openen', 'Diameter, wang, omtrek en voertuigen die deze maat gebruiken.'],
+      bolt: ['Steekmaat / PCD openen', 'Gatengeometrie, naafgaten en andere voertuigen.'],
+      compare: ['Vergelijken met een ander voertuig (in het Engels)', 'Gedocumenteerde verschillen in velgen en banden, zonder rangorde.'],
+      setup: ['Velg en band vergelijken (in het Engels)', 'Geometrie van band, velg en vrije ruimte, zonder belofte van compatibiliteit.'],
+      trip: ['Kosten van een rit schatten (in het Engels)', 'Afstand, verbruik, extra kosten en verdeling over passagiers.'],
+      tireCalc: ['Deze maat berekenen (in het Engels)', 'De calculator openen met de referentiemaat ingevuld.'],
+      tireCompare: ['Deze maat vergelijken (in het Engels)', 'De huidige maat invullen en een andere testen.'],
+      boltCalc: ['Deze steekmaat meten (in het Engels)', 'Aantal gaten en afstand tussen twee gaten vooraf ingevuld.'],
+      fuel: ['Brandstofkosten berekenen (in het Engels)', 'Voer uw werkelijke verbruik in; Atlas verzint het niet.'],
+    },
+    tire: {
+      compare: ['Deze maat vergelijken (in het Engels)', 'Diameter en effect op de snelheidsmeter, maat vooraf ingevuld.'],
+      calculate: ['Bandenmaatcalculator openen (in het Engels)', 'Dezelfde nominale geometrie, interactief.'],
+      vehicles: ['Voertuigen met deze maat bekijken', 'Naar de door Atlas gedocumenteerde voertuigen hieronder.'],
+      pcd: ['Bijbehorende steekmaten bekijken', 'Volg de voertuigen naar hun steekmaten en naafgaten.'],
+      caution: 'Een geometrisch vergelijkbare maat is geen goedgekeurde montage. Belastingsindex, snelheidsindex, velgbreedte, vrije ruimte, goedkeuring door de fabrikant en lokale regelgeving blijven doorslaggevend.',
+    },
+    bolt: {
+      vehicles: ['Voertuigen met deze steekmaat bekijken', 'Gedocumenteerde voertuigen en naafgaten.'],
+      measure: ['Steekmaatcalculator openen (in het Engels)', 'Aantal gaten en gatafstand vooraf ingevuld.'],
+      offset: ['Velgbreedte en ET vergelijken (in het Engels)', 'Positie aan de binnenkant en uitsteek aan de buitenkant apart berekend.'],
+      setup: ['Velg en band vergelijken (in het Engels)', 'Controleer het geheel; dezelfde steekmaat is niet genoeg.'],
+      tires: ['Bijbehorende bandenmaten bekijken', 'Volg de gedocumenteerde voertuigen naar hun originele maten.'],
+      directory: ['Voertuigreferentie openen', 'Begin bij een gedocumenteerd merk en model.'],
+      caution: 'Een identieke steekmaat bewijst geen compatibiliteit. Naafgat, inpersdiepte, velgbreedte, vrije ruimte voor de remmen, bevestigingsmateriaal en voertuigspecifieke eisen tellen ook mee.',
+    },
+    fuel: {
+      cost: ['Brandstofkosten berekenen', 'Prijs, verbruik en afstand omgezet in ritkosten.'],
+      trip: ['Een rit berekenen', 'Afstand, extra kosten en kosten per persoon.'],
+      vehicles: ['Beginnen bij een gedocumenteerd voertuig', 'Kies een referentie en voer het werkelijke verbruik in.'],
+    },
+  },
+  'tr': {
+    eyebrow: 'Sonraki adımlar', heading: 'Sırada ne kontrol edilmeli?', support: 'Diğer kontroller',
+    intros: {
+      vehicle: 'Referans verilerden, bir sonraki sorunuzu yanıtlayan hesaplamaya geçin.',
+      tire: 'Bilinen geometriden yola çıkın, ardından montaj kararı vermeden önce karşılaştırın.',
+      bolt: 'Bijon aralığını, daha kapsamlı bir jant uyum kontrolünün bir parçası olarak ele alın.',
+      fuel: 'Yayımlanan fiyatı yolculuğunuzun maliyetine dönüştürün.',
+    },
+    vehicle: {
+      tire: ['Referans ebadı açın', 'Çap, yanak, çevre ve bu ebadı kullanan araçlar.'],
+      bolt: ['Bijon aralığını / PCD’yi açın', 'Delik geometrisi, göbek çapları ve diğer araçlar.'],
+      compare: ['Başka bir araçla karşılaştırın (İngilizce)', 'Jant ve lastiklerdeki belgelenmiş farklar, sıralama yapmadan.'],
+      setup: ['Jant ve lastiği karşılaştırın (İngilizce)', 'Lastik, jant ve boşluk geometrisi; uyumluluk vaadi olmadan.'],
+      trip: ['Yolculuk maliyetini tahmin edin (İngilizce)', 'Mesafe, tüketim, ek giderler ve yolcular arasında paylaşım.'],
+      tireCalc: ['Bu ebadı hesaplayın (İngilizce)', 'Hesaplayıcıyı referans ebat önceden girilmiş olarak açın.'],
+      tireCompare: ['Bu ebadı karşılaştırın (İngilizce)', 'Mevcut ebadı önceden girin ve başka bir ebadı deneyin.'],
+      boltCalc: ['Bu bijon aralığını ölçün (İngilizce)', 'Bijon sayısı ve iki delik arası mesafe önceden girilir.'],
+      fuel: ['Yakıt maliyetini hesaplayın (İngilizce)', 'Gerçek tüketiminizi girin; Atlas bunu uydurmaz.'],
+    },
+    tire: {
+      compare: ['Bu ebadı karşılaştırın (İngilizce)', 'Çap ve kilometre saatine etkisi, ebat önceden girilmiş.'],
+      calculate: ['Ebat hesaplayıcısını açın (İngilizce)', 'Aynı nominal geometri, etkileşimli olarak.'],
+      vehicles: ['Bu ebadı kullanan araçları görün', 'Aşağıdaki Atlas tarafından belgelenmiş araçlara gidin.'],
+      pcd: ['İlgili bijon aralıklarını görün', 'Araçlardan bijon aralıklarına ve göbek çaplarına geçin.'],
+      caution: 'Geometrik olarak yakın bir ebat, onaylı bir montaj değildir. Yük endeksi, hız endeksi, jant genişliği, boşluk, üretici onayı ve yerel mevzuat belirleyici olmaya devam eder.',
+    },
+    bolt: {
+      vehicles: ['Bu bijon aralığına sahip araçları görün', 'Belgelenmiş araçlar ve göbek çapları.'],
+      measure: ['Bijon aralığı hesaplayıcısını açın (İngilizce)', 'Bijon sayısı ve iki delik arası mesafe önceden girilir.'],
+      offset: ['Jant genişliği ve ofseti karşılaştırın (İngilizce)', 'İç konum ve dış taşma ayrı ayrı hesaplanır.'],
+      setup: ['Jant ve lastiği karşılaştırın (İngilizce)', 'Bütünü kontrol edin; aynı bijon aralığı tek başına yetmez.'],
+      tires: ['İlgili lastik ebatlarını görün', 'Belgelenmiş araçlardan orijinal lastik ebatlarına geçin.'],
+      directory: ['Araç referansını açın', 'Belgelenmiş bir marka ve modelden başlayın.'],
+      caution: 'Aynı bijon aralığı uyumluluğu kanıtlamaz. Göbek çapı, ofset, jant genişliği, fren boşluğu, bağlantı elemanları ve araca özgü gereksinimler de önemlidir.',
+    },
+    fuel: {
+      cost: ['Yakıt maliyetini hesaplayın', 'Fiyat, tüketim ve mesafeden yolculuk maliyeti.'],
+      trip: ['Bir yolculuğu hesaplayın', 'Mesafe, ek giderler ve kişi başı maliyet.'],
+      vehicles: ['Belgelenmiş bir araçtan başlayın', 'Bir referans seçin, ardından gerçek tüketimini girin.'],
     },
   },
 };
@@ -198,7 +403,7 @@ const makeAction = (id: string, href: string, text: Pair): DecisionAction => Obj
 // The Fitment Studio flagship app keeps the same unprefixed slug in every locale (unlike
 // calculators, which get a fully localized slug from localizedToolPath), so it needs its own
 // locale-prefix-only path here rather than a bare '/fitment-studio/'.
-const fitmentStudioHref = (locale: EntityLocale): string => (locale === 'en' || locale === 'fr' ? '/fitment-studio/' : `/${locale}/fitment-studio/`);
+const fitmentStudioHref = (locale: EntityLocale): string => (toolLocaleFor(locale) === 'en' ? '/fitment-studio/' : `/${locale}/fitment-studio/`);
 
 function tireEntryForVehicle(vehicle: VehicleFitment): TireSizeEntry {
   const parsed = parseTireNotation(vehicle.tireSize);

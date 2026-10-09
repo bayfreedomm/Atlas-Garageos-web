@@ -40,10 +40,10 @@ const vehicleJsonLd = serializeJsonLd({
   model: vehicle.model,
   vehicleModelDate: vehicle.generation,
   additionalProperty: [
-    { '@type': 'PropertyValue', name: 'Taille de pneu', value: vehicle.tireSize },
-    { '@type': 'PropertyValue', name: 'Entraxe', value: vehicle.boltPattern },
-    { '@type': 'PropertyValue', name: 'Taille de jante', value: vehicle.wheelSize },
-    ...torqueJsonLdProperty(vehicle, 'Couple de serrage (Nm)'),
+    { '@type': 'PropertyValue', name: t.tireSize, value: vehicle.tireSize },
+    { '@type': 'PropertyValue', name: t.boltPattern, value: vehicle.boltPattern },
+    { '@type': 'PropertyValue', name: t.wheelSize, value: vehicle.wheelSize },
+    ...torqueJsonLdProperty(vehicle, `${t.torque} (Nm)`),
   ],
 });
 ---

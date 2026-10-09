@@ -1,4 +1,6 @@
 ---
+import { boltMakePath, boltMakes } from '../ui/bolt-make';
+import { boltMakeText } from '../content/bolt-make-text';
 // Shared body for the bolt-pattern hub in every locale. Same construction as the tire-size
 // hub: build-time <a href> listing grouped by lug count, with a filter that only hides rows.
 import { boltPatternCatalog, boltPatternsByLugCount, vehiclesForBoltPattern } from '../data/bolt-pattern-catalog';
@@ -96,6 +98,13 @@ const groupCards = groups.map(([lugs, entries]) => ({
   ))}
 
   <p class="entity-empty" data-entity-empty hidden>{t.searchEmpty}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="hub-makes">
+  <h2 id="hub-makes">{boltMakeText[locale].byMakeHeading}</h2>
+  <ul class="entity-chiplist">
+    {boltMakes.map((make) => <li><a class="entity-chip" href={boltMakePath(locale, make.makeSlug)}>{make.make}</a></li>)}
+  </ul>
 </section>
 
 <section class="entity-section entity-section--warn" aria-labelledby="hub-safety">

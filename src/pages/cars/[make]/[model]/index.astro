@@ -1,0 +1,121 @@
+---
+// One page per car model: EPA fuel economy by model year and every ANKUSI wheel record.
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import { serializeJsonLd } from '../../../../seo/safe-json-ld';
+import { type CarModel, ANKUSI_SOURCE, CAR_YEAR_PAGE_MIN, EPA_SOURCE, carMakePath, carModelPath, carModels, carYearPath, curatedVehiclesFor, epaYears, frequent, mpgSummary } from '../../../../data/cars';
+import { boltHref, carModelDescription, carModelTitle, carName, wheelText, yearsText } from '../../../../ui/car-pages';
+import { vehiclePagePath } from '../../../../ui/entity-page-model';
+
+export function getStaticPaths() {
+  return carModels.map((model) => ({ params: { make: model.makeSlug, model: model.modelSlug }, props: { model } }));
+}
+
+interface Props { model: CarModel; }
+const { model } = Astro.props as Props;
+const name = carName(model);
+const pathname = carModelPath(model);
+const years = epaYears(model).slice().reverse();
+const pcds = frequent(model.wheels.map((row) => row[4]));
+const bores = frequent(model.wheels.map((row) => row[5]));
+const latest = years[0];
+const latestSummary = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []) : undefined;
+const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
+const curated = curatedVehiclesFor(model);
+const faqs = [
+  ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the generation: ${pcds.join(', ')}. See the table for each version and year.` }] : []),
+  ...(latest !== undefined && latestSummary?.best ? [{ q: `What MPG does the ${latest} ${name} get?`, a: `The EPA rates the ${latest} ${name} at up to ${latestSummary.best} ${latestSummary.electric ? 'MPGe' : 'MPG'} combined. Every model year is listed below.` }] : []),
+];
+const faqJsonLd = faqs.length ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }) : undefined;
+const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+const answer = [
+  { label: 'Model years', value: years.length ? `${years[years.length - 1]}–${years[0]}` : wheels.length ? `${Math.min(...wheels.map((w) => w[1] ?? 9999))}–${Math.max(...wheels.map((w) => w[2] ?? 0))}` : '—' },
+  { label: `Best MPG${latest !== undefined ? ` (${latest})` : ''}`, value: latestSummary?.best ? String(latestSummary.best) : '—' },
+  { label: 'Bolt pattern', value: pcds[0] ?? '—', href: boltHref(pcds[0]) },
+  { label: 'Center bore', value: bores[0] ? `${bores[0]} mm` : '—' },
+];
+---
+<SiteLayout title={carModelTitle(model)} description={carModelDescription(model)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: pathname }]}>
+  {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/cars/">Cars</a><span aria-hidden="true">/</span><a href={carMakePath(model.makeSlug)}>{model.make}</a><span aria-hidden="true">/</span><span aria-current="page">{model.model}</span></nav>
+  <header class="entity-hero entity-hero--tire">
+    <p class="eyebrow">{model.make}</p>
+    <h1 class="entity-hero__title">{name}: {years.length ? 'MPG by year' : 'wheel specs'}{years.length && wheels.length ? ', bolt pattern and wheel size' : ''}</h1>
+    <dl class="entity-answer entity-answer--vehicle">
+      {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong></dd></div>)}
+    </dl>
+    <nav class="entity-pagenav" aria-label="On this page">
+      {years.length > 0 && <a href="#model-years">MPG by year</a>}
+      {wheels.length > 0 && <a href="#model-wheels">Wheels</a>}
+      {faqs.length > 0 && <a href="#model-faq">FAQ</a>}
+    </nav>
+  </header>
+
+  {years.length > 0 && (
+    <section class="entity-section" aria-labelledby="model-years">
+      <h2 id="model-years">{name} MPG by model year</h2>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr><th scope="col">Year</th><th scope="col">Best comb.</th><th scope="col">City / hwy</th><th scope="col" class="is-optional">Versions</th></tr></thead>
+          <tbody>
+            {years.map((year) => { const variants = model.epa[String(year)] ?? []; const s = mpgSummary(variants); return (
+              <tr>
+                <th scope="row">{year >= CAR_YEAR_PAGE_MIN ? <a href={carYearPath(model, year)}>{year}</a> : year}</th>
+                <td><strong>{s.best ?? '—'}</strong>{s.best !== null && s.worst !== null && s.worst !== s.best ? <span class="entity-card__meta"> (from {s.worst})</span> : null}</td>
+                <td>{s.bestCity ?? '—'} / {s.bestHighway ?? '—'}</td>
+                <td class="is-optional">{variants.length}</td>
+              </tr>
+            ); })}
+          </tbody>
+        </table>
+      </div>
+      <p class="entity-note">EPA combined {latestSummary?.electric ? 'MPGe' : 'MPG'} for the most efficient version of each year. Each year links to every version with engine, drive and annual fuel cost.</p>
+    </section>
+  )}
+
+  {wheels.length > 0 && (
+    <section class="entity-section" aria-labelledby="model-wheels">
+      <h2 id="model-wheels">{name} bolt pattern, center bore and wheel sizes</h2>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr><th scope="col">Version</th><th scope="col">Year</th><th scope="col">Bolt pattern</th><th scope="col">Center bore</th><th scope="col" class="is-optional">Factory wheel</th><th scope="col" class="is-optional">Flush fit</th><th scope="col" class="is-optional">Max wheel</th></tr></thead>
+          <tbody>
+            {wheels.map((row) => { const href = boltHref(row[4]); return (
+              <tr>
+                <th scope="row">{row[0]}{row[3] ? <span class="entity-card__meta"> · {row[3]}</span> : null}{row[12] ? <span class="entity-card__meta"> · {row[12]}</span> : null}</th>
+                <td>{yearsText(row)}</td>
+                <td>{href ? <a href={href}>{row[4]}</a> : row[4] ?? '—'}</td>
+                <td>{row[5] !== null ? `${row[5]} mm` : '—'}</td>
+                <td class="is-optional">{wheelText(row[8])}</td>
+                <td class="is-optional">{wheelText(row[9])}</td>
+                <td class="is-optional">{wheelText(row[10])}</td>
+              </tr>
+            ); })}
+          </tbody>
+        </table>
+      </div>
+      <p class="entity-note">"Flush fit" and "max wheel" are aftermarket guidance from the source, not factory approvals — check clearance, load rating and local rules before fitting.</p>
+    </section>
+  )}
+
+  {curated.length > 0 && (
+    <section class="entity-section" aria-labelledby="model-curated">
+      <h2 id="model-curated">Tire size and wheel torque</h2>
+      <div class="entity-links">
+        {curated.map((vehicle) => <a class="entity-link-card" href={vehiclePagePath('en', vehicle.id)}><strong>{vehicle.make} {vehicle.model} — {vehicle.tireSize}</strong><span>{vehicle.generation} · tire size, bolt pattern and torque reference</span><i aria-hidden="true">›</i></a>)}
+      </div>
+    </section>
+  )}
+
+  {faqs.length > 0 && (
+    <section class="entity-section" aria-labelledby="model-faq">
+      <h2 id="model-faq">Frequently asked questions</h2>
+      {faqs.map((f) => <details class="entity-faq"><summary>{f.q}</summary><p>{f.a}</p></details>)}
+    </section>
+  )}
+
+  <section class="entity-section" aria-labelledby="model-sources">
+    <h2 id="model-sources">Sources</h2>
+    <p class="entity-note">{years.length > 0 && <>Fuel economy: <a href={EPA_SOURCE.url} rel="noopener">{EPA_SOURCE.name}</a> (U.S. government data). </>}{wheels.length > 0 && <>Wheel fitment data: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a>.</>}</p>
+    <p class="entity-note"><a href={carMakePath(model.makeSlug)}>All {model.make} models</a> · <a href="/cars/">All makes</a></p>
+  </section>
+</SiteLayout>

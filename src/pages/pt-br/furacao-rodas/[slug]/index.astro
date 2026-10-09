@@ -1,0 +1,23 @@
+---
+// Localized bolt-pattern detail pages (pt-br): one page per row of boltPatternCatalog.
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import BoltPatternEntity from '../../../../components/BoltPatternEntity.astro';
+import { boltPatternCatalog, type BoltPatternEntry } from '../../../../data/bolt-pattern-catalog';
+import { boltPatternDetailMeta } from '../../../../ui/entity-page-model';
+import BoltMakeBody from '../../../../components/BoltMakeBody.astro';
+import { boltMakeMeta, boltMakes, type BoltMake } from '../../../../ui/bolt-make';
+
+export function getStaticPaths() {
+  return [
+    ...boltPatternCatalog.map((entry) => ({ params: { slug: entry.slug }, props: { entry, make: undefined } })),
+    ...boltMakes.map((make) => ({ params: { slug: make.makeSlug }, props: { entry: undefined, make } })),
+  ];
+}
+
+interface Props { entry: BoltPatternEntry | undefined; make: BoltMake | undefined; }
+const { entry, make } = Astro.props as Props;
+const meta = entry ? boltPatternDetailMeta(entry, 'pt-br') : boltMakeMeta(make!, 'pt-br');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="pt-br" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  {entry ? <BoltPatternEntity entry={entry} locale="pt-br" /> : <BoltMakeBody make={make!} locale="pt-br" />}
+</SiteLayout>

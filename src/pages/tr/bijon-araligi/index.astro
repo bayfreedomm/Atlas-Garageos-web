@@ -1,0 +1,11 @@
+---
+// Localized bolt-pattern hub (tr). The listing lives in BoltPatternHubBody.astro.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import BoltPatternHubBody from '../../../components/BoltPatternHubBody.astro';
+import { boltPatternHubMeta } from '../../../ui/entity-page-model';
+
+const meta = boltPatternHubMeta('tr');
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="tr" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+  <BoltPatternHubBody locale="tr" />
+</SiteLayout>
