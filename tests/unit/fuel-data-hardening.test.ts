@@ -105,15 +105,14 @@ describe('fuel SEO and update delivery', () => {
     expect(entityAlternates('tire-size', '205-55-r16').map(({ hreflang }) => hreflang)).toEqual(['en', 'de', 'es', 'fr', 'it', 'pt-BR', 'pl', 'nl', 'tr', 'x-default']);
   });
 
-  it('publishes data through one rolling PR instead of pushing the development branch', () => {
+  it('publishes fuel data automatically to the default branch with a backup branch', () => {
     for (const workflow of [scheduledWorkflow, germanyWorkflow]) {
-      expect(workflow).toContain('pull-requests: write');
-      expect(workflow).toContain('FUEL_BRANCH: automation/fuel-data');
-      expect(workflow).toContain('gh pr create');
-      expect(workflow).toContain('git push --force-with-lease="refs/heads/$FUEL_BRANCH:$EXPECTED_REMOTE_SHA"');
-      expect(workflow).toContain('--set-upstream origin "HEAD:refs/heads/$FUEL_BRANCH"');
+      expect(workflow).not.toContain('gh pr create');
+      expect(workflow).toContain('git push origin "HEAD:refs/heads/$BASE_BRANCH"');
+      expect(workflow).toContain('git -C "$tmp" push origin "HEAD:refs/heads/fuel-data"');
+      expect(workflow).toContain('--merge-history=/tmp/history-backup.json');
       expect(workflow).not.toMatch(/\bgit rebase\b/);
-      expect(workflow).not.toMatch(/git push\s*$/m);
+      expect(workflow).not.toMatch(/git push\s+--force(?:\s|$)/);
     }
   });
 });

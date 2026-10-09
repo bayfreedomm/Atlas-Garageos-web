@@ -19,7 +19,6 @@ name: Update fuel prices (Germany, manual only)
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: ${{ github.repository }}-fuel-data-rolling-pr
@@ -39,21 +38,14 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Prepare rolling fuel-data branch
-        id: fuel-branch
-        env:
-          BASE_BRANCH: ${{ github.event.repository.default_branch }}
-          FUEL_BRANCH: automation/fuel-data
+      - name: Restore history backup from the fuel-data branch
         run: |
           set -euo pipefail
-          git fetch --no-tags origin "+refs/heads/$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH"
-          remote_sha=""
-          if remote_ref="$(git ls-remote --heads origin "refs/heads/$FUEL_BRANCH")" && [ -n "$remote_ref" ]; then
-            remote_sha="${remote_ref%%[[:space:]]*}"
-            git fetch --no-tags origin "+refs/heads/$FUEL_BRANCH:refs/remotes/origin/$FUEL_BRANCH"
+          echo '{"es":[],"de":[],"us":[]}' > /tmp/history-backup.json
+          if git ls-remote --exit-code --heads origin fuel-data >/dev/null; then
+            git fetch --no-tags origin "+refs/heads/fuel-data:refs/remotes/origin/fuel-data"
+            git show origin/fuel-data:fuel-price-history.json > /tmp/history-backup.json || echo '{"es":[],"de":[],"us":[]}' > /tmp/history-backup.json
           fi
-          printf 'remote_sha=%s\n' "$remote_sha" >> "$GITHUB_OUTPUT"
-          git switch --force-create "$FUEL_BRANCH" "origin/$BASE_BRANCH"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -65,14 +57,14 @@ jobs:
         # It is never written into the built site and never printed by the script.
         env:
           TANKERKOENIG_API_KEY: ${{ secrets.TANKERKOENIG_API_KEY }}
-        run: node scripts/update-fuel-prices.mjs --providers=de
+        run: node scripts/update-fuel-prices.mjs --providers=de --merge-history=/tmp/history-backup.json
 
-      - name: Publish update through rolling pull request
+      - name: Publish to the default branch and the fuel-data backup branch
+        # Owner decision (2026-10-09): fuel data publishes directly, without a review PR, so
+        # prices and history reach the site on every run with no manual merge.
         env:
-          GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.event.repository.default_branch }}
-          FUEL_BRANCH: automation/fuel-data
-          EXPECTED_REMOTE_SHA: ${{ steps.fuel-branch.outputs.remote_sha }}
+          COMMIT_MESSAGE: "chore: refresh Germany monitored fuel sample (manual run)"
         run: |
           set -euo pipefail
           if git diff --quiet -- src/data/fuel-prices.json src/data/fuel-price-history.json; then
@@ -81,15 +73,34 @@ jobs:
           fi
           git config user.name "atlas-garageos-bot"
           git config user.email "actions@users.noreply.github.com"
+          cp src/data/fuel-prices.json /tmp/fuel-prices.json
+          cp src/data/fuel-price-history.json /tmp/fuel-price-history.json
           git add src/data/fuel-prices.json src/data/fuel-price-history.json
-          git commit -m "chore: refresh Germany monitored fuel sample (manual run)"
-          git push --force-with-lease="refs/heads/$FUEL_BRANCH:$EXPECTED_REMOTE_SHA" \
-            --set-upstream origin "HEAD:refs/heads/$FUEL_BRANCH"
-          pr_number="$(gh pr list --base "$BASE_BRANCH" --head "$FUEL_BRANCH" --state open --json number --jq '.[0].number // empty')"
-          if [ -z "$pr_number" ]; then
-            gh pr create --base "$BASE_BRANCH" --head "$FUEL_BRANCH" \
-              --title "chore: refresh fuel market data" \
-              --body "Automated fuel-data refresh. This rolling PR keeps mutable snapshots and history out of direct development-branch commits; merge it after normal checks pass."
+          git commit -m "$COMMIT_MESSAGE"
+          # If someone pushed meanwhile, start again from their commit and re-apply only the two
+          # data files (history is merged, never replaced).
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:refs/heads/$BASE_BRANCH"; then break; fi
+            if [ "$attempt" = 3 ]; then echo "Could not publish after 3 attempts"; exit 1; fi
+            git fetch --no-tags origin "+refs/heads/$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH"
+            git reset --hard "origin/$BASE_BRANCH"
+            node scripts/merge-fuel-history.mjs src/data/fuel-price-history.json /tmp/fuel-price-history.json
+            cp /tmp/fuel-prices.json src/data/fuel-prices.json
+            git add src/data/fuel-prices.json src/data/fuel-price-history.json
+            git commit -m "$COMMIT_MESSAGE" || exit 0
+          done
+          # Backup copy on a branch nobody edits by hand. If a manual upload overwrites the history
+          # file on the default branch, the next run merges it back from here.
+          tmp="$(mktemp -d)"
+          if git ls-remote --exit-code --heads origin fuel-data >/dev/null; then
+            git fetch --no-tags origin "+refs/heads/fuel-data:refs/remotes/origin/fuel-data"
+            git worktree add -B fuel-data "$tmp" origin/fuel-data
           else
-            echo "Updated rolling fuel PR #$pr_number."
+            git worktree add --detach "$tmp"
+            git -C "$tmp" switch --orphan fuel-data
           fi
+          cp /tmp/fuel-prices.json "$tmp/fuel-prices.json"
+          cp src/data/fuel-price-history.json "$tmp/fuel-price-history.json"
+          git -C "$tmp" add fuel-prices.json fuel-price-history.json
+          git -C "$tmp" commit -m "$COMMIT_MESSAGE" || true
+          git -C "$tmp" push origin "HEAD:refs/heads/fuel-data"

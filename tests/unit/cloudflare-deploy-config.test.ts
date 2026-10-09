@@ -28,10 +28,10 @@ describe('Cloudflare Workers static deployment contract', () => {
     expect(read('pnpm-lock.yaml')).not.toContain('workerd@1.20260921.1');
   });
 
-  it('keeps the existing fuel workflow split and rolling branch', () => {
+  it('keeps the fuel workflow split and the fuel-data backup branch', () => {
     const scheduled = read('.github/workflows/update-fuel-prices.yml');
     const germany = read('.github/workflows/update-fuel-prices-germany.yml');
-    expect(scheduled).toContain('automation/fuel-data');
+    expect(scheduled).toContain('refs/heads/fuel-data');
     expect(scheduled).toContain('--providers=es,us');
     expect(scheduled).not.toContain('TANKERKOENIG_API_KEY');
     expect(germany).toContain('workflow_dispatch: {}');

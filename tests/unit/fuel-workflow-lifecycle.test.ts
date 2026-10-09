@@ -1,33 +1,31 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { mergeHistories } from '../../scripts/update-fuel-prices.mjs';
 
 const workflowPaths = [
   '.github/workflows/update-fuel-prices.yml',
   '.github/workflows/update-fuel-prices-germany.yml',
 ] as const;
 
-describe('rolling fuel-data branch lifecycle', () => {
+describe('automatic fuel-data publication', () => {
   for (const path of workflowPaths) {
     const source = readFileSync(path, 'utf8');
 
-    it(`${path} recreates the publication branch from the current default branch`, () => {
-      expect(source).toContain('git switch --force-create "$FUEL_BRANCH" "origin/$BASE_BRANCH"');
-      expect(source).toContain('+refs/heads/$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH');
+    it(`${path} restores the history backup before fetching`, () => {
+      expect(source).toContain('git show origin/fuel-data:fuel-price-history.json > /tmp/history-backup.json');
+      expect(source.indexOf('Restore history backup')).toBeLessThan(source.indexOf('scripts/update-fuel-prices.mjs'));
+    });
+
+    it(`${path} retries a rejected push by re-applying only the data files`, () => {
+      expect(source).toContain('for attempt in 1 2 3; do');
+      expect(source).toContain('git reset --hard "origin/$BASE_BRANCH"');
+      expect(source).toContain('node scripts/merge-fuel-history.mjs src/data/fuel-price-history.json /tmp/fuel-price-history.json');
       expect(source).not.toMatch(/\bgit rebase\b/);
     });
 
-    it(`${path} pins destructive branch replacement to the observed remote SHA`, () => {
-      expect(source).toContain('git ls-remote --heads origin "refs/heads/$FUEL_BRANCH"');
-      expect(source).toContain('EXPECTED_REMOTE_SHA: ${{ steps.fuel-branch.outputs.remote_sha }}');
-      expect(source).toContain('--force-with-lease="refs/heads/$FUEL_BRANCH:$EXPECTED_REMOTE_SHA"');
-      expect(source).not.toMatch(/git push\s+--force(?:\s|$)/);
-    });
-
-    it(`${path} serializes writers and reuses an open rolling PR`, () => {
+    it(`${path} serializes writers`, () => {
       expect(source).toContain('group: ${{ github.repository }}-fuel-data-rolling-pr');
       expect(source).toContain('cancel-in-progress: false');
-      expect(source).toContain("--state open --json number --jq '.[0].number // empty'");
-      expect(source).toContain('if [ -z "$pr_number" ]; then');
     });
 
     it(`${path} does not create empty fuel commits`, () => {
@@ -35,4 +33,16 @@ describe('rolling fuel-data branch lifecycle', () => {
       expect(source).toContain('No price change — nothing to commit.');
     });
   }
+});
+
+describe('fuel history merge', () => {
+  it('unions observations and keeps existing entries', () => {
+    const base = { es: [{ date: '2026-09-22', products: { e5: 1.9 } }], de: [], us: [{ weekOf: '2026-09-21', products: {} }] };
+    const extra = { es: [{ date: '2026-09-22', products: { e5: 9.9 } }, { date: '2026-09-15', products: { e5: 1.8 } }], de: [{ date: '2026-09-01', products: {} }], us: [{ weekOf: '2026-09-14', products: {} }] };
+    const merged = mergeHistories(base, extra);
+    expect(merged.es.map((entry: { date: string }) => entry.date)).toEqual(['2026-09-15', '2026-09-22']);
+    expect(merged.es[1].products.e5).toBe(1.9);
+    expect(merged.de).toHaveLength(1);
+    expect(merged.us.map((entry: { weekOf: string }) => entry.weekOf)).toEqual(['2026-09-14', '2026-09-21']);
+  });
 });
