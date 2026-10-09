@@ -8,6 +8,15 @@
         "diesel": 1.934,
         "dieselPremium": 2.026
       }
+    },
+    {
+      "date": "2026-10-09",
+      "products": {
+        "e5": 1.785,
+        "e5_98": 1.944,
+        "diesel": 1.885,
+        "dieselPremium": 1.98
+      }
     }
   ],
   "de": [
@@ -31,6 +40,19 @@
         "diesel": {
           "perLitre": 1.725,
           "perGallon": 6.529
+        }
+      }
+    },
+    {
+      "weekOf": "2026-10-05",
+      "products": {
+        "regular": {
+          "perLitre": 1.15,
+          "perGallon": 4.354
+        },
+        "diesel": {
+          "perLitre": 1.638,
+          "perGallon": 6.199
         }
       }
     }
