@@ -2,12 +2,12 @@
 // One page per car model: EPA fuel economy by model year and every ANKUSI wheel record.
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import { serializeJsonLd } from '../../../../seo/safe-json-ld';
-import { type CarModel, ANKUSI_SOURCE, CAR_YEAR_PAGE_MIN, EPA_SOURCE, carMakePath, carModelPath, carModels, carYearPath, curatedVehiclesFor, epaYears, frequent, mpgSummary } from '../../../../data/cars';
+import { type CarModel, ANKUSI_SOURCE, CAR_YEAR_PAGE_MIN, EPA_SOURCE, carMakePath, carModelPath, publishedCarModels, carYearPath, curatedVehiclesFor, epaYears, frequent, mpgSummary } from '../../../../data/cars';
 import { boltHref, carModelDescription, carModelTitle, carName, wheelText, yearsText } from '../../../../ui/car-pages';
 import { vehiclePagePath } from '../../../../ui/entity-page-model';
 
 export function getStaticPaths() {
-  return carModels.map((model) => ({ params: { make: model.makeSlug, model: model.modelSlug }, props: { model } }));
+  return publishedCarModels.map((model) => ({ params: { make: model.makeSlug, model: model.modelSlug }, props: { model } }));
 }
 
 interface Props { model: CarModel; }

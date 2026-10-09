@@ -304,6 +304,20 @@ const EIA_SERIES = {
   diesel: { id: 'PET.EMD_EPD2D_PTE_NUS_DPG.W', label: 'Diesel' },
 };
 
+/** Every weekly row the EIA series returns, newest first: [{ period, value }]. */
+async function fetchEiaSeriesRows(seriesId, apiKey) {
+  const url = `https://api.eia.gov/v2/seriesid/${seriesId}?api_key=${apiKey}`;
+  const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for series ${seriesId}`);
+  const body = await res.json();
+  const rows = body?.response?.data;
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error(`Unexpected EIA response shape for ${seriesId}`);
+  return rows
+    .map((row) => ({ period: String(row.period), value: Number.parseFloat(row.value) }))
+    .filter((row) => /^\d{4}-\d{2}-\d{2}$/.test(row.period) && Number.isFinite(row.value) && row.value > 0)
+    .sort((a, b) => b.period.localeCompare(a.period));
+}
+
 async function fetchEiaSeriesLatest(seriesId, apiKey) {
   const url = `https://api.eia.gov/v2/seriesid/${seriesId}?api_key=${apiKey}`;
   const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' } });
@@ -319,6 +333,24 @@ async function fetchEiaSeriesLatest(seriesId, apiKey) {
 
 /** The EIA's public weekly table is a keyless, official fallback. It exposes only
  * regular gasoline and on-highway diesel, so never manufacture midgrade/premium. */
+export function parseEiaPublicWeeklyTableAll(html) {
+  const tables = [...html.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/gi)].map((match) => match[0]);
+  const parseTable = (caption) => {
+    const table = tables.find((item) => new RegExp(`<caption>\\s*${caption}`, 'i').test(item));
+    if (!table) throw new Error(`EIA public table missing: ${caption}`);
+    const heading = table.match(/<thead\b[^>]*>[\s\S]*?<\/thead>/i)?.[0] ?? '';
+    const dates = [...heading.matchAll(/<th\b[^>]*>\s*(\d{2})\/(\d{2})\/(\d{2})\s*<\/th>/gi)];
+    const row = table.match(/<tbody\b[^>]*>[\s\S]*?<tr\b[^>]*>[\s\S]*?<\/tr>/i)?.[0] ?? '';
+    const prices = [...row.matchAll(/<td\b[^>]*>\s*(\d+\.\d{3})\s*<\/td>/gi)].map((match) => Number(match[1]));
+    return dates.map(([, month, day, year], i) => ({ period: `20${year}-${month}-${day}`, value: prices[i] }))
+      .filter((point) => Number.isFinite(point.value) && point.value > 0 && point.value < 20);
+  };
+  const regular = parseTable('U\\.S\\. Regular Gasoline Prices');
+  const diesel = parseTable('U\\.S\\. On-Highway Diesel Fuel Prices');
+  const dieselBy = new Map(diesel.map((point) => [point.period, point.value]));
+  return regular.filter((point) => dieselBy.has(point.period)).map((point) => ({ weekOf: point.period, regular: point.value, diesel: dieselBy.get(point.period) }));
+}
+
 export function parseEiaPublicWeeklyTable(html) {
   const tables = [...html.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/gi)].map((match) => match[0]);
   const parseTable = (caption) => {
@@ -442,6 +474,93 @@ export function carryForward(previous, providerId) {
   };
 }
 
+/** Union of two history logs. Observations are immutable, so an entry already present wins. */
+export function mergeHistories(base, extra) {
+  const merged = { es: [...(base?.es ?? [])], de: [...(base?.de ?? [])], us: [...(base?.us ?? [])] };
+  for (const key of ['es', 'de']) {
+    const seen = new Set(merged[key].map((entry) => entry.date));
+    for (const entry of extra?.[key] ?? []) if (entry?.date && !seen.has(entry.date)) { merged[key].push(entry); seen.add(entry.date); }
+    merged[key].sort((a, b) => a.date.localeCompare(b.date));
+  }
+  const weeks = new Set(merged.us.map((entry) => entry.weekOf));
+  for (const entry of extra?.us ?? []) if (entry?.weekOf && !weeks.has(entry.weekOf)) { merged.us.push(entry); weeks.add(entry.weekOf); }
+  merged.us.sort((a, b) => a.weekOf.localeCompare(b.weekOf));
+  return merged;
+}
+
+async function readHistoryFile(file) {
+  try {
+    const parsed = JSON.parse(await readFile(file, 'utf8'));
+    if (parsed && Array.isArray(parsed.es) && Array.isArray(parsed.de) && Array.isArray(parsed.us)) return parsed;
+  } catch { /* missing or unreadable: treated as empty */ }
+  return { es: [], de: [], us: [] };
+}
+
+/** Backfill weeks for a short history (first run, or a history file overwritten by a manual upload). */
+const BACKFILL_MIN_POINTS = 8;
+const BACKFILL_WEEKS = 26;
+
+async function backfillUs(history) {
+  const apiKey = process.env.EIA_API_KEY;
+  const add = (weekOf, products) => {
+    if (history.us.some((entry) => entry.weekOf === weekOf)) return;
+    history.us.push({ weekOf, products });
+  };
+  const toLitre = (perGallon) => Math.round((perGallon / US_GALLON_TO_LITRE) * 1000) / 1000;
+  try {
+    if (apiKey) {
+      const ids = Object.entries(EIA_SERIES);
+      const rows = await Promise.all(ids.map(([, series]) => fetchEiaSeriesRows(series.id, apiKey)));
+      const weeks = rows[0].slice(0, BACKFILL_WEEKS).map((row) => row.period);
+      for (const weekOf of weeks) {
+        const products = {};
+        ids.forEach(([id], i) => { const hit = rows[i].find((row) => row.period === weekOf); if (hit) products[id] = { perLitre: toLitre(hit.value), perGallon: hit.value }; });
+        if (products.regular) add(weekOf, products);
+      }
+    } else {
+      const res = await fetchWithTimeout(PROVIDERS.us.sourceUrl, { headers: { Accept: 'text/html' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      for (const point of parseEiaPublicWeeklyTableAll(await res.text())) {
+        add(point.weekOf, { regular: { perLitre: toLitre(point.regular), perGallon: point.regular }, diesel: { perLitre: toLitre(point.diesel), perGallon: point.diesel } });
+      }
+    }
+    history.us.sort((a, b) => a.weekOf.localeCompare(b.weekOf));
+    console.log(`US backfill: ${history.us.length} weekly points`);
+  } catch (err) {
+    console.error('US backfill failed (current week is still recorded):', String(err?.message ?? err));
+  }
+}
+
+/** Spain publishes a dated historical endpoint; one point per week for the last BACKFILL_WEEKS weeks. */
+async function backfillSpain(history) {
+  const base = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestresHist/';
+  const parse = (raw) => { if (typeof raw !== 'string' || raw.trim() === '') return null; const n = Number.parseFloat(raw.replace(',', '.')); return Number.isFinite(n) ? n : null; };
+  const today = new Date();
+  for (let week = 1; week <= BACKFILL_WEEKS; week++) {
+    const day = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - week * 7));
+    const iso = day.toISOString().slice(0, 10);
+    if (history.es.some((entry) => entry.date === iso)) continue;
+    const [y, m, d] = iso.split('-');
+    try {
+      const res = await fetchWithTimeout(`${base}${d}-${m}-${y}`, { headers: { Accept: 'application/json' } }, ES_FETCH_TIMEOUT_MS);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const stations = (await res.json())?.ListaEESSPrecio;
+      if (!Array.isArray(stations) || stations.length === 0) throw new Error('no stations');
+      const products = buildProducts([
+        { id: 'e5', label: 'Gasolina 95 E5', ...average(stations.map((s) => parse(s['Precio Gasolina 95 E5']))) },
+        { id: 'e5_98', label: 'Gasolina 98 E5', ...average(stations.map((s) => parse(s['Precio Gasolina 98 E5']))) },
+        { id: 'diesel', label: 'Gasóleo A', ...average(stations.map((s) => parse(s['Precio Gasoleo A']))) },
+        { id: 'dieselPremium', label: 'Gasóleo Premium', ...average(stations.map((s) => parse(s['Precio Gasoleo Premium']))) },
+      ]);
+      if (products.length > 0) history.es.push({ date: iso, products: productsToMap(products) });
+    } catch (err) {
+      console.error(`Spain backfill ${iso} failed:`, String(err?.message ?? err));
+    }
+  }
+  history.es.sort((a, b) => a.date.localeCompare(b.date));
+  console.log(`Spain backfill: ${history.es.length} points`);
+}
+
 async function readHistory() {
   try {
     const raw = await readFile(HISTORY_PATH, 'utf8');
@@ -500,7 +619,15 @@ export function updateHistoryData(currentHistory, output, ran) {
 }
 
 async function updateHistory(output, ran) {
-  const history = updateHistoryData(await readHistory(), output, ran);
+  // A copy kept on the fuel-data branch survives manual uploads that overwrite the repository
+  // file; observations from both are merged before this run adds its own.
+  const extraFlag = process.argv.slice(2).find((arg) => arg.startsWith('--merge-history='));
+  let current = await readHistory();
+  if (extraFlag) current = mergeHistories(current, await readHistoryFile(extraFlag.slice('--merge-history='.length)));
+  const history = updateHistoryData(current, output, ran);
+  const forced = process.argv.includes('--backfill');
+  if (ran.has('us') && (forced || history.us.length < BACKFILL_MIN_POINTS)) await backfillUs(history);
+  if (ran.has('es') && (forced || history.es.length < BACKFILL_MIN_POINTS)) await backfillSpain(history);
   await writeFile(HISTORY_PATH, `${JSON.stringify(history, null, 2)}\n`, 'utf8');
   console.log('Wrote', HISTORY_PATH, `(es:${history.es.length} de:${history.de.length} us:${history.us.length})`);
 }

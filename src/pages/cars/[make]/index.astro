@@ -1,7 +1,7 @@
 ---
 // One page per make: every model with its model-year range, best recent MPG and bolt pattern.
 import SiteLayout from '../../../components/SiteLayout.astro';
-import { type CarMake, carMakePath, carMakes, carModelPath, epaYears, frequent, mpgSummary } from '../../../data/cars';
+import { type CarMake, carMakePath, carMakes, carModelPath, epaYears, frequent, hasModelPage, mpgSummary } from '../../../data/cars';
 import { boltHref } from '../../../ui/car-pages';
 import { boltMakeBySlug, boltMakePath } from '../../../ui/bolt-make';
 
@@ -42,7 +42,7 @@ const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname
         <thead><tr><th scope="col">Model</th><th scope="col">Years</th><th scope="col">Best MPG</th><th scope="col">Bolt pattern</th></tr></thead>
         <tbody>
           {rows.map((row) => { const href = boltHref(row.pcd); return (
-            <tr><th scope="row"><a href={carModelPath(row.model)}>{row.model.model}</a></th><td>{row.span}</td><td>{row.mpg ?? '—'}</td><td>{href ? <a href={href}>{row.pcd}</a> : row.pcd ?? '—'}</td></tr>
+            <tr><th scope="row">{hasModelPage(row.model) ? <a href={carModelPath(row.model)}>{row.model.model}</a> : row.model.model}</th><td>{row.span}</td><td>{row.mpg ?? '—'}</td><td>{href ? <a href={href}>{row.pcd}</a> : row.pcd ?? '—'}</td></tr>
           ); })}
         </tbody>
       </table>

@@ -8,7 +8,7 @@ import { dtcRecords } from '../data/dtc-records';
 import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
 import { REFERENCE_LOCALES } from '../localization/reference-locales';
 import { boltMakePath, boltMakes } from '../ui/bolt-make';
-import { carMakePath, carMakes, carModelPath, carModels, carYearPath, yearPageYears } from '../data/cars';
+import { carMakePath, carMakes, carModelPath, carYearPath, publishedCarModels, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
@@ -71,8 +71,8 @@ function carRoutes(): readonly string[] {
   return [
     '/cars/',
     ...carMakes.map((make) => carMakePath(make.makeSlug)),
-    ...carModels.map((model) => carModelPath(model)),
-    ...carModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year))),
+    ...publishedCarModels.map((model) => carModelPath(model)),
+    ...publishedCarModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year))),
   ];
 }
 

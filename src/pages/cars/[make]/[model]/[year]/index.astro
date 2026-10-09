@@ -3,11 +3,11 @@
 import SiteLayout from '../../../../../components/SiteLayout.astro';
 import CarYearBody from '../../../../../components/CarYearBody.astro';
 import { serializeJsonLd } from '../../../../../seo/safe-json-ld';
-import { type CarModel, annualFuelCost, carMakePath, carModelPath, carModels, carYearPath, frequent, mpgSummary, wheelRowsForYear, yearPageYears } from '../../../../../data/cars';
+import { type CarModel, annualFuelCost, carMakePath, carModelPath, publishedCarModels, carYearPath, frequent, mpgSummary, wheelRowsForYear, yearPageYears } from '../../../../../data/cars';
 import { carName, carYearDescription, carYearTitle, usd } from '../../../../../ui/car-pages';
 
 export function getStaticPaths() {
-  return carModels.flatMap((model) => yearPageYears(model).map((year) => ({ params: { make: model.makeSlug, model: model.modelSlug, year: String(year) }, props: { model, year } })));
+  return publishedCarModels.flatMap((model) => yearPageYears(model).map((year) => ({ params: { make: model.makeSlug, model: model.modelSlug, year: String(year) }, props: { model, year } })));
 }
 
 interface Props { model: CarModel; year: number; }

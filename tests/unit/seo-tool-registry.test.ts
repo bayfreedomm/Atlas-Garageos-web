@@ -8,7 +8,7 @@ import { entityLocales } from '../../src/seo/entity-routes';
 import { dtcRecords } from '../../src/data/dtc-records';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 import { boltMakes } from '../../src/ui/bolt-make';
-import { carMakes, carModels, yearPageYears } from '../../src/data/cars';
+import { carMakes, publishedCarModels, yearPageYears } from '../../src/data/cars';
 
 const intendedRoutes = [
   '/',
@@ -90,7 +90,9 @@ describe('SEO tool registry', () => {
     // Each reference-only locale (fr, it, pt-br, pl, nl, tr) publishes its reference families plus one home.
     const frenchRoutes = 6;
     // English /cars/ family: directory, makes, models and EPA model years from 2000.
-    const carRoutes = 1 + carMakes.length + carModels.length + carModels.reduce((total, model) => total + yearPageYears(model).length, 0);
+    const carRoutes = 1 + carMakes.length + publishedCarModels.length + publishedCarModels.reduce((total, model) => total + yearPageYears(model).length, 0);
+    // Cloudflare's free plan deploys at most 20,000 static files; keep headroom for assets.
+    expect(entries.length).toBeLessThan(19_800);
     const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + frenchRoutes + carRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);

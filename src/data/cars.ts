@@ -24,8 +24,15 @@ export interface CarModel {
   readonly wheels: readonly WheelRow[];
 }
 
-/** Year pages are published from this model year on; older years appear in the model page table. */
-export const CAR_YEAR_PAGE_MIN = 2000;
+/**
+ * Cloudflare's free plan serves at most 20,000 static files per deployment. Year pages are
+ * therefore published from CAR_YEAR_PAGE_MIN on (older years stay in the model page table),
+ * and a model that has no EPA data and fewer than CAR_MODEL_PAGE_MIN_WHEEL_ROWS wheel records
+ * is listed in the make and bolt-pattern tables without a page of its own. On a paid plan
+ * (100,000 files) set CAR_YEAR_PAGE_MIN = 2000 and CAR_MODEL_PAGE_MIN_WHEEL_ROWS = 1.
+ */
+export const CAR_YEAR_PAGE_MIN = 2015;
+export const CAR_MODEL_PAGE_MIN_WHEEL_ROWS = 3;
 
 export const EPA_SOURCE = { name: 'U.S. EPA / DOE — fueleconomy.gov', url: 'https://www.fueleconomy.gov/feg/download.shtml' } as const;
 export const ANKUSI_SOURCE = { name: 'ANKUSI Wheel Fitment Dataset (CC BY 4.0)', url: 'https://github.com/david025445/ankusi-wheel-fitment-data' } as const;
@@ -54,6 +61,12 @@ export const carMakes: readonly CarMake[] = (() => {
 })();
 
 const makeBySlug = new Map(carMakes.map((make) => [make.makeSlug, make]));
+
+/** Whether this model is published as its own /cars/{make}/{model}/ page. */
+export const hasModelPage = (model: CarModel): boolean => Object.keys(model.epa).length > 0 || model.wheels.length >= CAR_MODEL_PAGE_MIN_WHEEL_ROWS;
+
+/** Models with their own page. */
+export const publishedCarModels: readonly CarModel[] = Object.freeze(carModels.filter(hasModelPage));
 
 export const carModelByKey = (makeSlug: string, modelSlug: string): CarModel | undefined => byKey.get(`${makeSlug}/${modelSlug}`);
 export const carMakeBySlug = (makeSlug: string): CarMake | undefined => makeBySlug.get(makeSlug);
@@ -131,5 +144,5 @@ export function annualFuelCost(variant: EpaVariant): number | null {
 export function carModelForVehicle(vehicle: VehicleFitment): CarModel | undefined {
   const make = normName(vehicle.make);
   const model = normName(vehicle.model.replace(/\s*\(.*$/, ''));
-  return carModels.find((candidate) => normName(candidate.make) === make && normName(candidate.model) === model);
+  return publishedCarModels.find((candidate) => normName(candidate.make) === make && normName(candidate.model) === model);
 }

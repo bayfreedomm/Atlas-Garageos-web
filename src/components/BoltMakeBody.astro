@@ -2,7 +2,7 @@
 // Bolt pattern chart for one make, in every entity locale (ANKUSI open wheel fitment data).
 import { boltMakeText } from '../content/bolt-make-text';
 import { boltPatternPageText } from '../content/entity-page-text';
-import { ANKUSI_SOURCE, carMakePath, carModelPath } from '../data/cars';
+import { ANKUSI_SOURCE, carMakePath, carModelPath, hasModelPage } from '../data/cars';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { homePath } from '../ui/entity-page-model';
@@ -44,7 +44,7 @@ const linkModel = locale === 'en';
       <tbody>
         {make.rows.map((row) => (
           <tr>
-            <th scope="row">{linkModel ? <a href={carModelPath(row.model)}>{row.model.model}</a> : row.model.model}</th>
+            <th scope="row">{linkModel && hasModelPage(row.model) ? <a href={carModelPath(row.model)}>{row.model.model}</a> : row.model.model}</th>
             <td class="is-optional">{row.years}</td>
             <td>{row.pcds.map((pcd, i) => { const href = pcdLink(pcd); return <>{i > 0 && ', '}{href ? <a href={href}>{pcd}</a> : pcd}</>; })}</td>
             <td>{row.bores.length ? row.bores.slice(0, 2).map((bore) => `${formatPlain(bore, locale)} mm`).join(' / ') : '—'}</td>
