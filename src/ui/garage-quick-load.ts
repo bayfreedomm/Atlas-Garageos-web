@@ -1,5 +1,6 @@
 import { createBrowserGarageRepository } from '../storage/local-storage-garage-repository';
 import type { GarageState, SavedSetup } from '../domain/garage';
+import type { UiLocale } from './page-locale';
 
 /**
  * "Load from My Garage" quick-select, used by calculator pages that have no other vehicle
@@ -14,7 +15,9 @@ type QuickLoadTarget = 'wheel-offset' | 'tire-comparison';
  * because this control's copy is short and page-scoped, so it is kept as its own inline
  * dictionary (the same pattern TireInputGroup.astro already uses) rather than growing the
  * global UiStrings catalog for three lines of text. */
-type QuickLoadLocale = 'en' | 'de' | 'es';
+type QuickLoadLocale = UiLocale;
+
+const QUICK_LOAD_LOCALES: readonly QuickLoadLocale[] = ['en', 'de', 'es', 'pt-br', 'fr', 'it', 'pl', 'nl', 'tr'];
 
 interface QuickLoadCopy {
   readonly label: string;
@@ -42,10 +45,46 @@ const COPY: Readonly<Record<QuickLoadLocale, QuickLoadCopy>> = {
     emptyHint: 'Aún no hay configuraciones guardadas — guarde una desde el Comparador de Llantas y Neumáticos.',
     unknownVehicle: 'Vehículo sin guardar',
   },
+  fr: {
+    label: 'Charger depuis Mon garage',
+    apply: 'Utiliser cette configuration',
+    emptyHint: 'Aucune configuration enregistrée pour l’instant — enregistrez-en une depuis le Comparateur jantes et pneus.',
+    unknownVehicle: 'Véhicule non enregistré',
+  },
+  it: {
+    label: 'Carica da Il mio garage',
+    apply: 'Usa questa configurazione',
+    emptyHint: 'Nessuna configurazione salvata — salvane una da Confronto cerchi e pneumatici.',
+    unknownVehicle: 'Veicolo non salvato',
+  },
+  'pt-br': {
+    label: 'Carregar da Minha garagem',
+    apply: 'Usar esta configuração',
+    emptyHint: 'Ainda não há configurações salvas — salve uma no Comparador de rodas e pneus.',
+    unknownVehicle: 'Veículo não salvo',
+  },
+  pl: {
+    label: 'Wczytaj z Mojego garażu',
+    apply: 'Użyj tej konfiguracji',
+    emptyHint: 'Brak zapisanych konfiguracji — zapisz jedną w narzędziu Porównanie felg i opon.',
+    unknownVehicle: 'Niezapisany pojazd',
+  },
+  nl: {
+    label: 'Laden uit Mijn garage',
+    apply: 'Deze set-up gebruiken',
+    emptyHint: 'Nog geen opgeslagen set-ups — sla er een op via Velgen en banden vergelijken.',
+    unknownVehicle: 'Niet-opgeslagen voertuig',
+  },
+  tr: {
+    label: 'Garajım’dan yükle',
+    apply: 'Bu kurulumu kullan',
+    emptyHint: 'Henüz kayıtlı kurulum yok — Jant ve Lastik Karşılaştırma aracından bir tane kaydedin.',
+    unknownVehicle: 'Kaydedilmemiş araç',
+  },
 };
 
 function resolveLocale(value: string | undefined): QuickLoadLocale {
-  return value === 'de' || value === 'es' ? value : 'en';
+  return (QUICK_LOAD_LOCALES as readonly string[]).includes(value ?? '') ? value as QuickLoadLocale : 'en';
 }
 
 function setupLabel(state: GarageState, setup: SavedSetup, copy: QuickLoadCopy): string {

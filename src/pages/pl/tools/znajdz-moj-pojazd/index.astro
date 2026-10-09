@@ -1,0 +1,41 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+import { vehicleMakes } from '../../../../data/vehicle-fitment';
+import { indexedVehicleMakes } from '../../../../data/vehicle-model-index';
+const definition = toolById('vehicle-fitment-finder');
+const c = localizedTool('vehicle-fitment-finder', 'pl');
+const makeCount = vehicleMakes().length;
+const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()]).size;
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('vehicle-fitment-finder')}>
+  <form slot="tool" class="calculator-form" data-calculator="vehicle-finder" novalidate>
+    <fieldset><legend>Pojazd</legend>
+      <div class="utility-fields">
+        <label>Marka<select name="make" data-vehicle-make></select></label>
+        <label>Model<select name="model" data-vehicle-model disabled></select></label>
+      </div>
+    </fieldset>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Wybierz markę i model, aby zobaczyć dane referencyjne.</p>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="vehicle-meta" data-vehicle-meta hidden>
+      <span class="vehicle-confidence" data-vehicle-confidence></span>
+      <p class="vehicle-sources" data-vehicle-sources></p>
+      <p class="vehicle-notes" data-vehicle-notes hidden></p>
+    </div>
+    <div class="vehicle-actions" data-vehicle-actions hidden>
+      <a class="studio-cta studio-cta--row" data-vehicle-tire-link data-base-href="/pl/tools/kalkulator-rozmiaru-opon/"><span><small>Wypełnione danymi tego pojazdu</small><strong>Otwórz w kalkulatorze rozmiaru opon</strong></span><i aria-hidden="true">›</i></a>
+      <a class="studio-cta studio-cta--row" data-vehicle-bolt-link data-base-href="/pl/tools/kalkulator-rozstawu-srub/"><span><small>Wypełnione danymi tego pojazdu</small><strong>Otwórz w kalkulatorze rozstawu śrub</strong></span><i aria-hidden="true">›</i></a>
+    </div>
+  </form>
+  <div slot="explanation">
+    {c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}
+    <h2>Marki z udokumentowanymi wpisami dopasowania Atlas: obecnie {makeCount}</h2>
+    <p>To początkowy zestaw popularnych pojazdów, a nie pełna baza danych producenta – będzie stopniowo rosnąć. Jeśli Twojego pojazdu jeszcze tu nie ma, specyfikację producenta znajdziesz na naklejce na słupku drzwi kierowcy lub w instrukcji obsługi. Możesz ją wpisać bezpośrednio w <a href="/pl/tools/kalkulator-rozmiaru-opon/">kalkulatorze rozmiaru opon</a> lub <a href="/pl/tools/kalkulator-rozstawu-srub/">kalkulatorze rozstawu śrub</a>.</p>
+    <p>Wybór marki i modelu przeszukuje szerszą listę – łącznie {searchableMakeCount} marek – więc możesz wskazać swój pojazd, nawet jeśli Atlas nie ma jeszcze dla niego udokumentowanego wpisu. Wtedy jasno to komunikujemy, zamiast zgadywać rozmiar.</p>
+    <p>Szukasz linku do udostępnienia dla konkretnego pojazdu? Zajrzyj na strony <a href="/pl/pojazdy/">bazy dopasowania pojazdów</a> – jedna strona na każdy udokumentowany model.</p>
+  </div>
+</ToolPage>
+<script>import { initializeVehicleFitmentFinder } from '../../../../ui/vehicle-fitment-finder'; initializeVehicleFitmentFinder();</script>

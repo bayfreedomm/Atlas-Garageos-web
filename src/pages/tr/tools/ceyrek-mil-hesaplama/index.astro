@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('quarter-mile-calculator');
+const c = localizedTool('quarter-mile-calculator', 'tr');
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('quarter-mile-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
+    <div class="utility-fields">
+      <label>Araç ağırlığı<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>
+      <label>Ağırlık birimi<select name="weightUnit"><option value="lb" selected>lb</option><option value="kg">kg</option></select></label>
+      <label>Güç<input name="power" type="number" value="300" min="0" step="any" inputmode="decimal" /></label>
+      <label>Güç birimi<select name="powerUnit"><option value="hp" selected>Mekanik beygir gücü (hp)</option><option value="kw">kW</option></select></label>
+    </div>
+    <UtilityResultStandard locale="tr" primaryLabel="Tahmini çeyrek mil süresi" pending="Araç ağırlığını ve motor gücünü girin." visualTitle="Ağırlık ÷ güç → bitiş süresi" visualNote="Drag yarışlarında kullanılan klasik güç-ağırlık tahmini" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeQuarterMileCalculator } from '../../../../ui/quarter-mile-calculator'; initializeQuarterMileCalculator();</script>

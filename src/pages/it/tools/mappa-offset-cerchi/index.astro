@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'it');
+---
+<ToolPage {definition} locale="it" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/it/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Prima di aprire la mappa</p><h2>Parti da una base misurata</h2><p>La mappa interattiva ha bisogno di larghezza e offset del cerchio attuale, degli spazi interno ed esterno misurati e dell’intervallo che vuoi esplorare.</p>
+      <ol class="entry-steps">
+        <li><strong>Misura</strong><span>Annota gli spazi statici interno ed esterno più ridotti.</span></li>
+        <li><strong>Definisci l’intervallo</strong><span>Scegli con criterio i limiti di larghezza e offset.</span></li>
+        <li><strong>Controlla le celle</strong><span>Leggi gli spazi previsti e la spiegazione di ogni stato.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/it/fitment-studio/#fitment-map-section">Apri la mappa interattiva</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

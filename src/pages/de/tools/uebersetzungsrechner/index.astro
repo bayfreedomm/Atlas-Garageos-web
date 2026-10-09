@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
@@ -8,7 +9,7 @@ const definition = toolById('gear-ratio-calculator');
 const c = localizedTool('gear-ratio-calculator', 'de');
 const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/gear-ratio-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/uebersetzungsrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-relacion-transmision/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/gear-ratio-calculator/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('gear-ratio-calculator')}>
   <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
     <div class="utility-fields gear-ratio-inputs"><label>Aktueller Reifendurchmesser · Zoll<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Neuer Reifendurchmesser · Zoll<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Aktuelle Achsübersetzung<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Fahrgeschwindigkeit · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
     <button type="submit">Übersetzung vergleichen</button>

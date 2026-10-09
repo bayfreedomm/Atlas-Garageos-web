@@ -12,6 +12,12 @@ const tabs = {
   en: { studio: '3D Studio', drawing: 'Engineering 2D', label: 'Visual mode', badge: 'VISUAL STUDIO' },
   de: { studio: '3D-Studio', drawing: 'Technische 2D-Ansicht', label: 'Ansichtsmodus', badge: 'VISUELLES STUDIO' },
   es: { studio: 'Estudio 3D', drawing: 'Ingeniería 2D', label: 'Modo de visualización', badge: 'ESTUDIO VISUAL' },
+  fr: { studio: 'Studio 3D', drawing: 'Plan technique 2D', label: 'Mode d’affichage', badge: 'STUDIO VISUEL' },
+  it: { studio: 'Studio 3D', drawing: 'Disegno tecnico 2D', label: 'Modalità di visualizzazione', badge: 'STUDIO VISIVO' },
+  'pt-br': { studio: 'Estúdio 3D', drawing: 'Engenharia 2D', label: 'Modo de visualização', badge: 'ESTÚDIO VISUAL' },
+  pl: { studio: 'Studio 3D', drawing: 'Rysunek techniczny 2D', label: 'Tryb widoku', badge: 'STUDIO WIZUALNE' },
+  nl: { studio: '3D-studio', drawing: 'Technische 2D-tekening', label: 'Weergavemodus', badge: 'VISUELE STUDIO' },
+  tr: { studio: '3D Stüdyo', drawing: '2D Teknik Çizim', label: 'Görünüm modu', badge: 'GÖRSEL STÜDYO' },
 }[locale];
 ---
 <section class="tire-visual-studio tool-visual-studio" data-tool-visual-studio data-tool-studio-locale={locale} aria-label={t.title}>
@@ -56,7 +62,8 @@ const tabs = {
       for (const [key, value] of new FormData(form)) if (typeof value === 'string') values[key] = value;
       const [{ sceneForTool }, { tool3DText }, { convertFuelEconomyTool, convertPressureTool, convertPowerTool, convertTorqueTool, calculatePowerToWeightTool }] = await Promise.all([import('../lib/visualization/tool-3d-scenes'), import('../localization/tool-3d-catalog'), import('../features/tools/utility-tools')]);
       if (version !== updateVersion) return;
-      const language = locale === 'de' || locale === 'es' ? locale : 'en';
+      const supportedLanguages = ['en', 'de', 'es', 'pt-br', 'fr', 'it', 'pl', 'nl', 'tr'] as const;
+      const language: typeof supportedLanguages[number] = supportedLanguages.find((code) => code === locale) ?? 'en';
       const tool = id as import('../localization/tool-3d-catalog').Additional3DToolId;
       const result = sceneForTool(tool, values, { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' }, language, false);
       const reading = plate.querySelector<HTMLElement>('[data-tool-engineering-reading]');

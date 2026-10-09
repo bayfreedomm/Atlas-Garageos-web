@@ -1,0 +1,66 @@
+---
+import { platformAlternates } from '../../../seo/locale-alternates';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+
+const c = platformCatalog['it'].contact;
+const SUPPORT_EMAIL = 'atlas.supportdesk@gmail.com';
+
+const alternates = platformAlternates('/contact/');
+---
+<SiteLayout
+  title={c.title}
+  description={c.description}
+  pathname="/it/contact/"
+  active="tools"
+  locale="it"
+  alternates={alternates}
+  breadcrumbs={[{ name: 'Home', href: '/it/' }, { name: c.h1, href: '/it/contact/' }]}
+>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/it/">Home</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>
+  <header class="directory-identity">
+    <h1>{c.h1}</h1>
+    <p>{c.lead}</p>
+  </header>
+
+  <section class="contact-page" data-contact-page aria-labelledby="contact-form-title">
+    <form class="contact-form" data-contact-form novalidate>
+      <h2 class="contact-form__title" id="contact-form-title">{c.formTitle}</h2>
+
+      <label class="contact-field">
+        <span>{c.nameLabel}</span>
+        <input type="text" name="name" data-contact-name required autocomplete="name" placeholder={c.namePlaceholder} />
+      </label>
+
+      <label class="contact-field">
+        <span>{c.emailLabel}</span>
+        <input type="email" name="email" data-contact-email required autocomplete="email" placeholder={c.emailPlaceholder} />
+      </label>
+
+      <label class="contact-field">
+        <span>{c.subjectLabel}</span>
+        <select name="subject" data-contact-subject required>
+          {c.subjectOptions.map((option) => <option value={option.value}>{option.label}</option>)}
+        </select>
+      </label>
+
+      <label class="contact-field contact-field--wide">
+        <span>{c.messageLabel}</span>
+        <textarea name="message" data-contact-message required maxlength="1500" rows={6} placeholder={c.messagePlaceholder}></textarea>
+      </label>
+
+      <button type="submit" class="contact-form__submit">{c.submitLabel}</button>
+      <p class="contact-form__note" data-contact-note hidden>{c.openingNote}</p>
+    </form>
+
+    <aside class="contact-direct" aria-label="Email">
+      <p class="contact-direct__label">{c.directLabel}</p>
+      <div class="contact-direct__row">
+        <a class="contact-direct__email" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+        <button type="button" class="contact-direct__copy" data-contact-copy data-default-label={c.copyLabel} data-copied-label={c.copiedLabel}>{c.copyLabel}</button>
+      </div>
+      <p class="contact-direct__note">Leggiamo tutti i messaggi e di solito rispondiamo entro pochi giorni lavorativi. Se segnali una correzione su misure o dati, indica marca, modello e generazione esatti: ci aiuti a sistemarla più in fretta.</p>
+    </aside>
+  </section>
+</SiteLayout>
+<script>import { initializeContactForm } from '../../../ui/contact-form'; initializeContactForm();</script>

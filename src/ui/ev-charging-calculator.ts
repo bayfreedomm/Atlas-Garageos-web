@@ -43,6 +43,84 @@ const EV_CHARGING_LABELS = {
     metricCost: 'Coste estimado',
     metricTime: 'Tiempo ideal a potencia constante',
   },
+  fr: {
+    pendingSummary: 'Vérifiez les champs signalés pour mettre à jour l’estimation.',
+    endMustExceedStart: 'La charge finale doit être supérieure à la charge de départ.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `Recharger de ${start} % à ${end} % coûte environ ${currency} ${cost}.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `De ${start} % à ${end} % avec un rendement saisi de ${efficiency} %.`,
+    grid: (kwh: string): string => `${kwh} kWh prélevés sur le réseau.`,
+    metricBattery: 'Énergie stockée dans la batterie',
+    metricGrid: 'Énergie prélevée sur le réseau',
+    metricCost: 'Coût estimé',
+    metricTime: 'Durée idéale à puissance constante',
+  },
+  it: {
+    pendingSummary: 'Controlla i campi evidenziati per aggiornare la stima.',
+    endMustExceedStart: 'La carica finale deve essere superiore a quella iniziale.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `Ricaricare dal ${start}% al ${end}% costa circa ${currency} ${cost}.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `Dal ${start}% al ${end}% con un’efficienza inserita del ${efficiency}%.`,
+    grid: (kwh: string): string => `${kwh} kWh prelevati dalla rete.`,
+    metricBattery: 'Energia immessa nella batteria',
+    metricGrid: 'Energia prelevata dalla rete',
+    metricCost: 'Costo stimato',
+    metricTime: 'Tempo ideale a potenza costante',
+  },
+  'pt-br': {
+    pendingSummary: 'Confira os campos destacados para atualizar a estimativa.',
+    endMustExceedStart: 'A carga final deve ser maior que a carga inicial.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `Carregar de ${start}% a ${end}% custa cerca de ${currency} ${cost}.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `De ${start}% a ${end}% com eficiência informada de ${efficiency}%.`,
+    grid: (kwh: string): string => `${kwh} kWh retirados da rede.`,
+    metricBattery: 'Energia na bateria',
+    metricGrid: 'Energia da rede',
+    metricCost: 'Custo estimado',
+    metricTime: 'Tempo ideal com potência constante',
+  },
+  pl: {
+    pendingSummary: 'Sprawdź zaznaczone pola, aby zaktualizować szacunek.',
+    endMustExceedStart: 'Poziom końcowy musi być wyższy niż początkowy.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `Ładowanie od ${start}% do ${end}% kosztuje około ${currency} ${cost}.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `Od ${start}% do ${end}% przy wpisanej sprawności ${efficiency}%.`,
+    grid: (kwh: string): string => `${kwh} kWh pobranych z sieci.`,
+    metricBattery: 'Energia do akumulatora',
+    metricGrid: 'Energia z sieci',
+    metricCost: 'Szacowany koszt',
+    metricTime: 'Idealny czas przy stałej mocy',
+  },
+  nl: {
+    pendingSummary: 'Controleer de gemarkeerde velden om de schatting bij te werken.',
+    endMustExceedStart: 'Het eindniveau moet hoger zijn dan het startniveau.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `Laden van ${start}% tot ${end}% kost ongeveer ${currency} ${cost}.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `Van ${start}% tot ${end}% bij een ingevuld rendement van ${efficiency}%.`,
+    grid: (kwh: string): string => `${kwh} kWh van het net afgenomen.`,
+    metricBattery: 'Energie in de accu',
+    metricGrid: 'Energie van het net',
+    metricCost: 'Geschatte kosten',
+    metricTime: 'Ideale tijd bij constant vermogen',
+  },
+  tr: {
+    pendingSummary: 'Tahmini güncellemek için işaretli alanları kontrol edin.',
+    endMustExceedStart: 'Bitiş şarj seviyesi başlangıç seviyesinden yüksek olmalıdır.',
+    summary: (start: string, end: string, currency: string, cost: string): string =>
+      `%${start} seviyesinden %${end} seviyesine şarj etmek yaklaşık ${currency} ${cost} tutar.`,
+    context: (start: string, end: string, efficiency: string): string =>
+      `Girilen %${efficiency} verimle %${start} → %${end}.`,
+    grid: (kwh: string): string => `Şebekeden ${kwh} kWh çekilir.`,
+    metricBattery: 'Bataryaya giren enerji',
+    metricGrid: 'Şebekeden çekilen enerji',
+    metricCost: 'Tahmini maliyet',
+    metricTime: 'Sabit güçte ideal süre',
+  },
 } as const;
 
 const numberValue = (form: HTMLFormElement, name: string): number => {

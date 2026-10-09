@@ -8,9 +8,11 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className?: stri
   return node;
 };
 
+const ENTITY_LOCALE_VALUES: readonly EntityLocale[] = ['en', 'de', 'es', 'pt-br', 'fr', 'it', 'pl', 'nl', 'tr'];
+
 const localeFor = (root: HTMLElement): EntityLocale => {
   const locale = root.dataset.locale;
-  return locale === 'de' || locale === 'es' ? locale : 'en';
+  return (ENTITY_LOCALE_VALUES as readonly string[]).includes(locale ?? '') ? locale as EntityLocale : 'en';
 };
 
 function initializeComparison(root: HTMLElement): void {

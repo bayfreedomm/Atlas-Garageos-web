@@ -1,14 +1,27 @@
 ---
 import type { ContentLocale } from '../localization/site-catalog';
-interface Props { distance?: number; economy?: number; price?: number | undefined; currency?: 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD'; compact?: boolean; locale?: ContentLocale | undefined; }
-const { distance = 500, economy = 7.2, currency = 'USD', compact = false, locale } = Astro.props;
+import type { AtlasLocale } from '../localization/locales';
+type FuelCurrency = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'TRY' | 'PLN' | 'BRL';
+interface Props { distance?: number; economy?: number; price?: number | undefined; currency?: FuelCurrency; compact?: boolean; locale?: ContentLocale | undefined; }
+const { distance = 500, economy = 7.2, compact = false, locale } = Astro.props;
+// Without an explicit currency prop, default to the currency of the page's market.
+const DEFAULT_CURRENCY: Readonly<Record<AtlasLocale, FuelCurrency>> = { en: 'USD', de: 'EUR', es: 'EUR', fr: 'EUR', it: 'EUR', nl: 'EUR', 'pt-br': 'BRL', pl: 'PLN', tr: 'TRY' };
+const currency: FuelCurrency = Astro.props.currency ?? DEFAULT_CURRENCY[locale ?? 'en'];
 // An explicitly supplied `undefined` means the market feed is pending and must stay blank.
 // The generic 1.8 example is used only when a caller omits the price prop entirely.
-const price = Object.prototype.hasOwnProperty.call(Astro.props, 'price') ? Astro.props.price : 1.8;
+// Example per-litre prices by currency, so a market without a live feed still shows a realistic, editable value.
+const EXAMPLE_PRICE: Readonly<Record<FuelCurrency, number>> = { USD: 1.8, EUR: 1.8, GBP: 1.8, CAD: 1.8, AUD: 1.8, TRY: 48, PLN: 6.4, BRL: 6.3 };
+const price = Object.prototype.hasOwnProperty.call(Astro.props, 'price') ? Astro.props.price : EXAMPLE_PRICE[currency];
 const L = {
   en: { units: 'Units', metric: 'Metric · km, L/100km', imperial: 'US · miles, MPG', distance: 'Distance · km', economy: 'Fuel economy · L/100km', price: 'Fuel price · per litre', currency: 'Currency label' },
   de: { units: 'Einheiten', metric: 'Metrisch · km, L/100km', imperial: 'US · Meilen, MPG', distance: 'Distanz · km', economy: 'Kraftstoffverbrauch · L/100km', price: 'Kraftstoffpreis · pro Liter', currency: 'Währung' },
   es: { units: 'Unidades', metric: 'Métrico · km, L/100km', imperial: 'EE. UU. · millas, MPG', distance: 'Distancia · km', economy: 'Consumo · L/100km', price: 'Precio · por litro', currency: 'Moneda' },
+  fr: { units: 'Unités', metric: 'Métrique · km, L/100km', imperial: 'États-Unis · miles, MPG', distance: 'Distance · km', economy: 'Consommation · L/100km', price: 'Prix du carburant · par litre', currency: 'Devise' },
+  it: { units: 'Unità', metric: 'Metrico · km, L/100km', imperial: 'USA · miglia, MPG', distance: 'Distanza · km', economy: 'Consumo · L/100km', price: 'Prezzo carburante · al litro', currency: 'Valuta' },
+  'pt-br': { units: 'Unidades', metric: 'Métrico · km, L/100km', imperial: 'EUA · milhas, MPG', distance: 'Distância · km', economy: 'Consumo · L/100km', price: 'Preço do combustível · por litro', currency: 'Moeda' },
+  pl: { units: 'Jednostki', metric: 'Metryczne · km, L/100km', imperial: 'USA · mile, MPG', distance: 'Dystans · km', economy: 'Spalanie · L/100km', price: 'Cena paliwa · za litr', currency: 'Waluta' },
+  nl: { units: 'Eenheden', metric: 'Metrisch · km, L/100km', imperial: 'VS · mijl, MPG', distance: 'Afstand · km', economy: 'Verbruik · L/100km', price: 'Brandstofprijs · per liter', currency: 'Valuta' },
+  tr: { units: 'Birimler', metric: 'Metrik · km, L/100km', imperial: 'ABD · mil, MPG', distance: 'Mesafe · km', economy: 'Yakıt tüketimi · L/100km', price: 'Yakıt fiyatı · litre başına', currency: 'Para birimi' },
 }[locale ?? 'en'];
 ---
 <div class:list={['utility-fields', { 'utility-fields--compact': compact }]}>
@@ -16,5 +29,5 @@ const L = {
   <label><span data-distance-label>{L.distance}</span><input name="distance" type="number" value={distance} min="0" step="any" inputmode="decimal" /></label>
   <label><span data-economy-label>{L.economy}</span><input name="economy" type="number" value={economy} min="0" step="any" inputmode="decimal" /></label>
   <label><span data-price-label>{L.price}</span><input name="price" type="number" value={price} min="0" step="any" inputmode="decimal" /></label>
-  <label>{L.currency}<select name="currency">{(['USD', 'EUR', 'GBP', 'CAD', 'AUD'] as const).map((code) => <option value={code} selected={code === currency}>{code}</option>)}</select></label>
+  <label>{L.currency}<select name="currency">{(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'TRY', 'PLN', 'BRL'] as const).map((code) => <option value={code} selected={code === currency}>{code}</option>)}</select></label>
 </div>

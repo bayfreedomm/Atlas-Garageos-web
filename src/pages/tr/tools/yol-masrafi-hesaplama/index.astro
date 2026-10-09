@@ -1,0 +1,43 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import VehicleTripContext from '../../../../components/VehicleTripContext.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('road-trip-cost-calculator');
+const c = localizedTool('road-trip-cost-calculator', 'tr');
+// Türkiye için canlı akaryakıt fiyatı beslemesi yok: düzenlenebilir örnek benzin fiyatı (TRY/L).
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('road-trip-cost-calculator')}>
+  <VehicleTripContext slot="tool" locale="tr" />
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields locale="tr" currency="TRY" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">ABD akaryakıt fiyatları (İngilizce) <span aria-hidden="true">→</span></a>
+    <fieldset class="trip-options"><legend>Yolculuk</legend>
+      <div class="utility-fields"><label class="field-wide">Yön<select name="tripType"><option value="one">Tek yön</option><option value="round">Gidiş-dönüş</option></select></label></div>
+      <details><summary>Otoyol/köprü ücreti, ek masraf veya yol arkadaşı ekleyin</summary><div class="utility-fields">
+        <label>Ek yolculuk masrafı<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>Kişi sayısı<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Yolculuk maliyetini hesaplayın</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Tahmini yolculuk maliyeti">
+      <div class="trip-primary__main"><span>Tahmini toplam yolculuk maliyeti</span><strong data-trip-total>—</strong><p data-trip-context>Toplam maliyeti görmek için yolculuk bilgilerinizi girin.</p></div>
+      <div class="trip-primary__support"><div><span>Tüketilen yakıt</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>Yakıt maliyeti burada görünecek.</small></div><div><span>Güzergâh</span><strong data-trip-direction>—</strong><small data-trip-distance>Mesafe burada görünecek.</small></div><div data-trip-person-wrap hidden><span>Kişi başı</span><strong data-trip-person>—</strong><small data-trip-people>Toplamın paylaşımı</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Yolculuk tahmininiz burada görünecek.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Yolculuk mesafesi ve orantılı maliyet dökümü">
+      <div class="trip-technical-visual__head"><span>GÜZERGÂH → YAKIT + EKSTRALAR → TOPLAM</span><small>Rota şeması; maliyet bölümleri orantılıdır</small></div>
+      <div class="trip-route" aria-hidden="true"><span>BAŞLANGIÇ</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>VARIŞ</span></div>
+      <div class="trip-visual-stats"><div><small>Kat edilen mesafe</small><strong data-trip-visual-distance>—</strong></div><div><small>Gereken yakıt</small><strong data-trip-visual-fuel>—</strong></div><div><small>Toplam</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Yakıt ve ek masraf dağılımı" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Yakıt <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Ekstralar <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Ayrıntılar</span><small>Yolculuğun tam dökümü</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

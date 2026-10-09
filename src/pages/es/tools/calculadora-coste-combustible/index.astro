@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import FuelFields from '../../../../components/FuelFields.astro';
 import FuelCostTechnicalVisual from '../../../../components/FuelCostTechnicalVisual.astro';
@@ -12,7 +13,7 @@ const fuelPrices = asFuelPrices(rawFuelPrices);
 const e5 = fuelPrices.es.products.find((p) => p.id === 'e5');
 const livePrice = fuelPrices.es.status !== 'pending' ? e5?.value : undefined;
 ---
-<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/spritkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-combustible/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/fuel-cost-calculator/' }]}>
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('fuel-cost-calculator')}>
   <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
     <FuelFields locale="es" price={livePrice} currency="EUR" />
     <a class="fuel-price-hint" href="/es/precio-gasolina-hoy/">Ver el precio de la gasolina hoy <span aria-hidden="true">→</span></a>

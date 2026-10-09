@@ -6,14 +6,14 @@ import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, entityLocales } from './entity-routes';
 import { dtcRecords } from '../data/dtc-records';
 import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
-import { REFERENCE_LOCALES } from '../localization/reference-locales';
+import { CONTENT_LOCALES } from '../localization/site-catalog';
 import { boltMakePath, boltMakes } from '../ui/bolt-make';
 import { carMakePath, carMakes, carModelPath, carYearPath, publishedCarModels, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
 
 function localizedRoutes(): readonly string[] {
-  const locales = ['de', 'es'] as const;
+  const locales = CONTENT_LOCALES;
   const routes: string[] = [];
   for (const locale of locales) {
     for (const path of LOCALIZED_PLATFORM_PATHS) {
@@ -21,6 +21,8 @@ function localizedRoutes(): readonly string[] {
     }
     for (const tool of toolRegistry) {
       if (!(tool.indexable && tool.status === 'implemented')) continue;
+      // Fuel market dashboards exist only for markets with official price data (US, DE, ES).
+      if (tool.id === 'gas-prices-today' && locale !== 'de' && locale !== 'es') continue;
       // The fitment-studio flagship page now has a published DE/ES route too, but — unlike
       // every calculator, which gets a fully localized slug from localizedToolPath — it keeps
       // the same unprefixed 'fitment-studio' slug in every locale (see the DE/ES pages under
@@ -78,9 +80,7 @@ function carRoutes(): readonly string[] {
 
 export function sitemapEntries(): readonly string[] {
   const diagnosticRoutes = ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
-  // Reference-only locales publish the reference families; each has a localized home.
-  const referenceHomes = REFERENCE_LOCALES.map((locale) => `/${locale}/`);
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...referenceHomes, ...carRoutes()].map(canonicalForPath));
+  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...carRoutes()].map(canonicalForPath));
 }
 
 export function renderSitemapXml(): string {

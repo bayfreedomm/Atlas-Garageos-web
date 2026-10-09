@@ -1,0 +1,42 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import VehicleTripContext from '../../../../components/VehicleTripContext.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('road-trip-cost-calculator');
+const c = localizedTool('road-trip-cost-calculator', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('road-trip-cost-calculator')}>
+  <VehicleTripContext slot="tool" locale="nl" />
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields locale="nl" currency="EUR" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">Brandstofprijzen in de VS (Engels) <span aria-hidden="true">→</span></a>
+    <fieldset class="trip-options"><legend>Rit</legend>
+      <div class="utility-fields"><label class="field-wide">Richting<select name="tripType"><option value="one">Enkele reis</option><option value="round">Heen en terug</option></select></label></div>
+      <details><summary>Tol, extra kosten of medereizigers toevoegen</summary><div class="utility-fields">
+        <label>Extra reiskosten<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>Personen<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Reiskosten schatten</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Geschatte reiskosten">
+      <div class="trip-primary__main"><span>Geschatte totale reiskosten</span><strong data-trip-total>—</strong><p data-trip-context>Vul je reisgegevens in om de totale kosten te zien.</p></div>
+      <div class="trip-primary__support"><div><span>Verbruikte brandstof</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>De brandstofkosten verschijnen hier.</small></div><div><span>Rit</span><strong data-trip-direction>—</strong><small data-trip-distance>De afstand verschijnt hier.</small></div><div data-trip-person-wrap hidden><span>Per persoon</span><strong data-trip-person>—</strong><small data-trip-people>Verdeling van het totaal</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Je reisschatting verschijnt hier.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Reisafstand en kostenverdeling op schaal">
+      <div class="trip-technical-visual__head"><span>RIT → BRANDSTOF + EXTRA'S → TOTAAL</span><small>Schematische route; de kostenbalken zijn op schaal</small></div>
+      <div class="trip-route" aria-hidden="true"><span>START</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>BESTEMMING</span></div>
+      <div class="trip-visual-stats"><div><small>Afgelegde afstand</small><strong data-trip-visual-distance>—</strong></div><div><small>Benodigde brandstof</small><strong data-trip-visual-fuel>—</strong></div><div><small>Totaal</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Verdeling van brandstofkosten en extra's" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Brandstof <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Extra's <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Volledige uitsplitsing van de reis</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

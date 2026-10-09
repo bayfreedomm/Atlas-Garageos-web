@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
@@ -9,7 +10,7 @@ const c = localizedTool('vehicle-fitment-finder', 'es');
 const makeCount = vehicleMakes().length;
 const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()]).size;
 ---
-<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrzeug-finden/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/encontrar-mi-vehiculo/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }]}>
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('vehicle-fitment-finder')}>
   <form slot="tool" class="calculator-form" data-calculator="vehicle-finder" novalidate>
     <fieldset><legend>Vehículo</legend>
       <div class="utility-fields">

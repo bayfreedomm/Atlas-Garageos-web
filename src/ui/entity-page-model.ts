@@ -6,6 +6,7 @@
  * .astro files never do arithmetic of their own. Keeping it in a .ts module also means it is
  * covered by tsc and by unit tests, which .astro frontmatter is not.
  */
+import type { ToolEntityLocale } from '../seo/entity-routes';
 import { calculateTireSizeTool } from '../features/tools/calculator-tools';
 import { inchesToMillimeters } from '../core/units/conversion';
 import { tireSizeCatalog, vehiclesForTireSize, type TireSizeEntry } from '../data/tire-size-catalog';
@@ -282,11 +283,8 @@ export const signed = (value: number, digits: number, unit: string, locale: Numb
  * pre-fill instead of just saying "type it in".
  * ------------------------------------------------------------------------------------ */
 
-/**
- * Calculators and the vehicle directory exist in EN/DE/ES only. French entity pages (tire sizes,
- * bolt patterns) link to the English tools, and say so in their copy.
- */
-export function toolLocale(locale: EntityLocale): 'en' | 'de' | 'es' {
+/** Calculators exist in every entity locale, so entity pages link to tools in their own language. */
+export function toolLocale(locale: EntityLocale): ToolEntityLocale {
   return toolLocaleFor(locale);
 }
 

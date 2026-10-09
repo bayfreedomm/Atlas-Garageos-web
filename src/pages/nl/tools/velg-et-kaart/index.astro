@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/nl/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Voordat je de kaart opent</p><h2>Begin met een gemeten uitgangssituatie</h2><p>De interactieve kaart heeft de huidige breedte en ET van je velg nodig, de gemeten vrije ruimte aan binnen- en buitenkant, en het bereik dat je wilt verkennen.</p>
+      <ol class="entry-steps">
+        <li><strong>Meet</strong><span>Noteer de kleinste statische vrije ruimte aan binnen- en buitenkant.</span></li>
+        <li><strong>Bepaal het bereik</strong><span>Kies bewuste grenzen voor breedte en ET.</span></li>
+        <li><strong>Bekijk de cellen</strong><span>Lees de berekende vrije ruimte en de uitleg bij elke status.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/nl/fitment-studio/#fitment-map-section">Start met de interactieve kaart</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

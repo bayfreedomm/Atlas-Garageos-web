@@ -1,0 +1,25 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('gear-ratio-calculator');
+const c = localizedTool('gear-ratio-calculator', 'pl');
+const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('gear-ratio-calculator')}>
+  <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
+    <div class="utility-fields gear-ratio-inputs"><label>Obecna średnica opony · cale<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Nowa średnica opony · cale<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Obecne przełożenie mostu<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Prędkość jazdy · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
+    <button type="submit">Porównaj przełożenie</button>
+    <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Efektywne przełożenie mostu</span><strong data-gear-effective>—</strong><p data-gear-context>Tutaj pojawi się porównanie przełożeń.</p></div><div class="standard-answer__secondary"><span>Przełożenie przywracające fabryczną charakterystykę</span><strong data-gear-matching>—</strong><small data-gear-rpm>Tutaj pojawią się obroty na biegu bezpośrednim.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Tutaj pojawi się efektywne przełożenie.</p>
+    <Parametric3DPanel mode="gear" locale="pl" />
+    <GearRatioTechnicalVisual locale="pl" />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Szczegóły</span><small>Przełożenie i obliczenia na biegu bezpośrednim</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">OPONY 25–44 CALE</p><h2 id="rpm-matrix-heading">Mapa obrotów przy <span data-matrix-speed>65</span> mph</h2><p>Bieg bezpośredni (1,00:1). Kolor pokazuje względne obroty tylko w obrębie tej tabeli.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Opona</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>Najniższe względne obroty</span><i aria-hidden="true"></i><span>Najwyższe względne obroty</span></p></section>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeGearRatioCalculators } from '../../../../ui/gear-ratio-calculator'; initializeGearRatioCalculators();</script>

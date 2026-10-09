@@ -44,7 +44,12 @@ const boltHubHref = entityHubPath('bolt-pattern', locale);
 const flotation = entry.flotation;
 const rimText = formatPlain(entry.rimDiameterInches, locale);
 const diameterGroup = tireDiameterGroupFor(entry);
-const inchClass = diameterGroup ? (isReferenceLocale(locale) ? referenceChromeText[locale].inchClass(diameterGroup.inches) : locale === 'en' ? `${diameterGroup.inches}-inch` : locale === 'de' ? `${diameterGroup.inches}-Zoll` : `${diameterGroup.inches} pulgadas`) : '';
+const INCH_CLASS: Readonly<Record<EntityLocale, (inches: number) => string>> = {
+  en: (n) => `${n}-inch`, de: (n) => `${n}-Zoll`, es: (n) => `${n} pulgadas`,
+  fr: (n) => `${n} pouces`, it: (n) => `${n} pollici`, 'pt-br': (n) => `${n} polegadas`,
+  pl: (n) => `opony ${n}-calowe`, nl: (n) => `${n} inch`, tr: (n) => `${n} inç`,
+};
+const inchClass = diameterGroup ? (isReferenceLocale(locale) ? referenceChromeText[locale].inchClass(diameterGroup.inches) : INCH_CLASS[locale](diameterGroup.inches)) : '';
 const generalFaqs = t.faqs({ notation: shownNotation, vehicles: vehicles.length, makes: vehicleNames(vehicles), rim: entry.rimDiameterInches });
 const faqs = [
   ...t.sizeFaqs(shownNotation, {

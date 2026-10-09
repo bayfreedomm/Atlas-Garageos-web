@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import FuelFields from '../../../../components/FuelFields.astro';
 import VehicleTripContext from '../../../../components/VehicleTripContext.astro';
@@ -12,7 +13,7 @@ const fuelPrices = asFuelPrices(rawFuelPrices);
 const e5 = fuelPrices.de.products.find((p) => p.id === 'e5');
 const livePrice = fuelPrices.de.status !== 'pending' ? e5?.value : undefined;
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrtkostenrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-viaje/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/road-trip-cost-calculator/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('road-trip-cost-calculator')}>
   <VehicleTripContext slot="tool" locale="de" />
   <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
     <FuelFields locale="de" distance={420} economy={6.5} price={livePrice} currency="EUR" />

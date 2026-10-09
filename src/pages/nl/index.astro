@@ -1,4 +1,11 @@
 ---
-import ReferenceHome from '../../components/ReferenceHome.astro';
+import { platformAlternates } from '../../seo/locale-alternates';
+import SiteLayout from '../../components/SiteLayout.astro';
+import HomeLauncher from '../../components/HomeLauncher.astro';
+import { platformCatalog } from '../../localization/site-catalog';
+const c = platformCatalog.nl.home;
+const alternates = platformAlternates('/');
 ---
-<ReferenceHome locale="nl" />
+<SiteLayout title={c.title} description={c.description} pathname="/nl/" active="home" locale="nl" alternates={alternates}>
+  <HomeLauncher locale="nl" />
+</SiteLayout>

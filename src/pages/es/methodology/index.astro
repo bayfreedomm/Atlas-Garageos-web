@@ -1,13 +1,9 @@
 ---
+import { platformAlternates } from '../../../seo/locale-alternates';
 import SiteLayout from '../../../components/SiteLayout.astro';
 import { platformCatalog } from '../../../localization/site-catalog';
 const c = platformCatalog.es.methodology;
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/methodology/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/methodology/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/methodology/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/methodology/' },
-];
+const alternates = platformAlternates('/methodology/');
 ---
 <SiteLayout title={c.title} description={c.description} pathname="/es/methodology/" active="tools" locale="es" alternates={alternates} breadcrumbs={[{ name: 'Inicio', href: '/es/' }, { name: c.h1, href: '/es/methodology/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>

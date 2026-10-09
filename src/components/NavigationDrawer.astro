@@ -5,6 +5,7 @@ import { TOOL_CATEGORY_ORDER, type ToolCategory } from '../seo/tool-registry';
 import { referenceCopy, referenceLinks } from '../ui/reference-links';
 import { isReferenceLocale } from '../localization/reference-locales';
 import { referenceChromeText } from '../content/reference-locale-text';
+import type { AtlasLocale } from '../localization/locales';
 interface LocaleLink { readonly code: string; readonly label: string; readonly href: string; }
 interface Props { locale?: ChromeLocale | undefined; localeLinks?: readonly LocaleLink[] | undefined; }
 const { locale, localeLinks } = Astro.props;
@@ -20,10 +21,16 @@ const FALLBACK_CATEGORY_LABELS: Readonly<Record<ToolCategory, string>> = { 'Fuel
 const entityLocale = locale ?? 'en';
 const reference = referenceLinks(entityLocale);
 const refCopy = referenceCopy(entityLocale);
-const baseChrome = {
+const baseChrome: Readonly<Record<AtlasLocale, { open: string; close: string; dialog: string; main: string; categories: string; reference: string; diagnostics: string; diagnosticsHelper: string }>> = {
   en: { open: 'Open menu', close: 'Close menu', dialog: 'Atlas menu', main: 'Main navigation', categories: 'Tool categories', reference: 'Reference data', diagnostics: 'Diagnostics', diagnosticsHelper: 'Look up OBD-II codes and next checks' },
   de: { open: 'Menü öffnen', close: 'Menü schließen', dialog: 'Atlas-Menü', main: 'Hauptnavigation', categories: 'Werkzeugkategorien', reference: 'Referenzdaten', diagnostics: 'Diagnose (Englisch)', diagnosticsHelper: 'OBD-II-Fehlercodes nachschlagen' },
   es: { open: 'Abrir menú', close: 'Cerrar menú', dialog: 'Menú de Atlas', main: 'Navegación principal', categories: 'Categorías de herramientas', reference: 'Datos de referencia', diagnostics: 'Diagnóstico (inglés)', diagnosticsHelper: 'Consultar códigos OBD-II' },
+  fr: { open: 'Ouvrir le menu', close: 'Fermer le menu', dialog: 'Menu Atlas', main: 'Navigation principale', categories: 'Catégories d’outils', reference: 'Données de référence', diagnostics: 'Diagnostic (anglais)', diagnosticsHelper: 'Consulter les codes OBD-II' },
+  it: { open: 'Apri il menu', close: 'Chiudi il menu', dialog: 'Menu Atlas', main: 'Navigazione principale', categories: 'Categorie di strumenti', reference: 'Dati di riferimento', diagnostics: 'Diagnostica (inglese)', diagnosticsHelper: 'Consulta i codici OBD-II' },
+  'pt-br': { open: 'Abrir o menu', close: 'Fechar o menu', dialog: 'Menu Atlas', main: 'Navegação principal', categories: 'Categorias de ferramentas', reference: 'Dados de referência', diagnostics: 'Diagnóstico (inglês)', diagnosticsHelper: 'Consultar códigos OBD-II' },
+  pl: { open: 'Otwórz menu', close: 'Zamknij menu', dialog: 'Menu Atlas', main: 'Nawigacja główna', categories: 'Kategorie narzędzi', reference: 'Dane referencyjne', diagnostics: 'Diagnostyka (po angielsku)', diagnosticsHelper: 'Sprawdzanie kodów OBD-II' },
+  nl: { open: 'Menu openen', close: 'Menu sluiten', dialog: 'Atlas-menu', main: 'Hoofdnavigatie', categories: 'Toolcategorieën', reference: 'Referentiegegevens', diagnostics: 'Diagnose (Engels)', diagnosticsHelper: 'OBD-II-codes opzoeken' },
+  tr: { open: 'Menüyü aç', close: 'Menüyü kapat', dialog: 'Atlas menüsü', main: 'Ana gezinme', categories: 'Araç kategorileri', reference: 'Referans veriler', diagnostics: 'Arıza teşhisi (İngilizce)', diagnosticsHelper: 'OBD-II kodlarına bakın' },
 };
 const chrome = isReferenceLocale(entityLocale) ? referenceChromeText[entityLocale].drawer : baseChrome[entityLocale];
 const categoryLabels: Readonly<Record<ToolCategory, string>> = isReferenceLocale(locale)

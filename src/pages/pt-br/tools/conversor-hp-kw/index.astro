@@ -1,0 +1,20 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('hp-kw-converter');
+const c = localizedTool('hp-kw-converter', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('hp-kw-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="power" novalidate>
+    <div class="instant-input">
+      <label>Potência<input name="value" type="number" value="180" min="0" step="any" inputmode="decimal" /></label>
+      <label>Unidade<select name="unit"><option value="hp">hp (mecânico)</option><option value="kw">Quilowatts</option></select></label>
+    </div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Potência convertida" pending="Digite um valor de potência." visualTitle="Conversão de potência mecânica" visualNote="O hp mecânico é tratado separadamente do cv métrico" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

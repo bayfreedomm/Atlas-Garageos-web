@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-load-speed-rating');
+const c = localizedTool('tire-load-speed-rating', 'pl');
+const loadIndexes = Array.from({ length: 126 - 75 + 1 }, (_, index) => 75 + index);
+const speedRatings: readonly string[] = ['L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'H', 'V', 'W', 'Y'];
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('tire-load-speed-rating')}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-load-speed" novalidate>
+    <div class="utility-fields">
+      <label>Indeks nośności<select name="loadIndex">{loadIndexes.map((index) => <option value={index} selected={index === 91}>{index}</option>)}</select></label>
+      <label>Indeks prędkości<select name="speedRating">{speedRatings.map((rating) => <option value={rating} selected={rating === 'V'}>{rating}</option>)}</select></label>
+    </div>
+    <UtilityResultStandard locale="pl" primaryLabel="Nośność jednej opony" pending="Wybierz indeks nośności i indeks prędkości." visualTitle="Kod → standardowa nośność" visualNote="Standardowa tabela ETRTO / symbol prędkości" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTireLoadSpeedReference } from '../../../../ui/tire-load-speed-reference'; initializeTireLoadSpeedReference();</script>

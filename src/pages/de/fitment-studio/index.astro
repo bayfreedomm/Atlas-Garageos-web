@@ -8,6 +8,8 @@ import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
 import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
 import ToolIcon from '../../../components/ToolIcon.astro';
 import Footer from '../../../components/Footer.astro';
+import LanguageQuickToggle from '../../../components/LanguageQuickToggle.astro';
+import { localeSwitchLinks, platformAlternates } from '../../../seo/locale-alternates';
 import ThemeQuickToggle from '../../../components/ThemeQuickToggle.astro';
 import '../../../styles/global.css';
 import '../../../styles/product-v3.css';
@@ -25,10 +27,7 @@ const t = fitmentStudioText.de;
     <meta name="description" content={t.metaDescription} />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href={canonicalForPath('/de/fitment-studio/')} />
-    <link rel="alternate" hreflang="en" href={canonicalForPath('/fitment-studio/')} />
-    <link rel="alternate" hreflang="de" href={canonicalForPath('/de/fitment-studio/')} />
-    <link rel="alternate" hreflang="es" href={canonicalForPath('/es/fitment-studio/')} />
-    <link rel="alternate" hreflang="x-default" href={canonicalForPath('/fitment-studio/')} />
+    {platformAlternates('/fitment-studio/').map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#f7f8f5" />
@@ -40,7 +39,7 @@ const t = fitmentStudioText.de;
     <header class="app-header">
       <div class="app-header__inner">
         <a class="brand" href="/de/" aria-label={t.homeAriaLabel}><Brand subtitle={t.brandSubtitle} /></a>
-        <div class="app-header__actions"><nav class="desktop-nav" aria-label={t.primaryNavAria}><a href="/de/">{t.navHome}</a><a href="/de/tools/">{t.navTools}</a><a href="/de/fitment-studio/" aria-current="page">{t.navCompare}</a></nav><ThemeQuickToggle /><NavigationDrawer locale="de" localeLinks={[{ code: 'en', label: 'English', href: '/fitment-studio/' }, { code: 'de', label: 'Deutsch', href: '/de/fitment-studio/' }, { code: 'es', label: 'Español', href: '/es/fitment-studio/' }]} /></div>
+        <div class="app-header__actions"><nav class="desktop-nav" aria-label={t.primaryNavAria}><a href="/de/">{t.navHome}</a><a href="/de/tools/">{t.navTools}</a><a href="/de/fitment-studio/" aria-current="page">{t.navCompare}</a></nav><LanguageQuickToggle links={localeSwitchLinks('/fitment-studio/').map((l) => ({ ...l, label: l.code === 'pt-br' ? 'PT' : l.code.toUpperCase() }))} current="de" /><ThemeQuickToggle /><NavigationDrawer locale="de" localeLinks={localeSwitchLinks('/fitment-studio/')} /></div>
       </div>
     </header>
 

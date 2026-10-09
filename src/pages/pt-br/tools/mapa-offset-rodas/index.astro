@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/pt-br/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Antes de abrir o mapa</p><h2>Traga uma referência medida</h2><p>O mapa interativo precisa da tala e do offset atuais da sua roda, das folgas internas e externas medidas e da faixa que você quer explorar.</p>
+      <ol class="entry-steps">
+        <li><strong>Meça</strong><span>Anote as menores folgas estáticas internas e externas.</span></li>
+        <li><strong>Defina a faixa</strong><span>Escolha limites conscientes de tala e offset.</span></li>
+        <li><strong>Revise as células</strong><span>Leia as folgas projetadas e a explicação de cada status.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/pt-br/fitment-studio/#fitment-map-section">Começar pelo mapa interativo</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

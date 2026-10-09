@@ -8,7 +8,24 @@ const copy = {
   en: { a: 'Vehicle A', b: 'Vehicle B', choose: 'Choose a vehicle', compare: 'Compare vehicles', prompt: 'Choose two vehicles to see the differences Atlas can support.', summary: 'What is actually different', field: 'Reference field' },
   de: { a: 'Fahrzeug A', b: 'Fahrzeug B', choose: 'Fahrzeug wählen', compare: 'Fahrzeuge vergleichen', prompt: 'Wählen Sie zwei Fahrzeuge, um die von Atlas belegbaren Unterschiede zu sehen.', summary: 'Was unterscheidet sich tatsächlich', field: 'Referenzfeld' },
   es: { a: 'Vehículo A', b: 'Vehículo B', choose: 'Elegir vehículo', compare: 'Comparar vehículos', prompt: 'Elija dos vehículos para ver las diferencias que Atlas puede respaldar.', summary: 'Qué es realmente diferente', field: 'Campo de referencia' },
+  fr: { a: 'Véhicule A', b: 'Véhicule B', choose: 'Choisir un véhicule', compare: 'Comparer les véhicules', prompt: 'Choisissez deux véhicules pour voir les différences qu’Atlas peut étayer.', summary: 'Ce qui change vraiment', field: 'Donnée de référence' },
+  it: { a: 'Veicolo A', b: 'Veicolo B', choose: 'Scegli un veicolo', compare: 'Confronta i veicoli', prompt: 'Scegli due veicoli per vedere le differenze che Atlas può documentare.', summary: 'Cosa cambia davvero', field: 'Dato di riferimento' },
+  'pt-br': { a: 'Veículo A', b: 'Veículo B', choose: 'Escolha um veículo', compare: 'Comparar veículos', prompt: 'Escolha dois veículos para ver as diferenças que o Atlas consegue comprovar.', summary: 'O que realmente muda', field: 'Campo de referência' },
+  pl: { a: 'Pojazd A', b: 'Pojazd B', choose: 'Wybierz pojazd', compare: 'Porównaj pojazdy', prompt: 'Wybierz dwa pojazdy, aby zobaczyć różnice potwierdzone danymi Atlas.', summary: 'Co naprawdę się różni', field: 'Pole referencyjne' },
+  nl: { a: 'Voertuig A', b: 'Voertuig B', choose: 'Kies een voertuig', compare: 'Voertuigen vergelijken', prompt: 'Kies twee voertuigen om de verschillen te zien die Atlas kan onderbouwen.', summary: 'Wat er echt anders is', field: 'Referentieveld' },
+  tr: { a: 'Araç A', b: 'Araç B', choose: 'Araç seçin', compare: 'Araçları karşılaştırın', prompt: 'Atlas’ın verilerle desteklediği farkları görmek için iki araç seçin.', summary: 'Gerçekte ne farklı', field: 'Referans alanı' },
 }[locale];
+const CAUTION: Readonly<Record<ToolEntityLocale, string>> = {
+  en: 'Geometric differences are not a compatibility or safety approval. Check trim, clearance and vehicle documentation.',
+  de: 'Geometrische Unterschiede sind keine Kompatibilitäts- oder Sicherheitsfreigabe. Prüfen Sie Ausstattung, Freigang und Fahrzeugunterlagen.',
+  es: 'Las diferencias geométricas no son una aprobación de compatibilidad o seguridad. Compruebe acabado, holguras y documentación del vehículo.',
+  fr: 'Les différences géométriques ne valent pas homologation de compatibilité ou de sécurité. Vérifiez la finition, les dégagements et les documents du véhicule.',
+  it: 'Le differenze geometriche non sono un’omologazione di compatibilità o sicurezza. Controlla allestimento, spazi liberi e documenti del veicolo.',
+  'pt-br': 'Diferenças geométricas não são uma aprovação de compatibilidade ou segurança. Confira a versão, as folgas e a documentação do veículo.',
+  pl: 'Różnice geometryczne nie są potwierdzeniem zgodności ani bezpieczeństwa. Sprawdź wersję wyposażenia, prześwity i dokumentację pojazdu.',
+  nl: 'Geometrische verschillen zijn geen goedkeuring voor compatibiliteit of veiligheid. Controleer uitvoering, vrije ruimte en voertuigdocumenten.',
+  tr: 'Geometrik farklar uyumluluk ya da güvenlik onayı değildir. Donanım paketini, boşlukları ve araç belgelerini kontrol edin.',
+};
 const vehicles = vehicleFitmentData
   .slice()
   .sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
@@ -29,7 +46,7 @@ const vehicles = vehicleFitmentData
     </section>
     <div class="vehicle-comparison__rows" data-comparison-rows></div>
     <nav class="vehicle-comparison__actions" data-comparison-actions aria-label={copy.summary}></nav>
-    <p class="vehicle-comparison__caution">{locale === 'de' ? 'Geometrische Unterschiede sind keine Kompatibilitäts- oder Sicherheitsfreigabe. Prüfen Sie Ausstattung, Freigang und Fahrzeugunterlagen.' : locale === 'es' ? 'Las diferencias geométricas no son una aprobación de compatibilidad o seguridad. Compruebe acabado, holguras y documentación del vehículo.' : 'Geometric differences are not a compatibility or safety approval. Check trim, clearance and vehicle documentation.'}</p>
+    <p class="vehicle-comparison__caution">{CAUTION[locale]}</p>
   </div>
 </section>
 <script>import { initializeVehicleComparisons } from '../ui/vehicle-comparison-page'; initializeVehicleComparisons();</script>

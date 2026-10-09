@@ -1,0 +1,15 @@
+---
+import { platformAlternates } from '../../../seo/locale-alternates';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import ToolDirectory from '../../../components/ToolDirectory.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog.nl.toolsHub;
+const alternates = platformAlternates('/tools/');
+---
+<SiteLayout title={c.title} description={c.description} pathname="/nl/tools/" active="tools" locale="nl" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/nl/' }, { name: 'Tools', href: '/nl/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/nl/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Tools</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.lead}</p></header>
+  <ToolDirectory mode="all" locale="nl" />
+  <a class="fitment-directory-row" href="/nl/fitment-studio/"><strong>{c.fitmentRowTitle}</strong><span>{c.fitmentRowCopy}</span><i aria-hidden="true">›</i></a>
+  <a class="fitment-directory-row" href="/nl/voertuigen/"><strong>Pasvormreferentie per voertuig</strong><span>Gedocumenteerde bandenmaat, steekmaat en gekwalificeerd aanhaalmoment per merk en model</span><i aria-hidden="true">›</i></a>
+</SiteLayout>

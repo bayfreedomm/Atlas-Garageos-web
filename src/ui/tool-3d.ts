@@ -4,6 +4,11 @@ import type { VisualizationPalette } from '../lib/visualization/scene-builders';
 import { additional3DToolIds, tool3DText, type Additional3DToolId, type Tool3DLocale } from '../localization/tool-3d-catalog';
 import { studioCameraView, type StudioCamera } from '../lib/visualization/studio-camera';
 import { mountStudioFocus } from './studio-focus';
+import { LOCALE_CODES } from '../localization/locales';
+
+const dragToRotateText: Readonly<Record<Tool3DLocale, string>> = {
+  en: 'Drag to rotate.', de: 'Ziehen zum Drehen.', es: 'Arrastra para girar.', fr: 'Glissez pour pivoter.', it: 'Trascina per ruotare.', 'pt-br': 'Arraste para girar.', pl: 'Przeciągnij, aby obrócić.', nl: 'Sleep om te draaien.', tr: 'Döndürmek için sürükleyin.',
+};
 
 interface Renderer {
   setTheme(background: string, grid: string): void;
@@ -50,7 +55,7 @@ export async function mountTool3D(panel: HTMLElement): Promise<void> {
   // is not `dataset.tool3d`). Read these attributes explicitly.
   const id = panel.getAttribute('data-tool-3d') as Additional3DToolId;
   const localeAttribute = panel.getAttribute('data-tool-3d-locale');
-  const locale: Tool3DLocale = localeAttribute === 'de' || localeAttribute === 'es' ? localeAttribute : 'en';
+  const locale: Tool3DLocale = localeAttribute !== null && (LOCALE_CODES as readonly string[]).includes(localeAttribute) ? localeAttribute as Tool3DLocale : 'en';
   if (!(additional3DToolIds as readonly string[]).includes(id)) return;
   const initialCanvas = panel.querySelector<HTMLCanvasElement>('[data-tool-3d-canvas]');
   const stage = panel.querySelector<HTMLElement>('.parametric-3d__stage');
@@ -140,5 +145,5 @@ export async function mountTool3D(panel: HTMLElement): Promise<void> {
   removalObserver.observe(document.body, { childList: true, subtree: true });
   refreshTheme(); refresh();
   panel.classList.add('is-ready');
-  canvas.setAttribute('aria-label', `${panel.getAttribute('aria-label') ?? '3D'}. ${locale === 'de' ? 'Ziehen zum Drehen.' : locale === 'es' ? 'Arrastra para girar.' : 'Drag to rotate.'}`);
+  canvas.setAttribute('aria-label', `${panel.getAttribute('aria-label') ?? '3D'}. ${dragToRotateText[locale]}`);
 }

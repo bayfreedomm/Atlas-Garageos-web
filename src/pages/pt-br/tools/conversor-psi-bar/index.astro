@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('psi-bar-converter');
+const c = localizedTool('psi-bar-converter', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('psi-bar-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="pressure" novalidate>
+    <div class="instant-input"><label>Pressão<input name="value" type="number" value="32" min="0" step="any" inputmode="decimal" /></label><label>Unidade<select name="unit"><option value="psi">PSI</option><option value="bar">Bar</option><option value="kpa">kPa</option></select></label></div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Pressão convertida" pending="Digite um valor de pressão." visualTitle="Uma pressão, três unidades" visualNote="Relação direta entre unidades; não é uma recomendação de calibragem" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

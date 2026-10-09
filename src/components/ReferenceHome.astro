@@ -43,7 +43,7 @@ const alternates = [{ hreflang: entityHreflang(locale), href: `https://atlasgara
       <a class="entity-link-card" href={tireHub}><strong>{h.allTiresTitle}</strong><span>{h.allTiresHelper(tireSizeCatalog.length)}</span><i aria-hidden="true">›</i></a>
       <a class="entity-link-card" href={vehicleHubPath(locale)}><strong>{h.vehiclesTitle}</strong><span>{h.vehiclesHelper(vehicleFitmentData.length)}</span><i aria-hidden="true">›</i></a>
       <a class="entity-link-card" href={boltHub}><strong>{h.boltsTitle}</strong><span>{h.boltsHelper(boltPatternCatalog.length)}</span><i aria-hidden="true">›</i></a>
-      <a class="entity-link-card" href="/tools/" hreflang="en"><strong>{h.toolsTitle}</strong><span>{h.toolsHelper}</span><i aria-hidden="true">›</i></a>
+      <a class="entity-link-card" href={`/${locale}/tools/`}><strong>{h.toolsTitle}</strong><span>{h.toolsHelper}</span><i aria-hidden="true">›</i></a>
     </div>
   </section>
 

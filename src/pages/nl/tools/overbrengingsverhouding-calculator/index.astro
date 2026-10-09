@@ -1,0 +1,25 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('gear-ratio-calculator');
+const c = localizedTool('gear-ratio-calculator', 'nl');
+const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('gear-ratio-calculator')}>
+  <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
+    <div class="utility-fields gear-ratio-inputs"><label>Huidige banddiameter · inch<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Nieuwe banddiameter · inch<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Huidige asoverbrenging<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Kruissnelheid · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
+    <button type="submit">Overbrengingsverhouding vergelijken</button>
+    <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Effectieve asoverbrenging</span><strong data-gear-effective>—</strong><p data-gear-context>Je vergelijking van de overbrengingsverhouding verschijnt hier.</p></div><div class="standard-answer__secondary"><span>Verhouding voor hetzelfde rijgevoel als origineel</span><strong data-gear-matching>—</strong><small data-gear-rpm>Het toerental in de directe versnelling verschijnt hier.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Je effectieve overbrenging verschijnt hier.</p>
+    <Parametric3DPanel mode="gear" locale="nl" />
+    <GearRatioTechnicalVisual locale="nl" />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Details</span><small>Overbrenging en berekening in de directe versnelling</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">BANDEN VAN 25–44 INCH</p><h2 id="rpm-matrix-heading">Toerentalkaart bij <span data-matrix-speed>65</span> mph</h2><p>Directe versnelling (1,00:1). De kleur toont het relatieve toerental alleen binnen deze tabel.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Band</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>Laagste relatieve toerental</span><i aria-hidden="true"></i><span>Hoogste relatieve toerental</span></p></section>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeGearRatioCalculators } from '../../../../ui/gear-ratio-calculator'; initializeGearRatioCalculators();</script>

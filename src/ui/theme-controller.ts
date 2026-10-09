@@ -1,11 +1,17 @@
 import { parseThemePreference, resolveTheme, THEME_STORAGE_KEY } from './theme-preference';
-import { getPageLocale } from './page-locale';
+import { getPageLocale, type UiLocale } from './page-locale';
 
 const THEME_TOGGLE_LABELS = {
   en: { night: 'Switch to night mode', day: 'Switch to day mode' },
   de: { night: 'In den Nachtmodus wechseln', day: 'In den Tagmodus wechseln' },
   es: { night: 'Cambiar a modo noche', day: 'Cambiar a modo día' },
-} as const;
+  'pt-br': { night: 'Mudar para o modo noturno', day: 'Mudar para o modo diurno' },
+  fr: { night: 'Passer en mode nuit', day: 'Passer en mode jour' },
+  it: { night: 'Passa alla modalità notte', day: 'Passa alla modalità giorno' },
+  pl: { night: 'Przełącz na tryb nocny', day: 'Przełącz na tryb dzienny' },
+  nl: { night: 'Overschakelen naar nachtmodus', day: 'Overschakelen naar dagmodus' },
+  tr: { night: 'Gece moduna geç', day: 'Gündüz moduna geç' },
+} as const satisfies Record<UiLocale, { night: string; day: string }>;
 
 export function initializeThemeControls(): void {
   const labels = THEME_TOGGLE_LABELS[getPageLocale()];

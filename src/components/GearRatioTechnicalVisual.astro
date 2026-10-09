@@ -1,5 +1,6 @@
 ---
-type Locale = 'en' | 'de' | 'es';
+import type { AtlasLocale } from '../localization/locales';
+type Locale = AtlasLocale;
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
 const copy = {
@@ -23,6 +24,48 @@ const copy = {
     note: 'Los neumáticos se dibujan con la proporción de diámetros introducida',
     current: 'Neumático actual', next: 'Neumático nuevo', installed: 'Eje instalado', effective: 'Eje efectivo',
     pending: 'Introduzca ambos diámetros para comparar su efecto en la relación.',
+  },
+  fr: {
+    aria: 'Relation entre le diamètre du pneu et le rapport de pont effectif',
+    title: 'DIAMÈTRE DU PNEU → RAPPORT DE PONT EFFECTIF',
+    note: 'Les pneus sont dessinés selon le rapport de diamètres saisi',
+    current: 'Pneu actuel', next: 'Nouveau pneu', installed: 'Pont monté', effective: 'Pont effectif',
+    pending: 'Saisissez les deux diamètres de pneu pour comparer leur effet sur la démultiplication.',
+  },
+  it: {
+    aria: 'Relazione tra diametro del pneumatico e rapporto al ponte effettivo',
+    title: 'DIAMETRO PNEUMATICO → RAPPORTO AL PONTE EFFETTIVO',
+    note: 'I pneumatici sono disegnati con il rapporto di diametri inserito',
+    current: 'Pneumatico attuale', next: 'Pneumatico nuovo', installed: 'Ponte montato', effective: 'Ponte effettivo',
+    pending: 'Inserisci entrambi i diametri per confrontare l’effetto sul rapporto.',
+  },
+  'pt-br': {
+    aria: 'Relação entre o diâmetro do pneu e a relação efetiva do diferencial',
+    title: 'DIÂMETRO DO PNEU → RELAÇÃO EFETIVA DO DIFERENCIAL',
+    note: 'Os pneus são desenhados na proporção de diâmetros informada',
+    current: 'Pneu atual', next: 'Pneu novo', installed: 'Diferencial instalado', effective: 'Diferencial efetivo',
+    pending: 'Digite os dois diâmetros para comparar o efeito na relação.',
+  },
+  pl: {
+    aria: 'Zależność między średnicą opony a efektywnym przełożeniem głównym',
+    title: 'ŚREDNICA OPONY → EFEKTYWNE PRZEŁOŻENIE GŁÓWNE',
+    note: 'Opony narysowano w podanej proporcji średnic',
+    current: 'Obecna opona', next: 'Nowa opona', installed: 'Przełożenie fabryczne', effective: 'Przełożenie efektywne',
+    pending: 'Wpisz obie średnice opon, aby porównać wpływ na przełożenie.',
+  },
+  nl: {
+    aria: 'Verband tussen banddiameter en effectieve asoverbrenging',
+    title: 'BANDDIAMETER → EFFECTIEVE ASOVERBRENGING',
+    note: 'Banden zijn getekend in de ingevoerde diameterverhouding',
+    current: 'Huidige band', next: 'Nieuwe band', installed: 'Gemonteerde as', effective: 'Effectieve as',
+    pending: 'Vul beide banddiameters in om het effect op de overbrenging te vergelijken.',
+  },
+  tr: {
+    aria: 'Lastik çapı ile efektif diferansiyel oranı arasındaki ilişki',
+    title: 'LASTİK ÇAPI → EFEKTİF DİFERANSİYEL ORANI',
+    note: 'Lastikler girilen çap oranında çizilir',
+    current: 'Mevcut lastik', next: 'Yeni lastik', installed: 'Takılı oran', effective: 'Efektif oran',
+    pending: 'Oran etkisini karşılaştırmak için iki lastik çapını da girin.',
   },
 }[locale];
 ---

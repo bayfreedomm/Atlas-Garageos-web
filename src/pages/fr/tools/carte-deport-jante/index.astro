@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'fr');
+---
+<ToolPage {definition} locale="fr" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/fr/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Avant d'ouvrir la carte</p><h2>Partez d'une base mesurée</h2><p>La carte interactive a besoin de la largeur et du déport (ET) actuels de votre jante, des dégagements intérieur et extérieur mesurés, et de la plage que vous souhaitez explorer.</p>
+      <ol class="entry-steps">
+        <li><strong>Mesurez</strong><span>Relevez les plus petits dégagements statiques intérieur et extérieur.</span></li>
+        <li><strong>Définissez la plage</strong><span>Choisissez des limites réfléchies de largeur et de déport.</span></li>
+        <li><strong>Examinez les cellules</strong><span>Lisez les dégagements projetés et l'explication de chaque statut.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/fr/fitment-studio/#fitment-map-section">Commencer avec la carte interactive</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

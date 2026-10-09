@@ -2,7 +2,7 @@
 import type { ContentLocale } from '../localization/site-catalog';
 interface Props { prefix: string; title: string; width: number; aspect: number; rim: number; locale?: ContentLocale | undefined; }
 const { prefix, title, width, aspect, rim, locale } = Astro.props;
-const L = { en: { width: 'Width', profile: 'Profile', rim: 'Rim' }, de: { width: 'Breite', profile: 'Profil', rim: 'Felge' }, es: { width: 'Ancho', profile: 'Perfil', rim: 'Llanta' } }[locale ?? 'en'];
+const L = { en: { width: 'Width', profile: 'Profile', rim: 'Rim' }, de: { width: 'Breite', profile: 'Profil', rim: 'Felge' }, es: { width: 'Ancho', profile: 'Perfil', rim: 'Llanta' }, fr: { width: 'Largeur', profile: 'Série', rim: 'Jante' }, it: { width: 'Larghezza', profile: 'Spalla', rim: 'Cerchio' }, 'pt-br': { width: 'Largura', profile: 'Perfil', rim: 'Aro' }, pl: { width: 'Szerokość', profile: 'Profil', rim: 'Felga' }, nl: { width: 'Breedte', profile: 'Hoogte', rim: 'Velg' }, tr: { width: 'Genişlik', profile: 'Yanak', rim: 'Jant' } }[locale ?? 'en'];
 ---
 <fieldset class="calculator-group"><legend>{title}</legend><div class="tire-input-row">
   <label>{L.width}<input name={`${prefix}widthMm`} type="number" value={width} inputmode="numeric" /></label><span aria-hidden="true">/</span>

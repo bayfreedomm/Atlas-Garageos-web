@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../seo/locale-alternates';
 import ToolPage from '../../../components/ToolPage.astro';
 import EmbedCodePanel from '../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../components/TireInputGroup.astro';
@@ -7,7 +8,7 @@ import GuidedTireDecision from '../../../components/GuidedTireDecision.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('tire-size-comparison');
 ---
-<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifenrechner-vergleich/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/comparador-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }]} visual={false} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Compare wheel & tire geometry">
+<ToolPage {definition} alternates={toolAlternates('tire-size-comparison')} visual={false} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Compare wheel & tire geometry">
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="en" hidden></div>
     <div class="calculator-columns">

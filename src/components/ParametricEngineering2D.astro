@@ -6,6 +6,12 @@ const t = {
   en: { section: 'ENGINEERING SECTION', input: 'LIVE GEOMETRY', note: 'Measured or entered geometry · not a fitment or safety verdict', speed: 'Indicated vs theoretical speed', compression: 'Cylinder volume section', fitment: 'Tire and wheel clearance' },
   de: { section: 'TECHNISCHE ANSICHT', input: 'LIVE-GEOMETRIE', note: 'Gemessene oder eingegebene Geometrie · keine Freigabe', speed: 'Anzeige gegen theoretische Geschwindigkeit', compression: 'Zylindervolumen im Schnitt', fitment: 'Reifen- und Radabstand' },
   es: { section: 'SECCIÓN TÉCNICA', input: 'GEOMETRÍA EN VIVO', note: 'Geometría medida o introducida · no certifica seguridad ni ajuste', speed: 'Velocidad indicada y teórica', compression: 'Sección del volumen del cilindro', fitment: 'Espacio entre neumático y rueda' },
+  fr: { section: 'COUPE TECHNIQUE', input: 'GÉOMÉTRIE EN DIRECT', note: 'Géométrie mesurée ou saisie · ne valide ni sécurité ni montage', speed: 'Vitesse affichée et théorique', compression: 'Coupe du volume du cylindre', fitment: 'Jeu entre pneu et jante' },
+  it: { section: 'SEZIONE TECNICA', input: 'GEOMETRIA LIVE', note: 'Geometria misurata o inserita · non certifica sicurezza né montaggio', speed: 'Velocità indicata e teorica', compression: 'Sezione del volume del cilindro', fitment: 'Gioco tra pneumatico e cerchio' },
+  'pt-br': { section: 'SEÇÃO TÉCNICA', input: 'GEOMETRIA AO VIVO', note: 'Geometria medida ou informada · não certifica segurança nem encaixe', speed: 'Velocidade indicada e teórica', compression: 'Seção do volume do cilindro', fitment: 'Folga entre pneu e roda' },
+  pl: { section: 'PRZEKRÓJ TECHNICZNY', input: 'GEOMETRIA NA ŻYWO', note: 'Zmierzona lub wpisana geometria · to nie ocena dopasowania ani bezpieczeństwa', speed: 'Prędkość wskazana i teoretyczna', compression: 'Przekrój objętości cylindra', fitment: 'Prześwit opony i felgi' },
+  nl: { section: 'TECHNISCHE DOORSNEDE', input: 'LIVE GEOMETRIE', note: 'Gemeten of ingevoerde geometrie · geen oordeel over pasvorm of veiligheid', speed: 'Aangegeven en theoretische snelheid', compression: 'Doorsnede cilindervolume', fitment: 'Vrije ruimte band en velg' },
+  tr: { section: 'TEKNİK KESİT', input: 'CANLI GEOMETRİ', note: 'Ölçülen veya girilen geometri · uyum ya da güvenlik onayı değildir', speed: 'Gösterilen ve teorik hız', compression: 'Silindir hacmi kesiti', fitment: 'Lastik ve jant boşluğu' },
 }[locale];
 const title = mode === 'speed' ? t.speed : mode === 'compression' ? t.compression : t.fitment;
 ---

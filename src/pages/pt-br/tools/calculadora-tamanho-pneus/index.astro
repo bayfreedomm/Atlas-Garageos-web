@@ -1,0 +1,24 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireSizeTechnicalVisual from '../../../../components/TireSizeTechnicalVisual.astro';
+import TireCodeExplainer from '../../../../components/TireCodeExplainer.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-size-calculator');
+const c = localizedTool('tire-size-calculator', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('tire-size-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
+    <fieldset><legend>Medida do pneu</legend><div class="tire-input-row"><label>Largura<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Perfil<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Aro<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
+    <button type="submit">Calcular medidas do pneu</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Seu resultado aparecerá aqui.</p><Parametric3DPanel mode="single" locale="pt-br" /><TireSizeTechnicalVisual locale="pt-br" /><dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="near-sizes" data-near-sizes hidden>
+      <h3 data-near-sizes-heading></h3>
+      <p class="near-sizes__note" data-near-sizes-note></p>
+      <ul class="near-sizes__list" data-near-sizes-list></ul>
+    </div>
+  </form>
+  <div slot="explanation"><TireCodeExplainer locale="pt-br" />{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; initializeToolCalculators(); initializeShareableToolState();</script>

@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('measure-my-car');
+const c = localizedTool('measure-my-car', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/pt-br/fitment-studio/#measure-flow" alternates={toolAlternates('measure-my-car')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Checklist de medição</p><h2>Duas folgas, uma referência</h2><p>Confirme a roda e o pneu montados atualmente antes de medir. Em cada lado, use a menor folga estática relevante.</p>
+      <ol class="entry-steps">
+        <li><strong>Folga interna</strong><span>Da borda da roda ou do pneu até o componente fixo de suspensão ou carroceria mais próximo.</span></li>
+        <li><strong>Folga externa</strong><span>Da borda externa da roda ou do pneu até a borda do para-lama avaliada.</span></li>
+        <li><strong>Metas opcionais</strong><span>Adicione apenas margens escolhidas por você; o Atlas não inventa nenhuma.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/pt-br/fitment-studio/#measure-flow">Abrir o assistente de cinco etapas</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

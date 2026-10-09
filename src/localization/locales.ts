@@ -1,6 +1,6 @@
 import type { ToolId } from '../seo/tool-registry';
 
-export const LOCALE_CODES = ['en', 'de', 'es', 'pt-br', 'fr'] as const;
+export const LOCALE_CODES = ['en', 'de', 'es', 'pt-br', 'fr', 'it', 'pl', 'nl', 'tr'] as const;
 export type AtlasLocale = (typeof LOCALE_CODES)[number];
 
 export interface LocaleDefinition {
@@ -17,8 +17,12 @@ export const localeDefinitions: Readonly<Record<AtlasLocale, LocaleDefinition>> 
   en: { code: 'en', htmlLang: 'en', hreflang: 'en', label: 'English', nativeLabel: 'English', firstWave: true, published: true },
   de: { code: 'de', htmlLang: 'de', hreflang: 'de', label: 'German', nativeLabel: 'Deutsch', firstWave: true, published: true },
   es: { code: 'es', htmlLang: 'es', hreflang: 'es', label: 'Spanish', nativeLabel: 'Español', firstWave: true, published: true },
-  'pt-br': { code: 'pt-br', htmlLang: 'pt-BR', hreflang: 'pt-BR', label: 'Brazilian Portuguese', nativeLabel: 'Português (Brasil)', firstWave: true, published: false },
-  fr: { code: 'fr', htmlLang: 'fr', hreflang: 'fr', label: 'French', nativeLabel: 'Français', firstWave: true, published: false },
+  'pt-br': { code: 'pt-br', htmlLang: 'pt-BR', hreflang: 'pt-BR', label: 'Brazilian Portuguese', nativeLabel: 'Português (Brasil)', firstWave: true, published: true },
+  fr: { code: 'fr', htmlLang: 'fr', hreflang: 'fr', label: 'French', nativeLabel: 'Français', firstWave: true, published: true },
+  it: { code: 'it', htmlLang: 'it', hreflang: 'it', label: 'Italian', nativeLabel: 'Italiano', firstWave: false, published: true },
+  pl: { code: 'pl', htmlLang: 'pl', hreflang: 'pl', label: 'Polish', nativeLabel: 'Polski', firstWave: false, published: true },
+  nl: { code: 'nl', htmlLang: 'nl', hreflang: 'nl', label: 'Dutch', nativeLabel: 'Nederlands', firstWave: false, published: true },
+  tr: { code: 'tr', htmlLang: 'tr', hreflang: 'tr', label: 'Turkish', nativeLabel: 'Türkçe', firstWave: false, published: true },
 });
 
 const localizedToolSlugs: Readonly<Record<AtlasLocale, Readonly<Record<ToolId, string>>>> = Object.freeze({
@@ -40,12 +44,32 @@ const localizedToolSlugs: Readonly<Record<AtlasLocale, Readonly<Record<ToolId, s
   'pt-br': {
     'tire-fit-check': 'posso-montar-este-pneu',
     'fitment-studio': 'comparador-rodas-pneus', 'tire-size-calculator': 'calculadora-tamanho-pneus', 'tire-size-comparison': 'comparador-pneus', 'wheel-offset-calculator': 'calculadora-offset-rodas', 'speedometer-error-calculator': 'calculadora-erro-velocimetro', 'gear-ratio-calculator': 'calculadora-relacao-marchas', 'fitment-map': 'mapa-offset-rodas', 'measure-my-car': 'medir-folga-carro', 'fuel-cost-calculator': 'calculadora-gasto-combustivel', 'road-trip-cost-calculator': 'calculadora-custo-viagem', 'mpg-l100km-converter': 'conversor-mpg-l100km', 'psi-bar-converter': 'conversor-psi-bar', 'hp-kw-converter': 'conversor-hp-kw', 'nm-lb-ft-converter': 'conversor-nm-lb-ft', 'power-to-weight-calculator': 'calculadora-peso-potencia', 'ev-charging-cost-calculator': 'calculadora-custo-recarga-eletrica',
-    'bolt-pattern-calculator': 'bolt-pattern-calculator', 'towing-capacity-calculator': 'towing-capacity-calculator', 'quarter-mile-calculator': 'quarter-mile-calculator', 'tire-load-speed-rating': 'tire-load-speed-rating', 'compression-ratio-calculator': 'compression-ratio-calculator', 'tire-date-code-decoder': 'tire-date-code-decoder', 'vehicle-fitment-finder': 'encontrar-meu-veiculo', 'gas-prices-today': 'precos-combustiveis-hoje',
+    'bolt-pattern-calculator': 'calculadora-furacao-rodas', 'towing-capacity-calculator': 'calculadora-capacidade-reboque', 'quarter-mile-calculator': 'calculadora-quarto-de-milha', 'tire-load-speed-rating': 'indice-carga-velocidade-pneu', 'compression-ratio-calculator': 'calculadora-taxa-compressao', 'tire-date-code-decoder': 'decodificador-data-pneu', 'vehicle-fitment-finder': 'encontrar-meu-veiculo', 'gas-prices-today': 'precos-combustiveis-hoje',
   },
   fr: {
     'tire-fit-check': 'puis-je-monter-ce-pneu',
     'fitment-studio': 'comparateur-jantes-pneus', 'tire-size-calculator': 'calculateur-taille-pneus', 'tire-size-comparison': 'comparateur-taille-pneus', 'wheel-offset-calculator': 'calculateur-deport-jante', 'speedometer-error-calculator': 'calculateur-erreur-compteur', 'gear-ratio-calculator': 'calculateur-rapport-transmission', 'fitment-map': 'carte-deport-jante', 'measure-my-car': 'mesurer-degagement-roue', 'fuel-cost-calculator': 'calculateur-cout-carburant', 'road-trip-cost-calculator': 'calculateur-cout-trajet', 'mpg-l100km-converter': 'convertisseur-mpg-l100km', 'psi-bar-converter': 'convertisseur-psi-bar', 'hp-kw-converter': 'convertisseur-ch-kw', 'nm-lb-ft-converter': 'convertisseur-nm-lb-ft', 'power-to-weight-calculator': 'calculateur-rapport-poids-puissance', 'ev-charging-cost-calculator': 'calculateur-cout-recharge-electrique',
-    'bolt-pattern-calculator': 'bolt-pattern-calculator', 'towing-capacity-calculator': 'towing-capacity-calculator', 'quarter-mile-calculator': 'quarter-mile-calculator', 'tire-load-speed-rating': 'tire-load-speed-rating', 'compression-ratio-calculator': 'compression-ratio-calculator', 'tire-date-code-decoder': 'tire-date-code-decoder', 'vehicle-fitment-finder': 'trouver-mon-vehicule', 'gas-prices-today': 'prix-carburants-aujourdhui',
+    'bolt-pattern-calculator': 'calculateur-entraxe', 'towing-capacity-calculator': 'calculateur-capacite-remorquage', 'quarter-mile-calculator': 'calculateur-quart-de-mile', 'tire-load-speed-rating': 'indice-charge-vitesse-pneu', 'compression-ratio-calculator': 'calculateur-taux-compression', 'tire-date-code-decoder': 'decodeur-date-pneu', 'vehicle-fitment-finder': 'trouver-mon-vehicule', 'gas-prices-today': 'prix-carburants-aujourdhui',
+  },
+  it: {
+    'tire-fit-check': 'posso-montare-questa-misura',
+    'fitment-studio': 'confronto-cerchi-pneumatici', 'tire-size-calculator': 'calcolatore-misure-pneumatici', 'tire-size-comparison': 'confronto-misure-pneumatici', 'wheel-offset-calculator': 'calcolatore-offset-cerchi', 'speedometer-error-calculator': 'calcolatore-errore-tachimetro', 'gear-ratio-calculator': 'calcolatore-rapporto-trasmissione', 'fitment-map': 'mappa-offset-cerchi', 'measure-my-car': 'misurare-spazio-ruota', 'fuel-cost-calculator': 'calcolatore-costo-carburante', 'road-trip-cost-calculator': 'calcolatore-costo-viaggio', 'mpg-l100km-converter': 'convertitore-mpg-l100km', 'psi-bar-converter': 'convertitore-psi-bar', 'hp-kw-converter': 'convertitore-cv-kw', 'nm-lb-ft-converter': 'convertitore-nm-lb-ft', 'power-to-weight-calculator': 'calcolatore-rapporto-peso-potenza', 'ev-charging-cost-calculator': 'calcolatore-costo-ricarica-elettrica',
+    'bolt-pattern-calculator': 'calcolatore-foratura-cerchi', 'towing-capacity-calculator': 'calcolatore-capacita-traino', 'quarter-mile-calculator': 'calcolatore-quarto-di-miglio', 'tire-load-speed-rating': 'indice-carico-velocita-pneumatico', 'compression-ratio-calculator': 'calcolatore-rapporto-compressione', 'tire-date-code-decoder': 'decodificatore-data-pneumatico', 'vehicle-fitment-finder': 'trova-il-mio-veicolo', 'gas-prices-today': 'prezzi-carburante-oggi',
+  },
+  pl: {
+    'tire-fit-check': 'czy-ten-rozmiar-opony-pasuje',
+    'fitment-studio': 'porownanie-felg-i-opon', 'tire-size-calculator': 'kalkulator-rozmiaru-opon', 'tire-size-comparison': 'porownanie-rozmiarow-opon', 'wheel-offset-calculator': 'kalkulator-odsadzenia-felgi', 'speedometer-error-calculator': 'kalkulator-bledu-predkosciomierza', 'gear-ratio-calculator': 'kalkulator-przelozenia', 'fitment-map': 'mapa-odsadzenia-felg', 'measure-my-car': 'zmierz-przestrzen-w-nadkolu', 'fuel-cost-calculator': 'kalkulator-kosztow-paliwa', 'road-trip-cost-calculator': 'kalkulator-kosztow-podrozy', 'mpg-l100km-converter': 'przelicznik-mpg-l100km', 'psi-bar-converter': 'przelicznik-psi-bar', 'hp-kw-converter': 'przelicznik-km-kw', 'nm-lb-ft-converter': 'przelicznik-nm-lb-ft', 'power-to-weight-calculator': 'kalkulator-stosunku-mocy-do-masy', 'ev-charging-cost-calculator': 'kalkulator-kosztow-ladowania',
+    'bolt-pattern-calculator': 'kalkulator-rozstawu-srub', 'towing-capacity-calculator': 'kalkulator-masy-przyczepy', 'quarter-mile-calculator': 'kalkulator-cwierc-mili', 'tire-load-speed-rating': 'indeks-nosnosci-i-predkosci-opony', 'compression-ratio-calculator': 'kalkulator-stopnia-sprezania', 'tire-date-code-decoder': 'dekoder-daty-produkcji-opony', 'vehicle-fitment-finder': 'znajdz-moj-pojazd', 'gas-prices-today': 'ceny-paliw-dzis',
+  },
+  nl: {
+    'tire-fit-check': 'past-deze-bandenmaat',
+    'fitment-studio': 'velgen-en-banden-vergelijken', 'tire-size-calculator': 'bandenmaat-calculator', 'tire-size-comparison': 'bandenmaten-vergelijken', 'wheel-offset-calculator': 'velg-et-calculator', 'speedometer-error-calculator': 'snelheidsmeter-afwijking-calculator', 'gear-ratio-calculator': 'overbrengingsverhouding-calculator', 'fitment-map': 'velg-et-kaart', 'measure-my-car': 'ruimte-in-wielkast-meten', 'fuel-cost-calculator': 'brandstofkosten-calculator', 'road-trip-cost-calculator': 'reiskosten-calculator', 'mpg-l100km-converter': 'mpg-l100km-omrekenen', 'psi-bar-converter': 'psi-bar-omrekenen', 'hp-kw-converter': 'pk-kw-omrekenen', 'nm-lb-ft-converter': 'nm-lb-ft-omrekenen', 'power-to-weight-calculator': 'vermogen-gewicht-calculator', 'ev-charging-cost-calculator': 'laadkosten-calculator',
+    'bolt-pattern-calculator': 'steekmaat-calculator', 'towing-capacity-calculator': 'trekgewicht-calculator', 'quarter-mile-calculator': 'kwart-mijl-calculator', 'tire-load-speed-rating': 'band-draagvermogen-snelheidsindex', 'compression-ratio-calculator': 'compressieverhouding-calculator', 'tire-date-code-decoder': 'band-dot-code-decoder', 'vehicle-fitment-finder': 'mijn-voertuig-vinden', 'gas-prices-today': 'brandstofprijzen-vandaag',
+  },
+  tr: {
+    'tire-fit-check': 'bu-lastik-ebadi-uyar-mi',
+    'fitment-studio': 'jant-lastik-karsilastirma', 'tire-size-calculator': 'lastik-ebadi-hesaplama', 'tire-size-comparison': 'lastik-ebadi-karsilastirma', 'wheel-offset-calculator': 'jant-et-hesaplama', 'speedometer-error-calculator': 'kilometre-saati-sapma-hesaplama', 'gear-ratio-calculator': 'vites-orani-hesaplama', 'fitment-map': 'jant-et-haritasi', 'measure-my-car': 'camurluk-boslugu-olcme', 'fuel-cost-calculator': 'yakit-maliyeti-hesaplama', 'road-trip-cost-calculator': 'yol-masrafi-hesaplama', 'mpg-l100km-converter': 'mpg-l100km-cevirici', 'psi-bar-converter': 'psi-bar-cevirici', 'hp-kw-converter': 'hp-kw-cevirici', 'nm-lb-ft-converter': 'nm-lb-ft-cevirici', 'power-to-weight-calculator': 'guc-agirlik-orani-hesaplama', 'ev-charging-cost-calculator': 'elektrikli-arac-sarj-maliyeti',
+    'bolt-pattern-calculator': 'bijon-araligi-hesaplama', 'towing-capacity-calculator': 'cekme-kapasitesi-hesaplama', 'quarter-mile-calculator': 'ceyrek-mil-hesaplama', 'tire-load-speed-rating': 'lastik-yuk-hiz-endeksi', 'compression-ratio-calculator': 'sikistirma-orani-hesaplama', 'tire-date-code-decoder': 'lastik-uretim-tarihi-okuma', 'vehicle-fitment-finder': 'aracimi-bul', 'gas-prices-today': 'akaryakit-fiyatlari-bugun',
   },
 });
 

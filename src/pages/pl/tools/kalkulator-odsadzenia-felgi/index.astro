@@ -1,0 +1,39 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import WheelOffsetTechnicalVisual from '../../../../components/WheelOffsetTechnicalVisual.astro';
+import EngineeringVisualStudio from '../../../../components/EngineeringVisualStudio.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('wheel-offset-calculator');
+const c = localizedTool('wheel-offset-calculator', 'pl');
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/pl/tools/zmierz-przestrzen-w-nadkolu/" alternates={toolAlternates('wheel-offset-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="wheel-offset" novalidate>
+    <div class="garage-quick-load" data-garage-quick-load data-gql-target="wheel-offset" data-gql-locale="pl" hidden></div>
+    <div class="calculator-columns">
+      <fieldset class="calculator-group"><legend>Felga oryginalna</legend><div class="grid"><label>Szerokość · J<input name="originalWidthInches" type="number" value="8" step="0.5" inputmode="decimal" /></label><label>Odsadzenie · ET<input name="originalOffsetMm" type="number" value="40" inputmode="numeric" /></label></div></fieldset>
+      <fieldset class="calculator-group"><legend>Nowa felga</legend><div class="grid"><label>Szerokość · J<input name="newWidthInches" type="number" value="8.5" step="0.5" inputmode="decimal" /></label><label>Odsadzenie · ET<input name="newOffsetMm" type="number" value="35" inputmode="numeric" /></label></div></fieldset>
+    </div>
+    <div class="form-actions"><button type="submit">Porównaj położenie koła</button><button type="button" class="secondary" data-share-result>Kopiuj link do udostępnienia</button></div>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="wheel-primary-result is-pending" data-wheel-primary-result aria-live="polite" aria-label="Główny wynik położenia koła">
+      <div class="wheel-primary-result__answer">
+        <span>Zmiana krawędzi zewnętrznej</span>
+        <strong data-wheel-primary-outer>—</strong>
+        <p data-wheel-primary-outer-copy>Porównaj felgi, aby zobaczyć, o ile przesunie się krawędź zewnętrzna.</p>
+      </div>
+      <div class="wheel-primary-result__inner">
+        <span>Zmiana krawędzi wewnętrznej</span>
+        <strong data-wheel-primary-inner>—</strong>
+        <small data-wheel-primary-inner-copy>Pokazuje przesunięcie w stronę zawieszenia lub od niego.</small>
+      </div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Tutaj pojawi się podsumowanie położenia.</p>
+    <EngineeringVisualStudio mode="offset" locale="pl"><WheelOffsetTechnicalVisual locale="pl" /></EngineeringVisualStudio>
+    <div class="wheel-detail-heading" aria-hidden="true"><span>Szczegóły</span><small>Statyczna geometria koła</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

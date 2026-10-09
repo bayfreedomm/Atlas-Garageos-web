@@ -1,0 +1,192 @@
+---
+import { canonicalForPath } from '../../../seo/tool-registry';
+import { fitmentStudioText } from '../../../localization/fitment-studio-catalog';
+import Brand from '../../../components/Brand.astro';
+import ThemeBoot from '../../../components/ThemeBoot.astro';
+import NavigationDrawer from '../../../components/NavigationDrawer.astro';
+import FitmentVisualizer from '../../../components/FitmentVisualizer.astro';
+import Parametric3DPanel from '../../../components/Parametric3DPanel.astro';
+import ToolIcon from '../../../components/ToolIcon.astro';
+import Footer from '../../../components/Footer.astro';
+import LanguageQuickToggle from '../../../components/LanguageQuickToggle.astro';
+import { localeSwitchLinks, platformAlternates } from '../../../seo/locale-alternates';
+import ThemeQuickToggle from '../../../components/ThemeQuickToggle.astro';
+import '../../../styles/global.css';
+import '../../../styles/product-v3.css';
+import '../../../styles/product-v4.css';
+
+const t = fitmentStudioText['it'];
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <ThemeBoot />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={t.metaDescription} />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href={canonicalForPath('/it/fitment-studio/')} />
+    {platformAlternates('/fitment-studio/').map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f7f8f5" />
+    <title>{t.metaTitle} — Atlas GarageOS</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">{t.skipLink}</a>
+
+    <header class="app-header">
+      <div class="app-header__inner">
+        <a class="brand" href="/it/" aria-label={t.homeAriaLabel}><Brand subtitle={t.brandSubtitle} /></a>
+        <div class="app-header__actions"><nav class="desktop-nav" aria-label={t.primaryNavAria}><a href="/it/">{t.navHome}</a><a href="/it/tools/">{t.navTools}</a><a href="/it/fitment-studio/" aria-current="page">{t.navCompare}</a></nav><LanguageQuickToggle links={localeSwitchLinks('/fitment-studio/').map((l) => ({ ...l, label: l.code === 'pt-br' ? 'PT' : l.code.toUpperCase() }))} current="it" /><ThemeQuickToggle /><NavigationDrawer locale="it" localeLinks={localeSwitchLinks('/fitment-studio/')} /></div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <nav class="breadcrumbs studio-breadcrumbs" aria-label={t.breadcrumbAria}><a href="/it/tools/">{t.breadcrumbAllTools}</a><span aria-current="page">{t.navCompare}</span></nav>
+      <section class="studio-hero" id="fitment" aria-labelledby="studio-heading">
+        <p class="eyebrow">{t.heroEyebrow}</p>
+        <h1 id="studio-heading">{t.heroTitle}</h1>
+        <p class="hero-copy">{t.heroCopy}</p>
+        <a class="button studio-primary-cta" href="#compare">{t.ctaCompare}</a>
+        <a class="button secondary studio-primary-cta" href="#what-fits-section">{t.ctaFindWhatFits}</a>
+        <div class="studio-capabilities" aria-label={t.capabilitiesAria}>
+          <span><strong>{t.capTireSizeLabel}</strong><small>{t.capTireSizeDetail}</small></span>
+          <span><strong>{t.capWheelPositionLabel}</strong><small>{t.capWheelPositionDetail}</small></span>
+          <span><strong>{t.capSpeedLabel}</strong><small>{t.capSpeedDetail}</small></span>
+        </div>
+      </section>
+
+      <aside id="journey-import" class="journey-import" hidden aria-live="polite">
+        <strong>{t.journeyImportTitle}</strong>
+        <p id="journey-import-copy"></p>
+      </aside>
+
+      <aside id="shared-setup" class="shared-panel" hidden aria-labelledby="shared-heading">
+        <h2 id="shared-heading">{t.sharedTitle}</h2>
+        <p id="shared-message">{t.sharedNotice}</p>
+        <div class="setup-save">
+          <label for="shared-name">{t.sharedNameLabel}<input id="shared-name" name="shared-setup-name" value="Shared setup" maxlength="80" /></label>
+          <button id="save-shared" type="button">{t.sharedSaveButton}</button>
+        </div>
+      </aside>
+
+      <section class="product-section" id="compare" aria-labelledby="compare-heading">
+        <div class="section-heading">
+          <div><p class="eyebrow">{t.compareEyebrow}</p><h2 id="compare-heading">{t.compareTitle}</h2><p>{t.compareIntro}</p></div>
+        </div>
+        <form id="fitment-form" novalidate>
+          <div class="setup-columns">
+            <fieldset class="setup-card" data-setup="current">
+              <legend class="setup-card__header"><span>{t.setupCardCurrentLabel}</span><span class="setup-tag">{t.setupCardCurrentTag}</span></legend>
+              <div class="spec-group"><p class="spec-group__title">{t.groupTireTitle}</p><div class="spec-row">
+                <label for="current-tire-width">{t.fieldWidth}<input id="current-tire-width" name="current-tireWidthMm" type="number" value="225" step="1" inputmode="numeric" required /></label>
+                <label for="current-aspect">{t.fieldProfile}<input id="current-aspect" name="current-tireAspectRatio" type="number" value="45" step="1" inputmode="numeric" required /></label>
+                <label for="current-rim">{t.fieldRim}<input id="current-rim" name="current-rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" required /></label>
+              </div></div>
+              <div class="spec-group"><p class="spec-group__title">{t.groupWheelTitle}</p><div class="spec-row spec-row--wheel">
+                <label for="current-wheel-diameter">{t.fieldDiameter}<input id="current-wheel-diameter" value="18" type="number" step="0.5" inputmode="decimal" data-wheel-diameter="current" readonly aria-readonly="true" /></label>
+                <label for="current-wheel-width">{t.fieldWidthJ}<input id="current-wheel-width" name="current-wheelWidthInches" type="number" value="8" step="0.5" inputmode="decimal" required /></label>
+                <label for="current-offset">{t.fieldOffsetEt}<input id="current-offset" name="current-wheelOffsetMm" type="number" value="40" step="1" inputmode="numeric" required /></label>
+              </div></div>
+              <div class="setup-save"><label for="current-name">{t.setupNameLabel}<input id="current-name" name="current-setup-name" value="Current setup" maxlength="80" /></label><button id="save-current" type="button" class="secondary">{t.saveCurrentButton}</button></div>
+            </fieldset>
+
+            <fieldset class="setup-card" data-setup="proposed">
+              <legend class="setup-card__header"><span>{t.setupCardNewLabel}</span><span class="setup-tag">{t.setupCardNewTag}</span></legend>
+              <div class="spec-group"><p class="spec-group__title">{t.groupTireTitle}</p><div class="spec-row">
+                <label for="new-tire-width">{t.fieldWidth}<input id="new-tire-width" name="proposed-tireWidthMm" type="number" value="235" step="1" inputmode="numeric" required /></label>
+                <label for="new-aspect">{t.fieldProfile}<input id="new-aspect" name="proposed-tireAspectRatio" type="number" value="40" step="1" inputmode="numeric" required /></label>
+                <label for="new-rim">{t.fieldRim}<input id="new-rim" name="proposed-rimDiameterInches" type="number" value="19" step="0.5" inputmode="decimal" required /></label>
+              </div></div>
+              <div class="spec-group"><p class="spec-group__title">{t.groupWheelTitle}</p><div class="spec-row spec-row--wheel">
+                <label for="new-wheel-diameter">{t.fieldDiameter}<input id="new-wheel-diameter" value="19" type="number" step="0.5" inputmode="decimal" data-wheel-diameter="proposed" readonly aria-readonly="true" /></label>
+                <label for="new-wheel-width">{t.fieldWidthJ}<input id="new-wheel-width" name="proposed-wheelWidthInches" type="number" value="8.5" step="0.5" inputmode="decimal" required /></label>
+                <label for="new-offset">{t.fieldOffsetEt}<input id="new-offset" name="proposed-wheelOffsetMm" type="number" value="35" step="1" inputmode="numeric" required /></label>
+              </div></div>
+              <div class="setup-save"><label for="new-name">{t.setupNameLabel}<input id="new-name" name="proposed-setup-name" value="New setup" maxlength="80" /></label><button id="save-proposed" type="button" class="secondary">{t.saveNewButton}</button></div>
+            </fieldset>
+          </div>
+          <div class="form-actions"><button type="submit">{t.compareSubmitButton}</button></div>
+        </form>
+        <div id="errors" class="inline-errors" role="alert" aria-live="assertive" hidden></div>
+        <p id="comparison-summary" class="result-summary" aria-live="polite"></p>
+        <Parametric3DPanel mode="fitment" locale="it" />
+        <div class="comparison-layout" aria-labelledby="results-heading">
+          <div id="results-heading"><FitmentVisualizer mode="full" title={t.visualComparisonTitle} locale="it" /></div>
+          <div class="share-toolbar" role="group" aria-label={t.shareToolbarAria}>
+            <button id="copy-share" type="button" class="share-toolbar__cta">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .09 4.26L8.6 12.1a3 3 0 1 0 0 3.8l6.5 3.84A3 3 0 1 0 16 17.5a3 3 0 0 0-.09.62L9 14.24a3 3 0 0 0 0-2.48l6.91-4.08c.32.2.68.32 1.09.32Z" /></svg>
+              <span>{t.shareButtonLabel}</span>
+            </button>
+            <p id="share-feedback" class="share-toolbar__feedback" role="status" aria-live="polite"></p>
+          </div>
+          <dl id="results" class="metric-grid" aria-live="polite"></dl>
+        </div>
+        <section class="setup-decision-summary" aria-labelledby="setup-decision-heading">
+          <p class="eyebrow">{t.decisionEyebrow}</p>
+          <h3 id="setup-decision-heading">{t.decisionTitle}</h3>
+          <div class="setup-decision-summary__grid">
+            <div><small>{t.decisionTireLabel}</small><strong id="decision-tire">{t.decisionTireDefault}</strong><p>{t.decisionTireNote}</p></div>
+            <div><small>{t.decisionWheelLabel}</small><strong id="decision-wheel">{t.decisionWheelDefault}</strong><p>{t.decisionWheelNote}</p></div>
+            <div><small>{t.decisionMeasureLabel}</small><strong id="decision-measure">{t.decisionMeasureDefault}</strong><p>{t.decisionMeasureNote}</p></div>
+          </div>
+          <p class="setup-decision-summary__limit">{t.decisionLimit}</p>
+          <nav aria-label={t.decisionNavAria}><a href="/it/tools/calcolatore-foratura-cerchi/">{t.decisionLinkPcd}</a><a href="/it/tools/indice-carico-velocita-pneumatico/">{t.decisionLinkTireRating}</a><a href="#measure-flow">{t.decisionLinkMeasure}</a></nav>
+        </section>
+      </section>
+
+      <section class="product-section product-section--advanced" id="measure-flow" aria-labelledby="measure-heading">
+        <div class="section-heading"><div><p class="eyebrow">{t.measureEyebrow}</p><h2 id="measure-heading">{t.measureTitle}</h2><p>{t.measureIntro}</p></div></div>
+        <nav class="step-nav" aria-label={t.stepNavAria}>
+          <button type="button" data-measure-go="1">{t.stepGoCurrent}</button><button type="button" data-measure-go="2" class="secondary">{t.stepGoInner}</button><button type="button" data-measure-go="3" class="secondary">{t.stepGoOuter}</button><button type="button" data-measure-go="4" class="secondary">{t.stepGoTargets}</button><button type="button" data-measure-go="5" class="secondary">{t.stepGoReview}</button>
+        </nav>
+        <div class="step-progress" aria-hidden="true"><div id="measure-progress" class="step-progress__bar"></div></div>
+        <div class="step-meta"><span id="measure-step-label">{t.stepOf(1, 5)}</span><span>{t.stepUserMeasured}</span></div>
+        <div class="measure-panel" data-measure-step="1"><p class="eyebrow">{t.step1Eyebrow}</p><h3>{t.step1Title}</h3><p>{t.step1Copy}</p><a class="button secondary" href="#compare">{t.step1Link}</a></div>
+        <div class="measure-panel" data-measure-step="2" hidden><p class="eyebrow">{t.step2Eyebrow}</p><h3>{t.step2Title}</h3><figure class="measure-illustration" aria-label={t.step2DiagramAria}><svg viewBox="0 0 320 140" role="img"><path class="measure-illustration__fixed" d="M64 18v104" /><text class="measure-illustration__tag" x="64" y="12" text-anchor="middle">{t.fixedComponentLabel}</text><circle class="measure-illustration__tire" cx="212" cy="70" r="52" /><circle class="measure-illustration__rim" cx="212" cy="70" r="30" /><circle class="measure-illustration__hub" cx="212" cy="70" r="7" /><path class="measure-illustration__arrow" d="M64 70h96" marker-start="url(#measureArrow)" marker-end="url(#measureArrow)" /><text class="measure-illustration__label" x="112" y="60" text-anchor="middle">{t.innerClearanceSvgLabel}</text><defs><marker id="measureArrow" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M8 0 0 4l8 4Z" /></marker></defs></svg></figure><p>{t.step2Copy}</p><label for="measured-inner">{t.measuredInnerLabel}<input id="measured-inner" name="measured-inner" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder={t.requiredPlaceholder} /></label></div>
+        <div class="measure-panel" data-measure-step="3" hidden><p class="eyebrow">{t.step3Eyebrow}</p><h3>{t.step3Title}</h3><figure class="measure-illustration" aria-label={t.step3DiagramAria}><svg viewBox="0 0 320 140" role="img"><path class="measure-illustration__fixed" d="M252 12c26 12 40 34 42 58v58" /><text class="measure-illustration__tag" x="316" y="8" text-anchor="end">{t.fenderLabel}</text><circle class="measure-illustration__tire" cx="112" cy="70" r="52" /><circle class="measure-illustration__rim" cx="112" cy="70" r="30" /><circle class="measure-illustration__hub" cx="112" cy="70" r="7" /><path class="measure-illustration__arrow" d="M164 70h88" marker-start="url(#measureArrow2)" marker-end="url(#measureArrow2)" /><text class="measure-illustration__label" x="208" y="60" text-anchor="middle">{t.outerClearanceSvgLabel}</text><defs><marker id="measureArrow2" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M8 0 0 4l8 4Z" /></marker></defs></svg></figure><p>{t.step3Copy}</p><label for="measured-outer">{t.measuredOuterLabel}<input id="measured-outer" name="measured-outer" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder={t.requiredPlaceholder} /></label></div>
+        <div class="measure-panel" data-measure-step="4" hidden><p class="eyebrow">{t.step4Eyebrow}</p><h3>{t.step4Title}</h3><p>{t.step4Copy}</p><div class="grid"><label for="desired-inner">{t.desiredInnerLabel}<input id="desired-inner" name="desired-inner" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder={t.noTargetPlaceholder} /></label><label for="desired-outer">{t.desiredOuterLabel}<input id="desired-outer" name="desired-outer" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder={t.noTargetPlaceholder} /></label></div></div>
+        <div class="measure-panel" data-measure-step="5" hidden><p class="eyebrow">{t.step5Eyebrow}</p><h3>{t.step5Title}</h3><div id="measurement-review" aria-live="polite"></div><div id="measurement-errors" role="alert" aria-live="assertive" hidden></div><button id="save-clearance" type="button">{t.saveClearanceButton}</button></div>
+        <div class="step-actions"><button id="measure-back" type="button" class="secondary">{t.backButton}</button><button id="measure-next" type="button">{t.continueButton}</button></div>
+      </section>
+
+      <section class="product-section" id="what-fits-section" aria-labelledby="what-fits-heading">
+        <div class="section-heading"><div><p class="eyebrow">{t.whatFitsEyebrow}</p><h2 id="what-fits-heading">{t.whatFitsTitle}</h2><p>{t.whatFitsIntro}</p></div></div>
+        <label class="goal-select" for="explorer-goal">{t.goalSelectLabel}<select id="explorer-goal" name="explorer-goal"><option value="closestToCurrent">{t.goalOptionClosest}</option><option value="moreOuterPresence">{t.goalOptionOuter}</option><option value="moreInnerClearance">{t.goalOptionInner}</option><option value="balancedClearance">{t.goalOptionBalanced}</option><option value="targetOuterClearance">{t.goalOptionTarget}</option></select></label>
+        <div class="range-groups">
+          <fieldset class="range-card"><legend>{t.wheelRangeLegend}</legend><div class="grid"><label>{t.widthMinLabel}<input name="wf-width-min" type="number" value="7" step="0.5" inputmode="decimal" /></label><label>{t.widthMaxLabel}<input name="wf-width-max" type="number" value="10" step="0.5" inputmode="decimal" /></label><label>{t.widthStepLabel}<input name="wf-width-step" type="number" value="0.5" min="0.1" step="0.1" inputmode="decimal" /></label><label>{t.offsetMinLabel}<input name="wf-offset-min" type="number" value="20" step="1" inputmode="numeric" /></label><label>{t.offsetMaxLabel}<input name="wf-offset-max" type="number" value="55" step="1" inputmode="numeric" /></label><label>{t.offsetStepLabel}<input name="wf-offset-step" type="number" value="5" min="1" step="1" inputmode="numeric" /></label></div></fieldset>
+          <fieldset class="range-card"><legend>{t.tireRangeLegend}</legend><div class="grid"><label>{t.targetRimLabel}<input name="explorer-rim" type="number" value="19" step="0.5" inputmode="decimal" /></label><label>{t.tireWidthMinLabel}<input name="tire-width-min" type="number" value="215" step="10" inputmode="numeric" /></label><label>{t.tireWidthMaxLabel}<input name="tire-width-max" type="number" value="255" step="10" inputmode="numeric" /></label><label>{t.tireWidthStepLabel}<input name="tire-width-step" type="number" value="10" min="1" step="1" inputmode="numeric" /></label><label>{t.aspectMinLabel}<input name="aspect-min" type="number" value="35" step="5" inputmode="numeric" /></label><label>{t.aspectMaxLabel}<input name="aspect-max" type="number" value="50" step="5" inputmode="numeric" /></label><label>{t.aspectStepLabel}<input name="aspect-step" type="number" value="5" min="1" step="1" inputmode="numeric" /></label><label>{t.maxDiameterChangeLabel}<input name="max-diameter-difference" type="number" min="0" step="0.1" inputmode="decimal" placeholder={t.noConstraintPlaceholder} /></label><label>{t.resultsLabel}<input name="wf-max-results" type="number" value="10" min="1" max="100" step="1" inputmode="numeric" /></label></div></fieldset>
+        </div>
+        <p id="search-preflight" class="search-summary" aria-live="polite"></p><button id="search-what-fits" type="button">{t.findMatchesButton}</button><p id="what-fits-summary" class="search-summary" aria-live="polite"></p><div id="what-fits-errors" role="alert" aria-live="assertive" hidden></div><div id="what-fits-results" class="search-results"></div><article id="explorer-detail" class="map-detail" hidden aria-live="polite"></article>
+      </section>
+
+      <section class="product-section product-section--advanced" id="fitment-map-section" aria-labelledby="map-heading">
+        <div class="section-heading"><div><p class="eyebrow">{t.mapEyebrow}</p><h2 id="map-heading">{t.fitmentMapTitle}</h2><p>{t.mapIntro}</p></div></div>
+        <div class="map-inputs"><label>{t.widthMinLabel}<input name="map-width-min" type="number" value="7" step="0.5" inputmode="decimal" /></label><label>{t.widthMaxLabel}<input name="map-width-max" type="number" value="10" step="0.5" inputmode="decimal" /></label><label>{t.widthStepLabel}<input name="map-width-step" type="number" value="0.5" min="0.1" step="0.1" inputmode="decimal" /></label><label>{t.offsetMinLabel}<input name="map-offset-min" type="number" value="20" step="1" inputmode="numeric" /></label><label>{t.offsetMaxLabel}<input name="map-offset-max" type="number" value="55" step="1" inputmode="numeric" /></label><label>{t.offsetStepLabel}<input name="map-offset-step" type="number" value="5" min="1" step="1" inputmode="numeric" /></label></div>
+        <div class="form-actions"><button id="generate-map" type="button">{t.generateMapButton}</button></div>
+        <div class="map-legend" aria-label={t.mapLegendAria}><span class="legend-item"><span class="legend-dot status-neutral">•</span><span><strong>{t.legendChecked}</strong> · {t.legendCheckedDetail}</span></span><span class="legend-item"><span class="legend-dot status-green">✓</span><span><strong>{t.legendGreen}</strong> · {t.legendGreenDetail}</span></span><span class="legend-item"><span class="legend-dot status-yellow">!</span><span><strong>{t.legendYellow}</strong> · {t.legendYellowDetail}</span></span><span class="legend-item"><span class="legend-dot status-red">×</span><span><strong>{t.legendRed}</strong> · {t.legendRedDetail}</span></span></div>
+        <div id="map-errors" role="alert" aria-live="assertive" hidden></div><div id="fitment-map" class="map-scroll" aria-live="polite"></div><article id="map-detail" class="map-detail" hidden aria-live="polite"></article>
+      </section>
+
+      <section class="product-section product-section--save" id="garage" aria-labelledby="garage-heading">
+        <div class="section-heading"><div><p class="eyebrow">{t.garageEyebrow}</p><h2 id="garage-heading">{t.garageSectionTitle}</h2><p>{t.garageIntro}</p></div></div>
+        <div class="garage-shell"><article id="vehicle-summary" class="vehicle-card"></article><div><label for="active-vehicle">{t.currentVehicleLabel}<select id="active-vehicle"><option value="">{t.noSavedVehicleOption}</option></select></label><label for="vehicle-nickname">{t.vehicleNicknameLabel}<input id="vehicle-nickname" name="vehicle-nickname" value={t.vehicleNicknameDefaultValue} maxlength="80" /></label><p id="garage-status" role="status" aria-live="polite"></p><div id="saved-setups"></div></div></div>
+      </section>
+
+      <section class="product-section subtle-panel related-fitment-tools" id="tools" aria-labelledby="tools-heading"><p class="eyebrow">{t.relatedEyebrow}</p><h2 id="tools-heading">{t.relatedTitle}</h2><p>{t.relatedIntro}</p><div class="related-grid">
+        <a class="related-card" href="/it/tools/confronto-misure-pneumatici/"><ToolIcon id="tire-size-comparison" category="Tires & Wheels" /><span><strong>{t.relatedTireComparisonTitle}</strong><small>{t.relatedTireComparisonDetail}</small></span><i aria-hidden="true">›</i></a>
+        <a class="related-card" href="/it/tools/calcolatore-offset-cerchi/"><ToolIcon id="wheel-offset-calculator" category="Tires & Wheels" /><span><strong>{t.relatedWheelOffsetTitle}</strong><small>{t.relatedWheelOffsetDetail}</small></span><i aria-hidden="true">›</i></a>
+        <a class="related-card" href="#garage"><ToolIcon id="garage" /><span><strong>{t.relatedSaveTitle}</strong><small>{t.relatedSaveDetail}</small></span><i aria-hidden="true">›</i></a>
+      </div></section>
+    </main>
+
+
+    <Footer locale="it" />
+    <script>
+      import { initializeFitmentPage } from '../../../ui/fitment-page';
+      void initializeFitmentPage();
+    </script>
+  </body>
+</html>

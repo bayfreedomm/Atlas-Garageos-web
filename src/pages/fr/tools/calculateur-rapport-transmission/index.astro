@@ -1,0 +1,25 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('gear-ratio-calculator');
+const c = localizedTool('gear-ratio-calculator', 'fr');
+const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
+---
+<ToolPage {definition} locale="fr" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('gear-ratio-calculator')}>
+  <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
+    <div class="utility-fields gear-ratio-inputs"><label>Diamètre du pneu actuel · pouces<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Diamètre du nouveau pneu · pouces<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Rapport de pont actuel<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Vitesse de croisière · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
+    <button type="submit">Comparer le rapport de transmission</button>
+    <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Rapport de pont effectif</span><strong data-gear-effective>—</strong><p data-gear-context>Votre comparaison de rapport de transmission apparaîtra ici.</p></div><div class="standard-answer__secondary"><span>Rapport équivalent au comportement d'origine</span><strong data-gear-matching>—</strong><small data-gear-rpm>Le régime en prise directe apparaîtra ici.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Votre rapport effectif apparaîtra ici.</p>
+    <Parametric3DPanel mode="gear" locale="fr" />
+    <GearRatioTechnicalVisual locale="fr" />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Détails</span><small>Rapport et calcul en prise directe</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">PNEUS DE 25 À 44 POUCES</p><h2 id="rpm-matrix-heading">Carte des régimes (tr/min) à <span data-matrix-speed>65</span> mph</h2><p>Prise directe (1,00:1). La couleur indique le régime relatif uniquement au sein de ce tableau.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Pneu</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>Régime relatif le plus bas</span><i aria-hidden="true"></i><span>Régime relatif le plus élevé</span></p></section>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeGearRatioCalculators } from '../../../../ui/gear-ratio-calculator'; initializeGearRatioCalculators();</script>

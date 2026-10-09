@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('towing-capacity-calculator');
+const c = localizedTool('towing-capacity-calculator', 'pl');
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('towing-capacity-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Jednostka<select name="unit"><option value="lb" selected>Funty (lb)</option><option value="kg">Kilogramy (kg)</option></select></label>
+      <label>Dopuszczalna masa całkowita zestawu (GCWR)<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Masa własna pojazdu holującego<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Pasażerowie + ładunek w pojeździe<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="pl" primaryLabel="Maksymalna masa przyczepy" pending="Wpisz GCWR, masę własną i ładunek." visualTitle="GCWR − załadowany pojazd = dopuszczalna masa przyczepy" visualNote="Uproszczony szacunek, a nie wartość producenta" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

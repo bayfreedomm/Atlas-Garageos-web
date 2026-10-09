@@ -1,0 +1,14 @@
+---
+import { platformAlternates } from '../../../seo/locale-alternates';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog['pt-br'].privacy;
+const alternates = platformAlternates('/privacy-policy/');
+---
+<SiteLayout title={c.title} description={c.description} pathname="/pt-br/privacy-policy/" active="tools" locale="pt-br" alternates={alternates} breadcrumbs={[{ name: 'Início', href: '/pt-br/' }, { name: c.h1, href: '/pt-br/privacy-policy/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/pt-br/">Início</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.updated}</p></header>
+  <div class="tool-explanation privacy-copy">
+    {c.sections.map((s) => <><h2>{s.heading}</h2><p>{s.body}</p></>)}
+  </div>
+</SiteLayout>

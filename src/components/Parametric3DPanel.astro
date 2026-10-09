@@ -22,9 +22,15 @@ const viewText = {
   en: { label: 'Visual mode', studio: '3D Studio', drawing: 'Engineering 2D', badge: 'VISUAL STUDIO' },
   de: { label: 'Ansichtsmodus', studio: '3D-Studio', drawing: 'Technische 2D-Ansicht', badge: 'VISUELLES STUDIO' },
   es: { label: 'Modo de visualización', studio: 'Estudio 3D', drawing: 'Ingeniería 2D', badge: 'ESTUDIO VISUAL' },
+  fr: { label: 'Mode d’affichage', studio: 'Studio 3D', drawing: 'Plan technique 2D', badge: 'STUDIO VISUEL' },
+  it: { label: 'Modalità di visualizzazione', studio: 'Studio 3D', drawing: 'Disegno tecnico 2D', badge: 'STUDIO VISIVO' },
+  'pt-br': { label: 'Modo de visualização', studio: 'Estúdio 3D', drawing: 'Engenharia 2D', badge: 'ESTÚDIO VISUAL' },
+  pl: { label: 'Tryb widoku', studio: 'Studio 3D', drawing: 'Rysunek techniczny 2D', badge: 'STUDIO WIZUALNE' },
+  nl: { label: 'Weergavemodus', studio: '3D-studio', drawing: 'Technische 2D-tekening', badge: 'VISUELE STUDIO' },
+  tr: { label: 'Görünüm modu', studio: '3D Stüdyo', drawing: '2D Teknik Çizim', badge: 'GÖRSEL STÜDYO' },
 }[locale];
 const cameraText = studioCameraText[locale];
-const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { open: 'Studio vergrößern', close: 'Studio schließen' }, es: { open: 'Ampliar estudio', close: 'Cerrar estudio' } }[locale];
+const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { open: 'Studio vergrößern', close: 'Studio schließen' }, es: { open: 'Ampliar estudio', close: 'Cerrar estudio' }, fr: { open: 'Agrandir le studio', close: 'Fermer le studio' }, it: { open: 'Espandi studio', close: 'Chiudi studio' }, 'pt-br': { open: 'Ampliar estúdio', close: 'Fechar estúdio' }, pl: { open: 'Powiększ studio', close: 'Zamknij studio' }, nl: { open: 'Studio vergroten', close: 'Studio sluiten' }, tr: { open: 'Stüdyoyu büyüt', close: 'Stüdyoyu kapat' } }[locale];
 ---
 <div class:list={[{ 'tire-visual-studio parametric-visual-studio': dual }]} data-parametric-visual-studio={dual ? '' : undefined}>
   {dual && <header class="tire-visual-studio__header"><div><span>{viewText.badge}</span><h3>{title}</h3><p>{intro}</p></div>

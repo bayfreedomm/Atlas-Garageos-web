@@ -1,0 +1,42 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import VehicleTripContext from '../../../../components/VehicleTripContext.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('road-trip-cost-calculator');
+const c = localizedTool('road-trip-cost-calculator', 'pl');
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('road-trip-cost-calculator')}>
+  <VehicleTripContext slot="tool" locale="pl" />
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields locale="pl" currency="PLN" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">Ceny paliw w USA (po angielsku) <span aria-hidden="true">→</span></a>
+    <fieldset class="trip-options"><legend>Trasa</legend>
+      <div class="utility-fields"><label class="field-wide">Kierunek<select name="tripType"><option value="one">W jedną stronę</option><option value="round">Tam i z powrotem</option></select></label></div>
+      <details><summary>Dodaj opłaty drogowe, dodatki lub współpasażerów</summary><div class="utility-fields">
+        <label>Dodatkowe koszty podróży<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>Liczba osób<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Oszacuj koszt podróży</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Szacowany koszt podróży">
+      <div class="trip-primary__main"><span>Szacowany całkowity koszt podróży</span><strong data-trip-total>—</strong><p data-trip-context>Wpisz dane podróży, aby zobaczyć pełny koszt.</p></div>
+      <div class="trip-primary__support"><div><span>Zużyte paliwo</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>Tutaj pojawi się koszt paliwa.</small></div><div><span>Trasa</span><strong data-trip-direction>—</strong><small data-trip-distance>Tutaj pojawi się dystans.</small></div><div data-trip-person-wrap hidden><span>Na osobę</span><strong data-trip-person>—</strong><small data-trip-people>Podział sumy</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Tutaj pojawi się szacunek podróży.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Dystans podróży i proporcjonalny podział kosztów">
+      <div class="trip-technical-visual__head"><span>TRASA → PALIWO + DODATKI → RAZEM</span><small>Schemat trasy; odcinki kosztów w skali</small></div>
+      <div class="trip-route" aria-hidden="true"><span>START</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>CEL</span></div>
+      <div class="trip-visual-stats"><div><small>Przejechany dystans</small><strong data-trip-visual-distance>—</strong></div><div><small>Potrzebne paliwo</small><strong data-trip-visual-fuel>—</strong></div><div><small>Razem</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Podział kosztów paliwa i dodatków" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Paliwo <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Dodatki <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Szczegóły</span><small>Pełne zestawienie podróży</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

@@ -1,0 +1,25 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import GearRatioTechnicalVisual from '../../../../components/GearRatioTechnicalVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('gear-ratio-calculator');
+const c = localizedTool('gear-ratio-calculator', 'tr');
+const ratios = [3.08, 3.31, 3.55, 3.73, 4.10, 4.56];
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('gear-ratio-calculator')}>
+  <form slot="tool" class="calculator-form gear-ratio-calculator" data-calculator="gear-ratio" novalidate>
+    <div class="utility-fields gear-ratio-inputs"><label>Mevcut lastik çapı · inç<input name="currentDiameter" type="number" value="31" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Yeni lastik çapı · inç<input name="newDiameter" type="number" value="35" min="15" max="60" step="0.1" inputmode="decimal" /></label><label>Mevcut diferansiyel oranı<input name="currentRatio" type="number" value="3.73" min="1" max="8" step="0.01" inputmode="decimal" /></label><label>Seyir hızı · mph<input name="speedMph" type="number" value="65" min="1" max="200" step="1" inputmode="numeric" /></label></div>
+    <button type="submit">Dişli oranlarını karşılaştırın</button>
+    <section class="standard-answer gear-answer is-pending" data-gear-answer aria-live="polite"><div class="standard-answer__main"><span>Efektif diferansiyel oranı</span><strong data-gear-effective>—</strong><p data-gear-context>Dişli oranı karşılaştırmanız burada görünecek.</p></div><div class="standard-answer__secondary"><span>Orijinal hissi veren eşdeğer oran</span><strong data-gear-matching>—</strong><small data-gear-rpm>Direkt viteste motor devri (RPM) burada görünecek.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Efektif oranınız burada görünecek.</p>
+    <Parametric3DPanel mode="gear" locale="tr" />
+    <GearRatioTechnicalVisual locale="tr" />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Ayrıntılar</span><small>Oran ve direkt vites hesabı</small></div><dl class="tool-results" data-results aria-live="polite"></dl><div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="rpm-matrix" aria-labelledby="rpm-matrix-heading"><div><p class="eyebrow">25–44 İNÇ LASTİKLER</p><h2 id="rpm-matrix-heading"><span data-matrix-speed>65</span> mph hızda devir haritası</h2><p>Direkt vites (1,00:1). Renk, göreli devri yalnızca bu tablo içinde gösterir.</p></div><div class="rpm-matrix__scroll"><table><thead><tr><th scope="col">Lastik</th>{ratios.map((ratio) => <th scope="col">{ratio.toFixed(2)}</th>)}</tr></thead><tbody data-rpm-matrix></tbody></table></div><p class="rpm-matrix__legend"><span>En düşük göreli devir</span><i aria-hidden="true"></i><span>En yüksek göreli devir</span></p></section>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeGearRatioCalculators } from '../../../../ui/gear-ratio-calculator'; initializeGearRatioCalculators();</script>

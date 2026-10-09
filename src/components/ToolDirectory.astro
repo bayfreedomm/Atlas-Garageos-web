@@ -2,7 +2,7 @@
 import ToolIcon from './ToolIcon.astro';
 import { routeForTool, TOOL_CATEGORY_ORDER, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
-import { localizedToolPath } from '../localization/locales';
+import { localizedToolPath, type AtlasLocale } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
 import { normalizeFuelStatus } from '../data/fuel-prices-types';
 interface Props { mode?: 'home' | 'all'; locale?: ContentLocale | undefined; }
@@ -16,7 +16,7 @@ const { mode = 'all', locale } = Astro.props;
 const fuelStatus = normalizeFuelStatus(locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status);
 // Status-aware helper text. Never "LIVE" for the weekly US figure, and never "national
 // average" for Germany, whose data is an Atlas monitored city sample.
-const FUEL_FEATURE_TEXT: Record<'en' | 'de' | 'es', { helper: Record<'pending' | 'fresh' | 'stale', string>; keywords: string }> = {
+const FUEL_FEATURE_TEXT: Record<AtlasLocale, { helper: Record<'pending' | 'fresh' | 'stale', string>; keywords: string }> = {
   en: {
     helper: { pending: 'Weekly fuel data — awaiting first verified update', fresh: 'Weekly US average for regular, midgrade, premium and diesel, with history', stale: 'Weekly fuel data — showing last verified price' },
     keywords: 'gas prices today fuel price petrol diesel gasoline average per gallon per litre',
@@ -29,19 +29,58 @@ const FUEL_FEATURE_TEXT: Record<'en' | 'de' | 'es', { helper: Record<'pending' |
     helper: { pending: 'Datos de combustible — aún sin verificar', fresh: 'Precio medio nacional de gasolina y diésel, con histórico', stale: 'Datos de combustible — último valor verificado' },
     keywords: 'precio gasolina hoy combustible diesel gasoleo carburante',
   },
+  fr: {
+    helper: { pending: 'Prix des carburants aux États-Unis (anglais) — en attente de la première mise à jour', fresh: 'Prix des carburants aux États-Unis (anglais) — moyenne hebdomadaire essence et diesel, avec historique', stale: 'Prix des carburants aux États-Unis (anglais) — dernier prix vérifié' },
+    keywords: 'prix carburant essence diesel gazole états-unis usa gas prices',
+  },
+  it: {
+    helper: { pending: 'Prezzi del carburante negli USA (inglese) — in attesa del primo aggiornamento', fresh: 'Prezzi del carburante negli USA (inglese) — media settimanale di benzina e diesel, con storico', stale: 'Prezzi del carburante negli USA (inglese) — ultimo prezzo verificato' },
+    keywords: 'prezzi carburante benzina diesel gasolio usa stati uniti gas prices',
+  },
+  'pt-br': {
+    helper: { pending: 'Preços de combustível nos EUA (inglês) — aguardando a primeira atualização', fresh: 'Preços de combustível nos EUA (inglês) — média semanal de gasolina e diesel, com histórico', stale: 'Preços de combustível nos EUA (inglês) — último preço verificado' },
+    keywords: 'preço combustível gasolina diesel eua estados unidos gas prices',
+  },
+  pl: {
+    helper: { pending: 'Ceny paliw w USA (po angielsku) — oczekiwanie na pierwszą aktualizację', fresh: 'Ceny paliw w USA (po angielsku) — tygodniowa średnia benzyny i diesla, z historią', stale: 'Ceny paliw w USA (po angielsku) — ostatnia zweryfikowana cena' },
+    keywords: 'ceny paliw benzyna diesel olej napędowy usa stany zjednoczone gas prices',
+  },
+  nl: {
+    helper: { pending: 'Brandstofprijzen in de VS (Engels) — wacht op de eerste update', fresh: 'Brandstofprijzen in de VS (Engels) — weekgemiddelde voor benzine en diesel, met historie', stale: 'Brandstofprijzen in de VS (Engels) — laatst geverifieerde prijs' },
+    keywords: 'brandstofprijzen benzine diesel vs verenigde staten amerika gas prices',
+  },
+  tr: {
+    helper: { pending: 'ABD akaryakıt fiyatları (İngilizce) — ilk güncelleme bekleniyor', fresh: 'ABD akaryakıt fiyatları (İngilizce) — benzin ve dizel için haftalık ortalama, geçmiş verilerle', stale: 'ABD akaryakıt fiyatları (İngilizce) — son doğrulanmış fiyat' },
+    keywords: 'akaryakıt fiyatları benzin motorin dizel abd amerika gas prices',
+  },
 };
 const fuelFeature = FUEL_FEATURE_TEXT[locale ?? 'en'];
 const categoryLabels = locale ? new Map(platformCatalog[locale].home.categories.map((c, i) => [TOOL_CATEGORY_ORDER[i], c.name] as const)) : undefined;
-const allLabel = locale === 'de' ? 'Alle' : locale === 'es' ? 'Todo' : 'All';
+const DIRECTORY_TEXT: Readonly<Record<AtlasLocale, { all: string; search: string; allHeading: string; quickHeading: string; allLink: string; empty: string; viewAll: string; toolsWord: string }>> = {
+  en: { all: 'All', search: 'Search automotive tools', allHeading: 'All automotive tools', quickHeading: 'Quick tools', allLink: 'All tools', empty: 'No matching tools. Try a broader search.', viewAll: 'View all tools', toolsWord: 'tools' },
+  de: { all: 'Alle', search: 'Kfz-Werkzeuge durchsuchen', allHeading: 'Alle Kfz-Werkzeuge', quickHeading: 'Schnellwerkzeuge', allLink: 'Alle Werkzeuge', empty: 'Keine passenden Werkzeuge. Versuchen Sie eine allgemeinere Suche.', viewAll: 'Alle Werkzeuge ansehen', toolsWord: 'Werkzeuge' },
+  es: { all: 'Todo', search: 'Buscar herramientas', allHeading: 'Todas las herramientas', quickHeading: 'Herramientas rápidas', allLink: 'Todas', empty: 'No hay herramientas coincidentes. Pruebe una búsqueda más amplia.', viewAll: 'Ver todas las herramientas', toolsWord: 'herramientas' },
+  fr: { all: 'Tous', search: 'Rechercher un outil auto', allHeading: 'Tous les outils auto', quickHeading: 'Outils rapides', allLink: 'Tous les outils', empty: 'Aucun outil ne correspond. Essayez une recherche plus large.', viewAll: 'Voir tous les outils', toolsWord: 'outils' },
+  it: { all: 'Tutti', search: 'Cerca strumenti auto', allHeading: 'Tutti gli strumenti auto', quickHeading: 'Strumenti rapidi', allLink: 'Tutti gli strumenti', empty: 'Nessuno strumento trovato. Prova una ricerca più ampia.', viewAll: 'Vedi tutti gli strumenti', toolsWord: 'strumenti' },
+  'pt-br': { all: 'Todas', search: 'Buscar ferramentas automotivas', allHeading: 'Todas as ferramentas automotivas', quickHeading: 'Ferramentas rápidas', allLink: 'Todas as ferramentas', empty: 'Nenhuma ferramenta encontrada. Tente uma busca mais ampla.', viewAll: 'Ver todas as ferramentas', toolsWord: 'ferramentas' },
+  pl: { all: 'Wszystkie', search: 'Szukaj narzędzi motoryzacyjnych', allHeading: 'Wszystkie narzędzia motoryzacyjne', quickHeading: 'Szybkie narzędzia', allLink: 'Wszystkie narzędzia', empty: 'Brak pasujących narzędzi. Spróbuj szerszego wyszukiwania.', viewAll: 'Zobacz wszystkie narzędzia', toolsWord: 'narzędzi' },
+  nl: { all: 'Alle', search: 'Autotools zoeken', allHeading: 'Alle autotools', quickHeading: 'Snelle tools', allLink: 'Alle tools', empty: 'Geen passende tools gevonden. Probeer een bredere zoekopdracht.', viewAll: 'Bekijk alle tools', toolsWord: 'tools' },
+  tr: { all: 'Tümü', search: 'Otomotiv araçlarında arayın', allHeading: 'Tüm otomotiv araçları', quickHeading: 'Hızlı araçlar', allLink: 'Tüm araçlar', empty: 'Eşleşen araç bulunamadı. Daha genel bir arama deneyin.', viewAll: 'Tüm araçları görün', toolsWord: 'araç' },
+};
+const directoryText = DIRECTORY_TEXT[locale ?? 'en'];
+const allLabel = directoryText.all;
 const searchPlaceholder = locale ? platformCatalog[locale].home.searchPlaceholder : 'Search automotive tools...';
-const searchLabel = locale === 'de' ? 'Kfz-Werkzeuge durchsuchen' : locale === 'es' ? 'Buscar herramientas' : 'Search automotive tools';
-const allToolsHeading = locale === 'de' ? 'Alle Kfz-Werkzeuge' : locale === 'es' ? 'Todas las herramientas' : 'All automotive tools';
-const quickToolsHeading = locale === 'de' ? 'Schnellwerkzeuge' : locale === 'es' ? 'Herramientas rápidas' : 'Quick tools';
-const allToolsLink = locale === 'de' ? 'Alle Werkzeuge' : locale === 'es' ? 'Todas' : 'All tools';
-const emptyLabel = locale === 'de' ? 'Keine passenden Werkzeuge. Versuchen Sie eine allgemeinere Suche.' : locale === 'es' ? 'No hay herramientas coincidentes. Pruebe una búsqueda más amplia.' : 'No matching tools. Try a broader search.';
-const viewAllLabel = locale === 'de' ? 'Alle Werkzeuge ansehen' : locale === 'es' ? 'Ver todas las herramientas' : 'View all tools';
-const toolsWord = locale === 'de' ? 'Werkzeuge' : locale === 'es' ? 'herramientas' : 'tools';
+const searchLabel = directoryText.search;
+const allToolsHeading = directoryText.allHeading;
+const quickToolsHeading = directoryText.quickHeading;
+const allToolsLink = directoryText.allLink;
+const emptyLabel = directoryText.empty;
+const viewAllLabel = directoryText.viewAll;
+const toolsWord = directoryText.toolsWord;
 const hubPrefix = locale ? `/${locale}` : '';
+// Fuel-price dashboards exist only for the US (English), Germany and Spain; every other locale
+// links to the US English page.
+const isDataProductForUs = (id: ToolId): boolean => id === 'gas-prices-today' && locale !== 'de' && locale !== 'es';
 const tools = toolRegistry.filter(({ kind }) => kind === 'tool');
 const dataProducts = toolRegistry.filter(({ kind }) => kind === 'data-product');
 // One list, one mapping, one count. Data products lead their category so the fuel market
@@ -71,7 +110,7 @@ const helper = new Map<ToolId, string>([
   {mode === 'all' && <div class="tool-list-heading"><h2 id="toolbox-heading">{allToolsHeading}</h2><span data-tool-count>{listedEntries.length} {toolsWord}</span></div>}
   {mode === 'home' && <div class="tool-list-heading tool-list-heading--home"><h2 id="toolbox-heading">{quickToolsHeading}</h2><a href={`${hubPrefix}/tools/`}>{allToolsLink}</a></div>}
   <div class="tool-rows" data-tool-rows>
-    {displayedTools.map((tool) => { const label = locale ? localizedTool(tool.id, locale) : undefined; const href = locale ? localizedToolPath(locale, tool.id, tool.kind) : routeForTool(tool); const displayTitle = label?.title ?? tool.title; const isDataProduct = tool.kind === 'data-product'; const displayHelper = isDataProduct ? helper.get(tool.id) : (label?.intro ?? helper.get(tool.id)); const searchExtras = isDataProduct ? fuelFeature.keywords : ''; return (
+    {displayedTools.map((tool) => { const label = locale ? localizedTool(tool.id, locale) : undefined; const href = isDataProductForUs(tool.id) ? '/gas-prices-today/' : locale ? localizedToolPath(locale, tool.id, tool.kind) : routeForTool(tool); const displayTitle = label?.title ?? tool.title; const isDataProduct = tool.kind === 'data-product'; const displayHelper = isDataProduct ? helper.get(tool.id) : (label?.intro ?? helper.get(tool.id)); const searchExtras = isDataProduct ? fuelFeature.keywords : ''; return (
     <a class:list={['tool-row', { 'is-secondary': mode === 'home' && !popularIds.includes(tool.id), 'tool-row--data': isDataProduct }, isDataProduct ? `is-${fuelStatus}` : undefined]} href={href} data-tool-row data-tool-category-name={tool.category} data-tool-search-text={`${displayTitle} ${label?.description ?? tool.description} ${displayHelper ?? ''} ${searchExtras} ${tool.id}`.toLowerCase()} data-popular={popularIds.includes(tool.id) ? 'true' : 'false'}>
       <ToolIcon id={tool.id} category={tool.category} />
       <span class="tool-row__copy"><strong>{displayTitle}</strong>{displayHelper && <small>{displayHelper}</small>}</span><span class="tool-row__arrow" aria-hidden="true">›</span>

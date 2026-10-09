@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
 import { toolById } from '../../../../seo/tool-registry';
@@ -8,7 +9,7 @@ const c = localizedTool('tire-load-speed-rating', 'de');
 const loadIndexes = Array.from({ length: 126 - 75 + 1 }, (_, index) => 75 + index);
 const speedRatings: readonly string[] = ['L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'H', 'V', 'W', 'Y'];
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-load-speed-rating/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifen-tragfaehigkeit-geschwindigkeitsindex/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/indice-carga-velocidad-neumatico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-load-speed-rating/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('tire-load-speed-rating')}>
   <form slot="tool" class="calculator-form" data-calculator="tire-load-speed" novalidate>
     <div class="utility-fields">
       <label>Tragfähigkeitsindex<select name="loadIndex">{loadIndexes.map((index) => <option value={index} selected={index === 91}>{index}</option>)}</select></label>

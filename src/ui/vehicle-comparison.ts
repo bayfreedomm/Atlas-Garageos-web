@@ -2,7 +2,7 @@ import { vehicleFitmentData, type VehicleFitment } from '../data/vehicle-fitment
 import { boltPatternSlug } from '../data/bolt-pattern-catalog';
 import { parseTireNotation, tireSizeSlug } from '../data/tire-size-catalog';
 import { localizedToolPath } from '../localization/locales';
-import { entityDetailPath, toolLocaleFor, type EntityLocale } from '../seo/entity-routes';
+import { compareLocaleFor, entityDetailPath, toolLocaleFor, type EntityLocale } from '../seo/entity-routes';
 import { tireComparisonHref, vehicleLink } from './entity-page-model';
 import { torquePresentation } from './vehicle-torque';
 
@@ -72,7 +72,7 @@ interface ComparisonCopy {
   readonly actions: { readonly vehicleA: string; readonly vehicleB: string; readonly compareTires: string; readonly fitment: string };
 }
 
-const BASE_COPY: Readonly<Record<'en' | 'de' | 'es', ComparisonCopy>> = {
+const BASE_COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = {
   en: {
     chooseBoth: 'Choose two vehicles to compare their documented wheel and tire references.',
     same: 'Choose two different vehicles. A vehicle cannot be compared with itself.',
@@ -121,11 +121,113 @@ const BASE_COPY: Readonly<Record<'en' | 'de' | 'es', ComparisonCopy>> = {
     },
     actions: { vehicleA: 'Abrir Vehículo A', vehicleB: 'Abrir Vehículo B', compareTires: 'Comparar estos neumáticos', fitment: 'Abrir comparación de llantas y neumáticos' },
   },
+  fr: {
+    chooseBoth: 'Choisissez deux véhicules pour comparer leurs références de jantes et de pneus documentées.',
+    same: 'Choisissez deux véhicules différents. Un véhicule ne peut pas être comparé à lui-même.',
+    invalid: 'Un ou les deux identifiants de véhicule ne sont pas disponibles dans cette vue de marché Atlas.',
+    market: 'Marché de référence', generation: 'Génération / années', tire: 'Pneu de référence', width: 'Largeur du pneu', sidewall: 'Hauteur du flanc', diameter: 'Diamètre total', circumference: 'Circonférence', wheel: 'Jante de référence', pcd: 'Entraxe / PCD', lugs: 'Nombre de goujons', bore: 'Alésage central', fastener: 'Type de fixation', torque: 'Couple de serrage',
+    marketNames: { us: 'États-Unis', eu: 'Europe' }, fastenerNames: { 'lug-nut': 'Écrou de roue', 'wheel-bolt': 'Boulon de roue' }, missing: 'Non documenté',
+    summary: {
+      widerA: (name, amount) => `${name} utilise un pneu de référence plus large de ${amount.toFixed(0)} mm.`,
+      widerB: (name, amount) => `${name} utilise un pneu de référence plus large de ${amount.toFixed(0)} mm.`,
+      sameWidth: 'Les pneus de référence documentés ont la même largeur nominale.',
+      pcdDifferent: (a, b) => `Les véhicules ont des entraxes différents : ${a} et ${b}.`,
+      pcdSame: (pcd) => `Les deux fiches indiquent ${pcd}, mais l’entraxe seul ne prouve pas la compatibilité des jantes.`,
+      diameter: (percent) => `Les diamètres de leurs pneus de référence diffèrent de ${percent.toFixed(2)} %.`,
+    },
+    actions: { vehicleA: 'Ouvrir le véhicule A', vehicleB: 'Ouvrir le véhicule B', compareTires: 'Comparer ces tailles de pneus', fitment: 'Ouvrir le Comparateur jantes et pneus' },
+  },
+  it: {
+    chooseBoth: 'Scegli due veicoli per confrontare i loro riferimenti documentati di cerchi e pneumatici.',
+    same: 'Scegli due veicoli diversi. Un veicolo non può essere confrontato con sé stesso.',
+    invalid: 'Uno o entrambi gli ID veicolo non sono disponibili in questa vista di mercato Atlas.',
+    market: 'Mercato di riferimento', generation: 'Generazione / anni', tire: 'Pneumatico di riferimento', width: 'Larghezza pneumatico', sidewall: 'Altezza del fianco', diameter: 'Diametro totale', circumference: 'Circonferenza', wheel: 'Cerchio di riferimento', pcd: 'Foratura / PCD', lugs: 'Numero di fori', bore: 'Foro centrale', fastener: 'Tipo di fissaggio', torque: 'Coppia di serraggio',
+    marketNames: { us: 'USA', eu: 'Europa' }, fastenerNames: { 'lug-nut': 'Dado ruota', 'wheel-bolt': 'Bullone ruota' }, missing: 'Non documentato',
+    summary: {
+      widerA: (name, amount) => `${name} usa un pneumatico di riferimento più largo di ${amount.toFixed(0)} mm.`,
+      widerB: (name, amount) => `${name} usa un pneumatico di riferimento più largo di ${amount.toFixed(0)} mm.`,
+      sameWidth: 'I pneumatici di riferimento documentati hanno la stessa larghezza nominale.',
+      pcdDifferent: (a, b) => `I veicoli hanno forature diverse: ${a} e ${b}.`,
+      pcdSame: (pcd) => `Entrambe le schede indicano ${pcd}, ma la foratura da sola non dimostra la compatibilità dei cerchi.`,
+      diameter: (percent) => `I diametri dei loro pneumatici di riferimento differiscono del ${percent.toFixed(2)}%.`,
+    },
+    actions: { vehicleA: 'Apri il veicolo A', vehicleB: 'Apri il veicolo B', compareTires: 'Confronta queste misure', fitment: 'Apri Confronto cerchi e pneumatici' },
+  },
+  'pt-br': {
+    chooseBoth: 'Escolha dois veículos para comparar as referências documentadas de rodas e pneus.',
+    same: 'Escolha dois veículos diferentes. Um veículo não pode ser comparado com ele mesmo.',
+    invalid: 'Um ou ambos os IDs de veículo não estão disponíveis nesta visão de mercado da Atlas.',
+    market: 'Mercado de referência', generation: 'Geração / anos', tire: 'Pneu de referência', width: 'Largura do pneu', sidewall: 'Altura do flanco', diameter: 'Diâmetro total', circumference: 'Circunferência', wheel: 'Roda de referência', pcd: 'Furação / PCD', lugs: 'Número de furos', bore: 'Furo central', fastener: 'Tipo de fixação', torque: 'Torque de aperto',
+    marketNames: { us: 'EUA', eu: 'Europa' }, fastenerNames: { 'lug-nut': 'Porca de roda', 'wheel-bolt': 'Parafuso de roda' }, missing: 'Não documentado',
+    summary: {
+      widerA: (name, amount) => `${name} usa um pneu de referência ${amount.toFixed(0)} mm mais largo.`,
+      widerB: (name, amount) => `${name} usa um pneu de referência ${amount.toFixed(0)} mm mais largo.`,
+      sameWidth: 'Os pneus de referência documentados têm a mesma largura nominal.',
+      pcdDifferent: (a, b) => `Os veículos usam furações diferentes: ${a} e ${b}.`,
+      pcdSame: (pcd) => `Os dois registros usam ${pcd}, mas a furação sozinha não comprova a compatibilidade das rodas.`,
+      diameter: (percent) => `Os diâmetros dos pneus de referência diferem em ${percent.toFixed(2)}%.`,
+    },
+    actions: { vehicleA: 'Abrir veículo A', vehicleB: 'Abrir veículo B', compareTires: 'Comparar estas medidas de pneu', fitment: 'Abrir o Comparador de rodas e pneus' },
+  },
+  pl: {
+    chooseBoth: 'Wybierz dwa pojazdy, aby porównać ich udokumentowane dane felg i opon.',
+    same: 'Wybierz dwa różne pojazdy. Pojazdu nie można porównać z nim samym.',
+    invalid: 'Co najmniej jeden identyfikator pojazdu jest niedostępny w tym widoku rynku Atlas.',
+    market: 'Rynek referencyjny', generation: 'Generacja / lata', tire: 'Opona referencyjna', width: 'Szerokość opony', sidewall: 'Wysokość profilu', diameter: 'Średnica całkowita', circumference: 'Obwód', wheel: 'Felga referencyjna', pcd: 'Rozstaw śrub / PCD', lugs: 'Liczba śrub', bore: 'Otwór centralny', fastener: 'Rodzaj mocowania', torque: 'Moment dokręcania',
+    marketNames: { us: 'USA', eu: 'Europa' }, fastenerNames: { 'lug-nut': 'Nakrętka koła', 'wheel-bolt': 'Śruba koła' }, missing: 'Brak danych',
+    summary: {
+      widerA: (name, amount) => `${name} ma oponę referencyjną szerszą o ${amount.toFixed(0)} mm.`,
+      widerB: (name, amount) => `${name} ma oponę referencyjną szerszą o ${amount.toFixed(0)} mm.`,
+      sameWidth: 'Udokumentowane opony referencyjne mają tę samą szerokość nominalną.',
+      pcdDifferent: (a, b) => `Pojazdy mają różny rozstaw śrub: ${a} i ${b}.`,
+      pcdSame: (pcd) => `Oba wpisy mają ${pcd}, ale sam rozstaw śrub nie dowodzi zgodności felg.`,
+      diameter: (percent) => `Średnice ich opon referencyjnych różnią się o ${percent.toFixed(2)}%.`,
+    },
+    actions: { vehicleA: 'Otwórz pojazd A', vehicleB: 'Otwórz pojazd B', compareTires: 'Porównaj te rozmiary opon', fitment: 'Otwórz Porównanie felg i opon' },
+  },
+  nl: {
+    chooseBoth: 'Kies twee voertuigen om hun gedocumenteerde velg- en bandenreferenties te vergelijken.',
+    same: 'Kies twee verschillende voertuigen. Een voertuig kan niet met zichzelf worden vergeleken.',
+    invalid: 'Een of beide voertuig-ID’s zijn niet beschikbaar in deze Atlas-marktweergave.',
+    market: 'Referentiemarkt', generation: 'Generatie / bouwjaren', tire: 'Referentieband', width: 'Bandbreedte', sidewall: 'Wanghoogte', diameter: 'Totale diameter', circumference: 'Omtrek', wheel: 'Referentievelg', pcd: 'Steekmaat / PCD', lugs: 'Aantal boutgaten', bore: 'Naafgat', fastener: 'Type bevestiging', torque: 'Aanhaalmoment',
+    marketNames: { us: 'VS', eu: 'Europa' }, fastenerNames: { 'lug-nut': 'Wielmoer', 'wheel-bolt': 'Wielbout' }, missing: 'Niet gedocumenteerd',
+    summary: {
+      widerA: (name, amount) => `${name} heeft een ${amount.toFixed(0)} mm bredere referentieband.`,
+      widerB: (name, amount) => `${name} heeft een ${amount.toFixed(0)} mm bredere referentieband.`,
+      sameWidth: 'De gedocumenteerde referentiebanden hebben dezelfde nominale breedte.',
+      pcdDifferent: (a, b) => `De voertuigen hebben verschillende steekmaten: ${a} en ${b}.`,
+      pcdSame: (pcd) => `Beide vermeldingen hebben ${pcd}, maar de steekmaat alleen bewijst niet dat de velgen passen.`,
+      diameter: (percent) => `De diameters van hun referentiebanden verschillen ${percent.toFixed(2)}%.`,
+    },
+    actions: { vehicleA: 'Voertuig A openen', vehicleB: 'Voertuig B openen', compareTires: 'Deze bandenmaten vergelijken', fitment: 'Velgen en banden vergelijken openen' },
+  },
+  tr: {
+    chooseBoth: 'Belgelenmiş jant ve lastik referanslarını karşılaştırmak için iki araç seçin.',
+    same: 'İki farklı araç seçin. Bir araç kendisiyle karşılaştırılamaz.',
+    invalid: 'Araç kimliklerinden biri veya ikisi bu Atlas pazar görünümünde mevcut değil.',
+    market: 'Referans pazar', generation: 'Nesil / yıllar', tire: 'Referans lastik', width: 'Lastik genişliği', sidewall: 'Yanak yüksekliği', diameter: 'Toplam çap', circumference: 'Çevre', wheel: 'Referans jant', pcd: 'Bijon aralığı / PCD', lugs: 'Bijon sayısı', bore: 'Göbek çapı', fastener: 'Bağlantı tipi', torque: 'Sıkma torku',
+    marketNames: { us: 'ABD', eu: 'Avrupa' }, fastenerNames: { 'lug-nut': 'Bijon somunu', 'wheel-bolt': 'Bijon cıvatası' }, missing: 'Belgelenmemiş',
+    summary: {
+      widerA: (name, amount) => `${name}, ${amount.toFixed(0)} mm daha geniş bir referans lastik kullanıyor.`,
+      widerB: (name, amount) => `${name}, ${amount.toFixed(0)} mm daha geniş bir referans lastik kullanıyor.`,
+      sameWidth: 'Belgelenmiş referans lastiklerin nominal genişliği aynı.',
+      pcdDifferent: (a, b) => `Araçların bijon aralıkları farklı: ${a} ve ${b}.`,
+      pcdSame: (pcd) => `İki kayıt da ${pcd} kullanıyor, ancak bijon aralığı tek başına jant uyumluluğunu kanıtlamaz.`,
+      diameter: (percent) => `Referans lastik çapları arasında %${percent.toFixed(2)} fark var.`,
+    },
+    actions: { vehicleA: 'A aracını aç', vehicleB: 'B aracını aç', compareTires: 'Bu lastik ebatlarını karşılaştır', fitment: 'Jant ve Lastik Karşılaştırma’yı aç' },
+  },
 };
-// Reference-only locales have no vehicle-comparison page; their entity pages link to the English one.
-const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = { ...BASE_COPY, fr: BASE_COPY.en, it: BASE_COPY.en, 'pt-br': BASE_COPY.en, pl: BASE_COPY.en, nl: BASE_COPY.en, tr: BASE_COPY.en };
+const COPY: Readonly<Record<EntityLocale, ComparisonCopy>> = BASE_COPY;
 
-export const comparisonPath = (locale: EntityLocale): string => locale === 'de' ? '/de/fahrzeuge/vergleichen/' : locale === 'es' ? '/es/vehiculos/comparar/' : '/vehicles/compare/';
+const COMPARISON_HUB_PATHS: Readonly<Record<'en' | 'de' | 'es', string>> = {
+  en: '/vehicles/compare/',
+  de: '/de/fahrzeuge/vergleichen/',
+  es: '/es/vehiculos/comparar/',
+};
+
+/** The comparison hub exists in EN/DE/ES only; the other locales link to the English hub. */
+export const comparisonPath = (locale: EntityLocale): string => COMPARISON_HUB_PATHS[compareLocaleFor(locale)];
 
 export function canonicalVehiclePair(firstId: string, secondId: string): readonly [string, string] {
   return firstId.localeCompare(secondId) <= 0 ? [firstId, secondId] : [secondId, firstId];

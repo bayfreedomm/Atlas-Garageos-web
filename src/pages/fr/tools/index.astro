@@ -1,0 +1,15 @@
+---
+import { platformAlternates } from '../../../seo/locale-alternates';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import ToolDirectory from '../../../components/ToolDirectory.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog['fr'].toolsHub;
+const alternates = platformAlternates('/tools/');
+---
+<SiteLayout title={c.title} description={c.description} pathname="/fr/tools/" active="tools" locale="fr" alternates={alternates} breadcrumbs={[{ name: 'Accueil', href: '/fr/' }, { name: 'Outils', href: '/fr/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/fr/">Accueil</a><span aria-hidden="true">/</span><span aria-current="page">Outils</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.lead}</p></header>
+  <ToolDirectory mode="all" locale="fr" />
+  <a class="fitment-directory-row" href="/fr/fitment-studio/"><strong>{c.fitmentRowTitle}</strong><span>{c.fitmentRowCopy}</span><i aria-hidden="true">›</i></a>
+  <a class="fitment-directory-row" href="/fr/vehicules/"><strong>Référence de compatibilité des véhicules</strong><span>Pneus documentés, entraxe (PCD) et couple de serrage qualifié par marque et modèle</span><i aria-hidden="true">›</i></a>
+</SiteLayout>

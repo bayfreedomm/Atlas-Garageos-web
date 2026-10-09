@@ -17,7 +17,7 @@ const n = (values: Readonly<Record<string, string>>, key: string, fallback: numb
   return Number.isFinite(value) ? value : fallback;
 };
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-const local = (locale: Tool3DLocale, en: string, de: string, es: string) => ({ en, de, es })[locale];
+const local = (locale: Tool3DLocale, text: Readonly<Record<Tool3DLocale, string>>): string => text[locale];
 const annotation = (start: Vec3, end: Vec3, label: string, color: string): Annotation3D => ({ start, end, label, color });
 const referenceTire = (() => {
   const model = buildTireComparison3DModel(
@@ -80,8 +80,8 @@ function clearanceScene(palette: VisualizationPalette, variant: 'measure' | 'map
     box(.12, 2, 1.05, palette.proposed, v(1.13, 0, 0), .55, 0, satin),
   ];
   const annotations = [
-    annotation(v(-1.06, -.68, .47), v(-.82, -.68, .47), variant === 'measure' ? { en: 'INNER GAP', de: 'INNENABSTAND', es: 'HOLGURA INTERIOR' }[locale] : { en: 'WIDTH', de: 'BREITE', es: 'ANCHO' }[locale], palette.current),
-    annotation(v(.82, -.68, .47), v(1.06, -.68, .47), variant === 'measure' ? { en: 'OUTER GAP', de: 'AUSSENABSTAND', es: 'HOLGURA EXTERIOR' }[locale] : 'ET', palette.proposed),
+    annotation(v(-1.06, -.68, .47), v(-.82, -.68, .47), variant === 'measure' ? { en: 'INNER GAP', de: 'INNENABSTAND', es: 'HOLGURA INTERIOR', fr: 'JEU INTÉRIEUR', it: 'GIOCO INTERNO', 'pt-br': 'FOLGA INTERNA', pl: 'LUZ WEWN.', nl: 'BINNENSPELING', tr: 'İÇ BOŞLUK' }[locale] : { en: 'WIDTH', de: 'BREITE', es: 'ANCHO', fr: 'LARGEUR', it: 'LARGHEZZA', 'pt-br': 'LARGURA', pl: 'SZEROKOŚĆ', nl: 'BREEDTE', tr: 'GENİŞLİK' }[locale], palette.current),
+    annotation(v(.82, -.68, .47), v(1.06, -.68, .47), variant === 'measure' ? { en: 'OUTER GAP', de: 'AUSSENABSTAND', es: 'HOLGURA EXTERIOR', fr: 'JEU EXTÉRIEUR', it: 'GIOCO ESTERNO', 'pt-br': 'FOLGA EXTERNA', pl: 'LUZ ZEWN.', nl: 'BUITENSPELING', tr: 'DIŞ BOŞLUK' }[locale] : 'ET', palette.proposed),
   ];
   if (variant === 'map') {
     for (let i = -2; i <= 2; i += 1) {
@@ -97,7 +97,7 @@ export interface Tool3DResult { readonly scene: Scene3D; readonly readout: strin
 /** Explanatory geometry only. Canonical numerical results remain in the calculator UI. */
 function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<string, string>>, palette: VisualizationPalette, locale: Tool3DLocale = 'en', fallbackMeshes = true): Tool3DResult {
   const input = (key: string, fallback: number) => n(values, key, fallback);
-  if (id === 'fitment-map' || id === 'measure-my-car') return { scene: clearanceScene(palette, id === 'fitment-map' ? 'map' : 'measure', locale, fallbackMeshes), readout: id === 'fitment-map' ? local(locale, 'WIDTH × ET', 'BREITE × ET', 'ANCHO × ET') : local(locale, 'INNER ↔ OUTER', 'INNEN ↔ AUSSEN', 'INTERIOR ↔ EXTERIOR'), detail: local(locale, 'Static geometry · measure on your vehicle', 'Statische Geometrie · am Fahrzeug messen', 'Geometría estática · mida en su vehículo') };
+  if (id === 'fitment-map' || id === 'measure-my-car') return { scene: clearanceScene(palette, id === 'fitment-map' ? 'map' : 'measure', locale, fallbackMeshes), readout: id === 'fitment-map' ? local(locale, { en: 'WIDTH × ET', de: 'BREITE × ET', es: 'ANCHO × ET', fr: 'LARGEUR × ET', it: 'LARGHEZZA × ET', 'pt-br': 'LARGURA × ET', pl: 'SZEROKOŚĆ × ET', nl: 'BREEDTE × ET', tr: 'GENİŞLİK × ET' }) : local(locale, { en: 'INNER ↔ OUTER', de: 'INNEN ↔ AUSSEN', es: 'INTERIOR ↔ EXTERIOR', fr: 'INTÉRIEUR ↔ EXTÉRIEUR', it: 'INTERNO ↔ ESTERNO', 'pt-br': 'INTERNO ↔ EXTERNO', pl: 'WEWN. ↔ ZEWN.', nl: 'BINNEN ↔ BUITEN', tr: 'İÇ ↔ DIŞ' }), detail: local(locale, { en: 'Static geometry · measure on your vehicle', de: 'Statische Geometrie · am Fahrzeug messen', es: 'Geometría estática · mida en su vehículo', fr: 'Géométrie statique · mesurez sur votre véhicule', it: 'Geometria statica · misura sul tuo veicolo', 'pt-br': 'Geometria estática · meça no seu veículo', pl: 'Geometria statyczna · zmierz na swoim aucie', nl: 'Statische geometrie · meet aan je auto', tr: 'Statik geometri · aracınızda ölçün' }) };
 
   if (id === 'fuel-cost-calculator') {
     const distance = Math.max(0, input('distance', 100));
@@ -118,22 +118,22 @@ function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<st
     for (let i = 0; i < 8; i += 1) {
       tank.push(box(.12, .12, .055, i / 8 < level ? palette.proposed : '#395366', v(.19 + i * .145, -.64, .39), 1, 0, satin));
     }
-    return { scene: { meshes: tank, lines: [{ points: [v(-.55, -.3, .28), v(-.38, -.3, .28), v(-.38, .64, .28), v(.69, .64, .28)], color: palette.proposed, width: 3 }], annotations: [annotation(v(-1.2, .92, .25), v(1.2, .92, .25), `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}`, palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: calculated.ok ? `${fuelRequired.toFixed(1)} ${values.system === 'imperial' ? 'US gal' : 'L'}` : '—', detail: local(locale, 'Fuel required from canonical calculation', 'Kraftstoffbedarf aus der maßgeblichen Berechnung', 'Combustible necesario según el cálculo principal') };
+    return { scene: { meshes: tank, lines: [{ points: [v(-.55, -.3, .28), v(-.38, -.3, .28), v(-.38, .64, .28), v(.69, .64, .28)], color: palette.proposed, width: 3 }], annotations: [annotation(v(-1.2, .92, .25), v(1.2, .92, .25), `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}`, palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: calculated.ok ? `${fuelRequired.toFixed(1)} ${values.system === 'imperial' ? 'US gal' : 'L'}` : '—', detail: local(locale, { en: 'Fuel required from canonical calculation', de: 'Kraftstoffbedarf aus der maßgeblichen Berechnung', es: 'Combustible necesario según el cálculo principal', fr: 'Carburant nécessaire selon le calcul principal', it: 'Carburante necessario secondo il calcolo principale', 'pt-br': 'Combustível necessário segundo o cálculo principal', pl: 'Potrzebne paliwo wg głównego obliczenia', nl: 'Benodigde brandstof volgens de hoofdberekening', tr: 'Ana hesaplamaya göre gereken yakıt' }) };
   }
   if (id === 'road-trip-cost-calculator') {
     const distance = input('distance', 250);
     const isReturn = values.tripType === 'round';
-    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}${isReturn ? ' × 2' : ''}`, detail: isReturn ? local(locale, 'Return route', 'Hin- und Rückfahrt', 'Viaje de ida y vuelta') : local(locale, 'One-way route', 'Einfache Fahrt', 'Viaje de ida') };
+    return { scene: pathScene(distance, isReturn, palette, input('extraCost', 0)), readout: `${distance.toFixed(0)} ${values.system === 'imperial' ? 'mi' : 'km'}${isReturn ? ' × 2' : ''}`, detail: isReturn ? local(locale, { en: 'Return route', de: 'Hin- und Rückfahrt', es: 'Viaje de ida y vuelta', fr: 'Aller-retour', it: 'Andata e ritorno', 'pt-br': 'Ida e volta', pl: 'Tam i z powrotem', nl: 'Retourrit', tr: 'Gidiş-dönüş' }) : local(locale, { en: 'One-way route', de: 'Einfache Fahrt', es: 'Viaje de ida', fr: 'Aller simple', it: 'Solo andata', 'pt-br': 'Só ida', pl: 'W jedną stronę', nl: 'Enkele reis', tr: 'Tek yön' }) };
   }
   if (id === 'mpg-l100km-converter') {
     const value = input('value', 30);
     const scene = pathScene(clamp(value * 4, 10, 400), false, palette);
-    return { scene: { ...scene, meshes: [...scene.meshes, box(.62, .62, .62, palette.proposed, v(1.06, -.42, -.78), 1, 0, metal)] }, readout: `${value.toFixed(1)} ${values.unit ?? 'US mpg'}`, detail: local(locale, 'Distance and fuel volume · unit relationship', 'Strecke und Kraftstoffmenge · Einheitenbeziehung', 'Distancia y combustible · relación entre unidades') };
+    return { scene: { ...scene, meshes: [...scene.meshes, box(.62, .62, .62, palette.proposed, v(1.06, -.42, -.78), 1, 0, metal)] }, readout: `${value.toFixed(1)} ${values.unit ?? 'US mpg'}`, detail: local(locale, { en: 'Distance and fuel volume · unit relationship', de: 'Strecke und Kraftstoffmenge · Einheitenbeziehung', es: 'Distancia y combustible · relación entre unidades', fr: 'Distance et carburant · relation entre unités', it: 'Distanza e carburante · relazione tra unità', 'pt-br': 'Distância e combustível · relação entre unidades', pl: 'Dystans i paliwo · relacja jednostek', nl: 'Afstand en brandstof · eenheidsrelatie', tr: 'Mesafe ve yakıt · birim ilişkisi' }) };
   }
   if (id === 'psi-bar-converter') {
     const value = input('value', 32);
     const psi = values.unit === 'bar' ? value * 100000 / PASCALS_PER_PSI : values.unit === 'kpa' ? value * 1000 / PASCALS_PER_PSI : value;
-    return { scene: gauge(psi / 100, palette), readout: `${value.toFixed(1)} ${values.unit ?? 'psi'}`, detail: local(locale, 'Illustrative gauge · not a pressure recommendation', 'Schematische Anzeige · keine Druckempfehlung', 'Indicador ilustrativo · no recomienda una presión') };
+    return { scene: gauge(psi / 100, palette), readout: `${value.toFixed(1)} ${values.unit ?? 'psi'}`, detail: local(locale, { en: 'Illustrative gauge · not a pressure recommendation', de: 'Schematische Anzeige · keine Druckempfehlung', es: 'Indicador ilustrativo · no recomienda una presión', fr: 'Manomètre illustratif · pas une pression conseillée', it: 'Manometro illustrativo · non consiglia una pressione', 'pt-br': 'Manômetro ilustrativo · não recomenda pressão', pl: 'Wskaźnik poglądowy · to nie zalecane ciśnienie', nl: 'Illustratieve meter · geen drukadvies', tr: 'Temsili gösterge · basınç önerisi değildir' }) };
   }
   if (id === 'hp-kw-converter') {
     const value = input('value', 180);
@@ -144,13 +144,13 @@ function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<st
       meshes.push(box(.54, .12, .22, palette.current, v(-.14 + Math.cos(a) * .53, Math.sin(a) * .53, .28), 1, a, metal));
     }
     meshes.push(box(clamp(powerKw / 150, .12, 1.5), .17, .3, palette.proposed, v(.2, -1, .25), 1, 0, metal));
-    return { scene: { meshes, shadows: floor(), fitRadius: 1.42 }, readout: `${value.toFixed(1)} ${values.unit ?? 'hp'}`, detail: local(locale, 'Mechanical output · unit conversion', 'Mechanische Leistung · Einheitenumrechnung', 'Potencia mecánica · conversión de unidades') };
+    return { scene: { meshes, shadows: floor(), fitRadius: 1.42 }, readout: `${value.toFixed(1)} ${values.unit ?? 'hp'}`, detail: local(locale, { en: 'Mechanical output · unit conversion', de: 'Mechanische Leistung · Einheitenumrechnung', es: 'Potencia mecánica · conversión de unidades', fr: 'Puissance mécanique · conversion d’unités', it: 'Potenza meccanica · conversione di unità', 'pt-br': 'Potência mecânica · conversão de unidades', pl: 'Moc mechaniczna · przeliczanie jednostek', nl: 'Mechanisch vermogen · eenheidsomrekening', tr: 'Mekanik güç · birim dönüşümü' }) };
   }
   if (id === 'nm-lb-ft-converter') {
     const value = input('value', 300);
     const moment = values.unit === 'lb-ft' ? value * NEWTON_METERS_PER_POUND_FOOT : value;
     const angle = .2 + clamp(moment / 800, 0, 1) * .9;
-    return { scene: { meshes: [cylinder(.38, .56, palette.hub, v(0, 0, 0), 1, metal), box(1.8, .17, .23, palette.metal, v(.76 * Math.cos(angle), .76 * Math.sin(angle), .33), 1, angle, metal), cylinder(.14, .37, palette.proposed, v(1.55 * Math.cos(angle), 1.55 * Math.sin(angle), .32), 1, metal)], lines: [circleLine(.72, palette.proposed, .36, 54)], fitRadius: 1.6 }, readout: `${value.toFixed(1)} ${values.unit ?? 'Nm'}`, detail: local(locale, 'One moment about the same axle', 'Ein Drehmoment an derselben Achse', 'Un par de fuerza sobre el mismo eje') };
+    return { scene: { meshes: [cylinder(.38, .56, palette.hub, v(0, 0, 0), 1, metal), box(1.8, .17, .23, palette.metal, v(.76 * Math.cos(angle), .76 * Math.sin(angle), .33), 1, angle, metal), cylinder(.14, .37, palette.proposed, v(1.55 * Math.cos(angle), 1.55 * Math.sin(angle), .32), 1, metal)], lines: [circleLine(.72, palette.proposed, .36, 54)], fitRadius: 1.6 }, readout: `${value.toFixed(1)} ${values.unit ?? 'Nm'}`, detail: local(locale, { en: 'One moment about the same axle', de: 'Ein Drehmoment an derselben Achse', es: 'Un par de fuerza sobre el mismo eje', fr: 'Un même couple autour du même axe', it: 'Una coppia attorno allo stesso asse', 'pt-br': 'Um torque sobre o mesmo eixo', pl: 'Jeden moment wokół tej samej osi', nl: 'Eén koppel rond dezelfde as', tr: 'Aynı aks etrafında tek moment' }) };
   }
   if (id === 'power-to-weight-calculator') {
     const power = input('power', 180), mass = input('weight', 1350);
@@ -167,18 +167,18 @@ function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<st
       const angle = i * Math.PI / 4;
       meshes.push(box(.42, .055, .09, '#c6d5de', v(-.83 + Math.cos(angle) * .34, .14 + Math.sin(angle) * .34, .36), 1, angle, metal));
     }
-    return { scene: { meshes, annotations: [annotation(v(-1.28, .9, .3), v(1.28, .9, .3), local(locale, 'POWER ÷ MASS', 'LEISTUNG ÷ MASSE', 'POTENCIA ÷ MASA'), palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: `${power.toFixed(0)} / ${mass.toFixed(0)}`, detail: local(locale, 'Power ÷ mass · entered units', 'Leistung ÷ Masse · eingegebene Einheiten', 'Potencia ÷ masa · unidades introducidas') };
+    return { scene: { meshes, annotations: [annotation(v(-1.28, .9, .3), v(1.28, .9, .3), local(locale, { en: 'POWER ÷ MASS', de: 'LEISTUNG ÷ MASSE', es: 'POTENCIA ÷ MASA', fr: 'PUISSANCE ÷ MASSE', it: 'POTENZA ÷ MASSA', 'pt-br': 'POTÊNCIA ÷ MASSA', pl: 'MOC ÷ MASA', nl: 'VERMOGEN ÷ MASSA', tr: 'GÜÇ ÷ KÜTLE' }), palette.accent)], shadows: floor(1.8), fitRadius: 1.8 }, readout: `${power.toFixed(0)} / ${mass.toFixed(0)}`, detail: local(locale, { en: 'Power ÷ mass · entered units', de: 'Leistung ÷ Masse · eingegebene Einheiten', es: 'Potencia ÷ masa · unidades introducidas', fr: 'Puissance ÷ masse · unités saisies', it: 'Potenza ÷ massa · unità inserite', 'pt-br': 'Potência ÷ massa · unidades informadas', pl: 'Moc ÷ masa · wpisane jednostki', nl: 'Vermogen ÷ massa · ingevoerde eenheden', tr: 'Güç ÷ kütle · girilen birimler' }) };
   }
   if (id === 'tire-load-speed-rating') {
     const load = values.loadIndex ?? '91';
     const rating = values.speedRating ?? 'V';
     const tire = productTire(palette, locale, fallbackMeshes);
-    return { scene: { ...tire, meshes: [...tire.meshes, box(.62, .09, .14, palette.proposed, v(0, -.66, .44), 1, 0, metal)], annotations: [annotation(v(-.8, 1.15, .24), v(.8, 1.15, .24), `${load}${rating}`, palette.accent)] }, readout: `${load}${rating}`, detail: local(locale, 'Standards lookup · verify vehicle requirements', 'Normtabelle · Fahrzeuganforderungen prüfen', 'Tabla de normas · verifique los requisitos del vehículo') };
+    return { scene: { ...tire, meshes: [...tire.meshes, box(.62, .09, .14, palette.proposed, v(0, -.66, .44), 1, 0, metal)], annotations: [annotation(v(-.8, 1.15, .24), v(.8, 1.15, .24), `${load}${rating}`, palette.accent)] }, readout: `${load}${rating}`, detail: local(locale, { en: 'Standards lookup · verify vehicle requirements', de: 'Normtabelle · Fahrzeuganforderungen prüfen', es: 'Tabla de normas · verifique los requisitos del vehículo', fr: 'Table des normes · vérifiez les exigences du véhicule', it: 'Tabella norme · verifica i requisiti del veicolo', 'pt-br': 'Tabela de normas · confira os requisitos do veículo', pl: 'Tabela norm · sprawdź wymagania auta', nl: 'Normtabel · controleer de eisen van je auto', tr: 'Standart tablosu · araç gereksinimlerini kontrol edin' }) };
   }
   if (id === 'tire-date-code-decoder') {
     const code = (values.code ?? '2219').replace(/[^0-9]/g, '').slice(0, 4);
     const tire = productTire(palette, locale, fallbackMeshes);
-    return { scene: { ...tire, meshes: [...tire.meshes, box(.84, .09, .1, palette.proposed, v(0, -.72, .43), 1, 0, metal)], annotations: [annotation(v(-.65, 1.12, .26), v(.65, 1.12, .26), `DOT ${code || 'WWYY'}`, palette.accent)] }, readout: `DOT ${code || 'WWYY'}`, detail: local(locale, 'Last four digits · week / year', 'Letzte vier Ziffern · Woche / Jahr', 'Últimos cuatro dígitos · semana / año') };
+    return { scene: { ...tire, meshes: [...tire.meshes, box(.84, .09, .1, palette.proposed, v(0, -.72, .43), 1, 0, metal)], annotations: [annotation(v(-.65, 1.12, .26), v(.65, 1.12, .26), `DOT ${code || 'WWYY'}`, palette.accent)] }, readout: `DOT ${code || 'WWYY'}`, detail: local(locale, { en: 'Last four digits · week / year', de: 'Letzte vier Ziffern · Woche / Jahr', es: 'Últimos cuatro dígitos · semana / año', fr: 'Quatre derniers chiffres · semaine / année', it: 'Ultime quattro cifre · settimana / anno', 'pt-br': 'Últimos quatro dígitos · semana / ano', pl: 'Ostatnie cztery cyfry · tydzień / rok', nl: 'Laatste vier cijfers · week / jaar', tr: 'Son dört hane · hafta / yıl' }) };
   }
   if (id === 'towing-capacity-calculator') {
     const gcwr = Math.max(0, input('gcwr', 17000));
@@ -193,17 +193,17 @@ function sceneForToolFallback(id: Additional3DToolId, values: Readonly<Record<st
       cylinder(.12, .4, palette.accent, v(.02, -.53, 0), 1, metal),
       annulusCylinder(.18, .11, .22, '#b9cbd5', v(.02, -.53, .22), 1, metal),
     ];
-    return { scene: { meshes, lines: [{ points: [v(-.59, -.15, .25), v(.59, -.15, .25)], color: palette.accent, width: 3 }], annotations: [annotation(v(-1.38, .72, 0), v(1.4, .72, 0), 'GCWR', palette.accent)], shadows: floor(1.8), fitRadius: 1.88 }, readout: `${gcwr.toFixed(0)} − ${vehicle.toFixed(0)}`, detail: local(locale, 'GCWR − loaded vehicle · entered units', 'Zulässiges Zuggesamtgewicht − beladenes Fahrzeug · Eingabeeinheiten', 'Peso bruto combinado − vehículo cargado · unidades introducidas') };
+    return { scene: { meshes, lines: [{ points: [v(-.59, -.15, .25), v(.59, -.15, .25)], color: palette.accent, width: 3 }], annotations: [annotation(v(-1.38, .72, 0), v(1.4, .72, 0), 'GCWR', palette.accent)], shadows: floor(1.8), fitRadius: 1.88 }, readout: `${gcwr.toFixed(0)} − ${vehicle.toFixed(0)}`, detail: local(locale, { en: 'GCWR − loaded vehicle · entered units', de: 'Zulässiges Zuggesamtgewicht − beladenes Fahrzeug · Eingabeeinheiten', es: 'Peso bruto combinado − vehículo cargado · unidades introducidas', fr: 'PTRA − véhicule chargé · unités saisies', it: 'MTRA − veicolo carico · unità inserite', 'pt-br': 'PBTC − veículo carregado · unidades informadas', pl: 'DMC zestawu − załadowane auto · wpisane jednostki', nl: 'GCWR − beladen auto · ingevoerde eenheden', tr: 'GCWR − yüklü araç · girilen birimler' }) };
   }
   if (id === 'quarter-mile-calculator') {
     const weight = input('weight', 3400), power = input('power', 300);
     const scene = pathScene(.25, false, palette);
-    return { scene: { ...scene, annotations: [annotation(v(-1.3, .62, .1), v(1.3, .62, .1), '¼ mi · 402.3 m', palette.accent)] }, readout: `${weight.toFixed(0)} / ${power.toFixed(0)}`, detail: local(locale, 'Weight / power · illustrative course', 'Gewicht / Leistung · schematische Strecke', 'Peso / potencia · recorrido ilustrativo') };
+    return { scene: { ...scene, annotations: [annotation(v(-1.3, .62, .1), v(1.3, .62, .1), '¼ mi · 402.3 m', palette.accent)] }, readout: `${weight.toFixed(0)} / ${power.toFixed(0)}`, detail: local(locale, { en: 'Weight / power · illustrative course', de: 'Gewicht / Leistung · schematische Strecke', es: 'Peso / potencia · recorrido ilustrativo', fr: 'Poids / puissance · parcours illustratif', it: 'Peso / potenza · percorso illustrativo', 'pt-br': 'Peso / potência · percurso ilustrativo', pl: 'Masa / moc · trasa poglądowa', nl: 'Gewicht / vermogen · illustratief parcours', tr: 'Ağırlık / güç · temsili parkur' }) };
   }
   const selected = vehicleById(values.model ?? '');
   const lugCount = selected?.lugCount ?? 0;
   const holes = Array.from({ length: lugCount }, (_, i) => { const a = i * Math.PI * 2 / lugCount; return cylinder(.095, .23, dark, v(.9 + Math.cos(a) * .53, Math.sin(a) * .53, .12), 1, satin); });
-  return { scene: { meshes: [...wheel(v(-.8, 0, 0), .8, palette), annulusCylinder(.78, .27, .18, palette.metal, v(.9, 0, 0), 1, metal), ...holes], shadows: floor(1.7), fitRadius: 1.75 }, readout: selected ? `${selected.make} ${selected.model} · ${selected.boltPattern}` : local(locale, 'Select a sourced vehicle', 'Fahrzeug mit Quelle wählen', 'Elija un vehículo documentado'), detail: selected ? local(locale, 'Sourced reference · confirm exact trim', 'Referenz mit Quellen · genaue Ausstattung prüfen', 'Referencia documentada · confirme la versión exacta') : local(locale, 'No bolt pattern shown until a documented vehicle is selected', 'Lochkreis erst nach Auswahl eines dokumentierten Fahrzeugs', 'El patrón de birlos aparece tras elegir un vehículo documentado') };
+  return { scene: { meshes: [...wheel(v(-.8, 0, 0), .8, palette), annulusCylinder(.78, .27, .18, palette.metal, v(.9, 0, 0), 1, metal), ...holes], shadows: floor(1.7), fitRadius: 1.75 }, readout: selected ? `${selected.make} ${selected.model} · ${selected.boltPattern}` : local(locale, { en: 'Select a sourced vehicle', de: 'Fahrzeug mit Quelle wählen', es: 'Elija un vehículo documentado', fr: 'Choisissez un véhicule documenté', it: 'Scegli un veicolo documentato', 'pt-br': 'Escolha um veículo documentado', pl: 'Wybierz udokumentowane auto', nl: 'Kies een gedocumenteerde auto', tr: 'Belgelenmiş bir araç seçin' }), detail: selected ? local(locale, { en: 'Sourced reference · confirm exact trim', de: 'Referenz mit Quellen · genaue Ausstattung prüfen', es: 'Referencia documentada · confirme la versión exacta', fr: 'Référence sourcée · confirmez la version exacte', it: 'Riferimento documentato · conferma l’allestimento', 'pt-br': 'Referência documentada · confirme a versão exata', pl: 'Udokumentowane dane · sprawdź dokładną wersję', nl: 'Gedocumenteerde referentie · controleer de uitvoering', tr: 'Belgeli referans · tam donanımı doğrulayın' }) : local(locale, { en: 'No bolt pattern shown until a documented vehicle is selected', de: 'Lochkreis erst nach Auswahl eines dokumentierten Fahrzeugs', es: 'El patrón de birlos aparece tras elegir un vehículo documentado', fr: 'Entraxe affiché après le choix d’un véhicule documenté', it: 'La foratura appare dopo aver scelto un veicolo documentato', 'pt-br': 'A furação aparece após escolher um veículo documentado', pl: 'Rozstaw śrub pojawi się po wybraniu udokumentowanego auta', nl: 'Steekmaat verschijnt na keuze van een gedocumenteerde auto', tr: 'Bijon aralığı, belgelenmiş araç seçilince görünür' }) };
 }
 
 /** The native studio is authored per tool; the original bounded meshes stay as Canvas fallback. */

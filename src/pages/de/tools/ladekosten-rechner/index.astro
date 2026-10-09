@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
 import { toolById } from '../../../../seo/tool-registry';
@@ -6,7 +7,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('ev-charging-cost-calculator');
 const c = localizedTool('ev-charging-cost-calculator', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/ev-charging-cost-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/ladekosten-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-coste-carga-coche-electrico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/ev-charging-cost-calculator/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('ev-charging-cost-calculator')}>
   <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
     <div class="utility-fields">
       <label>Akkukapazität · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>

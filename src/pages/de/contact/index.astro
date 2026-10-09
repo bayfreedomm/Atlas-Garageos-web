@@ -1,16 +1,12 @@
 ---
+import { platformAlternates } from '../../../seo/locale-alternates';
 import SiteLayout from '../../../components/SiteLayout.astro';
 import { platformCatalog } from '../../../localization/site-catalog';
 
 const c = platformCatalog.de.contact;
 const SUPPORT_EMAIL = 'atlas.supportdesk@gmail.com';
 
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/contact/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/contact/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/contact/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/contact/' },
-];
+const alternates = platformAlternates('/contact/');
 ---
 <SiteLayout
   title={c.title}

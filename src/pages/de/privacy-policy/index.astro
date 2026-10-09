@@ -1,13 +1,9 @@
 ---
+import { platformAlternates } from '../../../seo/locale-alternates';
 import SiteLayout from '../../../components/SiteLayout.astro';
 import { platformCatalog } from '../../../localization/site-catalog';
 const c = platformCatalog.de.privacy;
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/privacy-policy/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/privacy-policy/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/privacy-policy/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/privacy-policy/' },
-];
+const alternates = platformAlternates('/privacy-policy/');
 ---
 <SiteLayout title={c.title} description={c.description} pathname="/de/privacy-policy/" active="tools" locale="de" alternates={alternates} breadcrumbs={[{ name: 'Start', href: '/de/' }, { name: c.h1, href: '/de/privacy-policy/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/de/">Start</a><span aria-hidden="true">/</span><span aria-current="page">{c.h1}</span></nav>

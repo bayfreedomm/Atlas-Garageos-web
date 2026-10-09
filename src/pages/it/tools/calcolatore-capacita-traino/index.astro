@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('towing-capacity-calculator');
+const c = localizedTool('towing-capacity-calculator', 'it');
+---
+<ToolPage {definition} locale="it" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('towing-capacity-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Unità<select name="unit"><option value="lb" selected>Libbre (lb)</option><option value="kg">Chilogrammi (kg)</option></select></label>
+      <label>Massa massima combinata (GCWR)<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Massa a vuoto del veicolo trainante<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Passeggeri + carico nel veicolo<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="it" primaryLabel="Massa rimorchiabile massima" pending="Inserisci GCWR, massa a vuoto e carico." visualTitle="GCWR − veicolo carico = capacità di traino" visualNote="Stima semplificata, non un dato del costruttore" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

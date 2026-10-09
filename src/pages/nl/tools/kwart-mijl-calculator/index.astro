@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('quarter-mile-calculator');
+const c = localizedTool('quarter-mile-calculator', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('quarter-mile-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
+    <div class="utility-fields">
+      <label>Voertuiggewicht<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>
+      <label>Gewichtseenheid<select name="weightUnit"><option value="lb" selected>lb</option><option value="kg">kg</option></select></label>
+      <label>Vermogen<input name="power" type="number" value="300" min="0" step="any" inputmode="decimal" /></label>
+      <label>Vermogenseenheid<select name="powerUnit"><option value="hp" selected>hp (mechanisch)</option><option value="kw">kW</option></select></label>
+    </div>
+    <UtilityResultStandard locale="nl" primaryLabel="Geschatte eindtijd op de kwart mijl" pending="Vul het voertuiggewicht en het vermogen in." visualTitle="Gewicht ÷ vermogen → eindtijd" visualNote="Klassieke dragrace-schatting op basis van gewicht en vermogen" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeQuarterMileCalculator } from '../../../../ui/quarter-mile-calculator'; initializeQuarterMileCalculator();</script>

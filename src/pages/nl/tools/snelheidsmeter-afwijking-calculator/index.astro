@@ -1,0 +1,20 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import TireInputGroup from '../../../../components/TireInputGroup.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('speedometer-error-calculator');
+const c = localizedTool('speedometer-error-calculator', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('speedometer-error-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="speedometer" novalidate><div class="calculator-columns"><TireInputGroup locale="nl" prefix="original-" title="Originele band" width={225} aspect={45} rim={18} /><TireInputGroup locale="nl" prefix="new-" title="Nieuwe band" width={235} aspect={40} rim={19} /></div><fieldset class="speed-inputs"><legend>Aangegeven snelheid</legend><div class="grid"><label>Aangegeven snelheid<input name="indicatedSpeed" type="number" value="100" min="0" inputmode="decimal" /></label><label>Eenheid<select name="unit"><option value="km/h">km/h</option><option value="mph">mph</option></select></label></div></fieldset><button type="submit">Werkelijke snelheid berekenen</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary result-summary--speed is-pending" data-result-summary aria-live="polite">Je werkelijke snelheid verschijnt hier.</p><Parametric3DPanel mode="speed" locale="nl" /><dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="speed-table" data-speed-table hidden>
+      <h3 data-speed-table-heading></h3>
+      <table><thead><tr data-speed-table-head></tr></thead><tbody data-speed-table-body></tbody></table>
+    </div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeToolCalculators } from '../../../../ui/tool-calculators'; initializeToolCalculators();</script>

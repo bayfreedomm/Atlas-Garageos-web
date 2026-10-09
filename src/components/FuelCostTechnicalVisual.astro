@@ -1,10 +1,17 @@
 ---
-interface Props { readonly locale?: 'en' | 'de' | 'es' | undefined; }
+import type { AtlasLocale } from '../localization/locales';
+interface Props { readonly locale?: AtlasLocale | undefined; }
 const { locale = 'en' } = Astro.props;
 const copy = {
   en: { aria: 'Fuel cost visual summary', flow: 'TRIP → FUEL → COST', live: 'Input changes update the whole picture', svgAria: 'Trip distance, fuel required, and estimated cost', distance: 'DISTANCE', fuel: 'FUEL REQUIRED', cost: 'EST. COST' },
   de: { aria: 'Visuelle Übersicht der Kraftstoffkosten', flow: 'STRECKE → KRAFTSTOFF → KOSTEN', live: 'Jede Eingabe aktualisiert das ganze Bild', svgAria: 'Strecke, benötigter Kraftstoff und geschätzte Kosten', distance: 'STRECKE', fuel: 'KRAFTSTOFFBEDARF', cost: 'KOSTEN (CA.)' },
   es: { aria: 'Resumen visual del coste de combustible', flow: 'TRAYECTO → COMBUSTIBLE → COSTE', live: 'Cada cambio actualiza todo el gráfico', svgAria: 'Distancia del trayecto, combustible necesario y coste estimado', distance: 'DISTANCIA', fuel: 'COMBUSTIBLE', cost: 'COSTE EST.' },
+  fr: { aria: 'Résumé visuel du coût du carburant', flow: 'TRAJET → CARBURANT → COÛT', live: 'Chaque saisie met à jour l’ensemble du schéma', svgAria: 'Distance du trajet, carburant nécessaire et coût estimé', distance: 'DISTANCE', fuel: 'CARBURANT', cost: 'COÛT EST.' },
+  it: { aria: 'Riepilogo visivo del costo del carburante', flow: 'VIAGGIO → CARBURANTE → COSTO', live: 'Ogni modifica aggiorna l’intero grafico', svgAria: 'Distanza del viaggio, carburante necessario e costo stimato', distance: 'DISTANZA', fuel: 'CARBURANTE', cost: 'COSTO STIM.' },
+  'pt-br': { aria: 'Resumo visual do gasto com combustível', flow: 'VIAGEM → COMBUSTÍVEL → CUSTO', live: 'Cada alteração atualiza todo o gráfico', svgAria: 'Distância da viagem, combustível necessário e custo estimado', distance: 'DISTÂNCIA', fuel: 'COMBUSTÍVEL', cost: 'CUSTO EST.' },
+  pl: { aria: 'Wizualne podsumowanie kosztów paliwa', flow: 'TRASA → PALIWO → KOSZT', live: 'Każda zmiana aktualizuje cały wykres', svgAria: 'Długość trasy, potrzebne paliwo i szacowany koszt', distance: 'DYSTANS', fuel: 'PALIWO', cost: 'KOSZT (SZAC.)' },
+  nl: { aria: 'Visueel overzicht van de brandstofkosten', flow: 'RIT → BRANDSTOF → KOSTEN', live: 'Elke invoer werkt het hele beeld bij', svgAria: 'Ritafstand, benodigde brandstof en geschatte kosten', distance: 'AFSTAND', fuel: 'BRANDSTOF', cost: 'KOSTEN (CA.)' },
+  tr: { aria: 'Yakıt maliyeti görsel özeti', flow: 'YOL → YAKIT → MALİYET', live: 'Her girdi tüm görünümü günceller', svgAria: 'Yolculuk mesafesi, gereken yakıt ve tahmini maliyet', distance: 'MESAFE', fuel: 'GEREKEN YAKIT', cost: 'TAHMİNİ MALİYET' },
 }[locale];
 ---
 <figure class="fuel-technical-visual" data-fuel-technical-visual aria-label={copy.aria}>

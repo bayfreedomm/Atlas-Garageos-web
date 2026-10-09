@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('mpg-l100km-converter');
+const c = localizedTool('mpg-l100km-converter', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('mpg-l100km-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="fuel-economy" novalidate>
+    <div class="instant-input"><label>Brandstofverbruik<input name="value" type="number" value="30" min="0" step="any" inputmode="decimal" /></label><label>Eenheid<select name="unit"><option value="us-mpg">MPG (VS)</option><option value="imperial-mpg">MPG (imperiaal)</option><option value="l100km">L/100km</option></select></label></div>
+    <UtilityResultStandard locale="nl" primaryLabel="Omgerekend verbruik" pending="Vul een verbruikswaarde in." visualTitle="Zelfde verbruik, andere eenheid" visualNote="MPG en L/100km bewegen in tegengestelde richting" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

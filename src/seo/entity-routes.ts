@@ -21,10 +21,16 @@ export type EntityFamily = 'tire-size' | 'bolt-pattern';
 /** The locales these families actually publish in. Narrower than AtlasLocale by design. */
 export type EntityLocale = 'en' | 'de' | 'es' | ReferenceLocale;
 /** Locales with their own calculators and tool pages (the reference-only locales link to EN). */
-export type ToolEntityLocale = 'en' | 'de' | 'es';
+/** Every entity locale now has its own translated calculators. */
+export type ToolEntityLocale = EntityLocale;
 
-/** The tool-page locale to link to from an entity page: reference-only locales use English. */
+/** The tool-page locale to link to from an entity page: every locale links to its own tools. */
 export function toolLocaleFor(locale: EntityLocale): ToolEntityLocale {
+  return locale;
+}
+
+/** The vehicle comparison hub exists in EN/DE/ES only; other locales link to the English hub. */
+export function compareLocaleFor(locale: EntityLocale): 'en' | 'de' | 'es' {
   return isReferenceLocale(locale) ? 'en' : locale;
 }
 

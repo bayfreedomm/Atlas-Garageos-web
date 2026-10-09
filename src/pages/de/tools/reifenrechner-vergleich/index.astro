@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import EmbedCodePanel from '../../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../../components/TireInputGroup.astro';
@@ -9,7 +10,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-size-comparison');
 const c = localizedTool('tire-size-comparison', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifenrechner-vergleich/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/comparador-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-comparison/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('tire-size-comparison')}>
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="de" hidden></div>
     <div class="calculator-columns">

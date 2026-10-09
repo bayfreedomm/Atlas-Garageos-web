@@ -38,13 +38,80 @@ const TIRE_CODE_TEXT = {
     rimLabel: 'Llanta',
     rimCopy: 'Construcción radial en una llanta de 18 pulgadas.',
   },
+  fr: {
+    eyebrow: 'LIRE LE FLANC',
+    heading: 'Un code. Trois indices physiques.',
+    intro: 'Ces chiffres ne sont pas trois mesures dans la même unité. Atlas les sépare avant de calculer la géométrie.',
+    widthLabel: 'Largeur',
+    widthCopy: 'Largeur de section en millimètres.',
+    ratioLabel: 'Série (rapport hauteur/largeur)',
+    ratioCopy: 'La hauteur du flanc vaut 45 % de la largeur.',
+    rimLabel: 'Jante',
+    rimCopy: 'Structure radiale sur une jante de 18 pouces.',
+  },
+  it: {
+    eyebrow: 'LEGGI IL FIANCO',
+    heading: 'Un codice. Tre indizi fisici.',
+    intro: 'Questi numeri non sono tre misure nella stessa unità. Atlas li separa prima di calcolare la geometria.',
+    widthLabel: 'Larghezza',
+    widthCopy: 'Larghezza della sezione in millimetri.',
+    ratioLabel: 'Rapporto di spalla',
+    ratioCopy: 'L’altezza della spalla è il 45 % della larghezza.',
+    rimLabel: 'Cerchio',
+    rimCopy: 'Struttura radiale su un cerchio da 18 pollici.',
+  },
+  'pt-br': {
+    eyebrow: 'LEIA A LATERAL DO PNEU',
+    heading: 'Um código. Três pistas físicas.',
+    intro: 'Os números não são três medidas na mesma unidade. O Atlas separa cada um antes de calcular a geometria.',
+    widthLabel: 'Largura',
+    widthCopy: 'Largura da seção em milímetros.',
+    ratioLabel: 'Perfil (relação altura/largura)',
+    ratioCopy: 'A altura da lateral é 45 % da largura.',
+    rimLabel: 'Aro',
+    rimCopy: 'Construção radial em uma roda aro 18.',
+  },
+  pl: {
+    eyebrow: 'ODCZYTAJ BOK OPONY',
+    heading: 'Jeden kod. Trzy fizyczne wskazówki.',
+    intro: 'Te liczby to nie trzy wymiary w tej samej jednostce. Atlas rozdziela je, zanim obliczy geometrię.',
+    widthLabel: 'Szerokość',
+    widthCopy: 'Szerokość przekroju w milimetrach.',
+    ratioLabel: 'Profil (wysokość/szerokość)',
+    ratioCopy: 'Wysokość boku opony to 45 % jej szerokości.',
+    rimLabel: 'Felga',
+    rimCopy: 'Konstrukcja radialna na 18-calowej feldze.',
+  },
+  nl: {
+    eyebrow: 'LEES DE ZIJWAND',
+    heading: 'Eén code. Drie fysieke aanwijzingen.',
+    intro: 'De getallen zijn geen drie maten in dezelfde eenheid. Atlas haalt ze uit elkaar voordat de geometrie wordt berekend.',
+    widthLabel: 'Breedte',
+    widthCopy: 'Sectiebreedte in millimeters.',
+    ratioLabel: 'Hoogte-breedteverhouding',
+    ratioCopy: 'De wanghoogte is 45 % van de breedte.',
+    rimLabel: 'Velg',
+    rimCopy: 'Radiaalconstructie op een 18-inch velg.',
+  },
+  tr: {
+    eyebrow: 'LASTİK YANAĞINI OKUYUN',
+    heading: 'Tek kod. Üç fiziksel ipucu.',
+    intro: 'Bu sayılar aynı birimde üç ölçü değildir. Atlas, geometriyi hesaplamadan önce onları birbirinden ayırır.',
+    widthLabel: 'Genişlik',
+    widthCopy: 'Milimetre cinsinden kesit genişliği.',
+    ratioLabel: 'Yanak oranı',
+    ratioCopy: 'Yanak yüksekliği genişliğin % 45’idir.',
+    rimLabel: 'Jant',
+    rimCopy: '18 inç jant üzerinde radyal yapı.',
+  },
 } as const;
 
 const t = TIRE_CODE_TEXT[locale ?? 'en'];
+const exampleAria = ({ en: 'Example tire size', de: 'Beispiel-Reifengröße', es: 'Medida de neumático de ejemplo', fr: 'Exemple de taille de pneu', it: 'Esempio di misura dello pneumatico', 'pt-br': 'Exemplo de medida de pneu', pl: 'Przykładowy rozmiar opony', nl: 'Voorbeeld bandenmaat', tr: 'Örnek lastik ebadı' } as const)[locale ?? 'en'];
 ---
 <section class="tire-code-explainer" data-tire-code-explainer aria-labelledby="tire-code-heading">
   <div class="tire-code-explainer__heading"><p class="eyebrow">{t.eyebrow}</p><h2 id="tire-code-heading">{t.heading}</h2><p>{t.intro}</p></div>
-  <div class="tire-code" aria-label="Example tire size"><strong data-tire-width>225</strong><b>/</b><strong data-tire-aspect>45</strong><b>R</b><strong data-tire-rim>18</strong></div>
+  <div class="tire-code" aria-label={exampleAria}><strong data-tire-width>225</strong><b>/</b><strong data-tire-aspect>45</strong><b>R</b><strong data-tire-rim>18</strong></div>
   <div class="tire-code-legend">
     <article><span>225</span><strong>{t.widthLabel}</strong><p>{t.widthCopy}</p></article>
     <article><span>45</span><strong>{t.ratioLabel}</strong><p>{t.ratioCopy}</p></article>

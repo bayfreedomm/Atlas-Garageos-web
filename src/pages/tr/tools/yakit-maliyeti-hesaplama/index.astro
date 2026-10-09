@@ -1,0 +1,29 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import FuelCostTechnicalVisual from '../../../../components/FuelCostTechnicalVisual.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fuel-cost-calculator');
+const c = localizedTool('fuel-cost-calculator', 'tr');
+// Türkiye için canlı akaryakıt fiyatı beslemesi yok: düzenlenebilir örnek benzin fiyatı (TRY/L).
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('fuel-cost-calculator')}>
+  <form slot="tool" class="calculator-form fuel-cost-form" data-utility-calculator="fuel-cost" novalidate>
+    <FuelFields locale="tr" currency="TRY" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">ABD akaryakıt fiyatları (İngilizce) <span aria-hidden="true">→</span></a>
+    <button type="submit">Yakıt maliyetini hesaplayın</button>
+    <div class="fuel-primary-result is-pending" data-fuel-primary-result aria-live="polite" aria-label="Yakıt maliyeti ana sonucu">
+      <div class="fuel-primary-result__cost"><span>Tahmini yakıt maliyeti</span><strong data-fuel-primary-cost>—</strong><p data-fuel-primary-copy>Tahmini yakıt maliyetini görmek için yolculuk bilgilerinizi girin.</p></div>
+      <div class="fuel-primary-result__fuel"><span>Gereken yakıt</span><strong data-fuel-primary-fuel>—</strong><small data-fuel-primary-rate>Mesafe başına maliyet burada görünecek.</small></div>
+    </div>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Yakıt tahmininiz burada görünecek.</p>
+    <FuelCostTechnicalVisual locale="tr" />
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Ayrıntılar</span><small>Yakıt ve maliyet dökümü</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

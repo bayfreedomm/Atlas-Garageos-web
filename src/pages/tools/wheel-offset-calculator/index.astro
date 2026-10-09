@@ -1,11 +1,12 @@
 ---
+import { toolAlternates } from '../../../seo/locale-alternates';
 import ToolPage from '../../../components/ToolPage.astro';
 import WheelOffsetTechnicalVisual from '../../../components/WheelOffsetTechnicalVisual.astro';
 import EngineeringVisualStudio from '../../../components/EngineeringVisualStudio.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('wheel-offset-calculator');
 ---
-<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }]} visual={false} eyebrow="Fitment geometry" intro="Compare wheel width and offset to see how the inner edge and outer face move relative to the original wheel." limitation="Position changes are geometric. Actual clearance depends on your vehicle, tire shape, suspension, brakes, bodywork, alignment, and operating conditions." studioCta="Measure your actual clearance" studioHref="/tools/measure-my-car/">
+<ToolPage {definition} alternates={toolAlternates('wheel-offset-calculator')} visual={false} eyebrow="Fitment geometry" intro="Compare wheel width and offset to see how the inner edge and outer face move relative to the original wheel." limitation="Position changes are geometric. Actual clearance depends on your vehicle, tire shape, suspension, brakes, bodywork, alignment, and operating conditions." studioCta="Measure your actual clearance" studioHref="/tools/measure-my-car/">
   <form slot="tool" class="calculator-form" data-calculator="wheel-offset" novalidate>
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="wheel-offset" data-gql-locale="en" hidden></div>
     <div class="calculator-columns">

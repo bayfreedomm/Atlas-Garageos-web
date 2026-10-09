@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import WheelOffsetTechnicalVisual from '../../../../components/WheelOffsetTechnicalVisual.astro';
 import EngineeringVisualStudio from '../../../../components/EngineeringVisualStudio.astro';
@@ -7,7 +8,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('wheel-offset-calculator');
 const c = localizedTool('wheel-offset-calculator', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/de/tools/freigang-messen/" alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/felgen-et-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-offset-llantas/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/wheel-offset-calculator/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/de/tools/freigang-messen/" alternates={toolAlternates('wheel-offset-calculator')}>
   <form slot="tool" class="calculator-form" data-calculator="wheel-offset" novalidate>
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="wheel-offset" data-gql-locale="de" hidden></div>
     <div class="calculator-columns">

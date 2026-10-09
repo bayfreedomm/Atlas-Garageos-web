@@ -1,0 +1,46 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import EmbedCodePanel from '../../../../components/EmbedCodePanel.astro';
+import TireInputGroup from '../../../../components/TireInputGroup.astro';
+import TireVisualStudio from '../../../../components/TireVisualStudio.astro';
+import GuidedTireDecision from '../../../../components/GuidedTireDecision.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-size-comparison');
+const c = localizedTool('tire-size-comparison', 'it');
+---
+<ToolPage {definition} locale="it" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('tire-size-comparison')}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="it" hidden></div>
+    <div class="calculator-columns">
+      <TireInputGroup locale="it" prefix="original-" title="Pneumatico originale" width={225} aspect={45} rim={18} />
+      <TireInputGroup locale="it" prefix="new-" title="Pneumatico nuovo" width={235} aspect={40} rim={19} />
+    </div>
+    <div class="form-actions">
+      <button type="submit">Confronta le misure dei pneumatici</button>
+      <button type="button" class="secondary" data-share-result>Copia link da condividere</button>
+    </div>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+    <section class="tire-primary-result is-pending" data-tire-primary-result aria-live="polite" aria-label="Risultato principale del confronto tra pneumatici">
+      <div class="tire-primary-result__answer">
+        <span>Variazione del diametro</span>
+        <strong data-tire-primary-percent>—</strong>
+        <p data-tire-primary-copy>Confronta le due misure per vedere la variazione principale.</p>
+      </div>
+      <div class="tire-primary-result__speed">
+        <span>A 100 km/h indicati</span>
+        <strong data-tire-speed-example>—</strong>
+        <small>Esempio teorico basato sulla geometria di rotolamento</small>
+      </div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Il riepilogo del confronto apparirà qui.</p>
+    <TireVisualStudio locale="it" />
+    <GuidedTireDecision locale="it" />
+    <div class="tire-detail-heading" aria-hidden="true"><span>Dettagli</span><small>Geometria nominale</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+  <EmbedCodePanel slot="explanation" locale="it" />
+</ToolPage>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>

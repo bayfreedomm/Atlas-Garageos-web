@@ -1,11 +1,22 @@
 import type { ToolId } from '../seo/tool-registry';
 import { deToolCatalog, type ToolCatalogEntry } from './catalogs/de.tool-catalog';
 import { esToolCatalog } from './catalogs/es.tool-catalog';
-import { REFERENCE_LOCALE_META, isReferenceLocale, type ReferenceLocale } from './reference-locales';
-import { referenceChromeText } from '../content/reference-locale-text';
+import { frToolCatalog } from './catalogs/fr.tool-catalog';
+import { frPlatformCatalog, frUiStrings } from './catalogs/fr.platform';
+import { itToolCatalog } from './catalogs/it.tool-catalog';
+import { itPlatformCatalog, itUiStrings } from './catalogs/it.platform';
+import { ptBrToolCatalog } from './catalogs/pt-br.tool-catalog';
+import { ptBrPlatformCatalog, ptBrUiStrings } from './catalogs/pt-br.platform';
+import { plToolCatalog } from './catalogs/pl.tool-catalog';
+import { plPlatformCatalog, plUiStrings } from './catalogs/pl.platform';
+import { nlToolCatalog } from './catalogs/nl.tool-catalog';
+import { nlPlatformCatalog, nlUiStrings } from './catalogs/nl.platform';
+import { trToolCatalog } from './catalogs/tr.tool-catalog';
+import { trPlatformCatalog, trUiStrings } from './catalogs/tr.platform';
+import { REFERENCE_LOCALE_META, isReferenceLocale } from './reference-locales';
 
-export type ContentLocale = 'de' | 'es';
-export const CONTENT_LOCALES: readonly ContentLocale[] = ['de', 'es'];
+export type ContentLocale = 'de' | 'es' | 'fr' | 'it' | 'pt-br' | 'pl' | 'nl' | 'tr';
+export const CONTENT_LOCALES: readonly ContentLocale[] = ['de', 'es', 'fr', 'it', 'pt-br', 'pl', 'nl', 'tr'];
 
 export interface UiStrings {
   readonly skipToContent: string;
@@ -46,7 +57,7 @@ export interface UiStrings {
   readonly displayLabel: string;
 }
 
-export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.freeze({
+const baseUiStrings: Readonly<Record<'de' | 'es', UiStrings>> = Object.freeze({
   de: {
     skipToContent: 'Zum Hauptinhalt springen',
     navHome: 'Start',
@@ -125,21 +136,26 @@ export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.free
   },
 });
 
+/** Header, footer and drawer strings for every non-English locale. */
+export const uiStrings: Readonly<Record<ContentLocale, UiStrings>> = Object.freeze({
+  ...baseUiStrings,
+  fr: frUiStrings, it: itUiStrings, 'pt-br': ptBrUiStrings, pl: plUiStrings, nl: nlUiStrings, tr: trUiStrings,
+});
+
 /**
  * Reference-only locales (fr, it, pt-br, pl, nl, tr) publish the reference families (tire
  * sizes, bolt patterns, vehicles) plus a localized home. Their page chrome is localized; links
  * to calculators, the fitment studio and policy pages go to the English pages and say so.
  */
-export type ChromeLocale = ContentLocale | ReferenceLocale;
+export type ChromeLocale = ContentLocale;
 
 export function chromeStrings(locale: ChromeLocale | undefined): UiStrings | undefined {
-  if (isReferenceLocale(locale)) return referenceChromeText[locale].ui;
   return locale ? uiStrings[locale] : undefined;
 }
 
-/** Path prefix for pages that exist per locale (tools, fitment studio, policies): reference locales use EN. */
+/** Path prefix for pages that exist in every locale (tools, fitment studio, policies). */
 export function chromePrefix(locale: ChromeLocale | undefined): string {
-  return locale === 'de' || locale === 'es' ? `/${locale}` : '';
+  return locale ? `/${locale}` : '';
 }
 
 /** <html lang> for a chrome locale (pt-br → pt-BR). */
@@ -201,7 +217,7 @@ export interface PlatformCatalog {
   };
 }
 
-export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> = Object.freeze({
+const basePlatformCatalog: Readonly<Record<'de' | 'es', PlatformCatalog>> = Object.freeze({
   de: {
     home: {
       title: 'Kostenlose Kfz-Rechner & Auto-Werkzeuge',
@@ -394,8 +410,17 @@ export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> =
   },
 });
 
+export const platformCatalog: Readonly<Record<ContentLocale, PlatformCatalog>> = Object.freeze({
+  ...basePlatformCatalog,
+  fr: frPlatformCatalog, it: itPlatformCatalog, 'pt-br': ptBrPlatformCatalog, pl: plPlatformCatalog, nl: nlPlatformCatalog, tr: trPlatformCatalog,
+});
+
+const TOOL_CATALOGS: Readonly<Record<ContentLocale, Readonly<Record<ToolId, ToolCatalogEntry>>>> = Object.freeze({
+  de: deToolCatalog, es: esToolCatalog, fr: frToolCatalog, it: itToolCatalog, 'pt-br': ptBrToolCatalog, pl: plToolCatalog, nl: nlToolCatalog, tr: trToolCatalog,
+});
+
 export function localizedToolCatalog(locale: ContentLocale): Readonly<Record<ToolId, ToolCatalogEntry>> {
-  return locale === 'de' ? deToolCatalog : esToolCatalog;
+  return TOOL_CATALOGS[locale];
 }
 
 export function localizedTool(id: ToolId, locale: ContentLocale): ToolCatalogEntry {

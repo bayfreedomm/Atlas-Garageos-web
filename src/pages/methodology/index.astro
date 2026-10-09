@@ -1,11 +1,7 @@
 ---
+import { platformAlternates } from '../../seo/locale-alternates';
 import SiteLayout from '../../components/SiteLayout.astro';
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/methodology/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/methodology/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/methodology/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/methodology/' },
-];
+const alternates = platformAlternates('/methodology/');
 ---
 <SiteLayout title="Accuracy & Methodology" description="How Atlas GarageOS automotive calculators work, which formulas and assumptions they use, and where calculated results stop." pathname="/methodology/" active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Accuracy & Methodology', href: '/methodology/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Accuracy &amp; Methodology</span></nav>

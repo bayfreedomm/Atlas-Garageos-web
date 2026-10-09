@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('nm-lb-ft-converter');
+const c = localizedTool('nm-lb-ft-converter', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('nm-lb-ft-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="torque" novalidate>
+    <div class="instant-input"><label>Torque<input name="value" type="number" value="300" min="0" step="any" inputmode="decimal" /></label><label>Unidade<select name="unit"><option value="nm">Nm</option><option value="lb-ft">lb-ft</option></select></label></div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Torque convertido" pending="Digite um valor de torque." visualTitle="Um torque, duas unidades" visualNote="Conversão exata de unidades, não uma estimativa do motor" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

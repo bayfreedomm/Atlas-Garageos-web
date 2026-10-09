@@ -1,0 +1,15 @@
+---
+import { platformAlternates } from '../../../seo/locale-alternates';
+import SiteLayout from '../../../components/SiteLayout.astro';
+import ToolDirectory from '../../../components/ToolDirectory.astro';
+import { platformCatalog } from '../../../localization/site-catalog';
+const c = platformCatalog['pt-br'].toolsHub;
+const alternates = platformAlternates('/tools/');
+---
+<SiteLayout title={c.title} description={c.description} pathname="/pt-br/tools/" active="tools" locale="pt-br" alternates={alternates} breadcrumbs={[{ name: 'Início', href: '/pt-br/' }, { name: 'Ferramentas', href: '/pt-br/tools/' }]}>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/pt-br/">Início</a><span aria-hidden="true">/</span><span aria-current="page">Ferramentas</span></nav>
+  <header class="directory-identity"><h1>{c.h1}</h1><p>{c.lead}</p></header>
+  <ToolDirectory mode="all" locale="pt-br" />
+  <a class="fitment-directory-row" href="/pt-br/fitment-studio/"><strong>{c.fitmentRowTitle}</strong><span>{c.fitmentRowCopy}</span><i aria-hidden="true">›</i></a>
+  <a class="fitment-directory-row" href="/pt-br/veiculos/"><strong>Referência de Aplicação por Veículo</strong><span>Pneu documentado, furação (PCD) e torque de aperto por marca e modelo</span><i aria-hidden="true">›</i></a>
+</SiteLayout>

@@ -1,4 +1,10 @@
 import type { UiLocale } from '../ui/page-locale';
+import { frFitmentStudioText } from './fitment-studio/fr';
+import { itFitmentStudioText } from './fitment-studio/it';
+import { ptBrFitmentStudioText } from './fitment-studio/pt-br';
+import { plFitmentStudioText } from './fitment-studio/pl';
+import { nlFitmentStudioText } from './fitment-studio/nl';
+import { trFitmentStudioText } from './fitment-studio/tr';
 
 /**
  * Dedicated locale catalog for the Fitment Studio flagship page (`/fitment-studio/`,
@@ -1184,4 +1190,10 @@ export const fitmentStudioText: Readonly<Record<UiLocale, FitmentStudioText>> = 
     linkCopiedMessage: 'Enlace copiado. Abrirlo no guardará nada automáticamente.',
     copyUnavailableMessage: (url) => `No se pudo copiar. Comparta este enlace: ${url}`,
   },
+  fr: frFitmentStudioText,
+  it: itFitmentStudioText,
+  'pt-br': ptBrFitmentStudioText,
+  pl: plFitmentStudioText,
+  nl: nlFitmentStudioText,
+  tr: trFitmentStudioText,
 });

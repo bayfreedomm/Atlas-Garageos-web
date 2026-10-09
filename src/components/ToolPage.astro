@@ -2,7 +2,7 @@
 import SiteLayout from './SiteLayout.astro';
 import type { ToolDefinition } from '../seo/tool-registry';
 import { uiStrings, type ContentLocale } from '../localization/site-catalog';
-import { localizedToolPath } from '../localization/locales';
+import { localizedToolPath, type AtlasLocale } from '../localization/locales';
 import ToolIcon from './ToolIcon.astro';
 import ToolVisual from './ToolVisual.astro';
 import { referenceCopy, referenceLinks, tireSizeShortcuts } from '../ui/reference-links';
@@ -37,6 +37,18 @@ const hasEmbeddedStudio = ['tire-size-calculator', 'speedometer-error-calculator
 // claimed the English homepage/tools-hub as its ancestors even though the page's own visible
 // breadcrumb (backHref, above) and content are correctly localized.
 const homeHref = locale ? `/${locale}/` : '/';
+const WORKSPACE_ARIA: Readonly<Record<AtlasLocale, (title: string) => string>> = {
+  en: (title) => `${title} calculator`, de: (title) => `Rechner: ${title}`, es: (title) => `Calculadora: ${title}`,
+  fr: (title) => `Calculateur : ${title}`, it: (title) => `Calcolatore: ${title}`, 'pt-br': (title) => `Calculadora: ${title}`,
+  pl: (title) => `Kalkulator: ${title}`, nl: (title) => `Calculator: ${title}`, tr: (title) => `Hesaplayıcı: ${title}`,
+};
+const VISUAL_ARIA: Readonly<Record<AtlasLocale, (title: string) => string>> = {
+  en: (title) => `${title} visual explanation`, de: (title) => `Visuelle Erklärung: ${title}`, es: (title) => `Explicación visual: ${title}`,
+  fr: (title) => `Explication visuelle : ${title}`, it: (title) => `Spiegazione visiva: ${title}`, 'pt-br': (title) => `Explicação visual: ${title}`,
+  pl: (title) => `Wyjaśnienie wizualne: ${title}`, nl: (title) => `Visuele uitleg: ${title}`, tr: (title) => `Görsel açıklama: ${title}`,
+};
+const workspaceAria = WORKSPACE_ARIA[journeyLocale](displayTitle);
+const visualAria = VISUAL_ARIA[journeyLocale](displayTitle);
 // Tire tools hand the reader straight into the per-size reference pages.
 const TIRE_REFERENCE_TOOLS = ['tire-size-calculator', 'tire-size-comparison', 'speedometer-error-calculator', 'tire-fit-check', 'tire-load-speed-rating'];
 const showTireReference = TIRE_REFERENCE_TOOLS.includes(definition.id);
@@ -60,8 +72,8 @@ const breadcrumbs = [
     </header>
 
     <div class:list={['tool-stage', { 'tool-stage--single': !visual || hasToolVisualStudio || hasEmbeddedStudio }]}> 
-      <section class="tool-workspace" aria-label={locale === 'de' ? `Rechner: ${displayTitle}` : locale === 'es' ? `Calculadora: ${displayTitle}` : `${displayTitle} calculator`}><slot name="tool" /></section>
-      {visual && !hasToolVisualStudio && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={locale === 'de' ? `Visuelle Erklärung: ${displayTitle}` : locale === 'es' ? `Explicación visual: ${displayTitle}` : `${displayTitle} visual explanation`}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} locale={locale} title={displayTitle} /></aside>}
+      <section class="tool-workspace" aria-label={workspaceAria}><slot name="tool" /></section>
+      {visual && !hasToolVisualStudio && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={visualAria}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} locale={locale} title={displayTitle} /></aside>}
     </div>
   </article>
 

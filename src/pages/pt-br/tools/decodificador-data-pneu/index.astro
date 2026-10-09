@@ -1,0 +1,19 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-date-code-decoder');
+const c = localizedTool('tire-date-code-decoder', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('tire-date-code-decoder')}>
+  <form slot="tool" class="calculator-form" data-calculator="tire-date-code" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Últimos 4 dígitos do código DOT<input name="code" type="text" value="2219" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="ex.: 2219" /></label>
+    </div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Data de fabricação" pending="Digite o código de 4 dígitos de semana/ano." visualTitle="SSAA → semana + ano" visualNote="Último grupo do número de série DOT" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTireDateCodeDecoder } from '../../../../ui/tire-date-code-decoder'; initializeTireDateCodeDecoder();</script>

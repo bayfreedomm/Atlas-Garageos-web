@@ -1,0 +1,14 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FitCheckForm from '../../../../components/FitCheckForm.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('tire-fit-check');
+const c = localizedTool('tire-fit-check', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('tire-fit-check')}>
+  <FitCheckForm slot="tool" locale="nl" />
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeFitCheck } from '../../../../ui/fit-check'; initializeFitCheck();</script>

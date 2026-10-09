@@ -5,7 +5,18 @@ interface Props { id: Additional3DToolId; locale: Tool3DLocale; studio?: boolean
 const { id, locale, studio = false } = Astro.props;
 const t = tool3DText(locale, id);
 const cameraText = studioCameraText[locale];
-const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { open: 'Studio vergrößern', close: 'Studio schließen' }, es: { open: 'Ampliar estudio', close: 'Cerrar estudio' } }[locale];
+const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { open: 'Studio vergrößern', close: 'Studio schließen' }, es: { open: 'Ampliar estudio', close: 'Cerrar estudio' }, fr: { open: 'Agrandir le studio', close: 'Fermer le studio' }, it: { open: 'Espandi studio', close: 'Chiudi studio' }, 'pt-br': { open: 'Ampliar estúdio', close: 'Fechar estúdio' }, pl: { open: 'Powiększ studio', close: 'Zamknij studio' }, nl: { open: 'Studio vergroten', close: 'Studio sluiten' }, tr: { open: 'Stüdyoyu büyüt', close: 'Stüdyoyu kapat' } }[locale];
+const controlText = {
+  en: { camera: 'Camera view', zoomOut: 'Zoom out', zoomIn: 'Zoom in' },
+  de: { camera: 'Ansichtsmodus', zoomOut: 'Verkleinern', zoomIn: 'Vergrößern' },
+  es: { camera: 'Modo de visualización', zoomOut: 'Alejar', zoomIn: 'Acercar' },
+  fr: { camera: 'Angle de vue', zoomOut: 'Zoom arrière', zoomIn: 'Zoom avant' },
+  it: { camera: 'Vista camera', zoomOut: 'Riduci', zoomIn: 'Ingrandisci' },
+  'pt-br': { camera: 'Ângulo da câmera', zoomOut: 'Afastar', zoomIn: 'Aproximar' },
+  pl: { camera: 'Widok kamery', zoomOut: 'Oddal', zoomIn: 'Przybliż' },
+  nl: { camera: 'Camerastandpunt', zoomOut: 'Uitzoomen', zoomIn: 'Inzoomen' },
+  tr: { camera: 'Kamera açısı', zoomOut: 'Uzaklaştır', zoomIn: 'Yakınlaştır' },
+}[locale];
 ---
 <section class="parametric-3d tool-3d-expansion" data-tool-3d={id} data-tool-3d-locale={locale} aria-label={t.title}>
   {!studio && <header class="parametric-3d__head"><div><span>{t.badge}</span><h3>{t.title}</h3><p>{t.intro}</p></div><p class="parametric-3d__hint">{t.hint}</p></header>}
@@ -16,13 +27,13 @@ const focusText = { en: { open: 'Expand studio', close: 'Close studio' }, de: { 
     <div class="parametric-3d__loading" data-tool-3d-loading>{t.hint}</div>
     <div class="parametric-3d__fallback" data-tool-3d-fallback hidden>{t.fallback}</div>
   </div>
-  <div class="parametric-3d__camera" role="group" aria-label={locale === 'de' ? 'Ansichtsmodus' : locale === 'es' ? 'Modo de visualización' : 'Camera view'}>
+  <div class="parametric-3d__camera" role="group" aria-label={controlText.camera}>
     <button type="button" data-tool-3d-camera="studio" aria-pressed="true">{cameraText.studio}</button>
     <button type="button" data-tool-3d-camera="front" aria-pressed="false">{cameraText.front}</button>
     <button type="button" data-tool-3d-camera="profile" aria-pressed="false">{cameraText.profile}</button>
     <button type="button" class="parametric-3d__focus" data-tool-3d-focus data-focus-open={focusText.open} data-focus-close={focusText.close} aria-expanded="false">{focusText.open}</button>
   </div>
-  <div class="parametric-3d__controls"><button type="button" data-tool-3d-zoom-out aria-label={locale === 'de' ? 'Verkleinern' : locale === 'es' ? 'Alejar' : 'Zoom out'}>−</button><button type="button" data-tool-3d-reset>{t.reset}</button><button type="button" data-tool-3d-zoom-in aria-label={locale === 'de' ? 'Vergrößern' : locale === 'es' ? 'Acercar' : 'Zoom in'}>+</button></div>
+  <div class="parametric-3d__controls"><button type="button" data-tool-3d-zoom-out aria-label={controlText.zoomOut}>−</button><button type="button" data-tool-3d-reset>{t.reset}</button><button type="button" data-tool-3d-zoom-in aria-label={controlText.zoomIn}>+</button></div>
   <p class="parametric-3d__caution">{t.caution}</p>
 </section>
 <script>

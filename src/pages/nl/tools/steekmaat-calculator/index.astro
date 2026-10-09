@@ -1,0 +1,26 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import EngineeringVisualStudio from '../../../../components/EngineeringVisualStudio.astro';
+import PcdEngineeringVisual from '../../../../components/PcdEngineeringVisual.astro';
+import PcdResultDetails from '../../../../components/PcdResultDetails.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('bolt-pattern-calculator');
+const c = localizedTool('bolt-pattern-calculator', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('bolt-pattern-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="bolt-pattern" novalidate>
+    <div class="utility-fields">
+      <label>Aantal wielbouten<select name="lugCount"><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option><option value="8">8</option><option value="10">10</option></select></label>
+      <label>Afstand tussen de gaten<input name="spacing" type="number" value="67.1" min="0" step="any" inputmode="decimal" /></label>
+      <label>Eenheid<select name="spacingUnit"><option value="mm" selected>mm</option><option value="in">in</option></select></label>
+    </div>
+    <UtilityResultStandard locale="nl" primaryLabel="Steekcirkeldiameter (PCD)" pending="Vul het aantal wielbouten en de afstand tussen de gaten in." visualTitle="Naastliggende gaten → steekcirkel" visualNote="Trigonometrische verhouding, geen rechte meting" hideVisual deferDetails />
+    <EngineeringVisualStudio mode="pcd" locale="nl"><PcdEngineeringVisual locale="nl" /></EngineeringVisualStudio>
+    <PcdResultDetails locale="nl" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeBoltPatternCalculator } from '../../../../ui/bolt-pattern-calculator'; import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; initializeBoltPatternCalculator(); initializeShareableToolState();</script>

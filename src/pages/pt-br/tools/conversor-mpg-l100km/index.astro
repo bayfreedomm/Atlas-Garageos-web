@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('mpg-l100km-converter');
+const c = localizedTool('mpg-l100km-converter', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('mpg-l100km-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="fuel-economy" novalidate>
+    <div class="instant-input"><label>Consumo de combustível<input name="value" type="number" value="30" min="0" step="any" inputmode="decimal" /></label><label>Unidade<select name="unit"><option value="us-mpg">MPG EUA</option><option value="imperial-mpg">MPG imperial</option><option value="l100km">L/100km</option></select></label></div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Consumo convertido" pending="Digite um valor de consumo." visualTitle="Mesmo consumo, outra unidade" visualNote="MPG e L/100km andam em direções opostas" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

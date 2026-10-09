@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('towing-capacity-calculator');
+const c = localizedTool('towing-capacity-calculator', 'tr');
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('towing-capacity-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Birim<select name="unit"><option value="lb" selected>Pound (lb)</option><option value="kg">Kilogram (kg)</option></select></label>
+      <label>Azami toplam katar ağırlığı (GCWR)<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Çekici aracın boş ağırlığı<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Araçtaki yolcu + yük<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="tr" primaryLabel="Azami römork ağırlığı" pending="GCWR, boş ağırlık ve yük değerlerini girin." visualTitle="GCWR − yüklü araç = çekme kapasitesi" visualNote="Basitleştirilmiş tahmin; üretici değeri değildir" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

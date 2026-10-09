@@ -2,7 +2,7 @@
 import ToolIcon from './ToolIcon.astro';
 import { routeForTool, toolRegistry, type ToolId } from '../seo/tool-registry';
 import { localizedTool, platformCatalog, type ContentLocale } from '../localization/site-catalog';
-import { localizedToolPath } from '../localization/locales';
+import { localizedToolPath, type AtlasLocale } from '../localization/locales';
 import fuelPrices from '../data/fuel-prices.json';
 import { normalizeFuelStatus } from '../data/fuel-prices-types';
 import { referenceCopy, referenceLinks, tireSizeShortcuts } from '../ui/reference-links';
@@ -27,6 +27,12 @@ const homeChrome = {
   en: { search: 'Search automotive tools', empty: 'No matching tool. Try a simpler word.', findAria: 'Find a calculator', categoriesAria: 'Tool categories', obdBadge: 'ATLAS DIAGNOSTICS', obdTitle: 'OBD-II Code Lookup', obdCopy: 'Enter a scanner code, understand what the monitor detected, and see what to check before replacing a part.' },
   de: { search: 'Kfz-Werkzeuge durchsuchen', empty: 'Kein passendes Werkzeug. Versuchen Sie ein einfacheres Wort.', findAria: 'Rechner finden', categoriesAria: 'Werkzeugkategorien', obdBadge: 'ATLAS DIAGNOSE · ENGLISCH', obdTitle: 'OBD-II-Fehlercodes nachschlagen', obdCopy: 'Code aus dem Diagnosegerät eingeben, verstehen, was erkannt wurde, und sehen, was vor einem Teiletausch zu prüfen ist (Inhalte auf Englisch).' },
   es: { search: 'Buscar herramientas', empty: 'Ninguna herramienta coincide. Pruebe con una palabra más sencilla.', findAria: 'Buscar una calculadora', categoriesAria: 'Categorías de herramientas', obdBadge: 'ATLAS DIAGNÓSTICO · INGLÉS', obdTitle: 'Consulta de códigos OBD-II', obdCopy: 'Introduzca el código del escáner, entienda qué detectó el sistema y vea qué comprobar antes de cambiar una pieza (contenido en inglés).' },
+  fr: { search: 'Rechercher un outil auto', empty: 'Aucun outil ne correspond. Essayez un mot plus simple.', findAria: 'Trouver un calculateur', categoriesAria: 'Catégories d’outils', obdBadge: 'ATLAS DIAGNOSTIC · ANGLAIS', obdTitle: 'Recherche de codes OBD-II', obdCopy: 'Saisissez le code lu par la valise, comprenez ce que le système a détecté et voyez quoi vérifier avant de remplacer une pièce (contenu en anglais).' },
+  it: { search: 'Cerca strumenti auto', empty: 'Nessuno strumento trovato. Prova con una parola più semplice.', findAria: 'Trova un calcolatore', categoriesAria: 'Categorie di strumenti', obdBadge: 'ATLAS DIAGNOSTICA · INGLESE', obdTitle: 'Ricerca codici OBD-II', obdCopy: 'Inserisci il codice letto dallo scanner, capisci cosa ha rilevato il sistema e scopri cosa controllare prima di sostituire un pezzo (contenuti in inglese).' },
+  'pt-br': { search: 'Buscar ferramentas automotivas', empty: 'Nenhuma ferramenta encontrada. Tente uma palavra mais simples.', findAria: 'Encontrar uma calculadora', categoriesAria: 'Categorias de ferramentas', obdBadge: 'ATLAS DIAGNÓSTICO · INGLÊS', obdTitle: 'Consulta de códigos OBD-II', obdCopy: 'Digite o código do scanner, entenda o que o sistema detectou e veja o que verificar antes de trocar uma peça (conteúdo em inglês).' },
+  pl: { search: 'Szukaj narzędzi motoryzacyjnych', empty: 'Brak pasujących narzędzi. Wpisz prostsze słowo.', findAria: 'Znajdź kalkulator', categoriesAria: 'Kategorie narzędzi', obdBadge: 'ATLAS DIAGNOSTYKA · PO ANGIELSKU', obdTitle: 'Wyszukiwarka kodów OBD-II', obdCopy: 'Wpisz kod z testera, sprawdź, co wykrył system, i dowiedz się, co skontrolować przed wymianą części (treści po angielsku).' },
+  nl: { search: 'Autotools zoeken', empty: 'Geen passende tool gevonden. Probeer een eenvoudiger woord.', findAria: 'Zoek een calculator', categoriesAria: 'Toolcategorieën', obdBadge: 'ATLAS DIAGNOSE · ENGELS', obdTitle: 'OBD-II-codes opzoeken', obdCopy: 'Vul de code van je uitleesapparaat in, begrijp wat het systeem heeft gedetecteerd en zie wat je moet controleren voordat je een onderdeel vervangt (inhoud in het Engels).' },
+  tr: { search: 'Otomotiv araçlarında arayın', empty: 'Eşleşen araç bulunamadı. Daha basit bir kelime deneyin.', findAria: 'Hesaplayıcı bulun', categoriesAria: 'Araç kategorileri', obdBadge: 'ATLAS ARIZA TEŞHİSİ · İNGİLİZCE', obdTitle: 'OBD-II Arıza Kodu Sorgulama', obdCopy: 'Arıza tespit cihazındaki kodu girin, sistemin neyi algıladığını anlayın ve parça değiştirmeden önce neleri kontrol etmeniz gerektiğini görün (içerik İngilizce).' },
 }[entityLocale];
 const prefix = locale ? `/${locale}` : '';
 const home = locale ? platformCatalog[locale].home : undefined;
@@ -82,10 +88,16 @@ const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'e
 // badge never uses "live" wording either; only the dot color reflects whether the latest
 // refresh actually succeeded.
 const fuelStatus = normalizeFuelStatus(locale === 'de' ? fuelPrices.de.status : locale === 'es' ? fuelPrices.es.status : fuelPrices.us.status);
-const FUEL_BADGE_TEXT: Record<'en' | 'de' | 'es', Record<'pending' | 'fresh' | 'stale', string>> = {
+const FUEL_BADGE_TEXT: Record<AtlasLocale, Record<'pending' | 'fresh' | 'stale', string>> = {
   en: { pending: 'WEEKLY FUEL DATA — AWAITING FIRST UPDATE', fresh: 'WEEKLY FUEL DATA', stale: 'WEEKLY FUEL DATA — LAST KNOWN PRICE' },
   de: { pending: 'KRAFTSTOFFDATEN AUSSTEHEND', fresh: 'BEOBACHTETE STICHPROBE', stale: 'LETZTER BESTÄTIGTER PREIS' },
   es: { pending: 'DATOS PENDIENTES', fresh: 'MEDIA NACIONAL OFICIAL', stale: 'ÚLTIMO PRECIO VERIFICADO' },
+  fr: { pending: 'DONNÉES CARBURANT US — EN ATTENTE (ANGLAIS)', fresh: 'PRIX HEBDOMADAIRES AUX ÉTATS-UNIS (ANGLAIS)', stale: 'ÉTATS-UNIS — DERNIER PRIX CONNU (ANGLAIS)' },
+  it: { pending: 'DATI CARBURANTE USA — IN ATTESA (INGLESE)', fresh: 'PREZZI SETTIMANALI NEGLI USA (INGLESE)', stale: 'USA — ULTIMO PREZZO NOTO (INGLESE)' },
+  'pt-br': { pending: 'DADOS DE COMBUSTÍVEL DOS EUA — AGUARDANDO (INGLÊS)', fresh: 'PREÇOS SEMANAIS NOS EUA (INGLÊS)', stale: 'EUA — ÚLTIMO PREÇO CONHECIDO (INGLÊS)' },
+  pl: { pending: 'DANE O PALIWIE Z USA — OCZEKIWANIE (PO ANGIELSKU)', fresh: 'TYGODNIOWE CENY W USA (PO ANGIELSKU)', stale: 'USA — OSTATNIA ZNANA CENA (PO ANGIELSKU)' },
+  nl: { pending: 'BRANDSTOFDATA VS — IN AFWACHTING (ENGELS)', fresh: 'WEKELIJKSE PRIJZEN IN DE VS (ENGELS)', stale: 'VS — LAATST BEKENDE PRIJS (ENGELS)' },
+  tr: { pending: 'ABD YAKIT VERİSİ — BEKLENİYOR (İNGİLİZCE)', fresh: 'ABD HAFTALIK YAKIT FİYATLARI (İNGİLİZCE)', stale: 'ABD — SON BİLİNEN FİYAT (İNGİLİZCE)' },
 };
 const fuelBadgeText = FUEL_BADGE_TEXT[locale ?? 'en'][fuelStatus];
 const fuelBadgeModifier = fuelStatus === 'pending' ? 'home-fuel-feature__badge--pending' : fuelStatus === 'stale' ? 'home-fuel-feature__badge--stale' : '';

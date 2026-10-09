@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('towing-capacity-calculator');
+const c = localizedTool('towing-capacity-calculator', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('towing-capacity-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="towing-capacity" novalidate>
+    <div class="utility-fields">
+      <label class="field-wide">Unidade<select name="unit"><option value="lb" selected>Libras (lb)</option><option value="kg">Quilogramas (kg)</option></select></label>
+      <label>Peso bruto total combinado (GCWR)<input name="gcwr" type="number" value="17000" min="0" step="any" inputmode="decimal" /></label>
+      <label>Peso em ordem de marcha do veículo rebocador<input name="curbWeight" type="number" value="5500" min="0" step="any" inputmode="decimal" /></label>
+      <label>Passageiros + carga no veículo<input name="loadWeight" type="number" value="500" min="0" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Peso máximo do reboque" pending="Digite o GCWR, o peso em ordem de marcha e a carga." visualTitle="GCWR − veículo carregado = capacidade de reboque" visualNote="Estimativa simplificada, não um valor do fabricante" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeTowingCapacityCalculator } from '../../../../ui/towing-capacity-calculator'; initializeTowingCapacityCalculator();</script>

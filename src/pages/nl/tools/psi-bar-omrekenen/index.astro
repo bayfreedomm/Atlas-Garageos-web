@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('psi-bar-converter');
+const c = localizedTool('psi-bar-converter', 'nl');
+---
+<ToolPage {definition} locale="nl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('psi-bar-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="pressure" novalidate>
+    <div class="instant-input"><label>Druk<input name="value" type="number" value="32" min="0" step="any" inputmode="decimal" /></label><label>Eenheid<select name="unit"><option value="psi">PSI</option><option value="bar">Bar</option><option value="kpa">kPa</option></select></label></div>
+    <UtilityResultStandard locale="nl" primaryLabel="Omgerekende druk" pending="Vul een drukwaarde in." visualTitle="Eén druk, drie eenheden" visualNote="Directe eenheidsverhouding; geen advies voor de bandenspanning" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

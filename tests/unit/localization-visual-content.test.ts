@@ -12,18 +12,14 @@ import { localizedTool } from '../../src/localization/site-catalog';
 
 describe('V3 visual and localization foundation', () => {
   it('keeps first-wave locale routing explicit, publishing only QA-passed translations', () => {
-    expect(LOCALE_CODES).toEqual(['en', 'de', 'es', 'pt-br', 'fr']);
-    expect(localeDefinitions.en.published).toBe(true);
-    // German and Spanish completed full professional translation QA this wave and are now published.
-    expect(localeDefinitions.de.published).toBe(true);
-    expect(localeDefinitions.es.published).toBe(true);
-    // Portuguese (BR) and French remain unwired placeholder slugs and stay unpublished.
-    expect(localeDefinitions['pt-br'].published).toBe(false);
-    expect(localeDefinitions.fr.published).toBe(false);
+    expect(LOCALE_CODES).toEqual(['en', 'de', 'es', 'pt-br', 'fr', 'it', 'pl', 'nl', 'tr']);
+    // Every locale now has the full site translated: home, calculators, fitment studio and policies.
+    for (const code of LOCALE_CODES) expect(localeDefinitions[code].published).toBe(true);
     expect(localizedToolPath('en', 'wheel-offset-calculator', 'tool')).toBe('/tools/wheel-offset-calculator/');
     expect(localizedToolPath('de', 'wheel-offset-calculator', 'tool')).toBe('/de/tools/felgen-et-rechner/');
     expect(localizedToolPath('es', 'wheel-offset-calculator', 'tool')).toBe('/es/tools/calculadora-offset-llantas/');
     expect(localizedToolPath('pt-br', 'fuel-cost-calculator', 'tool')).toBe('/pt-br/tools/calculadora-gasto-combustivel/');
+    expect(localizedToolPath('tr', 'tire-size-calculator', 'tool')).toBe('/tr/tools/lastik-ebadi-hesaplama/');
   });
 
   it('provides page-specific insight content for every registered tool', () => {

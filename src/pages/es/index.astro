@@ -1,14 +1,10 @@
 ---
+import { platformAlternates } from '../../seo/locale-alternates';
 import SiteLayout from '../../components/SiteLayout.astro';
 import HomeLauncher from '../../components/HomeLauncher.astro';
 import { platformCatalog } from '../../localization/site-catalog';
 const c = platformCatalog.es.home;
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/' },
-];
+const alternates = platformAlternates('/');
 ---
 <SiteLayout title={c.title} description={c.description} pathname="/es/" active="home" locale="es" alternates={alternates}>
   <HomeLauncher locale="es" />

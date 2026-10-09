@@ -1,10 +1,11 @@
 ---
+import { toolAlternates } from '../../../seo/locale-alternates';
 import ToolPage from '../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('tire-date-code-decoder');
 ---
-<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifen-dot-code-decoder/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/decodificador-fecha-neumatico/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-date-code-decoder/' }]} explanationBeforeInsights eyebrow="Tires & wheels" intro="Decode the DOT week-and-year code on a tire sidewall to find its manufacture date and age." limitation="Age guidance reflects commonly cited manufacturer and industry practice, not a specific vehicle or tire manufacturer recommendation.">
+<ToolPage {definition} alternates={toolAlternates('tire-date-code-decoder')} explanationBeforeInsights eyebrow="Tires & wheels" intro="Decode the DOT week-and-year code on a tire sidewall to find its manufacture date and age." limitation="Age guidance reflects commonly cited manufacturer and industry practice, not a specific vehicle or tire manufacturer recommendation.">
   <form slot="tool" class="calculator-form" data-calculator="tire-date-code" novalidate>
     <div class="utility-fields">
       <label class="field-wide">Last 4 digits of the DOT code<input name="code" type="text" value="2219" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 2219" /></label>

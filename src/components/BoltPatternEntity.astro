@@ -34,7 +34,12 @@ interface Props { readonly entry: BoltPatternEntry; readonly locale: EntityLocal
 const { entry, locale } = Astro.props;
 
 const t = boltPatternPageText[locale];
-const load3d = isReferenceLocale(locale) ? referenceChromeText[locale].load3d : { en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo' }[locale];
+const LOAD_3D_LABELS: Readonly<Record<EntityLocale, string>> = {
+  en: 'Open interactive 3D bolt pattern', de: 'Interaktiven 3D-Lochkreis öffnen', es: 'Abrir patrón de birlos 3D interactivo',
+  fr: 'Ouvrir l’entraxe en 3D interactif', it: 'Apri la foratura in 3D interattivo', 'pt-br': 'Abrir a furação em 3D interativo',
+  pl: 'Otwórz rozstaw śrub w interaktywnym 3D', nl: 'Steekmaat interactief in 3D openen', tr: 'Bijon aralığını etkileşimli 3B görünümde açın',
+};
+const load3d = isReferenceLocale(locale) ? referenceChromeText[locale].load3d : LOAD_3D_LABELS[locale];
 const vehicles = vehiclesForBoltPattern(entry.notation);
 const spacingMm = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount);
 const spacingValue = `${formatDecimal(spacingMm, 2, locale)} mm`;

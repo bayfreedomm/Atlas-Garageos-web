@@ -6,6 +6,12 @@ const sceneLabels = {
   en: { width: 'width', sidewall: 'sidewall', inner: 'inner', outer: 'outer', hub: 'Hub plane · fixed', spacing: 'spacing', bore: 'bore', stroke: 'stroke' },
   de: { width: 'Breite', sidewall: 'Flanke', inner: 'innen', outer: 'außen', hub: 'Nabenfläche · fest', spacing: 'Abstand', bore: 'Bohrung', stroke: 'Hub' },
   es: { width: 'ancho', sidewall: 'flanco', inner: 'interior', outer: 'exterior', hub: 'Plano del buje · fijo', spacing: 'distancia', bore: 'diámetro', stroke: 'carrera' },
+  fr: { width: 'largeur', sidewall: 'flanc', inner: 'intérieur', outer: 'extérieur', hub: 'Plan du moyeu · fixe', spacing: 'écart', bore: 'alésage', stroke: 'course' },
+  it: { width: 'larghezza', sidewall: 'spalla', inner: 'interno', outer: 'esterno', hub: 'Piano mozzo · fisso', spacing: 'distanza', bore: 'alesaggio', stroke: 'corsa' },
+  'pt-br': { width: 'largura', sidewall: 'lateral', inner: 'interno', outer: 'externo', hub: 'Plano do cubo · fixo', spacing: 'distância', bore: 'diâmetro', stroke: 'curso' },
+  pl: { width: 'szerokość', sidewall: 'bok', inner: 'wewn.', outer: 'zewn.', hub: 'Płaszczyzna piasty · stała', spacing: 'odstęp', bore: 'średnica', stroke: 'skok' },
+  nl: { width: 'breedte', sidewall: 'zijwand', inner: 'binnen', outer: 'buiten', hub: 'Naafvlak · vast', spacing: 'afstand', bore: 'boring', stroke: 'slag' },
+  tr: { width: 'genişlik', sidewall: 'yanak', inner: 'iç', outer: 'dış', hub: 'Porya yüzeyi · sabit', spacing: 'aralık', bore: 'çap', stroke: 'strok' },
 } as const;
 
 export interface VisualizationPalette {

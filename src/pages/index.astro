@@ -1,12 +1,8 @@
 ---
+import { platformAlternates } from '../seo/locale-alternates';
 import SiteLayout from '../components/SiteLayout.astro';
 import HomeLauncher from '../components/HomeLauncher.astro';
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/' },
-];
+const alternates = platformAlternates('/');
 ---
 <SiteLayout title="Free Automotive Calculators & Car Tools" description="Fast, accurate automotive calculators for tires, fuel, road trips, pressure, power, torque, and fitment." pathname="/" active="home" alternates={alternates}>
   <HomeLauncher />

@@ -1,0 +1,42 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('ev-charging-cost-calculator');
+const c = localizedTool('ev-charging-cost-calculator', 'pl');
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('ev-charging-cost-calculator')}>
+  <form slot="tool" class="calculator-form ev-charging-calculator" data-calculator="ev-charging" novalidate>
+    <div class="utility-fields">
+      <label>Pojemność akumulatora · kWh<input name="batteryCapacityKwh" type="number" value="64" min="1" max="250" step="1" inputmode="decimal" /></label>
+      <label>Cena energii · za kWh<input name="pricePerKwh" type="number" value="1.10" min="0" max="10" step="0.01" inputmode="decimal" /></label>
+      <label>Waluta<select name="currency"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CAD">CAD</option><option value="AUD">AUD</option><option value="TRY">TRY</option><option value="BRL">BRL</option></select></label>
+      <label>Ładowanie od · %<input name="startPercent" type="number" value="20" min="0" max="100" step="1" inputmode="numeric" /></label>
+      <label>Ładowanie do · %<input name="endPercent" type="number" value="80" min="0" max="100" step="1" inputmode="numeric" /></label>
+      <label>Moc ładowania · kW<input name="chargerPowerKw" type="number" value="11" min="0.1" max="400" step="0.1" inputmode="decimal" /></label>
+      <label>Sprawność ładowania · %<input name="chargingEfficiency" type="number" value="90" min="50" max="100" step="1" inputmode="numeric" /></label>
+    </div>
+    <button type="submit">Oblicz koszt ładowania</button>
+    <section class="standard-answer ev-answer is-pending" data-ev-answer aria-live="polite"><div class="standard-answer__main"><span>Szacowany koszt ładowania</span><strong data-ev-cost>—</strong><p data-ev-context>Tutaj pojawi się szacunek ładowania.</p></div><div class="standard-answer__secondary"><span>Idealny czas ładowania</span><strong data-ev-time>—</strong><small data-ev-grid>Tutaj pojawi się energia pobrana z sieci.</small></div></section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Tutaj pojawi się szacunek ładowania.</p>
+    <Parametric3DPanel mode="ev" locale="pl" />
+    <figure class="ev-technical-visual is-pending" data-ev-visual>
+      <figcaption><span>AKUMULATOR → ENERGIA Z SIECI → KOSZT + CZAS</span><small>Zakres ładowania w skali; czas zakłada stałą moc</small></figcaption>
+      <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Stan naładowania akumulatora">
+        <rect x="14" y="20" width="122" height="50" rx="8" fill="none" stroke="var(--color-ink-soft)" stroke-width="2"/>
+        <rect x="136" y="36" width="8" height="18" rx="2" fill="var(--color-ink-soft)"/>
+        <rect data-fill-start x="18" y="24" width="0" height="42" fill="var(--color-ink-soft)" opacity=".45"/>
+        <rect data-fill-end x="18" y="24" width="0" height="42" fill="var(--color-accent)" opacity=".85"/>
+        <text data-battery-label x="80" y="82" text-anchor="middle" font-size="9" fill="var(--color-ink-muted)">20% → 80%</text>
+      </svg>
+      <div class="ev-visual-stats"><div><small>W akumulatorze</small><strong data-ev-battery-energy>—</strong></div><div><small>Z sieci</small><strong data-ev-grid-energy>—</strong></div><div><small>Straty sprawności</small><strong data-ev-loss>—</strong></div></div>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Szczegóły</span><small>Energia, koszt i idealny czas</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeEvChargingCalculators } from '../../../../ui/ev-charging-calculator'; initializeEvChargingCalculators();</script>

@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import TireSizeTechnicalVisual from '../../../../components/TireSizeTechnicalVisual.astro';
 import TireCodeExplainer from '../../../../components/TireCodeExplainer.astro';
@@ -8,7 +9,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-size-calculator');
 const c = localizedTool('tire-size-calculator', 'es');
 ---
-<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/tire-size-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/reifengroesse-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-tamano-neumaticos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/tire-size-calculator/' }]}>
+<ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('tire-size-calculator')}>
   <form slot="tool" class="calculator-form" data-calculator="tire-size" novalidate>
     <fieldset><legend>Tamaño del neumático</legend><div class="tire-input-row"><label>Ancho<input name="widthMm" type="number" value="225" inputmode="numeric" /></label><span aria-hidden="true">/</span><label>Perfil<input name="aspectRatio" type="number" value="45" inputmode="numeric" /></label><span aria-hidden="true">R</span><label>Llanta<input name="rimDiameterInches" type="number" value="18" step="0.5" inputmode="decimal" /></label></div></fieldset>
     <button type="submit">Calcular medidas del neumático</button><div class="inline-errors" data-errors role="alert" hidden></div><p class="result-summary is-pending" data-result-summary aria-live="polite">Su resultado aparecerá aquí.</p><Parametric3DPanel mode="single" locale="es" /><TireSizeTechnicalVisual locale="es" /><dl class="tool-results" data-results aria-live="polite"></dl>

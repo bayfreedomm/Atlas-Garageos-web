@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
 import { toolById } from '../../../../seo/tool-registry';
@@ -6,7 +7,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('mpg-l100km-converter');
 const c = localizedTool('mpg-l100km-converter', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/mpg-l100km-converter/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/mpg-l100km-umrechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/convertidor-mpg-l100km/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/mpg-l100km-converter/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('mpg-l100km-converter')}>
   <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="fuel-economy" novalidate>
     <div class="instant-input"><label>Kraftstoffverbrauch<input name="value" type="number" value="30" min="0" step="any" inputmode="decimal" /></label><label>Einheit<select name="unit"><option value="us-mpg">US MPG</option><option value="imperial-mpg">Imperial MPG</option><option value="l100km">L/100km</option></select></label></div>
     <UtilityResultStandard locale="de" primaryLabel="Umgerechneter Kraftstoffverbrauch" pending="Geben Sie einen Verbrauchswert ein." visualTitle="Gleicher Verbrauch, andere Einheit" visualNote="MPG und L/100km laufen in entgegengesetzte Richtungen" />

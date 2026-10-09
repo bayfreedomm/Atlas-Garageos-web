@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'pl');
+---
+<ToolPage {definition} locale="pl" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/pl/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Zanim otworzysz mapę</p><h2>Przygotuj zmierzony punkt odniesienia</h2><p>Interaktywna mapa potrzebuje obecnej szerokości i odsadzenia (ET) felgi, zmierzonych luzów wewnętrznego i zewnętrznego oraz zakresu, który chcesz sprawdzić.</p>
+      <ol class="entry-steps">
+        <li><strong>Zmierz</strong><span>Zapisz najmniejsze statyczne luzy po stronie wewnętrznej i zewnętrznej.</span></li>
+        <li><strong>Ustal zakres</strong><span>Świadomie wybierz granice szerokości i odsadzenia.</span></li>
+        <li><strong>Sprawdź komórki</strong><span>Odczytaj przewidywane luzy i wyjaśnienie każdego statusu.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/pl/fitment-studio/#fitment-map-section">Otwórz interaktywną mapę</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

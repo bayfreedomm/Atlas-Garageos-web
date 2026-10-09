@@ -1,0 +1,24 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('compression-ratio-calculator');
+const c = localizedTool('compression-ratio-calculator', 'fr');
+---
+<ToolPage {definition} locale="fr" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('compression-ratio-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="compression-ratio" novalidate>
+    <div class="utility-fields">
+      <label>Alésage · mm<input name="bore" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Course · mm<input name="stroke" type="number" value="86" min="0" step="any" inputmode="decimal" /></label>
+      <label>Volume de la chambre · cc<input name="chamber" type="number" value="48" min="0" step="any" inputmode="decimal" /></label>
+      <label>Volume supplémentaire · cc<input name="otherVolume" type="number" value="4" step="any" inputmode="decimal" /></label>
+    </div>
+    <UtilityResultStandard locale="fr" primaryLabel="Taux de compression statique" pending="Saisissez l'alésage, la course et le volume de la chambre." visualTitle="Cylindrée unitaire + volume mort ÷ volume mort" visualNote="Rapport géométrique statique, pas la compression dynamique" />
+    <Parametric3DPanel mode="compression" locale="fr" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeCompressionRatioCalculator } from '../../../../ui/compression-ratio-calculator'; initializeCompressionRatioCalculator();</script>

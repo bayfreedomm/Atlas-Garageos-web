@@ -1,14 +1,10 @@
 ---
+import { platformAlternates } from '../../../seo/locale-alternates';
 import SiteLayout from '../../../components/SiteLayout.astro';
 import ToolDirectory from '../../../components/ToolDirectory.astro';
 import { platformCatalog } from '../../../localization/site-catalog';
 const c = platformCatalog.es.toolsHub;
-const alternates = [
-  { hreflang: 'en', href: 'https://atlasgarageos.com/tools/' },
-  { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/' },
-  { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/' },
-  { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/' },
-];
+const alternates = platformAlternates('/tools/');
 ---
 <SiteLayout title={c.title} description={c.description} pathname="/es/tools/" active="tools" locale="es" alternates={alternates} breadcrumbs={[{ name: 'Inicio', href: '/es/' }, { name: 'Herramientas', href: '/es/tools/' }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/es/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Herramientas</span></nav>

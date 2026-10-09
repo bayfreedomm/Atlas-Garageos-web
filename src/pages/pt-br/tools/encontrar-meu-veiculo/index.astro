@@ -1,0 +1,41 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+import { vehicleMakes } from '../../../../data/vehicle-fitment';
+import { indexedVehicleMakes } from '../../../../data/vehicle-model-index';
+const definition = toolById('vehicle-fitment-finder');
+const c = localizedTool('vehicle-fitment-finder', 'pt-br');
+const makeCount = vehicleMakes().length;
+const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()]).size;
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('vehicle-fitment-finder')}>
+  <form slot="tool" class="calculator-form" data-calculator="vehicle-finder" novalidate>
+    <fieldset><legend>Veículo</legend>
+      <div class="utility-fields">
+        <label>Marca<select name="make" data-vehicle-make></select></label>
+        <label>Modelo<select name="model" data-vehicle-model disabled></select></label>
+      </div>
+    </fieldset>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Escolha uma marca e um modelo para ver os dados de referência.</p>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="vehicle-meta" data-vehicle-meta hidden>
+      <span class="vehicle-confidence" data-vehicle-confidence></span>
+      <p class="vehicle-sources" data-vehicle-sources></p>
+      <p class="vehicle-notes" data-vehicle-notes hidden></p>
+    </div>
+    <div class="vehicle-actions" data-vehicle-actions hidden>
+      <a class="studio-cta studio-cta--row" data-vehicle-tire-link data-base-href="/pt-br/tools/calculadora-tamanho-pneus/"><span><small>Preenchido com os dados deste veículo</small><strong>Abrir na Calculadora de Tamanho de Pneus</strong></span><i aria-hidden="true">›</i></a>
+      <a class="studio-cta studio-cta--row" data-vehicle-bolt-link data-base-href="/pt-br/tools/calculadora-furacao-rodas/"><span><small>Preenchido com os dados deste veículo</small><strong>Abrir na Calculadora de Furação de Rodas</strong></span><i aria-hidden="true">›</i></a>
+    </div>
+  </form>
+  <div slot="explanation">
+    {c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}
+    <h2>Atualmente cobre {makeCount} marcas com fichas de aplicação Atlas documentadas</h2>
+    <p>Este é um conjunto inicial de veículos comuns, não um banco de dados completo de fabricante — ele vai crescer com o tempo. Se o seu veículo exato ainda não aparece, a etiqueta na coluna da porta do motorista ou o manual do proprietário trazem a especificação do fabricante, que você pode digitar direto na <a href="/pt-br/tools/calculadora-tamanho-pneus/">Calculadora de Tamanho de Pneus</a> ou na <a href="/pt-br/tools/calculadora-furacao-rodas/">Calculadora de Furação de Rodas</a>.</p>
+    <p>O seletor de marca e modelo busca em uma lista mais ampla — {searchableMakeCount} marcas no total — para que você possa escolher seu veículo mesmo que o Atlas ainda não tenha uma ficha documentada para ele. Nesse caso, avisamos claramente em vez de chutar uma medida.</p>
+    <p>Procurando um link para compartilhar sobre um veículo específico? Confira as páginas de <a href="/pt-br/veiculos/">Referência de Aplicação por Veículo</a> — uma página por modelo documentado.</p>
+  </div>
+</ToolPage>
+<script>import { initializeVehicleFitmentFinder } from '../../../../ui/vehicle-fitment-finder'; initializeVehicleFitmentFinder();</script>

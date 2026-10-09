@@ -3,15 +3,18 @@ import { chromePrefix, chromeStrings, type ChromeLocale } from '../localization/
 import { referenceLinks } from '../ui/reference-links';
 import { isReferenceLocale } from '../localization/reference-locales';
 import { referenceChromeText } from '../content/reference-locale-text';
+import type { AtlasLocale } from '../localization/locales';
 interface Props { locale?: ChromeLocale | undefined; }
 const { locale } = Astro.props;
 const t = chromeStrings(locale);
 const prefix = chromePrefix(locale);
 const fuelPricesPath = locale === 'de' ? '/de/kraftstoffpreise/' : locale === 'es' ? '/es/precio-gasolina-hoy/' : '/gas-prices-today/';
+const FOOTER_ARIA: Readonly<Record<AtlasLocale, string>> = { en: 'Footer', de: 'Fußzeile', es: 'Pie de página', fr: 'Pied de page', it: 'Piè di pagina', 'pt-br': 'Rodapé', pl: 'Stopka', nl: 'Voettekst', tr: 'Alt bilgi' };
+const DIAGNOSTICS_LABELS: Readonly<Record<AtlasLocale, string>> = { en: 'OBD Diagnostics', de: 'OBD-Diagnose (Englisch)', es: 'Diagnóstico OBD (inglés)', fr: 'Diagnostic OBD (anglais)', it: 'Diagnostica OBD (inglese)', 'pt-br': 'Diagnóstico OBD (inglês)', pl: 'Diagnostyka OBD (ang.)', nl: 'OBD-diagnose (Engels)', tr: 'OBD arıza teşhisi (İngilizce)' };
 const reference = referenceLinks(locale ?? 'en');
 const refChrome = isReferenceLocale(locale) ? referenceChromeText[locale] : undefined;
-const footerAria = refChrome?.footerAria ?? (locale === 'de' ? 'Fußzeile' : locale === 'es' ? 'Pie de página' : 'Footer');
-const diagnosticsLabel = refChrome?.diagnosticsLabel ?? (locale === 'de' ? 'OBD-Diagnose (Englisch)' : locale === 'es' ? 'Diagnóstico OBD (inglés)' : 'OBD Diagnostics');
+const footerAria = refChrome?.footerAria ?? FOOTER_ARIA[locale ?? 'en'];
+const diagnosticsLabel = refChrome?.diagnosticsLabel ?? DIAGNOSTICS_LABELS[locale ?? 'en'];
 const copy = (t?.footerCopy ?? '© {year} Atlas GarageOS. All calculations are estimates — verify anything safety-critical with your vehicle\'s manual.').replace('{year}', String(new Date().getFullYear()));
 ---
 <footer class="site-footer">

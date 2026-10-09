@@ -1,4 +1,11 @@
 ---
-import ReferenceHome from '../../components/ReferenceHome.astro';
+import { platformAlternates } from '../../seo/locale-alternates';
+import SiteLayout from '../../components/SiteLayout.astro';
+import HomeLauncher from '../../components/HomeLauncher.astro';
+import { platformCatalog } from '../../localization/site-catalog';
+const c = platformCatalog.tr.home;
+const alternates = platformAlternates('/');
 ---
-<ReferenceHome locale="tr" />
+<SiteLayout title={c.title} description={c.description} pathname="/tr/" active="home" locale="tr" alternates={alternates}>
+  <HomeLauncher locale="tr" />
+</SiteLayout>

@@ -1,0 +1,22 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('quarter-mile-calculator');
+const c = localizedTool('quarter-mile-calculator', 'it');
+---
+<ToolPage {definition} locale="it" titleOverride={c.title} descriptionOverride={c.description} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('quarter-mile-calculator')}>
+  <form slot="tool" class="calculator-form" data-calculator="quarter-mile" novalidate>
+    <div class="utility-fields">
+      <label>Peso del veicolo<input name="weight" type="number" value="3400" min="0" step="any" inputmode="decimal" /></label>
+      <label>Unità di peso<select name="weightUnit"><option value="lb" selected>lb</option><option value="kg">kg</option></select></label>
+      <label>Potenza<input name="power" type="number" value="300" min="0" step="any" inputmode="decimal" /></label>
+      <label>Unità di potenza<select name="powerUnit"><option value="hp" selected>hp (cavalli meccanici)</option><option value="kw">kW</option></select></label>
+    </div>
+    <UtilityResultStandard locale="it" primaryLabel="Tempo stimato sul quarto di miglio" pending="Inserisci il peso del veicolo e la potenza." visualTitle="Peso ÷ potenza → tempo finale" visualNote="Stima classica peso/potenza delle gare di accelerazione" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeQuarterMileCalculator } from '../../../../ui/quarter-mile-calculator'; initializeQuarterMileCalculator();</script>

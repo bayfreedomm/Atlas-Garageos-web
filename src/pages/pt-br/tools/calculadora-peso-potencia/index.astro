@@ -1,0 +1,18 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('power-to-weight-calculator');
+const c = localizedTool('power-to-weight-calculator', 'pt-br');
+---
+<ToolPage {definition} locale="pt-br" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('power-to-weight-calculator')}>
+  <form slot="tool" class="calculator-form" data-utility-calculator="power-weight" novalidate>
+    <div class="utility-fields"><label>Potência<input name="power" type="number" value="180" min="0" step="any" inputmode="decimal" /></label><label>Unidade de potência<select name="powerUnit"><option value="hp">hp (mecânico)</option><option value="kw">kW</option></select></label><label>Peso do veículo<input name="weight" type="number" value="1350" min="0" step="any" inputmode="decimal" /></label><label>Unidade de peso<select name="weightUnit"><option value="kg">kg</option><option value="lb">lb</option></select></label></div>
+    <button type="submit">Calcular relação peso/potência</button>
+    <UtilityResultStandard locale="pt-br" primaryLabel="Relação peso/potência" pending="Digite a potência e o peso do veículo." visualTitle="POTÊNCIA ÷ MASSA = RELAÇÃO" visualNote="Normalização física, não uma nota de desempenho" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

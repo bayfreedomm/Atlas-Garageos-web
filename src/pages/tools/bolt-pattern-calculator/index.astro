@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../seo/locale-alternates';
 import ToolPage from '../../../components/ToolPage.astro';
 import UtilityResultStandard from '../../../components/UtilityResultStandard.astro';
 import EngineeringVisualStudio from '../../../components/EngineeringVisualStudio.astro';
@@ -8,7 +9,7 @@ import VehicleFitmentPicker from '../../../components/VehicleFitmentPicker.astro
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('bolt-pattern-calculator');
 ---
-<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/bolt-pattern-calculator/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/lochkreis-rechner/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/calculadora-patron-birlos/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/bolt-pattern-calculator/' }]} explanationBeforeInsights eyebrow="Tires & wheels" intro="Calculate wheel bolt circle diameter (PCD) from the measured distance between two adjacent lug holes." limitation="This converts a measurement into a bolt circle diameter. It does not verify hub bore, lug thread, or vehicle fitment." studioCta="Confirm fitment in Wheel & Tire Compare">
+<ToolPage {definition} alternates={toolAlternates('bolt-pattern-calculator')} explanationBeforeInsights eyebrow="Tires & wheels" intro="Calculate wheel bolt circle diameter (PCD) from the measured distance between two adjacent lug holes." limitation="This converts a measurement into a bolt circle diameter. It does not verify hub bore, lug thread, or vehicle fitment." studioCta="Confirm fitment in Wheel & Tire Compare">
   <VehicleFitmentPicker slot="tool" target="bolt-pattern" />
   <form slot="tool" class="calculator-form" data-calculator="bolt-pattern" novalidate>
     <div class="utility-fields">

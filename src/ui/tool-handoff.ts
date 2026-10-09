@@ -24,6 +24,12 @@ const BADGE: Readonly<Record<UiLocale, string>> = {
   en: 'With your values',
   de: 'Mit Ihren Werten',
   es: 'Con sus valores',
+  'pt-br': 'Com seus valores',
+  fr: 'Avec vos valeurs',
+  it: 'Con i tuoi valori',
+  pl: 'Z Twoimi wartościami',
+  nl: 'Met jouw waarden',
+  tr: 'Değerlerinizle',
 };
 
 const raw = (form: HTMLFormElement, name: string): string => {

@@ -51,8 +51,8 @@ describe('Milestone 8 product experience', () => {
   it('keeps key internal routes connected', () => {
     // My Garage is a first-class nav destination again (it lives in Fitment Studio's #garage
     // section) and must stay locale-aware: /de/… and /es/… pages link to their own studio.
-    expect(siteLayout).toContain("'/fitment-studio/#garage'");
-    expect(siteLayout).toContain('/${locale}/fitment-studio/#garage');
+    expect(siteLayout).toContain('`${prefix}/fitment-studio/#garage`');
+    expect(siteLayout).toContain("const prefix = chromePrefix(locale);");
     expect(studio).toContain('id="garage"');
     expect(studio).toContain('href="/"');
     expect(studio).toContain('id="compare"');

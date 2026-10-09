@@ -1,10 +1,16 @@
-import { getPageLocale } from './page-locale';
+import { getPageLocale, type UiLocale } from './page-locale';
 
 const SHARE_LABELS = {
   en: { copied: 'Link copied', prompt: 'Copy this link', share: 'Copy share link' },
   de: { copied: 'Link kopiert', prompt: 'Diesen Link kopieren', share: 'Link zum Teilen kopieren' },
   es: { copied: 'Enlace copiado', prompt: 'Copiar este enlace', share: 'Copiar enlace para compartir' },
-} as const;
+  'pt-br': { copied: 'Link copiado', prompt: 'Copie este link', share: 'Copiar link para compartilhar' },
+  fr: { copied: 'Lien copié', prompt: 'Copiez ce lien', share: 'Copier le lien de partage' },
+  it: { copied: 'Link copiato', prompt: 'Copia questo link', share: 'Copia il link da condividere' },
+  pl: { copied: 'Link skopiowany', prompt: 'Skopiuj ten link', share: 'Skopiuj link do udostępnienia' },
+  nl: { copied: 'Link gekopieerd', prompt: 'Kopieer deze link', share: 'Deellink kopiëren' },
+  tr: { copied: 'Bağlantı kopyalandı', prompt: 'Bu bağlantıyı kopyalayın', share: 'Paylaşım bağlantısını kopyala' },
+} as const satisfies Record<UiLocale, { copied: string; prompt: string; share: string }>;
 
 type ShareLocale = keyof typeof SHARE_LABELS;
 type ShareState = Record<string, string>;

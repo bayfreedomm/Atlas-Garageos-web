@@ -1,0 +1,17 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import UtilityResultStandard from '../../../../components/UtilityResultStandard.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('mpg-l100km-converter');
+const c = localizedTool('mpg-l100km-converter', 'tr');
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('mpg-l100km-converter')}>
+  <form slot="tool" class="calculator-form instant-calculator" data-utility-calculator="fuel-economy" novalidate>
+    <div class="instant-input"><label>Yakıt tüketimi<input name="value" type="number" value="30" min="0" step="any" inputmode="decimal" /></label><label>Birim<select name="unit"><option value="us-mpg">ABD MPG</option><option value="imperial-mpg">İngiliz (imperial) MPG</option><option value="l100km">L/100km</option></select></label></div>
+    <UtilityResultStandard locale="tr" primaryLabel="Dönüştürülen tüketim" pending="Bir yakıt tüketimi değeri girin." visualTitle="Aynı tüketim, farklı birim" visualNote="MPG ile L/100km ters yönde değişir" />
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

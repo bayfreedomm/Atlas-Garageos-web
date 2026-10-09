@@ -1,0 +1,21 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('fitment-map');
+const c = localizedTool('fitment-map', 'tr');
+---
+<ToolPage {definition} locale="tr" titleOverride={c.title} descriptionOverride={c.description} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} studioHref="/tr/fitment-studio/#fitment-map-section" alternates={toolAlternates('fitment-map')}>
+  <div slot="tool" class="entry-workspace">
+    <div><p class="eyebrow">Haritayı açmadan önce</p><h2>Ölçülmüş bir başlangıç noktasıyla gelin</h2><p>Etkileşimli harita; mevcut jantınızın genişliğini ve ofsetini (ET), ölçtüğünüz iç ve dış boşlukları ve incelemek istediğiniz aralığı ister.</p>
+      <ol class="entry-steps">
+        <li><strong>Ölçün</strong><span>En dar statik iç ve dış boşlukları not edin.</span></li>
+        <li><strong>Aralığı belirleyin</strong><span>Genişlik ve ofset için bilinçli sınırlar seçin.</span></li>
+        <li><strong>Hücreleri inceleyin</strong><span>Öngörülen boşlukları ve her durumun açıklamasını okuyun.</span></li>
+      </ol>
+    </div>
+    <a class="button" href="/tr/fitment-studio/#fitment-map-section">Etkileşimli haritayla başlayın</a>
+  </div>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>

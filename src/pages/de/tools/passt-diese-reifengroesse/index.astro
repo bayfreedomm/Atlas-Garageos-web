@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import FitCheckForm from '../../../../components/FitCheckForm.astro';
 import { toolById } from '../../../../seo/tool-registry';
@@ -6,7 +7,7 @@ import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-fit-check');
 const c = localizedTool('tire-fit-check', 'de');
 ---
-<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/can-i-fit-tire-size/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/passt-diese-reifengroesse/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/puedo-montar-esta-medida/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/can-i-fit-tire-size/' }]}>
+<ToolPage {definition} locale="de" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('tire-fit-check')}>
   <FitCheckForm slot="tool" locale="de" />
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
 </ToolPage>

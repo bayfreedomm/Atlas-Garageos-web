@@ -1,0 +1,42 @@
+---
+import { toolAlternates } from '../../../../seo/locale-alternates';
+import ToolPage from '../../../../components/ToolPage.astro';
+import FuelFields from '../../../../components/FuelFields.astro';
+import VehicleTripContext from '../../../../components/VehicleTripContext.astro';
+import { toolById } from '../../../../seo/tool-registry';
+import { localizedTool } from '../../../../localization/site-catalog';
+const definition = toolById('road-trip-cost-calculator');
+const c = localizedTool('road-trip-cost-calculator', 'fr');
+---
+<ToolPage {definition} locale="fr" titleOverride={c.title} descriptionOverride={c.description} visual={false} explanationBeforeInsights eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} alternates={toolAlternates('road-trip-cost-calculator')}>
+  <VehicleTripContext slot="tool" locale="fr" />
+  <form slot="tool" class="calculator-form road-trip-form" data-utility-calculator="road-trip" novalidate>
+    <FuelFields locale="fr" currency="EUR" />
+    <a class="fuel-price-hint" href="/gas-prices-today/">Prix des carburants aux États-Unis (anglais) <span aria-hidden="true">→</span></a>
+    <fieldset class="trip-options"><legend>Trajet</legend>
+      <div class="utility-fields"><label class="field-wide">Sens<select name="tripType"><option value="one">Aller simple</option><option value="round">Aller-retour</option></select></label></div>
+      <details><summary>Ajouter péages, frais annexes ou passagers</summary><div class="utility-fields">
+        <label>Frais supplémentaires du trajet<input name="extraCost" type="number" value="0" min="0" step="any" inputmode="decimal" /></label>
+        <label>Personnes<input name="people" type="number" value="1" min="1" step="1" inputmode="numeric" /></label>
+      </div></details>
+    </fieldset>
+    <button type="submit">Estimer le coût du trajet</button>
+    <section class="trip-primary is-pending" data-trip-primary aria-live="polite" aria-label="Coût estimé du trajet">
+      <div class="trip-primary__main"><span>Coût total estimé du trajet</span><strong data-trip-total>—</strong><p data-trip-context>Saisissez les données de votre trajet pour voir le coût complet.</p></div>
+      <div class="trip-primary__support"><div><span>Carburant consommé</span><strong data-trip-fuel>—</strong><small data-trip-fuel-cost>Le coût du carburant apparaîtra ici.</small></div><div><span>Trajet</span><strong data-trip-direction>—</strong><small data-trip-distance>La distance apparaîtra ici.</small></div><div data-trip-person-wrap hidden><span>Par personne</span><strong data-trip-person>—</strong><small data-trip-people>Répartition du total</small></div></div>
+    </section>
+    <p class="result-summary is-pending" data-result-summary aria-live="polite">Votre estimation de trajet apparaîtra ici.</p>
+    <figure class="trip-technical-visual is-pending" data-trip-visual aria-label="Distance du trajet et répartition proportionnelle des coûts">
+      <div class="trip-technical-visual__head"><span>TRAJET → CARBURANT + FRAIS ANNEXES → TOTAL</span><small>Schéma de l'itinéraire ; les segments de coût sont proportionnels</small></div>
+      <div class="trip-route" aria-hidden="true"><span>DÉPART</span><div class="trip-route__track"><i></i><i data-trip-return hidden></i></div><span data-trip-end>ARRIVÉE</span></div>
+      <div class="trip-visual-stats"><div><small>Distance parcourue</small><strong data-trip-visual-distance>—</strong></div><div><small>Carburant nécessaire</small><strong data-trip-visual-fuel>—</strong></div><div><small>Total</small><strong data-trip-visual-total>—</strong></div></div>
+      <div class="trip-cost-track" role="img" aria-label="Répartition du coût du carburant et des frais annexes" data-trip-cost-track><span class="trip-cost-track__fuel" data-trip-fuel-bar></span><span class="trip-cost-track__extras" data-trip-extra-bar></span></div>
+      <figcaption><span><i class="trip-key trip-key--fuel"></i>Carburant <strong data-trip-visual-fuel-cost>—</strong></span><span><i class="trip-key trip-key--extras"></i>Frais annexes <strong data-trip-visual-extras>—</strong></span></figcaption>
+    </figure>
+    <div class="fuel-detail-heading" aria-hidden="true"><span>Détails</span><small>Détail complet du trajet</small></div>
+    <dl class="tool-results" data-results aria-live="polite"></dl>
+    <div class="inline-errors" data-errors role="alert" aria-live="assertive" hidden></div>
+  </form>
+  <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
+</ToolPage>
+<script>import { initializeUtilityCalculators } from '../../../../ui/utility-calculators'; initializeUtilityCalculators();</script>

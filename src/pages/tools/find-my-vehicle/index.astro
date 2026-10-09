@@ -1,4 +1,5 @@
 ---
+import { toolAlternates } from '../../../seo/locale-alternates';
 import ToolPage from '../../../components/ToolPage.astro';
 import { toolById } from '../../../seo/tool-registry';
 import { vehicleMakes } from '../../../data/vehicle-fitment';
@@ -7,7 +8,7 @@ const definition = toolById('vehicle-fitment-finder');
 const makeCount = vehicleMakes().length;
 const searchableMakeCount = new Set([...vehicleMakes(), ...indexedVehicleMakes()]).size;
 ---
-<ToolPage {definition} alternates={[{ hreflang: 'en', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }, { hreflang: 'de', href: 'https://atlasgarageos.com/de/tools/fahrzeug-finden/' }, { hreflang: 'es', href: 'https://atlasgarageos.com/es/tools/encontrar-mi-vehiculo/' }, { hreflang: 'x-default', href: 'https://atlasgarageos.com/tools/find-my-vehicle/' }]} visual={false} eyebrow="Tires & wheels" intro="Pick a make and model to see Atlas reference tire size, bolt pattern, and qualified wheel torque — then jump straight into the matching calculator." limitation="This is a curated reference set, not a live manufacturer feed. Trims and model years vary, so confirm against your own vehicle's manual or door-jamb sticker before buying parts." studioCta="Confirm fitment in Wheel & Tire Compare">
+<ToolPage {definition} alternates={toolAlternates('vehicle-fitment-finder')} visual={false} eyebrow="Tires & wheels" intro="Pick a make and model to see Atlas reference tire size, bolt pattern, and qualified wheel torque — then jump straight into the matching calculator." limitation="This is a curated reference set, not a live manufacturer feed. Trims and model years vary, so confirm against your own vehicle's manual or door-jamb sticker before buying parts." studioCta="Confirm fitment in Wheel & Tire Compare">
   <form slot="tool" class="calculator-form" data-calculator="vehicle-finder" novalidate>
     <fieldset><legend>Vehicle</legend>
       <div class="utility-fields">
