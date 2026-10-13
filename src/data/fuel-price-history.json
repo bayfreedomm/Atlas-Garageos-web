@@ -1,12 +1,246 @@
 {
   "es": [
     {
+      "date": "2026-04-14",
+      "products": {
+        "e5": 1.538,
+        "e5_98": 1.681,
+        "diesel": 1.848,
+        "dieselPremium": 1.931
+      }
+    },
+    {
+      "date": "2026-04-21",
+      "products": {
+        "e5": 1.502,
+        "e5_98": 1.653,
+        "diesel": 1.744,
+        "dieselPremium": 1.827
+      }
+    },
+    {
+      "date": "2026-04-28",
+      "products": {
+        "e5": 1.524,
+        "e5_98": 1.685,
+        "diesel": 1.733,
+        "dieselPremium": 1.819
+      }
+    },
+    {
+      "date": "2026-05-05",
+      "products": {
+        "e5": 1.546,
+        "e5_98": 1.707,
+        "diesel": 1.741,
+        "dieselPremium": 1.829
+      }
+    },
+    {
+      "date": "2026-05-12",
+      "products": {
+        "e5": 1.543,
+        "e5_98": 1.707,
+        "diesel": 1.692,
+        "dieselPremium": 1.781
+      }
+    },
+    {
+      "date": "2026-05-19",
+      "products": {
+        "e5": 1.563,
+        "e5_98": 1.729,
+        "diesel": 1.689,
+        "dieselPremium": 1.78
+      }
+    },
+    {
+      "date": "2026-05-26",
+      "products": {
+        "e5": 1.566,
+        "e5_98": 1.734,
+        "diesel": 1.673,
+        "dieselPremium": 1.766
+      }
+    },
+    {
+      "date": "2026-06-02",
+      "products": {
+        "e5": 1.533,
+        "e5_98": 1.698,
+        "diesel": 1.627,
+        "dieselPremium": 1.72
+      }
+    },
+    {
+      "date": "2026-06-09",
+      "products": {
+        "e5": 1.516,
+        "e5_98": 1.681,
+        "diesel": 1.61,
+        "dieselPremium": 1.704
+      }
+    },
+    {
+      "date": "2026-06-16",
+      "products": {
+        "e5": 1.487,
+        "e5_98": 1.652,
+        "diesel": 1.573,
+        "dieselPremium": 1.667
+      }
+    },
+    {
+      "date": "2026-06-23",
+      "products": {
+        "e5": 1.452,
+        "e5_98": 1.62,
+        "diesel": 1.521,
+        "dieselPremium": 1.618
+      }
+    },
+    {
+      "date": "2026-06-30",
+      "products": {
+        "e5": 1.444,
+        "e5_98": 1.617,
+        "diesel": 1.506,
+        "dieselPremium": 1.605
+      }
+    },
+    {
+      "date": "2026-07-07",
+      "products": {
+        "e5": 1.532,
+        "e5_98": 1.71,
+        "diesel": 1.538,
+        "dieselPremium": 1.636
+      }
+    },
+    {
+      "date": "2026-07-14",
+      "products": {
+        "e5": 1.555,
+        "e5_98": 1.732,
+        "diesel": 1.571,
+        "dieselPremium": 1.669
+      }
+    },
+    {
+      "date": "2026-07-21",
+      "products": {
+        "e5": 1.618,
+        "e5_98": 1.794,
+        "diesel": 1.68,
+        "dieselPremium": 1.78
+      }
+    },
+    {
+      "date": "2026-07-28",
+      "products": {
+        "e5": 1.659,
+        "e5_98": 1.827,
+        "diesel": 1.75,
+        "dieselPremium": 1.847
+      }
+    },
+    {
+      "date": "2026-08-04",
+      "products": {
+        "e5": 1.716,
+        "e5_98": 1.886,
+        "diesel": 1.837,
+        "dieselPremium": 1.934
+      }
+    },
+    {
+      "date": "2026-08-11",
+      "products": {
+        "e5": 1.691,
+        "e5_98": 1.856,
+        "diesel": 1.806,
+        "dieselPremium": 1.902
+      }
+    },
+    {
+      "date": "2026-08-18",
+      "products": {
+        "e5": 1.711,
+        "e5_98": 1.877,
+        "diesel": 1.839,
+        "dieselPremium": 1.933
+      }
+    },
+    {
+      "date": "2026-08-25",
+      "products": {
+        "e5": 1.726,
+        "e5_98": 1.892,
+        "diesel": 1.865,
+        "dieselPremium": 1.96
+      }
+    },
+    {
+      "date": "2026-09-01",
+      "products": {
+        "e5": 1.774,
+        "e5_98": 1.938,
+        "diesel": 1.773,
+        "dieselPremium": 1.862
+      }
+    },
+    {
+      "date": "2026-09-08",
+      "products": {
+        "e5": 1.835,
+        "e5_98": 1.993,
+        "diesel": 1.809,
+        "dieselPremium": 1.899
+      }
+    },
+    {
+      "date": "2026-09-15",
+      "products": {
+        "e5": 1.899,
+        "e5_98": 2.055,
+        "diesel": 1.881,
+        "dieselPremium": 1.971
+      }
+    },
+    {
       "date": "2026-09-22",
       "products": {
         "e5": 1.926,
         "e5_98": 2.08,
         "diesel": 1.934,
         "dieselPremium": 2.026
+      }
+    },
+    {
+      "date": "2026-09-29",
+      "products": {
+        "e5": 1.934,
+        "e5_98": 2.09,
+        "diesel": 1.928,
+        "dieselPremium": 2.021
+      }
+    },
+    {
+      "date": "2026-10-06",
+      "products": {
+        "e5": 1.791,
+        "e5_98": 1.945,
+        "diesel": 1.896,
+        "dieselPremium": 1.987
+      }
+    },
+    {
+      "date": "2026-10-13",
+      "products": {
+        "e5": 1.786,
+        "e5_98": 1.947,
+        "diesel": 1.887,
+        "dieselPremium": 1.979
       }
     }
   ],
@@ -31,6 +265,32 @@
         "diesel": {
           "perLitre": 1.725,
           "perGallon": 6.529
+        }
+      }
+    },
+    {
+      "weekOf": "2026-09-28",
+      "products": {
+        "regular": {
+          "perLitre": 1.18,
+          "perGallon": 4.465
+        },
+        "diesel": {
+          "perLitre": 1.686,
+          "perGallon": 6.382
+        }
+      }
+    },
+    {
+      "weekOf": "2026-10-05",
+      "products": {
+        "regular": {
+          "perLitre": 1.15,
+          "perGallon": 4.354
+        },
+        "diesel": {
+          "perLitre": 1.638,
+          "perGallon": 6.199
         }
       }
     }
