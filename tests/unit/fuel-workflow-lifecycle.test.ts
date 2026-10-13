@@ -23,6 +23,13 @@ describe('automatic fuel-data publication', () => {
       expect(source).not.toMatch(/\bgit rebase\b/);
     });
 
+    it(`${path} looks up the backup branch by its full ref`, () => {
+      // `ls-remote --heads origin fuel-data` also matches refs/heads/automation/fuel-data
+      // (tail match), which made every run fail on the follow-up fetch.
+      expect(source).toContain('git ls-remote --exit-code origin refs/heads/fuel-data');
+      expect(source).not.toContain('--heads origin fuel-data');
+    });
+
     it(`${path} serializes writers`, () => {
       expect(source).toContain('group: ${{ github.repository }}-fuel-data-rolling-pr');
       expect(source).toContain('cancel-in-progress: false');

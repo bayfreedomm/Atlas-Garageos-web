@@ -22,6 +22,7 @@ import { vehicleFitmentData, type VehicleFitment } from '../../src/data/vehicle-
 import { PRODUCTION_FLOTATION_TIRE_SIZES, productionCommercialTireSizeNotations, productionTireSizeNotations } from '../../src/data/production-tire-sizes';
 import { torqueIsTrusted, torqueJsonLdProperty, torquePresentation } from '../../src/ui/vehicle-torque';
 import { sitemapEntries } from '../../src/seo/sitemap';
+import { isTireSizeIndexable } from '../../src/seo/index-policy';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 import { boltMakes } from '../../src/ui/bolt-make';
 
@@ -190,7 +191,7 @@ describe('entity routing and sitemap', () => {
 
   it('lists every generated entity page in the sitemap exactly once', () => {
     const entries = sitemapEntries();
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
+    const expected = entityLocales().reduce((total, locale) => total + 2 + tireSizeCatalog.filter((entry) => isTireSizeIndexable(entry, locale)).length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length, 0);
     const entityUrls = entries.filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls).size).toBe(expected);

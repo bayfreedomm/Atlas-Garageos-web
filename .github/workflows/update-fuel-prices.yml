@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           echo '{"es":[],"de":[],"us":[]}' > /tmp/history-backup.json
-          if git ls-remote --exit-code --heads origin fuel-data >/dev/null; then
+          if git ls-remote --exit-code origin refs/heads/fuel-data >/dev/null; then
             git fetch --no-tags origin "+refs/heads/fuel-data:refs/remotes/origin/fuel-data"
             git show origin/fuel-data:fuel-price-history.json > /tmp/history-backup.json || echo '{"es":[],"de":[],"us":[]}' > /tmp/history-backup.json
           fi
@@ -96,7 +96,7 @@ jobs:
           # Backup copy on a branch nobody edits by hand. If a manual upload overwrites the history
           # file on the default branch, the next run merges it back from here.
           tmp="$(mktemp -d)"
-          if git ls-remote --exit-code --heads origin fuel-data >/dev/null; then
+          if git ls-remote --exit-code origin refs/heads/fuel-data >/dev/null; then
             git fetch --no-tags origin "+refs/heads/fuel-data:refs/remotes/origin/fuel-data"
             git worktree add -B fuel-data "$tmp" origin/fuel-data
           else

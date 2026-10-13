@@ -4,6 +4,7 @@ import SiteLayout from '../../../../components/SiteLayout.astro';
 import TireSizeEntity from '../../../../components/TireSizeEntity.astro';
 import TireDiameterGroup from '../../../../components/TireDiameterGroup.astro';
 import { tireSizeCatalog, type TireSizeEntry } from '../../../../data/tire-size-catalog';
+import { tireSizeIndexing } from '../../../../seo/index-policy';
 import { tireDiameterGroupMeta, tireDiameterGroupSlug, tireDiameterGroups, tireSizeDetailMeta, type TireDiameterGroup as DiameterGroup } from '../../../../ui/entity-page-model';
 
 export function getStaticPaths() {
@@ -16,7 +17,9 @@ export function getStaticPaths() {
 interface Props { entry: TireSizeEntry | undefined; group: DiameterGroup | undefined; }
 const { entry, group } = Astro.props as Props;
 const meta = entry ? tireSizeDetailMeta(entry, 'nl') : tireDiameterGroupMeta(group!, 'nl');
+// Low-value localized sizes stay live but noindex; see src/seo/index-policy.ts.
+const indexing = entry ? tireSizeIndexing(entry, 'nl') : undefined;
 ---
-<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="nl" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="nl" alternates={meta.alternates} indexable={indexing?.indexable ?? true} hreflangAlternates={indexing?.hreflang} breadcrumbs={meta.breadcrumbs}>
   {entry ? <TireSizeEntity entry={entry} locale="nl" /> : <TireDiameterGroup group={group!} locale="nl" />}
 </SiteLayout>
