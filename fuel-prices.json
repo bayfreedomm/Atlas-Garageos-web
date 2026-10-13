@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-10-13T20:40:53.242Z",
+  "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
+  "es": {
+    "status": "fresh",
+    "products": [
+      {
+        "id": "e5",
+        "label": "Gasolina 95 E5",
+        "value": 1.786,
+        "sampleSize": 10941
+      },
+      {
+        "id": "e5_98",
+        "label": "Gasolina 98 E5",
+        "value": 1.947,
+        "sampleSize": 5499
+      },
+      {
+        "id": "diesel",
+        "label": "Gasóleo A",
+        "value": 1.887,
+        "sampleSize": 11291
+      },
+      {
+        "id": "dieselPremium",
+        "label": "Gasóleo Premium",
+        "value": 1.979,
+        "sampleSize": 5915
+      }
+    ],
+    "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
+    "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
+    "lastAttemptAt": "2026-10-13T20:40:25.494Z",
+    "lastSuccessAt": "2026-10-13T20:40:25.494Z"
+  },
+  "de": {
+    "status": "fresh",
+    "products": [
+      {
+        "id": "e5",
+        "label": "Super E5",
+        "value": 2.291,
+        "sampleSize": 905
+      },
+      {
+        "id": "e10",
+        "label": "Super E10",
+        "value": 2.234,
+        "sampleSize": 890
+      },
+      {
+        "id": "diesel",
+        "label": "Diesel",
+        "value": 2.402,
+        "sampleSize": 906
+      }
+    ],
+    "source": "Tankerkönig — Atlas monitored sample: 2701 station readings across Berlin, Hamburg, Munich, Cologne, Frankfurt (not a national average)",
+    "sourceUrl": "https://creativecommons.tankerkoenig.de/",
+    "lastAttemptAt": "2026-09-21T19:46:32.446Z",
+    "lastSuccessAt": "2026-09-21T19:46:32.446Z"
+  },
+  "us": {
+    "status": "fresh",
+    "products": [
+      {
+        "id": "regular",
+        "label": "Regular",
+        "valuePerGallon": 4.354,
+        "valuePerLitre": 1.15
+      },
+      {
+        "id": "diesel",
+        "label": "Diesel",
+        "valuePerGallon": 6.199,
+        "valuePerLitre": 1.638
+      }
+    ],
+    "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
+    "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
+    "lastAttemptAt": "2026-10-13T20:40:25.527Z",
+    "lastSuccessAt": "2026-10-13T20:40:25.527Z",
+    "weekOf": "2026-10-05"
+  }
+}
