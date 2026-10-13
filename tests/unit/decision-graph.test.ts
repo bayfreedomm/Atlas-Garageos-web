@@ -12,7 +12,6 @@ import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
 import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
 import { entityLocales } from '../../src/seo/entity-routes';
 import { sitemapEntries } from '../../src/seo/sitemap';
-import { isTireSizeIndexable } from '../../src/seo/index-policy';
 import { boltDecisionGraph, fuelDecisionGraph, tireDecisionGraph, vehicleDecisionGraph } from '../../src/ui/decision-graph';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 import { boltMakes } from '../../src/ui/bolt-make';
@@ -95,13 +94,12 @@ describe('shared automotive decision graph', () => {
 describe('decision graph route-count guard', () => {
   it('preserves the expanded sourced record and entity URL counts', () => {
     // Growth is expected (more sourced vehicles, C sizes); shrinking below the published
-    // baseline is not. The URL count must equal the indexable catalog in every locale (English
-    // lists every size; other languages only the sizes src/seo/index-policy.ts keeps indexable).
+    // baseline is not. The URL count must always equal the catalog size in every locale.
     expect(vehicleFitmentData.length).toBeGreaterThanOrEqual(30);
     expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(950);
     expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
     const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
-    const expected = entityLocales().reduce((total, locale) => total + 2 + tireSizeCatalog.filter((entry) => isTireSizeIndexable(entry, locale)).length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length, 0);
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
     expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls)).toHaveLength(expected);

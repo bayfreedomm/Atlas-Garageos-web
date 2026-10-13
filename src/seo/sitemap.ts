@@ -8,7 +8,6 @@ import { dtcRecords } from '../data/dtc-records';
 import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
 import { CONTENT_LOCALES } from '../localization/site-catalog';
 import { boltMakePath, boltMakes } from '../ui/bolt-make';
-import { isTireSizeIndexable } from './index-policy';
 import { carMakePath, carMakes, carModelPath, carYearPath, publishedCarModels, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
@@ -60,8 +59,7 @@ function entityPageRoutes(): readonly string[] {
   const routes: string[] = [];
   for (const locale of entityLocales()) {
     routes.push(entityHubPath('tire-size', locale));
-    // Localized reference-only sizes are live but noindex (src/seo/index-policy.ts), so they stay out.
-    for (const entry of tireSizeCatalog) if (isTireSizeIndexable(entry, locale)) routes.push(entityDetailPath('tire-size', locale, entry.slug));
+    for (const entry of tireSizeCatalog) routes.push(entityDetailPath('tire-size', locale, entry.slug));
     for (const group of tireDiameterGroups()) routes.push(tireDiameterGroupPath(group.inches, locale));
     routes.push(entityHubPath('bolt-pattern', locale));
     for (const entry of boltPatternCatalog) routes.push(entityDetailPath('bolt-pattern', locale, entry.slug));

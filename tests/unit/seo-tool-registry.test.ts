@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, routeForTool, toolRegistry } from '../../src/seo/tool-registry';
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
-import { isTireSizeIndexable } from '../../src/seo/index-policy';
 import { vehicleFitmentData } from '../../src/data/vehicle-fitment';
 import { tireSizeCatalog } from '../../src/data/tire-size-catalog';
 import { boltPatternCatalog } from '../../src/data/bolt-pattern-catalog';
@@ -84,9 +83,7 @@ describe('SEO tool registry', () => {
     // row. Both catalogs are derived from vehicleFitmentData, so this figure moves on its own
     // when a vehicle with a new tire size or bolt pattern is added — nothing here is a
     // hand-maintained page count.
-    // Tire sizes: English lists every catalog size; the other languages list only the sizes the
-    // index policy keeps indexable (documented on a vehicle or in the core passenger band).
-    const entityRoutes = entityLocales().reduce((total, locale) => total + 2 + tireSizeCatalog.filter((entry) => isTireSizeIndexable(entry, locale)).length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length, 0);
+    const entityRoutes = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
     // Diagnostics adds one directory plus exactly one page per record that passed the production
     // catalog publication gate. Draft fixtures and arbitrary input state never reach the sitemap.
     const diagnosticRoutes = 1 + dtcRecords.length;

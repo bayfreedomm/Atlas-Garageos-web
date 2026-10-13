@@ -19,7 +19,7 @@ import '../styles/product-v4.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
-interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ChromeLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; indexable?: boolean | undefined; hreflangAlternates?: readonly HreflangAlternate[] | undefined; }
+interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ChromeLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
 const props = Astro.props;
 const definition = props.definition;
 const title = props.title ?? definition?.title;
@@ -34,11 +34,6 @@ const prefix = chromePrefix(locale);
 const homeHref = locale ? `/${locale}/` : '/';
 const htmlLang = locale ? chromeHtmlLang(locale) : definition?.locale ?? 'en';
 const alternates = props.alternates ?? [{ hreflang: 'en', href: canonical }, { hreflang: 'x-default', href: canonical }];
-// `alternates` also feeds the language switcher (every translation that exists). Search engines get
-// `hreflangAlternates` when a page narrows its cluster to the languages in which it is indexable,
-// and a noindex page emits no hreflang at all (see src/seo/index-policy.ts).
-const indexable = props.indexable ?? true;
-const hreflangLinks = indexable ? (props.hreflangAlternates ?? alternates) : [];
 // Keyed by hreflang value; reference locales come from their registry.
 const LOCALE_SHORT_LABELS: Readonly<Record<string, string>> = { en: 'EN', de: 'DE', es: 'ES', ...Object.fromEntries(REFERENCE_LOCALES.map((code) => [REFERENCE_LOCALE_META[code].hreflang, REFERENCE_LOCALE_META[code].short])) };
 const LOCALE_FULL_LABELS: Readonly<Record<string, string>> = { en: 'English', de: 'Deutsch', es: 'Español', ...Object.fromEntries(REFERENCE_LOCALES.map((code) => [REFERENCE_LOCALE_META[code].hreflang, REFERENCE_LOCALE_META[code].full])) };
@@ -76,7 +71,7 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="robots" content={indexable ? 'index,follow' : 'noindex,follow'} />
+    <meta name="robots" content="index,follow" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Atlas GarageOS" />
     <meta property="og:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
@@ -90,7 +85,7 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${SITE_ORIGIN}/atlas-hero-car.png`} />
     <link rel="canonical" href={canonical} />
-    {hreflangLinks.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#f7f8f5" />
