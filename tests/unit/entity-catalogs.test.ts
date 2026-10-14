@@ -1,3 +1,4 @@
+import { tireComparisonPairs } from '../../src/data/tire-comparisons';
 import { describe, expect, it } from 'vitest';
 import {
   buildTireSizeCatalog, excludedTireSizes, parseTireNotation, tireGeometryProblem,
@@ -190,7 +191,7 @@ describe('entity routing and sitemap', () => {
 
   it('lists every generated entity page in the sitemap exactly once', () => {
     const entries = sitemapEntries();
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length + tireComparisonPairs.length);
     const entityUrls = entries.filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls).size).toBe(expected);

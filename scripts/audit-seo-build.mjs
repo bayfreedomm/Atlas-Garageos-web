@@ -26,8 +26,29 @@ const pathForFile = (file) => {
   return `/${local}`;
 };
 
+// /sitemap.xml is a sitemap index; every child it lists must exist in dist/ and stay within
+// the protocol limits (50,000 URLs, 50 MB uncompressed). A plain urlset is still accepted.
 const sitemapXml = await readFile(new URL('sitemap.xml', root), 'utf8');
-const sitemapUrls = one(sitemapXml, /<loc>([^<]+)<\/loc>/g);
+const sitemapUrls = [];
+if (sitemapXml.includes('<sitemapindex')) {
+  const children = one(sitemapXml, /<sitemap><loc>([^<]+)<\/loc><\/sitemap>/g);
+  if (children.length === 0) failures.push('Sitemap index lists no child sitemaps.');
+  if (new Set(children).size !== children.length) failures.push('Sitemap index lists a child twice.');
+  for (const child of children) {
+    if (!child.startsWith(`${origin}/`) || !child.endsWith('.xml')) { failures.push(`Sitemap index child is not a canonical .xml URL: ${child}`); continue; }
+    let xml;
+    try { xml = await readFile(new URL(child.slice(origin.length + 1), root), 'utf8'); }
+    catch { failures.push(`Sitemap index child is missing from the build: ${child}`); continue; }
+    const urls = one(xml, /<loc>([^<]+)<\/loc>/g);
+    if (urls.length === 0) failures.push(`${child}: child sitemap is empty.`);
+    if (urls.length > 50000) failures.push(`${child}: ${urls.length} URLs exceeds the 50,000 sitemap limit.`);
+    if (Buffer.byteLength(xml) > 50 * 1024 * 1024) failures.push(`${child}: larger than 50 MB.`);
+    sitemapUrls.push(...urls);
+  }
+  console.log(`Sitemap index: ${children.length} child sitemaps.`);
+} else {
+  sitemapUrls.push(...one(sitemapXml, /<loc>([^<]+)<\/loc>/g));
+}
 const sitemapSet = new Set(sitemapUrls);
 if (sitemapSet.size !== sitemapUrls.length) failures.push('Sitemap contains duplicate URLs.');
 if (sitemapUrls.some((url) => !url.startsWith(`${origin}/`) || /[?#]/.test(url))) failures.push('Sitemap contains a non-canonical, query, or fragment URL.');

@@ -1,0 +1,78 @@
+name: IndexNow (notify Bing, Yandex and other engines)
+
+# After every push to the default branch (and once a day for the fuel-price pages the bot
+# refreshes), build the site, find the sitemap URLs whose HTML is new, changed or removed since
+# the last successful run, wait until Cloudflare serves that commit, and send exactly those URLs
+# to IndexNow. The first run (no saved state) sends every sitemap URL once.
+# State lives in the Actions cache — nothing is committed back to the repository.
+
+"on":
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'tests/**'
+  schedule:
+    # Once a day, after the fuel-price bot's 21:15 UTC run has deployed.
+    - cron: '50 22 * * *'
+  workflow_dispatch:
+    inputs:
+      all:
+        description: 'Send every sitemap URL again (not only changes)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.repository }}-indexnow
+  cancel-in-progress: false
+
+jobs:
+  indexnow:
+    name: Submit changed URLs
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the site
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: pnpm exec astro build
+
+      - name: Restore previous IndexNow state
+        uses: actions/cache/restore@v4
+        with:
+          path: .indexnow
+          key: indexnow-state-${{ github.run_id }}
+          restore-keys: indexnow-state-
+
+      - name: Submit new and changed URLs
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          node scripts/indexnow.mjs --dist dist --state .indexnow/state.json --wait-for "$sha" --timeout 1200 ${{ inputs.all && '--all' || '' }}
+
+      - name: Save IndexNow state
+        uses: actions/cache/save@v4
+        with:
+          path: .indexnow
+          key: indexnow-state-${{ github.run_id }}-${{ github.run_attempt }}

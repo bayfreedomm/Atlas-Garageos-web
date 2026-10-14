@@ -1,3 +1,4 @@
+import { tireComparisonPairs } from '../../src/data/tire-comparisons';
 import { describe, expect, it } from 'vitest';
 import decisionComponent from '../../src/components/DecisionGraph.astro?raw';
 import tireComponent from '../../src/components/TireSizeEntity.astro?raw';
@@ -99,7 +100,7 @@ describe('decision graph route-count guard', () => {
     expect(tireSizeCatalog.length).toBeGreaterThanOrEqual(950);
     expect(boltPatternCatalog.length).toBeGreaterThanOrEqual(10);
     const entityUrls = sitemapEntries().filter((url) => /\/(tire-sizes|bolt-patterns|reifengroessen|lochkreise|medidas-neumaticos|patrones-birlos|dimensions-pneus|entraxes|misure-pneumatici|foratura-cerchi|medidas-pneus|furacao-rodas|rozmiary-opon|rozstaw-srub|bandenmaten|steekmaten|lastik-ebatlari|bijon-araligi)\//.test(url));
-    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length);
+    const expected = entityLocales().length * (2 + tireSizeCatalog.length + tireDiameterGroups().length + boltPatternCatalog.length + boltMakes.length + tireComparisonPairs.length);
     expect(entityUrls.length).toBeGreaterThanOrEqual(1782);
     expect(entityUrls).toHaveLength(expected);
     expect(new Set(entityUrls)).toHaveLength(expected);

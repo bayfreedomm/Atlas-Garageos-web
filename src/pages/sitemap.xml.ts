@@ -1,3 +1,5 @@
 import type { APIRoute } from 'astro';
-import { renderSitemapXml } from '../seo/sitemap';
-export const GET: APIRoute = () => new Response(renderSitemapXml(), { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
+import { renderSitemapIndexXml } from '../seo/sitemap';
+
+/** Sitemap index: one child sitemap per page type (see src/seo/sitemap.ts). */
+export const GET: APIRoute = () => new Response(renderSitemapIndexXml(), { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });

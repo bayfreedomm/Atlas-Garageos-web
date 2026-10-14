@@ -26,6 +26,11 @@ import {
 } from '../ui/entity-page-model';
 import { formatDecimal, formatMm, formatPlain } from '../ui/locale-format';
 import { tireDecisionGraph } from '../ui/decision-graph';
+import { carModelsForTireSize, comparisonsForTireSize } from '../data/tire-comparisons';
+import { tireComparisonText } from '../content/tire-comparison-text';
+import { otherSize } from '../ui/tire-comparison';
+import { carModelLinkFor } from '../ui/car-locale';
+import { carName } from '../ui/car-pages';
 
 interface Props { readonly entry: TireSizeEntry; readonly locale: EntityLocale; }
 const { entry, locale } = Astro.props;
@@ -97,6 +102,9 @@ const answer = [
 const speedCell = (trueSpeedAt100: number): string =>
   `${formatDecimal((trueSpeedAt100 / 100) * t.speedBase.indicated, 1, locale)} ${t.speedBase.unit}`;
 const decisions = tireDecisionGraph(entry, locale);
+const ct = tireComparisonText[locale];
+const comparisons = comparisonsForTireSize(entry.notation).slice(0, 18);
+const carModelsOnSize = carModelsForTireSize(entry.notation).slice(0, 24);
 ---
 <nav class="breadcrumbs" aria-label="Breadcrumb">
   <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
@@ -206,6 +214,26 @@ const decisions = tireDecisionGraph(entry, locale);
     </>
   )}
 </section>
+
+{comparisons.length > 0 && (
+  <section class="entity-section" aria-labelledby="entity-comparisons">
+    <h2 id="entity-comparisons">{ct.sizeSectionHeading(shownNotation)}</h2>
+    <p class="entity-note">{ct.sizeSectionIntro}</p>
+    <ul class="entity-chiplist">
+      {comparisons.map((pair) => <li><a class="entity-chip" href={entityDetailPath('tire-size', locale, pair.slug)}>{shownNotation} vs {displayTireNotation(otherSize(pair, entry).notation, locale)}</a></li>)}
+    </ul>
+  </section>
+)}
+
+{carModelsOnSize.length > 0 && (
+  <section class="entity-section" aria-labelledby="entity-car-models">
+    <h2 id="entity-car-models">{ct.modelsHeading(shownNotation)}</h2>
+    <p class="entity-note">{ct.modelsIntro}</p>
+    <ul class="entity-chiplist">
+      {carModelsOnSize.map((car) => <li><a class="entity-chip" href={carModelLinkFor(locale, car).href}>{carName(car)}</a></li>)}
+    </ul>
+  </section>
+)}
 
 {neighbours.length > 0 && (
   <section class="entity-section" aria-labelledby="entity-neighbours">

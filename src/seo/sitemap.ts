@@ -9,6 +9,7 @@ import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePageP
 import { CONTENT_LOCALES } from '../localization/site-catalog';
 import { boltMakePath, boltMakes } from '../ui/bolt-make';
 import { localizedCarRoutes } from '../ui/car-locale';
+import { tireComparisonPairs } from '../data/tire-comparisons';
 import { carMakePath, carMakes, carModelPath, carYearPath, publishedCarModels, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
@@ -69,24 +70,84 @@ function entityPageRoutes(): readonly string[] {
   return routes;
 }
 
-/** /cars/ family: English directory, makes, models and EPA model years from 2000, plus the localized wheel pages. */
-function carRoutes(): readonly string[] {
-  return [
-    '/cars/',
-    ...carMakes.map((make) => carMakePath(make.makeSlug)),
-    ...publishedCarModels.map((model) => carModelPath(model)),
-    ...publishedCarModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year))),
+/** English /cars/ directory, make pages and model pages. */
+function carModelRoutes(): readonly string[] {
+  return ['/cars/', ...carMakes.map((make) => carMakePath(make.makeSlug)), ...publishedCarModels.map((model) => carModelPath(model))];
+}
+
+/** English EPA model-year pages from 2000 (/cars/{make}/{model}/{year}/). */
+function carYearRoutes(): readonly string[] {
+  return publishedCarModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year)));
+}
+
+/** Factory-backed "X vs Y" tire-size comparisons in every entity locale. */
+function tireComparisonRoutes(): readonly string[] {
+  return entityLocales().flatMap((locale) => tireComparisonPairs.map((pair) => entityDetailPath('tire-size', locale, pair.slug)));
+}
+
+function diagnosticRoutes(): readonly string[] {
+  return ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
+}
+
+function split(routes: readonly string[], test: (path: string) => boolean): [string[], string[]] {
+  const hit: string[] = [];
+  const miss: string[] = [];
+  for (const route of routes) (test(route) ? hit : miss).push(route);
+  return [hit, miss];
+}
+
+/**
+ * The sitemap is published as a sitemap index (/sitemap.xml) plus one child sitemap per page
+ * type, so Search Console and Bing Webmaster report discovery and indexing per type. Every
+ * indexable URL belongs to exactly one group; the groups are listed in a fixed order.
+ */
+export const SITEMAP_GROUP_IDS = ['pages', 'tire-sizes', 'tire-comparisons', 'bolt-patterns', 'vehicles', 'cars', 'car-years', 'cars-localized', 'obd-codes'] as const;
+export type SitemapGroupId = (typeof SITEMAP_GROUP_IDS)[number];
+export interface SitemapGroup { readonly id: SitemapGroupId; readonly path: string; readonly urls: readonly string[]; }
+
+let cachedGroups: readonly SitemapGroup[] | undefined;
+
+export function sitemapGroups(): readonly SitemapGroup[] {
+  if (cachedGroups) return cachedGroups;
+  const tireAndBolt = entityPageRoutes();
+  const tirePrefixes = new Set(entityLocales().map((locale) => entityHubPath('tire-size', locale)));
+  const [tires, bolts] = split(tireAndBolt, (path) => [...tirePrefixes].some((prefix) => path.startsWith(prefix)));
+  const raw: Record<SitemapGroupId, readonly string[]> = {
+    pages: [...indexableRoutes, ...localizedRoutes()],
+    'tire-sizes': tires,
+    'tire-comparisons': tireComparisonRoutes(),
+    'bolt-patterns': bolts,
+    vehicles: vehiclePageRoutes(),
+    cars: carModelRoutes(),
+    'car-years': carYearRoutes(),
     // Localized wheel-fitment view of every model with ANKUSI wheel data (src/ui/car-locale.ts).
-    ...localizedCarRoutes(),
-  ];
+    'cars-localized': localizedCarRoutes(),
+    'obd-codes': diagnosticRoutes(),
+  };
+  cachedGroups = Object.freeze(SITEMAP_GROUP_IDS.map((id) => Object.freeze({ id, path: `/sitemap-${id}.xml`, urls: Object.freeze(raw[id].map(canonicalForPath)) })));
+  return cachedGroups;
 }
 
 export function sitemapEntries(): readonly string[] {
-  const diagnosticRoutes = ['/obd-codes/', ...dtcRecords.map((record) => `/obd-codes/${record.slug}/`)];
-  return Object.freeze([...indexableRoutes, ...localizedRoutes(), ...vehiclePageRoutes(), ...entityPageRoutes(), ...diagnosticRoutes, ...carRoutes()].map(canonicalForPath));
+  return Object.freeze(sitemapGroups().flatMap((group) => group.urls));
 }
 
+const urlset = (urls: readonly string[]): string =>
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${url}</loc></url>`).join('\n')}\n</urlset>\n`;
+
+/** One flat urlset with every indexable URL (kept for tests and tooling; not published). */
 export function renderSitemapXml(): string {
-  const urls = sitemapEntries().map((url) => `  <url><loc>${url}</loc></url>`).join('\n');
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+  return urlset(sitemapEntries());
+}
+
+/** /sitemap.xml — the sitemap index advertised in robots.txt and submitted to Search Console. */
+export function renderSitemapIndexXml(): string {
+  const items = sitemapGroups().map((group) => `  <sitemap><loc>${canonicalForPath(group.path)}</loc></sitemap>`).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}\n</sitemapindex>\n`;
+}
+
+export function renderSitemapGroupXml(id: SitemapGroupId): string {
+  const group = sitemapGroups().find((entry) => entry.id === id);
+  if (!group) throw new Error(`Unknown sitemap group: ${id}`);
+  return urlset(group.urls);
 }

@@ -21,6 +21,7 @@ Updated: 2026-10-08. Priority combines user value, organic opportunity, differen
 - `PLANNED` — Grow vehicle rows toward the top EU/US models per make, one verified generation page each; add Fiat Ducato as two rows (5x118 / 5x130 Maxi) once each variant's OE size is confirmed.
 - `VERIFIED DONE` — Part 1: ~1,000-size tire catalog, flotation sizes, tire-height group pages, "in inches"/"pulgadas" titles.
 - `VERIFIED DONE` — Part 2: mobile density redesign + tire-size lookup.
+- `VERIFIED DONE` — 2026-10-14 (v7-14): typed sitemap index, IndexNow workflow, 542 × 9 factory-backed tire comparison pages, tire-page model/comparison sections, Egea/Bayon/Taliant rows.
 - `PLANNED` — Next: backlinks via the embeddable widget and forum answers; vehicle growth + make pages; Part 3: wheel/rim compatibility pages; Part 4: French entity pages; Part 5: IndexNow, OG images, internal-link and performance pass.
 - `PLANNED` — Watch GSC impressions/CTR on the new tire titles and height pages for 2–4 weeks before further title changes.
 

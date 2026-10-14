@@ -1,0 +1,174 @@
+---
+// "X vs Y" tire-size comparison page body, in every entity locale. Published only for the
+// factory-backed pairs in src/data/tire-comparisons.ts; it reuses the tire-page styling.
+//   HERO + ANSWER STRIP → SIDE-BY-SIDE TABLE → SPEEDOMETER → VEHICLES → LINKS → RELATED → FAQ
+import type { TireComparisonPair } from '../data/tire-comparisons';
+import { comparisonsForTireSize } from '../data/tire-comparisons';
+import { tireComparisonText } from '../content/tire-comparison-text';
+import { tireSizePageText } from '../content/entity-page-text';
+import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
+import { serializeJsonLd } from '../seo/safe-json-ld';
+import { displayTireNotation, homePath, signed, tireComparisonHref, vehicleLink } from '../ui/entity-page-model';
+import { comparisonModel, comparisonVehicles } from '../ui/tire-comparison';
+import { carModelLinkFor } from '../ui/car-locale';
+import { carName } from '../ui/car-pages';
+import { formatDecimal, formatMm, formatPlain } from '../ui/locale-format';
+
+interface Props { readonly pair: TireComparisonPair; readonly locale: EntityLocale; }
+const { pair, locale } = Astro.props;
+
+const t = tireComparisonText[locale];
+const page = tireSizePageText[locale];
+const vehicles = comparisonVehicles(pair);
+const model = comparisonModel(pair, locale, vehicles);
+const f = model.figures;
+const A = model.metricsA;
+const B = model.metricsB;
+const inch = (mm: number): string => `${formatDecimal(mm / 25.4, 2, locale)}″`;
+const rows = [
+  { label: page.metrics.overallDiameter, a: A.overallDiameterMm, b: B.overallDiameterMm, digits: 1 },
+  { label: page.metrics.sectionWidth, a: A.sectionWidthMm, b: B.sectionWidthMm, digits: 0 },
+  { label: page.metrics.sidewallHeight, a: A.sidewallHeightMm, b: B.sidewallHeightMm, digits: 1 },
+  { label: page.metrics.circumference, a: A.circumferenceMm, b: B.circumferenceMm, digits: 0 },
+];
+const revs = (mm: number): number => 1_000_000 / mm;
+const answer = [
+  { label: t.answer.diameter, value: signed(((B.overallDiameterMm / A.overallDiameterMm) - 1) * 100, 1, '%', locale), sub: signed(B.overallDiameterMm - A.overallDiameterMm, 1, 'mm', locale) },
+  { label: t.answer.speed, value: `${f.speedTrue} ${f.speedUnit}`, sub: '' },
+  { label: t.answer.width, value: signed(B.sectionWidthMm - A.sectionWidthMm, 0, 'mm', locale), sub: '' },
+  { label: t.answer.sidewall, value: signed(B.sidewallHeightMm - A.sidewallHeightMm, 1, 'mm', locale), sub: '' },
+];
+const faqs = t.faqs(f);
+const faqJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) });
+const sizeHref = (notation: string, slug: string): { href: string; label: string } => ({ href: entityDetailPath('tire-size', locale, slug), label: displayTireNotation(notation, locale) });
+const linkA = sizeHref(pair.a.notation, pair.a.slug);
+const linkB = sizeHref(pair.b.notation, pair.b.slug);
+const related = [...comparisonsForTireSize(pair.a.notation), ...comparisonsForTireSize(pair.b.notation)]
+  .filter((other, index, list) => other.slug !== pair.slug && list.findIndex((item) => item.slug === other.slug) === index)
+  .slice(0, 12);
+const VEHICLE_LIMIT = 16;
+const columns = [
+  { label: t.onSize(f.a), curated: vehicles.curatedA, models: vehicles.modelsA },
+  { label: t.onSize(f.b), curated: vehicles.curatedB, models: vehicles.modelsB },
+].filter((column) => column.curated.length + column.models.length > 0);
+const hasVehicles = vehicles.both.length > 0 || columns.length > 0;
+---
+<script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{page.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <a href={entityHubPath('tire-size', locale)}>{page.breadcrumbHub}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{f.a} vs {f.b}</span>
+</nav>
+
+<header class="entity-hero entity-hero--tire">
+  <p class="eyebrow">{t.kicker}</p>
+  <h1 class="entity-hero__title"><span class="entity-hero__key">{f.a}</span> vs <span class="entity-hero__key">{f.b}</span></h1>
+  <dl class="entity-answer">
+    {answer.map((item) => (
+      <div class="entity-answer__item">
+        <dt>{item.label}</dt>
+        <dd><strong>{item.value}</strong>{item.sub && <span>{item.sub}</span>}</dd>
+      </div>
+    ))}
+  </dl>
+  <p class="entity-hero__lead">{t.lead(f)}</p>
+  <p class="entity-note">{pair.reason === 'same-vehicle' ? t.reasonSame : t.reasonPlus}</p>
+  <div class="entity-hero__links">
+    <a class="entity-inline-link" href={linkA.href}>{linkA.label} ›</a>
+    <a class="entity-inline-link" href={linkB.href}>{linkB.label} ›</a>
+  </div>
+</header>
+
+<section class="entity-section" aria-labelledby="cmp-specs">
+  <h2 id="cmp-specs">{t.specHeading}</h2>
+  <div class="entity-table-scroll">
+    <table class="entity-table">
+      <thead><tr><th scope="col">{page.specCols.measure}</th><th scope="col">{f.a}</th><th scope="col">{f.b}</th><th scope="col">{t.colDifference}</th></tr></thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <th scope="row">{row.label}</th>
+            <td>{formatMm(row.a, row.digits, locale)}<span class="entity-subvalue">{inch(row.a)}</span></td>
+            <td>{formatMm(row.b, row.digits, locale)}<span class="entity-subvalue">{inch(row.b)}</span></td>
+            <td>{signed(row.b - row.a, row.digits, 'mm', locale)}<span class="entity-subvalue">{signed(((row.b / row.a) - 1) * 100, 1, '%', locale)}</span></td>
+          </tr>
+        ))}
+        <tr>
+          <th scope="row">{page.metrics.rimDiameterIn}</th>
+          <td>{formatPlain(pair.a.rimDiameterInches, locale)}″</td>
+          <td>{formatPlain(pair.b.rimDiameterInches, locale)}″</td>
+          <td>{signed(pair.b.rimDiameterInches - pair.a.rimDiameterInches, 0, '″', locale).replace(' ″', '″')}</td>
+        </tr>
+        <tr>
+          <th scope="row">{page.revsLabel}</th>
+          <td>{formatDecimal(revs(A.circumferenceMm), 0, locale)} /km</td>
+          <td>{formatDecimal(revs(B.circumferenceMm), 0, locale)} /km</td>
+          <td>{signed(revs(B.circumferenceMm) - revs(A.circumferenceMm), 0, '/km', locale)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="entity-section" aria-labelledby="cmp-speed">
+  <h2 id="cmp-speed">{t.speedHeading}</h2>
+  <p class="entity-note">{t.speedIntro(f)}</p>
+  <table class="entity-spec">
+    <thead><tr><th scope="col">{t.colIndicated}</th><th scope="col">{t.colTrue}</th></tr></thead>
+    <tbody>
+      {model.speedRows.map((row) => <tr><th scope="row">{row.indicated}</th><td>{row.actual}</td></tr>)}
+    </tbody>
+  </table>
+  <p class="entity-caveat"><strong>⚠</strong> {page.compareCaveat}</p>
+</section>
+
+<section class="entity-section" aria-labelledby="cmp-vehicles">
+  <h2 id="cmp-vehicles">{t.vehiclesHeading}</h2>
+  {!hasVehicles && <p class="entity-empty">{t.vehiclesEmpty}</p>}
+  {vehicles.both.length > 0 && (
+    <>
+      <h3 class="entity-subheading">{t.bothSizes}</h3>
+      <ul class="entity-chiplist">
+        {vehicles.curatedBoth.map((vehicle) => {
+          const link = vehicleLink(vehicle, locale);
+          return <li><a class="entity-chip" href={link.href}>{vehicle.make} {vehicle.model}</a></li>;
+        })}
+        {vehicles.modelsBoth.map((car) => <li><a class="entity-chip" href={carModelLinkFor(locale, car).href}>{carName(car)}</a></li>)}
+      </ul>
+    </>
+  )}
+  {columns.map((column) => (
+    <>
+      <h3 class="entity-subheading">{column.label}</h3>
+      <ul class="entity-chiplist">
+        {column.curated.slice(0, VEHICLE_LIMIT).map((vehicle) => {
+          const link = vehicleLink(vehicle, locale);
+          return <li><a class="entity-chip" href={link.href}>{vehicle.make} {vehicle.model}</a></li>;
+        })}
+        {column.models.slice(0, Math.max(0, VEHICLE_LIMIT - column.curated.length)).map((car) => <li><a class="entity-chip" href={carModelLinkFor(locale, car).href}>{carName(car)}</a></li>)}
+      </ul>
+    </>
+  ))}
+</section>
+
+<nav class="entity-section" aria-label={t.toolCta}>
+  <div class="entity-links">
+    <a class="entity-link-card" href={tireComparisonHref(locale, pair.a, pair.b)}><strong>{t.toolCta}</strong><span>{t.toolCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={linkA.href}><strong>{t.sizeCta(linkA.label)}</strong><span>{t.sizeCtaDetail}</span><i aria-hidden="true">›</i></a>
+    <a class="entity-link-card" href={linkB.href}><strong>{t.sizeCta(linkB.label)}</strong><span>{t.sizeCtaDetail}</span><i aria-hidden="true">›</i></a>
+  </div>
+</nav>
+
+{related.length > 0 && (
+  <section class="entity-section" aria-labelledby="cmp-related">
+    <h2 id="cmp-related">{t.relatedHeading}</h2>
+    <ul class="entity-chiplist">
+      {related.map((other) => <li><a class="entity-chip" href={entityDetailPath('tire-size', locale, other.slug)}>{displayTireNotation(other.a.notation, locale)} vs {displayTireNotation(other.b.notation, locale)}</a></li>)}
+    </ul>
+  </section>
+)}
+
+<section class="entity-section" aria-labelledby="cmp-faq">
+  <h2 id="cmp-faq">{t.faqHeading}</h2>
+  {faqs.map((faq) => <details class="entity-faq"><summary>{faq.q}</summary><p>{faq.a}</p></details>)}
+</section>

@@ -1,3 +1,4 @@
+import { tireComparisonPairs } from '../../src/data/tire-comparisons';
 import { describe, expect, it } from 'vitest';
 import { canonicalForPath, createSeoPageModel, indexableRoutes, relatedTools, routeForTool, toolRegistry } from '../../src/seo/tool-registry';
 import { renderSitemapXml, sitemapEntries } from '../../src/seo/sitemap';
@@ -98,7 +99,7 @@ describe('SEO tool registry', () => {
     const carRoutes = 1 + carMakes.length + publishedCarModels.length + publishedCarModels.reduce((total, model) => total + yearPageYears(model).length, 0) + localizedCars;
     // Cloudflare Workers Paid deploys at most 100,000 static files; keep headroom for assets.
     expect(entries.length).toBeLessThan(98_000);
-    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + newLocaleRoutes + carRoutes;
+    const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + newLocaleRoutes + carRoutes + entityLocales().length * tireComparisonPairs.length;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
     expect(entries).toContain('https://atlasgarageos.com/de/');

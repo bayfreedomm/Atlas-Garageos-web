@@ -1,6 +1,16 @@
 # Atlas GarageOS — Session Handoff
 
-Updated: 2026-10-08.
+Updated: 2026-10-14.
+
+## 2026-10-14 session (v7-14)
+
+- Sitemap: `/sitemap.xml` is now a sitemap index with one child per page type (`src/seo/sitemap.ts` → `sitemapGroups()`; `src/pages/sitemap-[group].xml.ts`): pages, tire-sizes, tire-comparisons, bolt-patterns, vehicles, cars, car-years, cars-localized, obd-codes. `scripts/audit-seo-build.mjs` follows the index and checks the 50,000-URL / 50 MB limits.
+- IndexNow: key file `public/719c746308ef2b913463b2443bb03c00.txt` (`src/seo/indexnow.ts`), `/build-id.txt` (commit of the live deployment), `scripts/indexnow.mjs` (hash diff of built HTML vs. previous run; only new/changed/removed sitemap URLs; batches of 10,000) and `.github/workflows/indexnow.yml` (on push to master + daily 22:50 UTC; state in the Actions cache). First run submits every sitemap URL once. Builds are byte-deterministic (verified), so unchanged pages are never resubmitted.
+- Tire comparisons: `src/data/tire-comparisons.ts` publishes 542 factory-backed "X vs Y" pairs (same-vehicle factory sizes from curated rows and ANKUSI records, plus the closest ±1-inch alternative of every factory size) at `/{tire segment}/{a}-vs-{b}/` in all 9 locales (4,878 pages), with FAQPage JSON-LD. Copy: `src/content/tire-comparison-text.ts`; model: `src/ui/tire-comparison.ts`; body: `src/components/TireComparisonEntity.astro`.
+- Tire-size pages gained "compared with" and "car models listed with this size" (ANKUSI) sections.
+- Vehicles: added Fiat Egea / Tipo (356), Hyundai Bayon (BC3), Renault Taliant (low confidence, one source). Togg T10X and EU Corolla E210 were not added: no published size data / conflicting PCD sources.
+- Gate: 47 files / 323 tests, astro check 0 errors, 48,964 pages, SEO audit passed, 0 long titles/descriptions.
+- Next: Part 3 — Türkiye fuel price page (/tr/akaryakit-fiyatlari-bugun/).
 
 ## 2026-10-08 session
 

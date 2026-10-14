@@ -1053,6 +1053,8 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 .decision-graph__caution>strong{color:var(--semantic-warning-text)}
 
 .entity-chiplist{display:flex;flex-wrap:wrap;gap:.4rem;margin:var(--space-4) 0 0;padding:0;list-style:none}
+.entity-subheading{margin:var(--space-5) 0 0;font-size:var(--text-base);line-height:1.3}
+.entity-subheading + .entity-chiplist{margin-top:var(--space-2)}
 .entity-chip{display:inline-block;padding:.3rem .65rem;border:var(--border);border-radius:var(--radius-pill);background:var(--color-surface-subtle);color:var(--color-ink);font-size:var(--text-sm);font-weight:700;text-decoration:none}
 .entity-chip:hover{border-color:var(--color-line-strong);background:var(--color-surface-selected)}
 
