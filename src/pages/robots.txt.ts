@@ -2,9 +2,9 @@ import type { APIRoute } from 'astro';
 import { canonicalForPath } from '../seo/tool-registry';
 
 /**
- * Query-string URLs are calculator application state (?current=…&new=…, ?size=…, shared
- * ?tool=…&state=…), never indexable pages: every one canonicalises to its clean route. Internal
- * hand-off links create ~100,000 distinct variants, so crawling them would spend crawl budget the
- * ~49,000 real pages need. Clean URLs stay fully crawlable.
+ * Every URL is crawlable. Internal links never carry calculator state (src/seo/state-links.ts moves
+ * it to data-link-state), so the link graph has no parameter variants; the query URLs that remain
+ * come from shares and bookmarks, and crawling them lets Google read their clean canonical.
+ * History: 2026-10-14 v7-16 briefly used `Disallow: /*?` while ~105,000 internal variants existed.
  */
-export const GET: APIRoute = () => new Response(`User-agent: *\nAllow: /\nDisallow: /*?\nSitemap: ${canonicalForPath('/sitemap.xml')}\n`, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+export const GET: APIRoute = () => new Response(`User-agent: *\nAllow: /\nSitemap: ${canonicalForPath('/sitemap.xml')}\n`, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });

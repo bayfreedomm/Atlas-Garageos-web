@@ -55,8 +55,11 @@ if (sitemapUrls.some((url) => !url.startsWith(`${origin}/`) || /[?#]/.test(url))
 
 const robots = await readFile(new URL('robots.txt', root), 'utf8');
 if (!robots.includes(`Sitemap: ${origin}/sitemap.xml`)) failures.push('robots.txt does not advertise the canonical sitemap.');
-// Calculator state lives in query strings; those variants must not compete for crawl budget.
-if (!/^Disallow: \/\*\?$/m.test(robots)) failures.push('robots.txt must disallow query-string (calculator state) URLs.');
+// Internal links never carry calculator state (src/seo/state-links.ts), so query URLs only come
+// from shares and bookmarks. They must stay crawlable so Google can read their clean canonical.
+if (/^Disallow: \/\*\?/m.test(robots)) failures.push('robots.txt must not block query URLs: shared calculator URLs need their canonical read.');
+let queryHrefs = 0;
+const queryHrefSamples = [];
 
 const htmlFiles = (await filesBelow(rootPath)).filter((file) => file.endsWith('.html'));
 const pages = new Map();
@@ -67,6 +70,10 @@ const descriptionOwners = new Map();
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
   const pathname = pathForFile(file);
+  for (const match of html.matchAll(/<a\b[^>]*?\shref="((?:\/(?!\/)|\?|https:\/\/atlasgarageos\.com)[^"]*\?[^"]*)"/gi)) {
+    queryHrefs += 1;
+    if (queryHrefSamples.length < 5) queryHrefSamples.push(`${pathname} → ${match[1]}`);
+  }
   const titles = one(html, /<title>([\s\S]*?)<\/title>/gi);
   const descriptions = one(html, /<meta\s+name="description"\s+content="([^"]*)"\s*\/?\s*>/gi);
   const canonicals = one(html, /<link\s+rel="canonical"\s+href="([^"]+)"\s*\/?\s*>/gi);
@@ -123,6 +130,8 @@ for (const file of htmlFiles) {
   }
   pages.set(`${origin}${pathname}`, { pathname, lang: langs[0], alternates, noindex });
 }
+
+if (queryHrefs > 0) failures.push(`${queryHrefs} internal links carry a query string (calculator state belongs in data-link-state): ${queryHrefSamples.join('; ')}`);
 
 for (const url of sitemapUrls) {
   const page = pages.get(url);

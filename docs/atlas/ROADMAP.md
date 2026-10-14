@@ -6,16 +6,16 @@ Updated: 2026-10-14. Priority combines user value, organic opportunity, differen
 
 Rule for this cycle: no new pSEO route family or mass URL generation. Improve, link and measure the existing ~49,000-page graph.
 
-1. `PLANNED` — **Measure which cluster Google rewards.** Submit `/sitemap.xml` (index) in Search Console and Bing Webmaster; after 2–3 weeks read indexed / discovered-not-indexed per typed sitemap and per locale. Decide car-years (8,158 EN pages, weakest linking) and cars-localized depth from that data, not before. Confirm IndexNow runs green and robots `Disallow: /*?` has reduced crawled-not-indexed parameter URLs.
-2. `PLANNED` — **Generation answers on existing car model pages** (branch `parca-3-model-sayfalari`): editorial generation years for ~35 high-demand EU/TR models mapped onto ANKUSI records ("Megane 4", "Corsa F", "Passat B8" headings, FAQ and titles) plus a bolt-pattern-by-year timeline for every other model. Targets impressions already at positions 5–8 with 0 clicks ("opel corsa f lochkreis", "megane 4 bijon aralığı", "duster bijon aralığı"). No new URLs.
+1. `PLANNED` — **Measure which cluster Google rewards.** Submit `/sitemap.xml` (index) in Search Console and Bing Webmaster; after 2–3 weeks read indexed / discovered-not-indexed per typed sitemap and per locale. Decide car-years (8,158 EN pages, weakest linking) and cars-localized depth from that data, not before. Confirm IndexNow runs green and that crawled-not-indexed parameter URLs fall now that no internal link carries a query string (v7-18).
+2. `BLOCKED` (source verification) — **Generation answers on existing car model pages** (branch `parca-3-model-sayfalari`, one WIP commit `ff098ec`, 35 models / ~150 generation rows, merges cleanly into master but stays unmerged until every row is sourced — see DECISIONS 2026-10-14 "Generation names need sources" and HANDOFF verification plan): editorial generation years for ~35 high-demand EU/TR models mapped onto ANKUSI records ("Megane 4", "Corsa F", "Passat B8" headings, FAQ and titles) plus a bolt-pattern-by-year timeline for every other model. Targets impressions already at positions 5–8 with 0 clicks ("opel corsa f lochkreis", "megane 4 bijon aralığı", "duster bijon aralığı"). No new URLs.
 3. `PLANNED` — **CTR on tire-size pages (where ~all clicks come from)**: rewrite titles/descriptions for the DE/ES/PL tire sizes with impressions but low CTR, and surface the new cross-section and comparison links above the fold. Watch 2–4 weeks before further changes.
 
 ## P0 — protect and measure the current foundation
 
-- `VERIFIED DONE` — 2026-10-14: typed sitemap index + IndexNow (v7-14), true-scale cross-section drawing (v7-15), Vehicle → Tire → Compare → Calculator flow and robots query-URL disallow (v7-16). Link crawl: 0 orphans, 0 broken internal links, max click depth 4. v7-17: one drawing language across calculator visuals, driven by the calculators' own functions.
+- `VERIFIED DONE` — 2026-10-14: typed sitemap index + IndexNow (v7-14), true-scale cross-section drawing (v7-15), Vehicle → Tire → Compare → Calculator flow (v7-16; its robots query-URL disallow was superseded in v7-18 by clean internal hrefs). Link crawl: 0 orphans, 0 broken internal links, max click depth 4. v7-17: one drawing language across calculator visuals, driven by the calculators' own functions.
 
 - `PARTIAL` — Finish deployed launch gates: local rendered-output canonical/hreflang/sitemap/noindex/JSON-LD/title/description checks pass across all 48,964 HTML outputs; IndexNow is wired. Bing Webmaster registration, deployed 404/redirect/Open Graph smoke tests and Core Web Vitals remain.
-- `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 48,954 indexable canonicals with 48,954 sitemap URLs across the 9 typed sitemaps, requires `Disallow: /*?` in robots.txt and reports zero long-title/description advisories.
+- `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 48,954 indexable canonicals with 48,954 sitemap URLs across the 9 typed sitemaps, fails on any internal `<a href>` carrying a query string, forbids `Disallow: /*?` in robots.txt (since v7-18; v7-16 required it) and reports zero long-title/description advisories.
 - `PLANNED` — Analyze Cloudflare 3xx/4xx by path and status. Separate intentional language/HTTPS redirects from broken URLs, bot probes, and real user errors; do not block Googlebot/Bingbot blindly.
 - `PLANNED` — Complete visual acceptance on representative mobile widths, WebKit/Firefox, keyboard/assistive technology, reduced motion, low-power GPU, and deployed pages.
 - `VERIFIED DONE` — Local Chromium acceptance at 390 px covered all 23 English tool routes: no document-level horizontal overflow, all opened 3D studios initialized with WebGL, and no browser console error/warning was observed in the sampled live-state pass. Physical devices, WebKit/Firefox, accessibility and deployed performance remain in the broader acceptance item above.
@@ -32,16 +32,17 @@ Rule for this cycle: no new pSEO route family or mass URL generation. Improve, l
 - `VERIFIED DONE` — Part 1: ~1,000-size tire catalog, flotation sizes, tire-height group pages, "in inches"/"pulgadas" titles.
 - `VERIFIED DONE` — Part 2: mobile density redesign + tire-size lookup.
 - `VERIFIED DONE` — 2026-10-14 (v7-14): typed sitemap index, IndexNow workflow, 542 × 9 factory-backed tire comparison pages, tire-page model/comparison sections, Egea/Bayon/Taliant rows.
-- `PLANNED` — Next: backlinks via the embeddable widget and forum answers; vehicle growth + make pages; Part 3: wheel/rim compatibility pages; Part 4: French entity pages; Part 5: IndexNow, OG images, internal-link and performance pass.
+- `REJECTED / SUPERSEDED` (history, 2026-10-08 plan) — Next: backlinks via the embeddable widget and forum answers; vehicle growth + make pages; Part 3: wheel/rim compatibility pages; Part 4: French entity pages; Part 5: IndexNow, OG images, internal-link and performance pass. Superseded 2026-10-14: French entity pages (all nine locales) and IndexNow are `VERIFIED DONE`; internal-link pass done (v7-16/v7-18); wheel/rim compatibility pages are a new URL family and wait for the no-new-pSEO cycle to end.
+- `PLANNED` — Remaining from that plan: backlinks via the embeddable widget and forum answers; OG images; performance pass (P0 Part B: CSS consolidation, lazy tire catalog, responsive hero).
 - `PLANNED` — Watch GSC impressions/CTR on the new tire titles and height pages for 2–4 weeks before further title changes.
 
 ## P1 — controlled language expansion
 
-- `ACCEPTED` — Add French (`fr`) and Brazilian Portuguese (`pt-BR`) as the next language families; do not expose either locale until its published route set has complete human-reviewed UI, SEO, FAQ, warning, and navigation copy.
+- `REJECTED / SUPERSEDED` (history, 2026-09-25) — Add French (`fr`) and Brazilian Portuguese (`pt-BR`) as the next language families; do not expose either locale until its published route set has complete human-reviewed UI, SEO, FAQ, warning, and navigation copy. Superseded: all nine locales (en, de, es, fr, it, pt-br, pl, nl, tr) are published with translated calculators — see PROJECT_STATE snapshot.
 - `PLANNED` — Keep language-specific URLs and reciprocal `hreflang`/canonical metadata correct for every published route; language variants are localized product pages, not keyword-only copies.
 - `PLANNED` — Roll out in bounded waves: platform/home/tools first, then the highest-value calculator and entity clusters, then the remaining catalog after translation and visual QA.
 - `PLANNED` — Audit hardcoded English, locale jumps, navigation/footer copy, result/validation text, visual labels, metadata, schema, canonical, reciprocal `hreflang`, sitemap membership and internal links before each locale launch.
-- `PLANNED` — Use Search Console query/country data to choose the next language after French and Brazilian Portuguese rather than guessing from page-count potential.
+- `PLANNED` — Use Search Console query/country data to choose any tenth language rather than guessing from page-count potential.
 - `REJECTED / SUPERSEDED` — Publish incomplete machine-translated catalogues merely to multiply indexed URLs.
 
 ## P1 — evidence-first OBD/DTC and warning-light foundation

@@ -22,7 +22,8 @@ Snapshot date: 2026-10-14 (master after v7-16). This file records what the repos
 | Internal link graph | 0 orphan pages, 0 broken internal links, every page ≤ 4 clicks from `/` | rendered-output link crawl, 2026-10-14 |
 
 - `VERIFIED DONE` — IndexNow: key file `public/719c746308ef2b913463b2443bb03c00.txt`, `/build-id.txt`, `scripts/indexnow.mjs` and `.github/workflows/indexnow.yml` submit only new/changed/removed sitemap URLs after Cloudflare serves the commit. The first live run (2026-10-14) was answered `403 SiteVerificationNotCompleted` while the engines verified the fresh key; the script now waits and retries.
-- `VERIFIED DONE` — `robots.txt` disallows query-string URLs (`Disallow: /*?`): internal hand-off links produce ~104,800 distinct calculator-state variants, all canonicalised to clean routes. Enforced by `pnpm audit:seo`.
+- `REJECTED / SUPERSEDED` (v7-16 → v7-18) — `robots.txt` disallowed query-string URLs (`Disallow: /*?`) because internal hand-off links produced ~104,800 distinct calculator-state variants.
+- `VERIFIED DONE` — v7-18: rendered HTML has 0 internal query-string hrefs (`src/middleware.ts` + `src/seo/state-links.ts`; state in `data-link-state`, restored on interaction by `src/ui/state-link-enhancer.ts`); robots.txt allows query URLs so shared links expose their clean canonical. Enforced by `pnpm audit:seo` and `tests/unit/state-links.test.ts`.
 - `VERIFIED DONE` — Vehicle → Tire → Compare → Calculator flow (`src/components/TireSizeFlow.astro`) on curated vehicle pages and on EN/localized car model pages with tire data: each sourced size opens its tire page, the published comparison with the baseline (only factory-backed pairs; otherwise the comparison calculator pre-filled), the speedometer calculator pre-filled, or the tire calculator. Comparison pages also hand both sizes to the speedometer and fit-check calculators. No new URLs.
 - `VERIFIED DONE` — One true-scale fitment cross-section (`src/ui/fitment-section.ts`) replaces the small side/front/vehicle panels on the tire-comparison and wheel-offset calculators and appears on every tire comparison page.
 
@@ -46,7 +47,7 @@ Snapshot date: 2026-10-14 (master after v7-16). This file records what the repos
 ## Search and indexability
 
 - `VERIFIED DONE` — `scripts/audit-seo-build.mjs` now enforces the rendered-output SEO contract across all generated HTML: unique non-empty titles and descriptions per language, one indexable H1, route-matching canonical URLs, sitemap membership, valid JSON-LD, reciprocal self-referencing hreflang clusters with `x-default`, and no query/fragment URLs.
-- `VERIFIED DONE` — The latest production output (2026-10-14) contains 48,964 HTML files, 48,954 indexable canonical pages and exactly 48,954 sitemap URLs (historical: 2,145 / 2,141 on 2026-10-08). The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
+- `VERIFIED DONE` — The latest production output (2026-10-14) contains 48,964 HTML files, 48,954 indexable canonical pages and exactly 48,954 sitemap URLs (historical: 2,145 / 2,141 on 2026-10-08). The only excluded HTML outputs are the 404 page and nine embed routes (one tire-comparison embed per locale), each intentionally `noindex`; none appears in the sitemap (10 noindex files in `dist`, verified 2026-10-14). The earlier "three embed routes" count dates from the EN/DE/ES period.
 - `VERIFIED DONE` — The latest length review reports zero titles over 75 characters and zero descriptions over 180 characters. Shared EN/DE/ES tire/bolt templates and the remaining page-specific outliers were shortened without changing route identity or page purpose.
 - `PARTIAL` — Local technical SEO is verified, but Google indexing, search-result rewrites, ranking, deployed Core Web Vitals and crawl behavior remain external outcomes requiring Search Console and production monitoring.
 
@@ -101,7 +102,9 @@ Snapshot date: 2026-10-14 (master after v7-16). This file records what the repos
 | Ownership cost | `PARTIAL` | Fuel cost, road trip, EV charge and fuel-price history exist; repairs, maintenance, depreciation and total ownership cost do not. |
 | Ask Atlas | `NOT FOUND` | No intent router or source-bound automotive assistant surface found. |
 
-## Part 4 — vehicles in every language, US expansion (2026-10-08)
+## Part 4 — vehicles in every language, US expansion (2026-10-08) — historical log
+
+> Historical record. Counts and locale lists below describe 2026-10-08; the current state is the 2026-10-14 snapshot at the top.
 
 - Vehicle dataset: 201 rows (132 US-market, 69 EU-market). 117 US rows added from tirewheelguide.com (USA trims only, first OE row per trim; torque not published there, so no torque on those rows; fastener type set by make: BMW/Mercedes-Benz/Audi/VW/Porsche/Volvo = wheel bolts, others = lug nuts).
 - Every vehicle now has a page in EN (/vehicles/), DE (/de/fahrzeuge/), ES (/es/vehiculos/) and FR (/fr/vehicules/), with reciprocal hreflang (x-default = EN). The market the data describes is shown in the spec table. Vehicle links always stay in the reader's language.
@@ -109,7 +112,9 @@ Snapshot date: 2026-10-14 (master after v7-16). This file records what the repos
 - wheel-size.com is no longer used for automated collection: it answered with human-verification pages, and Atlas does not work around bot checks.
 - Build: 4,979 sitemap URLs; bolt-pattern pages 14 → 22 per locale.
 
-## Part 5 — five more languages, /cars/ (EPA + ANKUSI), bolt charts by make (2026-10-09)
+## Part 5 — five more languages, /cars/ (EPA + ANKUSI), bolt charts by make (2026-10-09) — historical log
+
+> Historical record. "Reference-only locales … calculators stay English" was superseded: all nine locales are published with translated calculators (snapshot, `src/localization/locales.ts`).
 
 - Reference-only locales are now one list (src/localization/reference-locales.ts): fr, it, pt-br, pl, nl, tr. Each publishes tire sizes, tire heights, bolt patterns, bolt charts by make, vehicles and a home (ReferenceHome.astro); calculators stay English and say so. Chrome copy lives in src/content/reference-locale-text.ts.
 - /cars/: EPA fuel economy (fueleconomy.gov, 50,407 configurations 1984–2027) merged with the ANKUSI Wheel Fitment Dataset (CC BY 4.0, 9,701 records) into src/data/generated/cars.json by scripts/build-cars-data.py. Pages: directory, one per make, one per model (all years in a table), one per model year from 2000 (MPG by version, annual fuel cost at today's EIA price, wheel record). English only.

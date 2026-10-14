@@ -4,7 +4,7 @@ Durable decisions are recorded with date, status, rationale, and evidence. Histo
 
 ## 2026-10-08 — French reference families before French tools
 
-Status: `ACCEPTED`.
+Status: `REJECTED / SUPERSEDED` (2026-10-14: `fr` and the other eight locales are fully published, calculators included). Kept as history.
 
 Tire-size and bolt-pattern pages carry the site's search traffic, so French publishes those families (and a French home) first, with fully written French copy. Calculators, vehicle pages and policy pages stay English for French readers and are labelled "(anglais)". This supersedes "do not expose FR until the whole route set is translated" for the reference families only; `fr` remains unpublished for tools.
 
@@ -80,7 +80,7 @@ Rationale: evidence discipline should prevent fabricated or copied claims withou
 
 ## 2026-09-25 — French and Brazilian Portuguese are the next language rollout
 
-Status: `ACCEPTED`.
+Status: `REJECTED / SUPERSEDED` (2026-10-14: both shipped as part of the nine published locales). The quality bar below still applies to any future locale.
 
 FR and PT-BR are the next language families. They remain unpublished until their main content, metadata, navigation, warnings, FAQs, internal links, and reciprocal `hreflang` annotations pass completeness and visual QA.
 
@@ -112,8 +112,25 @@ Status: `ACCEPTED`.
 
 - No new pSEO route family or mass URL generation this cycle; the ~49,000-page graph is linked, enriched and measured first. Generation sections on existing car model pages are allowed because they add no URL.
 - `/sitemap.xml` is a sitemap index with one child per page type so Search Console reports indexing per cluster; IndexNow submits only new/changed/removed sitemap URLs.
-- Query-string URLs are calculator state and are disallowed in robots.txt (`Disallow: /*?`); internal hand-off links may keep using them.
+- ~~Query-string URLs are calculator state and are disallowed in robots.txt (`Disallow: /*?`); internal hand-off links may keep using them.~~ Superseded the same day by "Clean internal hrefs, crawlable query URLs" below.
 - Tire comparison pages exist only for factory-backed pairs (two factory sizes of one vehicle/wheel record, or a factory size and its closest ±1-inch manufactured alternative). Same-diameter plus-one pairs (e.g. 255/40 R19 vs 255/35 R20) are kept: rim size and sidewall differ and that is the question being searched.
 - Vehicle and model pages link sizes onward (tire page, published comparison, pre-filled speedometer/tire calculator) but never state that a size fits; ANKUSI sizes are labelled "recorded", not standard/option.
 
 Rationale: Search Console showed 6.5k indexed vs 10.4k discovered-not-indexed with ~100k crawlable parameter variants; crawl focus and per-cluster measurement are worth more than page count.
+
+## 2026-10-14 — Clean internal hrefs, crawlable query URLs (v7-18)
+
+Status: `ACCEPTED`.
+
+- Rendered HTML never links to a query-string URL. `src/middleware.ts` runs `cleanStateLinks()` (`src/seo/state-links.ts`) on every built page: the clean canonical path stays in `href`, calculator state moves to `data-link-state`. `src/ui/state-link-enhancer.ts` restores the query on the first pointer/focus/context-menu/click interaction (so clicks, new tabs and "copy link" keep the state) and cleans links that scripts add after load.
+- robots.txt no longer has `Disallow: /*?`. Query URLs now only come from shares and bookmarks; crawling them lets Google read their clean canonical instead of indexing blocked URL-only results.
+- `pnpm audit:seo` fails on any internal `<a href>` with a query string and on `Disallow: /*?`.
+
+Rationale: the v7-16 crawl found 320,836 query-state hrefs (104,755 unique) in rendered HTML. Removing them at the source removes the parameter graph instead of hiding it.
+
+## 2026-10-14 — Generation names need sources before production
+
+Status: `ACCEPTED`.
+
+Editorial generation names and year spans (e.g. "Megane IV 2016–2024") are factual claims that appear in titles and FAQ. Branch `parca-3-model-sayfalari` stays unmerged until every generation row carries a source (manufacturer press release or homologation/EU type-approval data first; two independent references otherwise) and the ANKUSI year mapping is checked per row. Unsourced rows are dropped, not guessed.
+

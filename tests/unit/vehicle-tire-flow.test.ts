@@ -55,9 +55,9 @@ describe('Vehicle → Tire → Compare → Calculator flow', () => {
 });
 
 describe('crawl budget', () => {
-  it('keeps calculator query-state URLs out of the crawl while advertising the sitemap', async () => {
+  it('lets crawlers read the canonical of shared query URLs while advertising the sitemap', async () => {
     const text = await (robots as unknown as () => Response)().text();
-    expect(text).toContain('Disallow: /*?');
+    expect(text).not.toMatch(/Disallow: \/\*\?/);
     expect(text).toContain('Sitemap: https://atlasgarageos.com/sitemap.xml');
     expect(text).toMatch(/^Allow: \/$/m);
   });
