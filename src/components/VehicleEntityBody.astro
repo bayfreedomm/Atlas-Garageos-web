@@ -1,5 +1,7 @@
 ---
 import { carModelForVehicle, carModelPath, epaYears } from '../data/cars';
+import { carModelPathFor, isLocalizedModel } from '../ui/car-locale';
+import { carLocaleText } from '../content/car-locale-text';
 // Shared mobile-first body for vehicle reference pages (EN/DE/ES/FR), matching the tire-size page:
 // answer strip → spec table → same-pattern vehicles → sources → FAQ → next decisions.
 import DecisionGraph from './DecisionGraph.astro';
@@ -46,7 +48,10 @@ const answer = [
   { label: t.torque, value: torque.value === '—' ? '—' : torque.value.replace(/\s*\(.*\)$/, ''), href: undefined },
   { label: t.centerBore, value: vehicle.centerBoreMm !== undefined ? `${formatPlain(vehicle.centerBoreMm, locale)} mm` : '—', href: undefined },
 ];
-const carModel = locale === 'en' ? carModelForVehicle(vehicle) : undefined;
+const matchedCarModel = carModelForVehicle(vehicle);
+// English links to the MPG-first /cars/ page; other languages to the localized wheel page when one exists.
+const carModel = matchedCarModel && (locale === 'en' || isLocalizedModel(matchedCarModel)) ? matchedCarModel : undefined;
+const carText = carLocaleText[locale];
 const carYears = carModel ? epaYears(carModel) : [];
 ---
 <header class="entity-hero entity-hero--tire">
@@ -103,7 +108,16 @@ const carYears = carModel ? epaYears(carModel) : [];
   </section>
 )}
 
-{carModel && (
+{carModel && locale !== 'en' && (
+  <section class="entity-section" aria-labelledby="vehicle-cars">
+    <h2 id="vehicle-cars">{carText.vehicleSectionHeading(`${carModel.make} ${carModel.model}`)}</h2>
+    <div class="entity-links">
+      <a class="entity-link-card" href={carModelPathFor(locale, carModel)}><strong>{carText.vehicleCardTitle(`${carModel.make} ${carModel.model}`)}</strong><span>{carText.vehicleCardDetail(carModel.wheels.length)}</span><i aria-hidden="true">›</i></a>
+    </div>
+  </section>
+)}
+
+{carModel && locale === 'en' && (
   <section class="entity-section" aria-labelledby="vehicle-cars">
     <h2 id="vehicle-cars">{carModel.make} {carModel.model}: MPG and wheel data by year</h2>
     <div class="entity-links">

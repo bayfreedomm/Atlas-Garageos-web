@@ -2,7 +2,9 @@
 // Bolt pattern chart for one make, in every entity locale (ANKUSI open wheel fitment data).
 import { boltMakeText } from '../content/bolt-make-text';
 import { boltPatternPageText } from '../content/entity-page-text';
-import { ANKUSI_SOURCE, carMakePath, carModelPath, hasModelPage } from '../data/cars';
+import { ANKUSI_SOURCE, carMakePath, hasModelPage } from '../data/cars';
+import { carMakePathFor, carModelLinkFor, isLocalizedMake } from '../ui/car-locale';
+import { carLocaleText } from '../content/car-locale-text';
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { homePath } from '../ui/entity-page-model';
@@ -16,7 +18,6 @@ const t = boltMakeText[locale];
 const b = boltPatternPageText[locale];
 const known = new Map(boltPatternCatalog.map((entry) => [entry.notation, entry.slug]));
 const pcdLink = (pcd: string): string | undefined => { const slug = known.get(pcd); return slug ? entityDetailPath('bolt-pattern', locale, slug) : undefined; };
-const linkModel = locale === 'en';
 ---
 <nav class="breadcrumbs" aria-label="Breadcrumb">
   <a href={homePath(locale)}>{b.breadcrumbHome}</a><span aria-hidden="true">/</span>
@@ -44,7 +45,7 @@ const linkModel = locale === 'en';
       <tbody>
         {make.rows.map((row) => (
           <tr>
-            <th scope="row">{linkModel && hasModelPage(row.model) ? <a href={carModelPath(row.model)}>{row.model.model}</a> : row.model.model}</th>
+            <th scope="row">{hasModelPage(row.model) ? (() => { const link = carModelLinkFor(locale, row.model); return <a href={link.href} hreflang={link.crossLocale ? 'en' : undefined}>{row.model.model}</a>; })() : row.model.model}</th>
             <td class="is-optional">{row.years}</td>
             <td>{row.pcds.map((pcd, i) => { const href = pcdLink(pcd); return <>{i > 0 && ', '}{href ? <a href={href}>{pcd}</a> : pcd}</>; })}</td>
             <td>{row.bores.length ? row.bores.slice(0, 2).map((bore) => `${formatPlain(bore, locale)} mm`).join(' / ') : '—'}</td>
@@ -56,5 +57,5 @@ const linkModel = locale === 'en';
     </table>
   </div>
   <p class="entity-note">{t.note}</p>
-  <p class="entity-note">{t.source}: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a> · <a href={carMakePath(make.makeSlug)} hreflang={locale === 'en' ? undefined : 'en'}>{t.mpgLink(make.make)}</a></p>
+  <p class="entity-note">{t.source}: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a> · {locale !== 'en' && isLocalizedMake(make.makeSlug) && <><a href={carMakePathFor(locale, make.makeSlug)}>{carLocaleText[locale].allModelsOf(make.make)}</a> · </>}<a href={carMakePath(make.makeSlug)} hreflang={locale === 'en' ? undefined : 'en'}>{t.mpgLink(make.make)}</a></p>
 </section>

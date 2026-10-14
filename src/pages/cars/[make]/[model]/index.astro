@@ -1,8 +1,9 @@
 ---
+import { carModelAlternates } from '../../../../ui/car-locale';
 // One page per car model: EPA fuel economy by model year and every ANKUSI wheel record.
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import { serializeJsonLd } from '../../../../seo/safe-json-ld';
-import { type CarModel, ANKUSI_SOURCE, CAR_YEAR_PAGE_MIN, EPA_SOURCE, carMakePath, carModelPath, publishedCarModels, carYearPath, curatedVehiclesFor, epaYears, frequent, mpgSummary } from '../../../../data/cars';
+import { type CarModel, ANKUSI_SOURCE, CAR_YEAR_PAGE_MIN, EPA_SOURCE, carMakePath, carModelPath, publishedCarModels, carYearPath, curatedVehiclesFor, epaYears, newestFirst, mpgSummary } from '../../../../data/cars';
 import { boltHref, carModelDescription, carModelTitle, carName, wheelText, yearsText } from '../../../../ui/car-pages';
 import { vehiclePagePath } from '../../../../ui/entity-page-model';
 
@@ -15,8 +16,8 @@ const { model } = Astro.props as Props;
 const name = carName(model);
 const pathname = carModelPath(model);
 const years = epaYears(model).slice().reverse();
-const pcds = frequent(model.wheels.map((row) => row[4]));
-const bores = frequent(model.wheels.map((row) => row[5]));
+const pcds = newestFirst(model.wheels, (row) => row[4]);
+const bores = newestFirst(model.wheels, (row) => row[5]);
 const latest = years[0];
 const latestSummary = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []) : undefined;
 const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
@@ -26,7 +27,7 @@ const faqs = [
   ...(latest !== undefined && latestSummary?.best ? [{ q: `What MPG does the ${latest} ${name} get?`, a: `The EPA rates the ${latest} ${name} at up to ${latestSummary.best} ${latestSummary.electric ? 'MPGe' : 'MPG'} combined. Every model year is listed below.` }] : []),
 ];
 const faqJsonLd = faqs.length ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }) : undefined;
-const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+const alternates = carModelAlternates(model);
 const answer = [
   { label: 'Model years', value: years.length ? `${years[years.length - 1]}–${years[0]}` : wheels.length ? `${Math.min(...wheels.map((w) => w[1] ?? 9999))}–${Math.max(...wheels.map((w) => w[2] ?? 0))}` : '—' },
   { label: `Best MPG${latest !== undefined ? ` (${latest})` : ''}`, value: latestSummary?.best ? String(latestSummary.best) : '—' },

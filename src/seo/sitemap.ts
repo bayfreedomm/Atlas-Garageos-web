@@ -8,6 +8,7 @@ import { dtcRecords } from '../data/dtc-records';
 import { tireDiameterGroupPath, tireDiameterGroups, vehicleHubPath, vehiclePagePath } from '../ui/entity-page-model';
 import { CONTENT_LOCALES } from '../localization/site-catalog';
 import { boltMakePath, boltMakes } from '../ui/bolt-make';
+import { localizedCarRoutes } from '../ui/car-locale';
 import { carMakePath, carMakes, carModelPath, carYearPath, publishedCarModels, yearPageYears } from '../data/cars';
 
 const LOCALIZED_PLATFORM_PATHS = ['/', '/tools/', '/methodology/', '/privacy-policy/', '/contact/'] as const;
@@ -68,13 +69,15 @@ function entityPageRoutes(): readonly string[] {
   return routes;
 }
 
-/** English /cars/ family: directory, one page per make, per model, and per EPA model year from 2000. */
+/** /cars/ family: English directory, makes, models and EPA model years from 2000, plus the localized wheel pages. */
 function carRoutes(): readonly string[] {
   return [
     '/cars/',
     ...carMakes.map((make) => carMakePath(make.makeSlug)),
     ...publishedCarModels.map((model) => carModelPath(model)),
     ...publishedCarModels.flatMap((model) => yearPageYears(model).map((year) => carYearPath(model, year))),
+    // Localized wheel-fitment view of every model with ANKUSI wheel data (src/ui/car-locale.ts).
+    ...localizedCarRoutes(),
   ];
 }
 

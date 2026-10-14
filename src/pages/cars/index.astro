@@ -1,11 +1,12 @@
 ---
+import { carHubAlternates } from '../../ui/car-locale';
 // Directory of every make in the /cars/ reference.
 import SiteLayout from '../../components/SiteLayout.astro';
 import { ANKUSI_SOURCE, EPA_SOURCE, carMakePath, carMakes, carModels } from '../../data/cars';
 
 const pathname = '/cars/';
 const yearPages = carModels.reduce((total, model) => total + Object.keys(model.epa).length, 0);
-const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+const alternates = carHubAlternates();
 ---
 <SiteLayout title="Car MPG, Bolt Patterns and Wheel Sizes by Make" description={`EPA fuel economy for ${carModels.length.toLocaleString('en-US')} car models and ${yearPages.toLocaleString('en-US')} model years, plus bolt pattern, center bore and wheel sizes — from open government and fitment data.`} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: pathname }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Cars</span></nav>

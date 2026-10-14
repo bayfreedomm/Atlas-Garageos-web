@@ -1,0 +1,27 @@
+---
+// Localized car directory: every make with at least one model that has wheel data.
+import { carLocaleText } from '../content/car-locale-text';
+import { ANKUSI_SOURCE } from '../data/cars';
+import type { EntityLocale } from '../seo/entity-routes';
+import { carMakePathFor, localizedCarMakes, localizedCarModels } from '../ui/car-locale';
+import { homePath } from '../ui/entity-page-model';
+
+interface Props { readonly locale: EntityLocale; }
+const { locale } = Astro.props;
+const t = carLocaleText[locale];
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{t.hub}</span>
+</nav>
+<header class="entity-hero">
+  <p class="eyebrow">{t.hubKicker(localizedCarMakes.length, localizedCarModels.length)}</p>
+  <h1 class="entity-hero__title">{t.hubH1}</h1>
+  <p class="entity-hero__lead">{t.hubLead}</p>
+</header>
+<section class="entity-section" aria-label={t.hub}>
+  <ul class="entity-chiplist">
+    {localizedCarMakes.map((make) => <li><a class="entity-chip" href={carMakePathFor(locale, make.makeSlug)}>{make.make} · {make.models.length}</a></li>)}
+  </ul>
+  <p class="entity-note">{t.sourcesWheels}: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a>.</p>
+</section>

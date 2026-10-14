@@ -9,6 +9,7 @@ import { dtcRecords } from '../../src/data/dtc-records';
 import { tireDiameterGroups } from '../../src/ui/entity-page-model';
 import { boltMakes } from '../../src/ui/bolt-make';
 import { carMakes, publishedCarModels, yearPageYears } from '../../src/data/cars';
+import { localizedCarMakes, localizedCarModels } from '../../src/ui/car-locale';
 
 const intendedRoutes = [
   '/',
@@ -91,9 +92,12 @@ describe('SEO tool registry', () => {
     // except the fuel market dashboard, which exists only for markets with official data (US, DE, ES).
     const newLocaleRoutes = 6 * (localizedPlatformPages + localizedTools - 1);
     // English /cars/ family: directory, makes, models and EPA model years from 2000.
-    const carRoutes = 1 + carMakes.length + publishedCarModels.length + publishedCarModels.reduce((total, model) => total + yearPageYears(model).length, 0);
-    // Cloudflare's free plan deploys at most 20,000 static files; keep headroom for assets.
-    expect(entries.length).toBeLessThan(19_800);
+    // Localized wheel pages: per non-English locale one directory, one page per make and one per
+    // model that has ANKUSI wheel data.
+    const localizedCars = (entityLocales().length - 1) * (1 + localizedCarMakes.length + localizedCarModels.length);
+    const carRoutes = 1 + carMakes.length + publishedCarModels.length + publishedCarModels.reduce((total, model) => total + yearPageYears(model).length, 0) + localizedCars;
+    // Cloudflare Workers Paid deploys at most 100,000 static files; keep headroom for assets.
+    expect(entries.length).toBeLessThan(98_000);
     const expectedCount = intendedRoutes.length + 2 * (localizedPlatformPages + localizedTools) + vehicleRoutes + entityRoutes + diagnosticRoutes + newLocaleRoutes + carRoutes;
     expect(entries).toHaveLength(expectedCount);
     for (const route of intendedRoutes.map(canonicalForPath)) expect(entries).toContain(route);
@@ -104,6 +108,8 @@ describe('SEO tool registry', () => {
     expect(entries).toContain('https://atlasgarageos.com/vehicles/compare/');
     expect(entries).toContain('https://atlasgarageos.com/de/fahrzeuge/vergleichen/');
     expect(entries).toContain('https://atlasgarageos.com/es/vehiculos/comparar/');
+    expect(entries).toContain('https://atlasgarageos.com/tr/otomobil/');
+    expect(entries).toContain('https://atlasgarageos.com/cars/toyota/corolla/2005/');
     expect(entries).toContain('https://atlasgarageos.com/tr/tools/lastik-ebadi-hesaplama/');
     expect(entries).toContain('https://atlasgarageos.com/fr/fitment-studio/');
     expect(entries).not.toContain('https://atlasgarageos.com/tr/akaryakit-fiyatlari-bugun/');

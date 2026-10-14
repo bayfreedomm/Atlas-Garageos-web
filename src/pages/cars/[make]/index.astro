@@ -1,4 +1,5 @@
 ---
+import { carMakeAlternates } from '../../../ui/car-locale';
 // One page per make: every model with its model-year range, best recent MPG and bolt pattern.
 import SiteLayout from '../../../components/SiteLayout.astro';
 import { type CarMake, carMakePath, carMakes, carModelPath, epaYears, frequent, hasModelPage, mpgSummary } from '../../../data/cars';
@@ -27,7 +28,7 @@ const rows = make.models.map((model) => {
 const title = `${make.make} Models: MPG, Bolt Pattern and Wheel Size`.length <= 58 ? `${make.make} Models: MPG, Bolt Pattern and Wheel Size` : `${make.make} MPG and Bolt Patterns`;
 const description = `All ${make.models.length} ${make.make} models in the Atlas reference with EPA fuel economy by year, bolt pattern, center bore and wheel sizes from open data.`;
 const hasBoltChart = boltMakeBySlug(make.makeSlug) !== undefined;
-const alternates = [{ hreflang: 'en', href: `https://atlasgarageos.com${pathname}` }, { hreflang: 'x-default', href: `https://atlasgarageos.com${pathname}` }];
+const alternates = carMakeAlternates(make.makeSlug);
 ---
 <SiteLayout title={title} description={description} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: make.make, href: pathname }]}>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/cars/">Cars</a><span aria-hidden="true">/</span><span aria-current="page">{make.make}</span></nav>

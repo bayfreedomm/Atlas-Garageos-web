@@ -1,0 +1,47 @@
+---
+// Localized make page: every model of the make that has wheel data, with years and bolt pattern.
+import { carLocaleText } from '../content/car-locale-text';
+import { ANKUSI_SOURCE, type CarMake, frequent } from '../data/cars';
+import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
+import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
+import { boltMakeBySlug, boltMakePath } from '../ui/bolt-make';
+import { carHubPathFor, carModelPathFor } from '../ui/car-locale';
+import { homePath } from '../ui/entity-page-model';
+import { formatPlain } from '../ui/locale-format';
+
+interface Props { readonly make: CarMake; readonly locale: EntityLocale; }
+const { make, locale } = Astro.props;
+const t = carLocaleText[locale];
+const boltSlug = new Map(boltPatternCatalog.map((entry) => [entry.notation, entry.slug]));
+const rows = make.models.map((model) => {
+  const years = model.wheels.flatMap((row) => [row[1], row[2]]).filter((year): year is number => year !== null && year > 0);
+  const pcd = frequent(model.wheels.map((row) => row[4]))[0];
+  const bore = frequent(model.wheels.map((row) => row[5]))[0];
+  const slug = pcd ? boltSlug.get(pcd) : undefined;
+  return { model, span: years.length ? (Math.min(...years) === Math.max(...years) ? String(Math.min(...years)) : `${Math.min(...years)}–${Math.max(...years)}`) : '—', pcd, bore, pcdHref: slug ? entityDetailPath('bolt-pattern', locale, slug) : undefined };
+});
+const hasBoltChart = boltMakeBySlug(make.makeSlug) !== undefined;
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <a href={carHubPathFor(locale)}>{t.hub}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{make.make}</span>
+</nav>
+<header class="entity-hero">
+  <p class="eyebrow">{t.makeKicker(make.models.length)}</p>
+  <h1 class="entity-hero__title">{t.makeH1(make.make)}</h1>
+  <p class="entity-hero__lead">{t.makeLead(make.make, make.models.length)}{hasBoltChart && <> <a href={boltMakePath(locale, make.makeSlug)}>{t.boltChartLink(make.make)}</a></>}</p>
+</header>
+<section class="entity-section" aria-label={make.make}>
+  <div class="entity-table-scroll">
+    <table class="entity-table">
+      <thead><tr><th scope="col">{t.cols.model}</th><th scope="col">{t.cols.years}</th><th scope="col">{t.cols.pcd}</th><th scope="col" class="is-optional">{t.cols.bore}</th></tr></thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr><th scope="row"><a href={carModelPathFor(locale, row.model)}>{row.model.model}</a></th><td>{row.span}</td><td>{row.pcdHref ? <a href={row.pcdHref}>{row.pcd}</a> : row.pcd ?? '—'}</td><td class="is-optional">{row.bore !== undefined ? `${formatPlain(row.bore, locale)} mm` : '—'}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="entity-note">{t.sourcesWheels}: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a>. <a href={carHubPathFor(locale)}>{t.allMakes}</a></p>
+</section>

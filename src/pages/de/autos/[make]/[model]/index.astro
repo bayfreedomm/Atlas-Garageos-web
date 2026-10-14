@@ -1,0 +1,22 @@
+---
+// Localized car model pages (de): bolt pattern, center bore, wheel and tire sizes by version.
+import SiteLayout from '../../../../../components/SiteLayout.astro';
+import CarModelLocaleBody from '../../../../../components/CarModelLocaleBody.astro';
+import { carLocaleText } from '../../../../../content/car-locale-text';
+import type { CarModel } from '../../../../../data/cars';
+import { carHubPathFor, carMakePathFor, carModelAlternates, carModelLocaleMeta, carModelPathFor, localizedCarModels } from '../../../../../ui/car-locale';
+import { homePath } from '../../../../../ui/entity-page-model';
+
+export function getStaticPaths() {
+  return localizedCarModels.map((model) => ({ params: { make: model.makeSlug, model: model.modelSlug }, props: { model } }));
+}
+
+interface Props { model: CarModel; }
+const { model } = Astro.props as Props;
+const t = carLocaleText['de'];
+const meta = carModelLocaleMeta(model, 'de');
+const pathname = carModelPathFor('de', model);
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={pathname} active="tools" locale="de" alternates={carModelAlternates(model)} breadcrumbs={[{ name: t.breadcrumbHome, href: homePath('de') }, { name: t.hub, href: carHubPathFor('de') }, { name: model.make, href: carMakePathFor('de', model.makeSlug) }, { name: model.model, href: pathname }]}>
+  <CarModelLocaleBody model={model} locale="de" />
+</SiteLayout>

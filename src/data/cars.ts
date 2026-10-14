@@ -25,14 +25,13 @@ export interface CarModel {
 }
 
 /**
- * Cloudflare's free plan serves at most 20,000 static files per deployment. Year pages are
- * therefore published from CAR_YEAR_PAGE_MIN on (older years stay in the model page table),
- * and a model that has no EPA data and fewer than CAR_MODEL_PAGE_MIN_WHEEL_ROWS wheel records
- * is listed in the make and bolt-pattern tables without a page of its own. On a paid plan
- * (100,000 files) set CAR_YEAR_PAGE_MIN = 2000 and CAR_MODEL_PAGE_MIN_WHEEL_ROWS = 1.
+ * Publication thresholds. The site runs on Cloudflare Workers Paid (100,000 static files per
+ * deployment, owner decision 2026-10-13), so every EPA model year from 2000 and every model with
+ * at least one wheel record gets its own page. On the free plan (20,000 files) these were 2015
+ * and 3.
  */
-export const CAR_YEAR_PAGE_MIN = 2015;
-export const CAR_MODEL_PAGE_MIN_WHEEL_ROWS = 3;
+export const CAR_YEAR_PAGE_MIN = 2000;
+export const CAR_MODEL_PAGE_MIN_WHEEL_ROWS = 1;
 
 export const EPA_SOURCE = { name: 'U.S. EPA / DOE — fueleconomy.gov', url: 'https://www.fueleconomy.gov/feg/download.shtml' } as const;
 export const ANKUSI_SOURCE = { name: 'ANKUSI Wheel Fitment Dataset (CC BY 4.0)', url: 'https://github.com/david025445/ankusi-wheel-fitment-data' } as const;
@@ -84,6 +83,16 @@ export function wheelRowsForYear(model: CarModel, year: number): readonly WheelR
 }
 
 /** Distinct, most frequent first. */
+/**
+ * Values of one wheel-row column, the newest generation's value first, then the rest by
+ * frequency. Answer boxes use this so a current owner sees today's figure (Corsa F: 4×108)
+ * rather than the value of the older generations that make up most rows (4×100).
+ */
+export function newestFirst<T>(rows: readonly WheelRow[], pick: (row: WheelRow) => T | null | undefined): readonly T[] {
+  const newest = rows.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0)).map(pick).find((value) => value !== null && value !== undefined && value !== '');
+  return [...new Set([...(newest === undefined || newest === null ? [] : [newest]), ...frequent(rows.map(pick))])];
+}
+
 export function frequent<T>(values: readonly (T | null | undefined)[]): readonly T[] {
   const counts = new Map<T, number>();
   for (const value of values) if (value !== null && value !== undefined && value !== '') counts.set(value, (counts.get(value) ?? 0) + 1);

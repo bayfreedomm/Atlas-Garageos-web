@@ -1,0 +1,15 @@
+---
+// Localized car directory (nl): makes with wheel fitment data. See src/ui/car-locale.ts.
+import SiteLayout from '../../../components/SiteLayout.astro';
+import CarHubLocaleBody from '../../../components/CarHubLocaleBody.astro';
+import { carLocaleText } from '../../../content/car-locale-text';
+import { carHubAlternates, carHubPathFor, localizedCarMakes, localizedCarModels } from '../../../ui/car-locale';
+import { fitDescription } from '../../../ui/car-pages';
+import { homePath } from '../../../ui/entity-page-model';
+
+const t = carLocaleText['nl'];
+const pathname = carHubPathFor('nl');
+---
+<SiteLayout title={t.hubTitle} description={fitDescription(t.hubDescription(localizedCarMakes.length, localizedCarModels.length))} pathname={pathname} active="tools" locale="nl" alternates={carHubAlternates()} breadcrumbs={[{ name: t.breadcrumbHome, href: homePath('nl') }, { name: t.hub, href: pathname }]}>
+  <CarHubLocaleBody locale="nl" />
+</SiteLayout>

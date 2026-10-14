@@ -1,0 +1,139 @@
+---
+// Localized car model page body (every entity locale except English): bolt pattern, center
+// bore, wheel and tire sizes by version from the ANKUSI open wheel data, plus EPA consumption
+// converted to L/100 km when the model has U.S. fuel economy data.
+import { carLocaleText } from '../content/car-locale-text';
+import { ANKUSI_SOURCE, EPA_SOURCE, type CarModel, carModelPath, curatedVehiclesFor, epaYears, frequent, mpgSummary, newestFirst, mpgToL100 } from '../data/cars';
+import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
+import { tireSizeByNotation } from '../data/tire-size-catalog';
+import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
+import { serializeJsonLd } from '../seo/safe-json-ld';
+import { boltMakeBySlug, boltMakePath } from '../ui/bolt-make';
+import { carName, wheelText, yearsText } from '../ui/car-pages';
+import { carHubPathFor, carMakePathFor } from '../ui/car-locale';
+import { displayTireNotation, homePath, vehiclePagePath } from '../ui/entity-page-model';
+import { formatDecimal, formatPlain } from '../ui/locale-format';
+
+interface Props { readonly model: CarModel; readonly locale: EntityLocale; }
+const { model, locale } = Astro.props;
+const t = carLocaleText[locale];
+const name = carName(model);
+const boltSlug = new Map(boltPatternCatalog.map((entry) => [entry.notation, entry.slug]));
+const pcdHref = (pcd: string | null | undefined): string | undefined => { const slug = pcd ? boltSlug.get(pcd) : undefined; return slug ? entityDetailPath('bolt-pattern', locale, slug) : undefined; };
+const TIRE = /(\d{3})\/(\d{2})\s?Z?R\s?(\d{2}(?:\.5)?)/g;
+const tiresOf = (field: string | null | undefined): string[] => field ? [...new Set([...field.matchAll(TIRE)].map((m) => `${m[1]}/${m[2]}R${m[3]}`))] : [];
+const tireHref = (notation: string): string | undefined => { const entry = tireSizeByNotation(notation); return entry ? entityDetailPath('tire-size', locale, entry.slug) : undefined; };
+const mm = (value: number | null | undefined): string => (value === null || value === undefined ? '—' : `${formatPlain(value, locale)} mm`);
+const l100 = (mpg: number | null): string => (mpg === null || mpg <= 0 ? '—' : `${formatDecimal(mpgToL100(mpg), 1, locale)} L/100 km`);
+
+const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
+const pcds = newestFirst(wheels, (row) => row[4]);
+const bores = newestFirst(wheels, (row) => row[5]);
+const tireSizes = [...new Set([...tiresOf(wheels.find((row) => tiresOf(row[11]).length > 0)?.[11]), ...frequent(wheels.flatMap((row) => tiresOf(row[11])))])];
+const curated = curatedVehiclesFor(model);
+const allTires = [...new Set([...tireSizes, ...curated.flatMap((vehicle) => [vehicle.tireSize, ...(vehicle.optionalTireSizes ?? [])])])];
+const wheelYears = wheels.flatMap((row) => [row[1], row[2]]).filter((year): year is number => year !== null && year > 0);
+const span = wheelYears.length ? (Math.min(...wheelYears) === Math.max(...wheelYears) ? String(Math.min(...wheelYears)) : `${Math.min(...wheelYears)}–${Math.max(...wheelYears)}`) : '';
+const years = epaYears(model).slice().reverse();
+const electric = years.some((year) => mpgSummary(model.epa[String(year)] ?? []).electric);
+const showConsumption = years.length > 0 && !electric;
+const latest = years[0];
+const latestBest = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []).best : null;
+const boreText = bores[0] !== undefined ? mm(bores[0]) : undefined;
+
+const answer = [
+  { label: t.answer.pcd, value: pcds[0] ?? '—', href: pcdHref(pcds[0]) },
+  { label: t.answer.bore, value: boreText ?? '—' },
+  { label: t.answer.tire, value: allTires[0] ? displayTireNotation(allTires[0], locale) : '—', href: allTires[0] ? tireHref(allTires[0]) : undefined },
+  showConsumption && latest !== undefined ? { label: `${t.answer.consumption} (${latest})`, value: l100(latestBest) } : { label: t.answer.years, value: span || '—' },
+];
+const faqs = [
+  ...(pcds.length ? [{ q: t.faqPcdQ(name), a: pcds.length === 1 ? t.faqPcdA(name, pcds[0]!, boreText) : t.faqPcdMultiA(pcds.join(', ')) }] : []),
+  ...(allTires.length ? [{ q: t.faqTireQ(name), a: t.faqTireA(name, allTires.slice(0, 6).map((notation) => displayTireNotation(notation, locale)).join(', ')) }] : []),
+  ...(bores.length === 1 && boreText ? [{ q: t.faqBoreQ(name), a: t.faqBoreA(name, boreText) }] : []),
+];
+const faqJsonLd = faqs.length ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }) : undefined;
+const hasBoltChart = boltMakeBySlug(model.makeSlug) !== undefined;
+---
+{faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href={homePath(locale)}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span>
+  <a href={carHubPathFor(locale)}>{t.hub}</a><span aria-hidden="true">/</span>
+  <a href={carMakePathFor(locale, model.makeSlug)}>{model.make}</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{model.model}</span>
+</nav>
+<header class="entity-hero entity-hero--tire">
+  <p class="eyebrow">{model.make}</p>
+  <h1 class="entity-hero__title">{t.modelH1(name)}</h1>
+  <p class="entity-hero__lead">{t.modelLead(name, wheels.length)}</p>
+  <dl class="entity-answer entity-answer--vehicle">
+    {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong></dd></div>)}
+  </dl>
+  <nav class="entity-pagenav" aria-label={t.nav.wheels}>
+    <a href="#model-wheels">{t.nav.wheels}</a>
+    {showConsumption && <a href="#model-consumption">{t.nav.consumption}</a>}
+    {faqs.length > 0 && <a href="#model-faq">{t.nav.faq}</a>}
+  </nav>
+</header>
+
+<section class="entity-section" aria-labelledby="model-wheels">
+  <h2 id="model-wheels">{t.wheelsHeading(name)}</h2>
+  <div class="entity-table-scroll">
+    <table class="entity-table car-mpg-table">
+      <thead><tr><th scope="col">{t.cols.version}</th><th scope="col">{t.cols.years}</th><th scope="col">{t.cols.pcd}</th><th scope="col">{t.cols.bore}</th><th scope="col" class="is-optional">{t.cols.factory}</th><th scope="col" class="is-optional">{t.cols.tires}</th><th scope="col" class="is-optional">{t.cols.max}</th></tr></thead>
+      <tbody>
+        {wheels.map((row) => { const href = pcdHref(row[4]); const tires = tiresOf(row[11]); return (
+          <tr>
+            <th scope="row">{row[0]}{row[3] ? <span class="entity-card__meta"> · {row[3]}</span> : null}{row[12] ? <span class="entity-card__meta"> · {row[12]}</span> : null}</th>
+            <td>{yearsText(row)}</td>
+            <td>{href ? <a href={href}>{row[4]}</a> : row[4] ?? '—'}</td>
+            <td>{mm(row[5])}</td>
+            <td class="is-optional">{wheelText(row[8])}</td>
+            <td class="is-optional">{tires.length ? tires.map((notation, index) => { const link = tireHref(notation); return <>{index > 0 ? ', ' : ''}{link ? <a href={link}>{displayTireNotation(notation, locale)}</a> : displayTireNotation(notation, locale)}</>; }) : '—'}</td>
+            <td class="is-optional">{wheelText(row[10])}</td>
+          </tr>
+        ); })}
+      </tbody>
+    </table>
+  </div>
+  <p class="entity-note">{t.wheelsNote}</p>
+</section>
+
+{showConsumption && (
+  <section class="entity-section" aria-labelledby="model-consumption">
+    <h2 id="model-consumption">{t.consumptionHeading(name)}</h2>
+    <div class="entity-table-scroll">
+      <table class="entity-table car-mpg-table">
+        <thead><tr><th scope="col">{t.cols.year}</th><th scope="col">{t.cols.best}</th><th scope="col">{t.cols.cityHwy}</th></tr></thead>
+        <tbody>
+          {years.map((year) => { const s = mpgSummary(model.epa[String(year)] ?? []); return (
+            <tr><th scope="row">{year}</th><td><strong>{l100(s.best)}</strong></td><td>{s.bestCity && s.bestHighway ? `${formatDecimal(mpgToL100(s.bestCity), 1, locale)} / ${formatDecimal(mpgToL100(s.bestHighway), 1, locale)}` : '—'}</td></tr>
+          ); })}
+        </tbody>
+      </table>
+    </div>
+    <p class="entity-note">{t.consumptionNote} <a href={carModelPath(model)} hreflang="en">{t.mpgEnglish(name)}</a></p>
+  </section>
+)}
+
+{curated.length > 0 && (
+  <section class="entity-section" aria-labelledby="model-curated">
+    <h2 id="model-curated">{t.curatedHeading}</h2>
+    <div class="entity-links">
+      {curated.map((vehicle) => <a class="entity-link-card" href={vehiclePagePath(locale, vehicle.id)}><strong>{vehicle.make} {vehicle.model} — {displayTireNotation(vehicle.tireSize, locale)}</strong><span>{t.curatedCard(vehicle.generation)}</span><i aria-hidden="true">›</i></a>)}
+    </div>
+  </section>
+)}
+
+{faqs.length > 0 && (
+  <section class="entity-section" aria-labelledby="model-faq">
+    <h2 id="model-faq">{t.faqHeading}</h2>
+    {faqs.map((f) => <details class="entity-faq"><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+)}
+
+<section class="entity-section" aria-labelledby="model-sources">
+  <h2 id="model-sources">{t.sourcesHeading}</h2>
+  <p class="entity-note">{t.sourcesWheels}: <a href={ANKUSI_SOURCE.url} rel="noopener">{ANKUSI_SOURCE.name}</a>.{showConsumption && <> {t.sourcesEpa}: <a href={EPA_SOURCE.url} rel="noopener">{EPA_SOURCE.name}</a>.</>}</p>
+  <p class="entity-note"><a href={carMakePathFor(locale, model.makeSlug)}>{t.allModelsOf(model.make)}</a>{hasBoltChart && <> · <a href={boltMakePath(locale, model.makeSlug)}>{t.boltChartLink(model.make)}</a></>} · <a href={carHubPathFor(locale)}>{t.allMakes}</a></p>
+</section>

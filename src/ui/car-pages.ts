@@ -1,18 +1,18 @@
 /** Titles, descriptions and shared view helpers for the /cars/ page family (English). */
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath } from '../seo/entity-routes';
-import { type CarModel, type EpaVariant, type WheelRow, epaYears, frequent, mpgSummary } from '../data/cars';
+import { type CarModel, type EpaVariant, type WheelRow, epaYears, mpgSummary, newestFirst } from '../data/cars';
 
 const TITLE_BUDGET = 58; // 75 minus " — Atlas GarageOS"; '&' is never used, so no &amp; inflation.
 
-function fit(candidates: readonly string[]): string {
+export function fit(candidates: readonly string[]): string {
   const hit = candidates.find((candidate) => candidate.length <= TITLE_BUDGET);
   if (hit) return hit;
   const last = candidates[candidates.length - 1]!;
   return `${last.slice(0, TITLE_BUDGET - 1).trimEnd()}…`;
 }
 
-function fitDescription(text: string): string {
+export function fitDescription(text: string): string {
   return text.length <= 178 ? text : `${text.slice(0, 176).replace(/\s+\S*$/, '')}…`;
 }
 
@@ -45,7 +45,7 @@ export function carModelTitle(model: CarModel): string {
 
 export function carModelDescription(model: CarModel): string {
   const years = epaYears(model);
-  const pcd = frequent(model.wheels.map((row) => row[4]));
+  const pcd = newestFirst(model.wheels, (row) => row[4]);
   const parts: string[] = [];
   if (years.length) parts.push(`EPA fuel economy for ${years.length} model ${years.length === 1 ? 'year' : 'years'} (${years[0]}–${years[years.length - 1]})`);
   if (pcd.length) parts.push(`bolt pattern ${pcd.slice(0, 2).join(' / ')}, center bore, factory and maximum wheel sizes`);

@@ -1,0 +1,22 @@
+---
+// Localized make pages (tr): one per make with wheel fitment data.
+import SiteLayout from '../../../../components/SiteLayout.astro';
+import CarMakeLocaleBody from '../../../../components/CarMakeLocaleBody.astro';
+import { carLocaleText } from '../../../../content/car-locale-text';
+import type { CarMake } from '../../../../data/cars';
+import { carHubPathFor, carMakeAlternates, carMakeLocaleMeta, carMakePathFor, localizedCarMakes } from '../../../../ui/car-locale';
+import { homePath } from '../../../../ui/entity-page-model';
+
+export function getStaticPaths() {
+  return localizedCarMakes.map((make) => ({ params: { make: make.makeSlug }, props: { make } }));
+}
+
+interface Props { make: CarMake; }
+const { make } = Astro.props as Props;
+const t = carLocaleText['tr'];
+const meta = carMakeLocaleMeta(make, 'tr');
+const pathname = carMakePathFor('tr', make.makeSlug);
+---
+<SiteLayout title={meta.title} description={meta.description} pathname={pathname} active="tools" locale="tr" alternates={carMakeAlternates(make.makeSlug)} breadcrumbs={[{ name: t.breadcrumbHome, href: homePath('tr') }, { name: t.hub, href: carHubPathFor('tr') }, { name: make.make, href: pathname }]}>
+  <CarMakeLocaleBody make={make} locale="tr" />
+</SiteLayout>
