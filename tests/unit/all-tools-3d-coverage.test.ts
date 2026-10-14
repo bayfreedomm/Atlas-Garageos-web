@@ -11,6 +11,8 @@ import engineering2D from '../../src/components/ToolEngineering2D.astro?raw';
 import toolVisualStudio from '../../src/components/ToolVisualStudio.astro?raw';
 import gearRatioTechnicalVisual from '../../src/components/GearRatioTechnicalVisual.astro?raw';
 import tool3DController from '../../src/ui/tool-3d.ts?raw';
+import toolDrawings from '../../src/ui/tool-drawings.ts?raw';
+import toolDrawingDriver from '../../src/ui/tool-drawing-driver.ts?raw';
 const productV4Css = readFileSync(new URL('../../src/styles/product-v4.css', import.meta.url), 'utf8');
 
 const palette = { current: '#2e9dff', proposed: '#ff8a22', metal: '#8fa2b1', hub: '#415563', guide: '#8295a4', accent: '#7ed6ff', warning: '#ffc35b' };
@@ -91,20 +93,13 @@ describe('truthful visual coverage', () => {
     expect(sceneForTool('vehicle-fitment-finder', { model: 'peugeot-208' }, palette).scene.studio?.count).toBe(4);
   });
 
-  it('binds data-bearing 2D labels and shapes to current form state', () => {
-    for (const hook of ['data-fuel-us-mpg', 'data-fuel-imperial-mpg', 'data-fuel-l100', 'data-pressure-psi', 'data-pressure-bar', 'data-pressure-kpa', 'data-power-hp', 'data-power-kw', 'data-torque-nm', 'data-torque-lbft', 'data-pw-power', 'data-pw-mass', 'data-pw-ratio', 'data-tool-power-level', 'data-tool-mass-level', 'data-tool-level', 'data-tool-rotor', 'data-tool-lever', 'data-tool-code', 'data-tool-dot-code', 'data-tool-car', 'data-tool-lug']) {
-      expect(engineering2D, hook).toContain(hook);
-      expect(toolVisualStudio, hook).toContain(hook);
+  it('binds the shared 2D drawing to current form state through authoritative calculators', () => {
+    expect(engineering2D).toContain('ToolDrawingFrame');
+    expect(toolVisualStudio).toContain('bindToolDrawing(plate, form)');
+    for (const fn of ['convertPressureTool', 'convertFuelEconomyTool', 'convertPowerTool', 'convertTorqueTool', 'calculatePowerToWeightTool', 'calculateFuelCostTool', 'calculateRoadTripCostTool', 'pcdFromAdjacentHoleSpacingMm']) {
+      expect(toolDrawings, fn).toContain(fn);
     }
-    expect(toolVisualStudio).toContain('convertPressureTool');
-    expect(toolVisualStudio).toContain('convertFuelEconomyTool');
-    expect(toolVisualStudio).toContain('convertPowerTool');
-    expect(toolVisualStudio).toContain('convertTorqueTool');
-    expect(toolVisualStudio).toContain('calculatePowerToWeightTool');
-    expect(toolVisualStudio).toContain('values.loadIndex');
-    expect(toolVisualStudio).toContain('values.speedRating');
-    expect(toolVisualStudio).toContain("values.code");
-    expect(toolVisualStudio).toContain('visualState?.count');
+    for (const name of ['input', 'change', 'submit']) expect(toolDrawingDriver).toContain(`'${name}'`);
   });
 
   it('connects sibling 3D studios to the owning calculator form and refreshes after edits', () => {
@@ -144,11 +139,7 @@ describe('truthful visual coverage', () => {
     expect(toolVisualStudio).toContain('(drawing.scrollWidth - drawing.clientWidth) / 2');
   });
 
-  it('keeps the redesigned converter and gearing visuals tied to authoritative live values', () => {
-    for (const hook of ['data-fuel-us-mpg', 'data-fuel-imperial-mpg', 'data-fuel-l100', 'data-power-hp', 'data-power-kw', 'data-torque-nm', 'data-torque-lbft', 'data-pw-power', 'data-pw-mass', 'data-pw-ratio']) {
-      expect(engineering2D).toContain(hook);
-      expect(toolVisualStudio).toContain(hook);
-    }
+  it('keeps the gearing visual tied to authoritative live values', () => {
     for (const hook of ['data-gear-current-wheel', 'data-gear-new-wheel', 'data-gear-current-ratio', 'data-gear-effective-visual']) {
       expect(gearRatioTechnicalVisual).toContain(hook);
     }

@@ -12,7 +12,7 @@ Rule for this cycle: no new pSEO route family or mass URL generation. Improve, l
 
 ## P0 — protect and measure the current foundation
 
-- `VERIFIED DONE` — 2026-10-14: typed sitemap index + IndexNow (v7-14), true-scale cross-section drawing (v7-15), Vehicle → Tire → Compare → Calculator flow and robots query-URL disallow (v7-16). Link crawl: 0 orphans, 0 broken internal links, max click depth 4.
+- `VERIFIED DONE` — 2026-10-14: typed sitemap index + IndexNow (v7-14), true-scale cross-section drawing (v7-15), Vehicle → Tire → Compare → Calculator flow and robots query-URL disallow (v7-16). Link crawl: 0 orphans, 0 broken internal links, max click depth 4. v7-17: one drawing language across calculator visuals, driven by the calculators' own functions.
 
 - `PARTIAL` — Finish deployed launch gates: local rendered-output canonical/hreflang/sitemap/noindex/JSON-LD/title/description checks pass across all 48,964 HTML outputs; IndexNow is wired. Bing Webmaster registration, deployed 404/redirect/Open Graph smoke tests and Core Web Vitals remain.
 - `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 48,954 indexable canonicals with 48,954 sitemap URLs across the 9 typed sitemaps, requires `Disallow: /*?` in robots.txt and reports zero long-title/description advisories.

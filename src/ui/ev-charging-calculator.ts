@@ -128,16 +128,6 @@ const numberValue = (form: HTMLFormElement, name: string): number => {
   return raw === '' ? Number.NaN : Number(raw);
 };
 
-function paintBattery(form: HTMLFormElement, startPercent: number, endPercent: number): void {
-  const fillStart = form.querySelector<SVGRectElement>('[data-fill-start]');
-  const fillEnd = form.querySelector<SVGRectElement>('[data-fill-end]');
-  const width = 116;
-  if (fillStart) fillStart.setAttribute('width', String(Math.max(0, (startPercent / 100) * width)));
-  if (fillEnd) fillEnd.setAttribute('width', String(Math.max(0, (endPercent / 100) * width)));
-  const label = form.querySelector<SVGTextElement>('[data-battery-label]');
-  if (label) label.textContent = `${Math.round(startPercent)}% → ${Math.round(endPercent)}%`;
-}
-
 export function initializeEvChargingCalculators(): void {
   const t = EV_CHARGING_LABELS[getPageLocale()];
   document.querySelectorAll<HTMLFormElement>('[data-calculator="ev-charging"]').forEach((form) => {
@@ -155,7 +145,6 @@ export function initializeEvChargingCalculators(): void {
         chargingEfficiency: numberValue(form, 'chargingEfficiency'),
       };
       const currency = String(new FormData(form).get('currency') ?? 'USD');
-      paintBattery(form, input.startPercent, input.endPercent);
       const result = calculateEvChargingCostTool(input);
       if (!result.ok) {
         errors.textContent = result.issues

@@ -1,5 +1,7 @@
 ---
 import type { Visualization3DLocale } from '../localization/visualization-3d';
+import ToolDrawingFrame from './ToolDrawingFrame.astro';
+import { tireComparisonText } from '../content/tire-comparison-text';
 interface Props { readonly mode: 'tire' | 'single' | 'speed' | 'gear' | 'compression' | 'ev' | 'fitment' | 'offset' | 'pcd'; readonly locale: Visualization3DLocale; }
 const { mode, locale } = Astro.props;
 const t = {
@@ -14,7 +16,12 @@ const t = {
   tr: { section: 'TEKNİK KESİT', input: 'CANLI GEOMETRİ', note: 'Ölçülen veya girilen geometri · uyum ya da güvenlik onayı değildir', speed: 'Gösterilen ve teorik hız', compression: 'Silindir hacmi kesiti', fitment: 'Lastik ve jant boşluğu' },
 }[locale];
 const title = mode === 'speed' ? t.speed : mode === 'compression' ? t.compression : t.fitment;
+const speedText = tireComparisonText[locale];
 ---
+{mode === 'speed' && <ToolDrawingFrame kind="speedometer" labels={{ indicated: speedText.colIndicated, actual: speedText.colTrue }} locale={locale} readoutLabel={t.input} />}
+{mode === 'compression' && <ToolDrawingFrame kind="compression" labels={{}} locale={locale} readoutLabel={t.input} />}
+{mode === 'fitment' && <ToolDrawingFrame kind="fitment-setup" labels={{}} locale={locale} readoutLabel={t.input} attrs={{ 'data-drawing-form': 'fitment-form' }} />}
+{mode !== 'speed' && mode !== 'compression' && mode !== 'fitment' && (
 <div class:list={['tool-engineering-plate', `parametric-engineering-plate--${mode}`]} data-parametric-engineering-2d={mode}>
   <div class="tool-engineering-plate__top"><span>{t.section} / {title.toUpperCase()}</span><span>ATLAS · 02</span></div>
   <div class="tool-engineering-plate__drawing">
@@ -22,29 +29,8 @@ const title = mode === 'speed' ? t.speed : mode === 'compression' ? t.compressio
       <defs><pattern id={`pgrid-${mode}`} width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" class="bp-grid" /></pattern><marker id={`parrow-${mode}`} viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M10 0 0 5l10 5Z" class="bp-arrow" /></marker></defs>
       <rect x="0" y="0" width="760" height="340" fill={`url(#pgrid-${mode})`} />
       <path class="bp-center" d="M380 12v316M18 170h724" />
-      {mode === 'speed' && <g>
-        <circle class="bp-solid" cx="220" cy="167" r="100" data-p2d-speed-original />
-        <circle class="bp-secondary" cx="220" cy="167" r="72" />
-        <circle class="bp-solid" cx="542" cy="167" r="100" data-p2d-speed-new />
-        <circle class="bp-secondary" cx="542" cy="167" r="72" />
-        <path class="bp-accent" d="M348 168h66" marker-end={`url(#parrow-${mode})`} />
-        <path class="bp-dimension" d="M80 55v224M680 55v224" marker-start={`url(#parrow-${mode})`} marker-end={`url(#parrow-${mode})`} />
-        <path class="bp-secondary" d="M100 55h120M100 279h120M542 55h118M542 279h118" />
-      </g>}
-      {mode === 'compression' && <g>
-        <path class="bp-solid" d="M242 48h276v236H242zM242 84h276M270 120h220v24H270zM270 144v116h220V144" />
-        <path class="bp-accent" d="M260 96h240M270 144h220" />
-        <path class="bp-dimension" d="M542 84v60M542 150v110M242 307h276" marker-start={`url(#parrow-${mode})`} marker-end={`url(#parrow-${mode})`} />
-        <path class="bp-secondary" d="M270 260l-28 24M490 260l28 24M380 144v116" />
-      </g>}
-      {mode === 'fitment' && <g>
-        <path class="bp-boundary" d="M112 38v264M648 38v264" />
-        <path class="bp-solid" d="M238 76h126v188H238zM396 68h144v204H396z" />
-        <path class="bp-secondary" d="M260 88h82v164h-82zM422 80h92v180h-92z" />
-        <path class="bp-accent" d="M380 32v276M364 170h32" />
-        <path class="bp-dimension" d="M112 316h126M540 316h108" marker-start={`url(#parrow-${mode})`} marker-end={`url(#parrow-${mode})`} />
-      </g>}
     </svg>
   </div>
   <div class="tool-engineering-plate__bottom"><div><small>{t.input}</small><strong data-parametric-engineering-reading>—</strong></div><p>{t.note}</p></div>
 </div>
+)}

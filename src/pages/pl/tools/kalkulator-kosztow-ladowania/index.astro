@@ -1,4 +1,5 @@
 ---
+import ToolDrawingFrame from '../../../../components/ToolDrawingFrame.astro';
 import { toolAlternates } from '../../../../seo/locale-alternates';
 import ToolPage from '../../../../components/ToolPage.astro';
 import Parametric3DPanel from '../../../../components/Parametric3DPanel.astro';
@@ -24,13 +25,7 @@ const c = localizedTool('ev-charging-cost-calculator', 'pl');
     <Parametric3DPanel mode="ev" locale="pl" />
     <figure class="ev-technical-visual is-pending" data-ev-visual>
       <figcaption><span>AKUMULATOR → ENERGIA Z SIECI → KOSZT + CZAS</span><small>Zakres ładowania w skali; czas zakłada stałą moc</small></figcaption>
-      <svg class="tool-visual__scene" viewBox="0 0 160 90" role="img" aria-label="Stan naładowania akumulatora">
-        <rect x="14" y="20" width="122" height="50" rx="8" fill="none" stroke="var(--color-ink-soft)" stroke-width="2"/>
-        <rect x="136" y="36" width="8" height="18" rx="2" fill="var(--color-ink-soft)"/>
-        <rect data-fill-start x="18" y="24" width="0" height="42" fill="var(--color-ink-soft)" opacity=".45"/>
-        <rect data-fill-end x="18" y="24" width="0" height="42" fill="var(--color-accent)" opacity=".85"/>
-        <text data-battery-label x="80" y="82" text-anchor="middle" font-size="9" fill="var(--color-ink-muted)">20% → 80%</text>
-      </svg>
+      <ToolDrawingFrame kind="ev-charge" labels={{}} locale="pl" />
       <div class="ev-visual-stats"><div><small>W akumulatorze</small><strong data-ev-battery-energy>—</strong></div><div><small>Z sieci</small><strong data-ev-grid-energy>—</strong></div><div><small>Straty sprawności</small><strong data-ev-loss>—</strong></div></div>
     </figure>
     <div class="fuel-detail-heading" aria-hidden="true"><span>Szczegóły</span><small>Energia, koszt i idealny czas</small></div>

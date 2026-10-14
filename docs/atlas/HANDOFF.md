@@ -2,6 +2,13 @@
 
 Updated: 2026-10-14.
 
+## 2026-10-14 night session (v7-17)
+
+- Drawings: new `src/ui/tool-drawings.ts` / `tool-drawing-driver.ts` / `ToolDrawingFrame.astro` replace the old Engineering 2D plates on 14 utility tools, speedometer, compression, fitment studio, bolt pattern and EV. Old `update2D` in `ToolVisualStudio.astro` and `paintBattery` in `ev-charging-calculator.ts` removed. Tire anatomy, fit-check and gear visuals restyled in `product-v4.css` (end of file).
+- Fixed on the way: NaN on blank fields, future DOT year accepted by the drawing, drawing math duplicated outside the calculators.
+- Verified: 50 files / 338 tests, astro check 0 errors, 48,964 pages, SEO audit passed; Chromium 24-route sweep desktop + 390 px.
+- Next: Part B (CSS cleanup: 4 stylesheet generations, ~295 KB; lazy tire catalog on tool pages; responsive hero image), then Part C (generation answers on model pages, branch `parca-3-model-sayfalari`).
+
 ## 2026-10-14 evening session (v7-15, v7-16)
 
 - v7-15: `src/ui/fitment-section.ts` true-scale cross-section on the tire comparison and wheel offset calculators and on all tire comparison pages; IndexNow retries while a new key is being verified.

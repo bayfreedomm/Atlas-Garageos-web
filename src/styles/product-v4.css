@@ -1619,3 +1619,115 @@ p>.entity-confidence{white-space:normal;max-width:100%}
 .tire-flow-actions{white-space:nowrap}
 .tire-flow-actions .entity-inline-link+.entity-inline-link{margin-left:.6rem}
 @media (max-width:40rem){.tire-flow-table{min-width:0;width:100%}.tire-flow-table thead{display:none}.tire-flow-table tr{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:.25rem .75rem;padding:.7rem .2rem;border-bottom:var(--border)}.tire-flow-table th,.tire-flow-table td{padding:0;border:0}.tire-flow-table td.is-optional{display:none}.tire-flow-actions{grid-column:1 / -1;white-space:normal}.tire-flow-actions .entity-inline-link{display:inline-block;margin:.15rem .9rem .15rem 0}.tire-flow-actions .entity-inline-link+.entity-inline-link{margin-left:0}}
+
+/* Calculator drawings (src/ui/tool-drawings.ts): one light, thin-line language for every tool. */
+.tool-drawing{--td-a:#2f7cf6;--td-b:#f08a24;--td-ink:var(--color-ink);--td-muted:var(--color-ink-muted);--td-line:var(--color-line-strong);display:block;width:100%;height:auto;max-height:34rem;margin:0 auto;font-family:inherit}
+.tool-drawing text{fill:var(--td-ink);font-size:22px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.tool-drawing .td-big{font-size:34px;font-weight:700;letter-spacing:-.02em}
+.tool-drawing .td-big--small{font-size:24px}
+.tool-drawing .td-big--warn{fill:var(--color-red)}
+.tool-drawing .td-kpi{font-size:30px;font-weight:700}
+.tool-drawing .td-caption,.tool-drawing .td-tick-text,.tool-drawing .td-unit{fill:var(--td-muted);font-size:17px;font-weight:600}
+.tool-drawing .td-caption{letter-spacing:.02em}
+.tool-drawing .td-unit{font-size:18px}
+.tool-drawing .td-text--muted{fill:var(--td-muted);font-weight:500}
+.tool-drawing .td-text--a,.tool-drawing .td-tick-text--a{fill:var(--td-a)}
+.tool-drawing .td-text--b,.tool-drawing .td-tick-text--b,.tool-drawing .td-unit--b{fill:var(--td-b)}
+.tool-drawing .td-op{fill:var(--td-muted);font-size:30px}
+.tool-drawing .td-code{font-size:21px;font-weight:700;letter-spacing:.04em}
+.tool-drawing .td-dim-text{fill:var(--td-muted);font-size:18px}
+.tool-drawing path,.tool-drawing circle,.tool-drawing rect,.tool-drawing polygon{vector-effect:non-scaling-stroke}
+.tool-drawing .td-axis,.tool-drawing .td-tick{stroke:var(--td-line);stroke-width:2;fill:none}
+.tool-drawing .td-tick--major{stroke:var(--td-ink);stroke-width:2.4}
+.tool-drawing .td-tick--b{stroke:var(--td-b)}
+.tool-drawing .td-guide{stroke:var(--td-muted);stroke-width:1.2;stroke-dasharray:4 5;fill:none}
+.tool-drawing .td-marker--a{fill:var(--td-a)}
+.tool-drawing .td-marker--b{fill:var(--td-b)}
+.tool-drawing .td-gauge-arc{fill:none;stroke:var(--td-line);stroke-width:3}
+.tool-drawing .td-gauge-arc--inner{stroke:color-mix(in srgb,var(--td-b) 45%,transparent);stroke-width:2}
+.tool-drawing .td-needle{stroke-width:6;stroke-linecap:round;fill:none}
+.tool-drawing .td-needle--a{stroke:var(--td-a)}
+.tool-drawing .td-needle--b{stroke:var(--td-b);stroke-width:4}
+.tool-drawing .td-hub{fill:var(--td-ink)}
+.tool-drawing .td-part{fill:color-mix(in srgb,var(--td-ink) 6%,transparent);stroke:var(--td-ink);stroke-width:2.2;stroke-linejoin:round}
+.tool-drawing .td-part-line{fill:none;stroke:var(--td-line);stroke-width:2}
+.tool-drawing .td-force{stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tool-drawing .td-force--a{stroke:var(--td-a)}
+.tool-drawing .td-force--b{stroke:var(--td-b)}
+.tool-drawing .td-accent-arc{fill:none;stroke:var(--td-a);stroke-width:3;stroke-dasharray:8 7}
+.tool-drawing .td-dim-line{stroke:var(--td-muted);stroke-width:1.4;fill:none}
+.tool-drawing .td-dim-line--a{stroke:var(--td-a);stroke-width:2}
+.tool-drawing .td-dim-line--b{stroke:var(--td-b);stroke-width:2.4}
+.tool-drawing .td-bar--a{fill:color-mix(in srgb,var(--td-a) 82%,transparent)}
+.tool-drawing .td-bar--b{fill:color-mix(in srgb,var(--td-b) 82%,transparent)}
+.tool-drawing .td-bar--muted{fill:color-mix(in srgb,var(--td-muted) 18%,transparent)}
+.tool-drawing .td-card{fill:var(--color-surface-subtle);stroke:var(--td-line);stroke-width:1.4}
+.tool-drawing .td-curve{fill:none;stroke-width:3.4;stroke-linecap:round}
+.tool-drawing .td-curve--a{stroke:var(--td-a)}
+.tool-drawing .td-route{fill:none;stroke:var(--td-a);stroke-width:3.2;stroke-dasharray:10 8;stroke-linecap:round}
+.tool-drawing .td-route--return{stroke:var(--td-b);opacity:.8}
+.tool-drawing .td-tire{fill:color-mix(in srgb,var(--td-ink) 9%,var(--color-surface));stroke:var(--td-muted);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.tool-drawing .td-rim{fill:var(--color-surface);stroke:var(--td-line);stroke-width:2}
+.tool-drawing .td-chip{fill:var(--color-surface);stroke:var(--td-b);stroke-width:2}
+.tool-drawing .td-callout{fill:none;stroke:var(--td-b);stroke-width:2}
+.tool-drawing .td-tire-section{fill:color-mix(in srgb,var(--td-ink) 9%,var(--color-surface));stroke:var(--td-muted);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.tool-drawing .td-rim-section{fill:var(--color-surface-subtle);stroke:var(--td-line);stroke-width:2}
+.tool-drawing .td-dot{fill:var(--td-line)}
+.tool-drawing .td-hub-face{fill:var(--color-surface-subtle);stroke:var(--td-line);stroke-width:2}
+.tool-drawing .td-pcd{fill:none;stroke:var(--td-a);stroke-width:2;stroke-dasharray:6 6}
+.tool-drawing .td-lug{fill:var(--color-surface);stroke:var(--td-ink);stroke-width:3}
+.tool-drawing .td-lug--ghost{stroke:var(--td-line);stroke-width:1.5;stroke-dasharray:4 4}
+.tool-drawing .td-volume--a{fill:color-mix(in srgb,var(--td-a) 14%,transparent)}
+.tool-drawing .td-volume--b{fill:color-mix(in srgb,var(--td-b) 28%,transparent)}
+.tool-drawing .td-piston{fill:color-mix(in srgb,var(--td-ink) 70%,transparent)}
+.tool-drawing .td-piston--ghost{fill:none;stroke:var(--td-ink);stroke-width:1.6;stroke-dasharray:6 5}
+@media (max-width:40rem){.tool-drawing text{font-size:28px}.tool-drawing .td-big{font-size:40px}.tool-drawing .td-caption,.tool-drawing .td-tick-text,.tool-drawing .td-unit,.tool-drawing .td-dim-text{font-size:23px}}
+.tool-drawing-frame{margin:0;padding:var(--space-4);border:var(--border);border-radius:var(--radius-md);background:var(--color-surface)}
+.tool-drawing-frame__readout{display:flex;justify-content:space-between;gap:var(--space-3);margin-top:var(--space-2);padding-top:var(--space-2);border-top:var(--border);color:var(--color-ink-muted);font-size:var(--text-sm)}
+.tool-drawing-frame__readout strong{color:var(--color-ink);font-variant-numeric:tabular-nums}
+.tool-drawing-frame--plain{padding:0;border:0;background:none}
+.tool-drawing .td-gap-arc{fill:none;stroke:var(--td-b);stroke-width:10;stroke-linecap:round;opacity:.85}
+
+/* ── Drawing language, shared by the older live visuals (2026-10-14) ──────────────────────
+   Tire anatomy, fit-check shape and EV figure follow the same light, thin-line language as
+   .tool-drawing: one neutral line colour, blue = current, orange = new / added, sans text. */
+.single-tire-visual{--td-a:#2f7cf6;--td-b:#f08a24;background:var(--color-surface)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}
+.single-tire-visual figcaption p{color:var(--color-ink-muted)!important;font-size:var(--text-sm)!important}
+.single-tire-visual .visual-kicker{color:var(--color-ink-muted);font-family:inherit;letter-spacing:.06em}
+.single-tire-visual .single-tire-card{background:var(--color-surface)!important;border-color:var(--color-line)!important}
+.single-tire-visual .single-tire-card--facts>div{background:var(--color-surface-subtle)!important}
+.single-tire-visual .single-tire-panel__label{color:var(--color-ink-muted)!important;font-family:inherit!important}
+.single-tire-visual .single-tire-badge{background:none;color:var(--color-ink);border:1px solid var(--color-line);font-family:inherit;font-variant-numeric:tabular-nums}
+.single-tire-visual .single-tire-shadow{display:none}
+.single-tire-visual .single-tire-body{fill:color-mix(in srgb,var(--color-ink) 7%,var(--color-surface))!important;stroke:var(--color-ink-muted)!important;stroke-width:1.5!important;vector-effect:non-scaling-stroke}
+.single-tire-visual .single-tread-ticks line,.single-tire-visual .single-cross-tread-ticks line{stroke:color-mix(in srgb,var(--color-ink) 28%,transparent)!important;stroke-width:1!important}
+.single-tire-visual .single-tire-rim-seat{stroke:var(--color-line)!important;stroke-width:2!important}
+.single-tire-visual .single-tire-rim{fill:var(--color-surface)!important;stroke:var(--color-ink-muted)!important}
+.single-tire-visual .single-spoke{stroke:color-mix(in srgb,var(--color-ink) 35%,transparent)!important;stroke-width:2!important}
+.single-tire-visual .single-hub,.single-tire-visual .single-lug{fill:var(--color-surface)!important;stroke:var(--color-ink-muted)!important;stroke-width:1.5!important}
+.single-tire-visual .single-measure path,.single-tire-visual .single-cross-measure path{stroke-width:1.25!important;vector-effect:non-scaling-stroke}
+.single-tire-visual .single-measure text,.single-tire-visual .single-cross-measure text{font:600 13px var(--font-sans)!important;font-variant-numeric:tabular-nums}
+.single-tire-visual .single-measure--sidewall path{stroke:var(--td-b)!important}.single-tire-visual .single-measure--sidewall text{fill:#c25e0a!important}
+.single-tire-visual .single-measure--diameter path{stroke:var(--td-a)!important}.single-tire-visual .single-measure--diameter text{fill:#1d63d6!important}
+.single-tire-visual .single-measure--rim path,.single-tire-visual .single-cross-measure path{stroke:var(--color-ink-muted)!important}
+.single-tire-visual .single-measure--rim text,.single-tire-visual .single-cross-measure text{fill:var(--color-ink)!important}
+.single-tire-visual .single-cross-outer{fill:color-mix(in srgb,var(--color-ink) 7%,var(--color-surface))!important;stroke:var(--color-ink-muted)!important}
+.single-tire-visual .single-cross-cavity{fill:var(--color-surface)!important;stroke:var(--color-line)!important}
+.single-tire-visual .single-cross-rim{fill:color-mix(in srgb,var(--color-ink) 16%,var(--color-surface))!important;stroke:var(--color-ink-muted)!important}
+.single-tire-visual .single-cross-legend text,.single-tire-visual .single-cross-rim-label{font:600 11px var(--font-sans)!important;fill:var(--color-ink-muted)!important;letter-spacing:.04em}
+.single-tire-visual .single-cross-legend path{stroke:var(--color-line)!important}
+@media(min-width:48rem){.single-tire-visual .single-tire-grid{grid-template-columns:1fr!important}.single-tire-visual .single-tire-card--facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.fit-shape{background:var(--color-surface)}
+.fit-shape__tire{fill:color-mix(in srgb,var(--color-ink) 4%,transparent);stroke-width:2}
+.fit-shape__tire--current,.fit-shape__top--current{stroke:#2f7cf6}
+.fit-shape__tire--new,.fit-shape__top--new{stroke:#f08a24}
+.fit-shape__rim{stroke:var(--color-ink-muted);stroke-width:1.25}
+.fit-shape__ground{stroke:var(--color-line);stroke-width:1}
+.fit-shape__label{font-weight:600}
+.ev-technical-visual{background:var(--color-surface)!important}
+.gear-technical-visual--assembly{background:var(--color-surface)!important}
+.gear-technical-visual .gear-wheel-assembly{border:2px solid #2f7cf6!important;background:color-mix(in srgb,var(--color-ink) 4%,var(--color-surface))!important;box-shadow:none!important}
+.gear-technical-visual .gear-wheel-assembly--new{border-color:#f08a24!important}
+.gear-technical-visual .gear-wheel-assembly::before{inset:22%!important;border:1.25px solid var(--color-ink-muted)!important;background:var(--color-surface)!important}
+.gear-technical-visual .gear-wheel-assembly>i{width:22%!important;height:22%!important;background:var(--color-surface)!important;box-shadow:inset 0 0 0 1.25px var(--color-ink-muted)!important}
+.gear-technical-visual .gear-wheel-assembly>b{width:6%!important;height:6%!important;background:var(--color-ink-muted)!important;box-shadow:none!important}

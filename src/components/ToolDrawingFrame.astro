@@ -1,0 +1,18 @@
+---
+// One calculator drawing (src/ui/tool-drawings.ts) with its live readout. Rendered on the
+// server at the form defaults; src/ui/tool-drawing-driver.ts keeps it in step with the form.
+import { renderToolDrawing, type DrawingKind } from '../ui/tool-drawings';
+
+interface Props { readonly kind: DrawingKind; readonly labels: Readonly<Record<string, string | undefined>>; readonly locale: string; readonly readoutLabel?: string; readonly attrs?: Readonly<Record<string, string>> }
+const { kind, labels, locale, readoutLabel, attrs = {} } = Astro.props;
+const comma = locale !== 'en';
+const initial = renderToolDrawing(kind, undefined, labels, comma);
+---
+<div class={`tool-drawing-frame${readoutLabel === undefined ? ' tool-drawing-frame--plain' : ''}`} data-tool-drawing={kind} data-drawing-labels={JSON.stringify(labels)} data-drawing-comma={String(comma)} {...attrs}>
+  <div data-tool-drawing-host set:html={initial.svg}></div>
+  {readoutLabel !== undefined && kind !== 'measure-my-car' && kind !== 'fitment-map' && <div class="tool-drawing-frame__readout" hidden={initial.readout === ''}><span>{readoutLabel}</span><strong data-tool-drawing-readout data-tool-engineering-reading>{initial.readout}</strong></div>}
+</div>
+<script>
+  import { bindAllToolDrawings } from '../ui/tool-drawing-driver';
+  bindAllToolDrawings();
+</script>

@@ -1,5 +1,6 @@
 ---
 import type { Visualization3DLocale } from '../localization/visualization-3d';
+import ToolDrawingFrame from './ToolDrawingFrame.astro';
 interface Props { readonly locale: Visualization3DLocale; }
 const { locale } = Astro.props;
 const copy = {
@@ -14,7 +15,4 @@ const copy = {
   tr: { title: 'Komşu delikler → bijon aralığı', note: 'Trigonometrik ilişki, düz çizgi ölçümü değildir', input: 'Girdi', result: 'Sonuç' },
 }[locale];
 ---
-<figure class="standard-visual is-pending" data-standard-visual aria-label={copy.title}>
-  <figcaption><span>{copy.title}</span><small>{copy.note}</small></figcaption>
-  <div class="standard-visual__equation"><div><small data-standard-visual-left-label>{copy.input}</small><strong data-standard-visual-left>—</strong></div><i aria-hidden="true">→</i><div><small data-standard-visual-right-label>{copy.result}</small><strong data-standard-visual-right>—</strong></div></div>
-</figure>
+<ToolDrawingFrame kind="bolt-pattern" labels={{}} locale={locale} readoutLabel={copy.result} />
