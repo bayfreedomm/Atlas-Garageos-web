@@ -118,10 +118,17 @@ async function verifyLiveKey(key) {
 
 async function submit(key, urlList) {
   const payload = JSON.stringify({ host: HOST, key, keyLocation: `${SITE}/${key}.txt`, urlList });
-  for (let attempt = 1; attempt <= 4; attempt += 1) {
+  for (let attempt = 1; attempt <= 8; attempt += 1) {
     const response = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json; charset=utf-8' }, body: payload });
     if (response.status === 200 || response.status === 202) return response.status;
     const text = (await response.text()).slice(0, 300);
+    // Right after the key file first goes live, engines verify it asynchronously and answer
+    // 403 SiteVerificationNotCompleted for a few minutes: wait and try again.
+    if (response.status === 403 && text.includes('SiteVerificationNotCompleted')) {
+      console.warn(`Key verification still pending (attempt ${attempt}); retrying in 2 minutes.`);
+      await sleep(120_000);
+      continue;
+    }
     if (response.status === 429 || response.status >= 500) {
       console.warn(`IndexNow HTTP ${response.status} (attempt ${attempt}): ${text}`);
       await sleep(attempt * 60_000);
@@ -129,7 +136,7 @@ async function submit(key, urlList) {
     }
     throw new Error(`IndexNow rejected the batch with HTTP ${response.status}: ${text}`);
   }
-  throw new Error('IndexNow kept failing after 4 attempts.');
+  throw new Error('IndexNow kept failing after 8 attempts.');
 }
 
 const key = await findKey();

@@ -360,8 +360,8 @@ body { background:var(--color-canvas)!important; color:var(--color-ink)!importan
 :root[data-theme="light"] .tire-tech-card header span,
 :root[data-theme="light"] .offset-tech-card header span,
 :root[data-theme="light"] .offset-tech-values span { color:#748695!important; }
-:root[data-theme="light"] .tire-tech-card svg text,
-:root[data-theme="light"] .offset-tech-card svg text { fill:#536979!important; }
+:root[data-theme="light"] .tire-tech-card svg:not(.fitment-section) text,
+:root[data-theme="light"] .offset-tech-card svg:not(.fitment-section) text { fill:#536979!important; }
 :root[data-theme="light"] .offset-tech-values>div { background:#f3f6f8!important; border-color:#d8e2e9!important; }
 :root[data-theme="light"] .offset-tech-values strong { color:#172635!important; }
 :root[data-theme="light"] .offset-tech-values small { color:#6e7f8c!important; }
@@ -1574,3 +1574,43 @@ p>.entity-confidence{white-space:normal;max-width:100%}
 .car-mpg-table tbody th{white-space:normal}
 .car-mpg-table tbody th .entity-card__meta{display:block;font-weight:500}
 @media (max-width:47.99rem){.car-mpg-table{table-layout:auto;width:100%}.car-mpg-table tbody th{min-width:0}}
+
+/* Fitment cross-section (src/ui/fitment-section.ts): one true-scale cut through the wheel axis. */
+.fitment-section{--fs-current:#2f7cf6;--fs-next:#f08a24;--fs-ink:var(--color-ink);--fs-muted:var(--color-ink-muted);display:block;width:100%;height:auto;font-family:inherit}
+.fitment-section text{fill:var(--fs-ink);font-size:22px;font-weight:600;letter-spacing:-.01em}
+.fitment-section .fs-axis{stroke:var(--color-line-strong);stroke-width:1;stroke-dasharray:6 6}
+.fitment-section .fs-setup--current .fs-tire{fill:color-mix(in srgb,var(--fs-current) 10%,transparent);stroke:var(--fs-current);stroke-width:2.4}
+.fitment-section .fs-setup--next .fs-tire{fill:color-mix(in srgb,var(--fs-next) 8%,transparent);stroke:var(--fs-next);stroke-width:2.4;stroke-dasharray:9 5}
+.fitment-section .fs-tread{fill:none;stroke-width:1.4;opacity:.55}
+.fitment-section .fs-setup--current .fs-tread{stroke:var(--fs-current)}
+.fitment-section .fs-setup--next .fs-tread{stroke:var(--fs-next)}
+.fitment-section .fs-rim,.fitment-section .fs-face{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fitment-section .fs-setup--current .fs-rim{stroke:var(--fs-current);stroke-width:4.5}
+.fitment-section .fs-setup--next .fs-rim{stroke:var(--fs-next);stroke-width:3;opacity:.95}
+.fitment-section .fs-setup--current .fs-face{stroke:color-mix(in srgb,var(--fs-current) 70%,transparent);stroke-width:3}
+.fitment-section .fs-setup--next .fs-face{stroke:color-mix(in srgb,var(--fs-next) 75%,transparent);stroke-width:2.2}
+.fitment-section .fs-centerline{stroke-width:1;stroke-dasharray:2 5;fill:none}
+.fitment-section .fs-setup--current .fs-centerline{stroke:var(--fs-current)}
+.fitment-section .fs-setup--next .fs-centerline{stroke:var(--fs-next)}
+.fitment-section .fs-hub{fill:var(--color-surface-strong);stroke:var(--color-line-strong);stroke-width:1.5}
+.fitment-section .fs-disc{fill:color-mix(in srgb,var(--fs-muted) 22%,transparent);stroke:var(--fs-muted);stroke-width:1.2}
+.fitment-section .fs-hubface{stroke:var(--fs-ink);stroke-width:2;stroke-dasharray:1 0}
+.fitment-section .fs-ref{fill:none;stroke:var(--fs-muted);stroke-width:2.5;stroke-linecap:round;opacity:.7}
+.fitment-section .fs-ref-label{fill:var(--fs-muted);font-size:16px;font-weight:700;letter-spacing:.06em}
+.fitment-section .fs-dim path{fill:none;stroke-width:1.3}
+.fitment-section .fs-dim--current path{stroke:var(--fs-current)}
+.fitment-section .fs-dim--current text{fill:var(--fs-current)}
+.fitment-section .fs-dim--next path{stroke:var(--fs-next)}
+.fitment-section .fs-dim--next text{fill:var(--fs-next)}
+.fitment-section .fs-dim--delta path{stroke:var(--fs-ink)}
+.fitment-section .fs-dim text{font-size:22px;font-variant-numeric:tabular-nums}
+.fitment-section .fs-swatch--current{fill:var(--fs-current)}
+.fitment-section .fs-swatch--next{fill:var(--fs-next)}
+.fitment-section .fs-legend text{font-size:20px}
+.fitment-section-frame{margin:0;padding:var(--space-4);border:var(--border);border-radius:var(--radius-md);background:var(--color-surface)}
+.fitment-section-frame figcaption{margin-top:var(--space-2);color:var(--color-ink-muted);font-size:var(--text-sm);line-height:1.4}
+.fitment-section-host{display:grid;place-items:center}
+.fitment-section-host .fitment-section{max-height:38rem;width:100%}
+.tire-tech-card--section{grid-column:1 / -1}
+.tire-tech-grid .tire-tech-card--magnify{grid-column:1 / -1}
+@media (max-width:40rem){.fitment-section text,.fitment-section .fs-dim text{font-size:30px}.fitment-section .fs-ref-label{font-size:22px}.fitment-section .fs-legend text{font-size:26px}}

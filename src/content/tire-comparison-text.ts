@@ -41,6 +41,8 @@ export interface TireComparisonText {
   readonly lead: (f: ComparisonFigures) => string;
   readonly answer: { readonly diameter: string; readonly speed: string; readonly width: string; readonly sidewall: string };
   readonly specHeading: string;
+  readonly sectionAria: (f: ComparisonFigures) => string;
+  readonly sectionCaption: (f: ComparisonFigures) => string;
   readonly colDifference: string;
   readonly speedHeading: string;
   readonly speedIntro: (f: ComparisonFigures) => string;
@@ -82,6 +84,8 @@ const en: TireComparisonText = {
     : `${f.b} is ${f.diameterPct} ${f.larger === 'b' ? 'larger' : 'smaller'} in overall diameter than ${f.a} (${f.diameterB} mm against ${f.diameterA} mm). With a speedometer set up for ${f.a}, an indicated ${f.speedShown} ${f.speedUnit} means a true ${f.speedTrue} ${f.speedUnit} on ${f.b}.`,
   answer: { diameter: 'Diameter', speed: 'True speed', width: 'Width', sidewall: 'Sidewall' },
   specHeading: 'Dimensions side by side',
+  sectionAria: (f) => `True-scale cross-section of ${f.a} and ${f.b} on the same axle`,
+  sectionCaption: (f) => `Blue: ${f.a}. Orange: ${f.b}. Both tires are drawn to scale on the same axle; rim and wheel shapes are illustrative.`,
   colDifference: 'Difference',
   speedHeading: 'Speedometer difference',
   speedIntro: (f) => `Speedometer calibrated for ${f.a}, car running on ${f.b}.`,
@@ -134,6 +138,8 @@ const de: TireComparisonText = {
     : `${f.b} hat einen um ${f.diameterPct} ${f.larger === 'b' ? 'größeren' : 'kleineren'} Gesamtdurchmesser als ${f.a} (${f.diameterB} mm statt ${f.diameterA} mm). Ist der Tacho auf ${f.a} abgestimmt, bedeutet eine Anzeige von ${f.speedShown} ${f.speedUnit} mit ${f.b} tatsächlich ${f.speedTrue} ${f.speedUnit}.`,
   answer: { diameter: 'Durchmesser', speed: 'Echtes Tempo', width: 'Breite', sidewall: 'Flanke' },
   specHeading: 'Maße im direkten Vergleich',
+  sectionAria: (f) => `Maßstäblicher Querschnitt von ${f.a} und ${f.b} auf derselben Achse`,
+  sectionCaption: (f) => `Blau: ${f.a}. Orange: ${f.b}. Beide Reifen maßstabsgetreu auf derselben Achse; Felgen- und Schüsselform sind schematisch.`,
   colDifference: 'Unterschied',
   speedHeading: 'Tachoabweichung',
   speedIntro: (f) => `Tacho auf ${f.a} abgestimmt, Fahrzeug fährt auf ${f.b}.`,
@@ -186,6 +192,8 @@ const es: TireComparisonText = {
     : `${f.b} tiene un diámetro total un ${f.diameterPct} ${f.larger === 'b' ? 'mayor' : 'menor'} que ${f.a} (${f.diameterB} mm frente a ${f.diameterA} mm). Con el velocímetro ajustado para ${f.a}, marcar ${f.speedShown} ${f.speedUnit} con ${f.b} significa ir realmente a ${f.speedTrue} ${f.speedUnit}.`,
   answer: { diameter: 'Diámetro', speed: 'Velocidad real', width: 'Ancho', sidewall: 'Flanco' },
   specHeading: 'Dimensiones lado a lado',
+  sectionAria: (f) => `Sección a escala de ${f.a} y ${f.b} sobre el mismo eje`,
+  sectionCaption: (f) => `Azul: ${f.a}. Naranja: ${f.b}. Ambos neumáticos a escala sobre el mismo eje; la forma de la llanta es ilustrativa.`,
   colDifference: 'Diferencia',
   speedHeading: 'Diferencia en el velocímetro',
   speedIntro: (f) => `Velocímetro ajustado para ${f.a}, coche rodando con ${f.b}.`,
@@ -238,6 +246,8 @@ const fr: TireComparisonText = {
     : `${f.b} a un diamètre extérieur ${f.diameterPct} plus ${f.larger === 'b' ? 'grand' : 'petit'} que ${f.a} (${f.diameterB} mm contre ${f.diameterA} mm). Avec un compteur réglé pour ${f.a}, ${f.speedShown} ${f.speedUnit} affichés correspondent en réalité à ${f.speedTrue} ${f.speedUnit} en ${f.b}.`,
   answer: { diameter: 'Diamètre', speed: 'Vitesse réelle', width: 'Largeur', sidewall: 'Flanc' },
   specHeading: 'Dimensions côte à côte',
+  sectionAria: (f) => `Coupe à l’échelle de ${f.a} et ${f.b} sur le même axe`,
+  sectionCaption: (f) => `Bleu : ${f.a}. Orange : ${f.b}. Les deux pneus sont à l’échelle sur le même axe ; la forme de la jante est indicative.`,
   colDifference: 'Écart',
   speedHeading: 'Écart au compteur',
   speedIntro: (f) => `Compteur réglé pour ${f.a}, véhicule roulant en ${f.b}.`,
@@ -290,6 +300,8 @@ const it: TireComparisonText = {
     : `${f.b} ha un diametro esterno ${f.larger === 'b' ? 'maggiore' : 'minore'} del ${f.diameterPct} rispetto a ${f.a} (${f.diameterB} mm contro ${f.diameterA} mm). Con il tachimetro tarato per ${f.a}, ${f.speedShown} ${f.speedUnit} indicati con ${f.b} corrispondono a ${f.speedTrue} ${f.speedUnit} reali.`,
   answer: { diameter: 'Diametro', speed: 'Velocità reale', width: 'Larghezza', sidewall: 'Spalla' },
   specHeading: 'Misure a confronto',
+  sectionAria: (f) => `Sezione in scala di ${f.a} e ${f.b} sullo stesso asse`,
+  sectionCaption: (f) => `Blu: ${f.a}. Arancione: ${f.b}. Entrambi i pneumatici in scala sullo stesso asse; la forma del cerchio è indicativa.`,
   colDifference: 'Differenza',
   speedHeading: 'Differenza sul tachimetro',
   speedIntro: (f) => `Tachimetro tarato per ${f.a}, auto montata con ${f.b}.`,
@@ -342,6 +354,8 @@ const ptBr: TireComparisonText = {
     : `O ${f.b} tem diâmetro externo ${f.diameterPct} ${f.larger === 'b' ? 'maior' : 'menor'} que o ${f.a} (${f.diameterB} mm contra ${f.diameterA} mm). Com o velocímetro calibrado para o ${f.a}, marcar ${f.speedShown} ${f.speedUnit} com o ${f.b} significa andar de verdade a ${f.speedTrue} ${f.speedUnit}.`,
   answer: { diameter: 'Diâmetro', speed: 'Velocidade real', width: 'Largura', sidewall: 'Flanco' },
   specHeading: 'Dimensões lado a lado',
+  sectionAria: (f) => `Corte em escala de ${f.a} e ${f.b} no mesmo eixo`,
+  sectionCaption: (f) => `Azul: ${f.a}. Laranja: ${f.b}. Os dois pneus em escala no mesmo eixo; o formato da roda é ilustrativo.`,
   colDifference: 'Diferença',
   speedHeading: 'Diferença no velocímetro',
   speedIntro: (f) => `Velocímetro calibrado para ${f.a}, carro rodando com ${f.b}.`,
@@ -394,6 +408,8 @@ const pl: TireComparisonText = {
     : `${f.b} ma o ${f.diameterPct} ${f.larger === 'b' ? 'większą' : 'mniejszą'} średnicę zewnętrzną niż ${f.a} (${f.diameterB} mm zamiast ${f.diameterA} mm). Przy prędkościomierzu ustawionym na ${f.a} wskazanie ${f.speedShown} ${f.speedUnit} na ${f.b} oznacza rzeczywiste ${f.speedTrue} ${f.speedUnit}.`,
   answer: { diameter: 'Średnica', speed: 'Realna prędkość', width: 'Szerokość', sidewall: 'Bok opony' },
   specHeading: 'Wymiary obok siebie',
+  sectionAria: (f) => `Przekrój w skali opon ${f.a} i ${f.b} na tej samej osi`,
+  sectionCaption: (f) => `Niebieska: ${f.a}. Pomarańczowa: ${f.b}. Obie opony w skali na tej samej osi; kształt felgi jest poglądowy.`,
   colDifference: 'Różnica',
   speedHeading: 'Różnica wskazań prędkościomierza',
   speedIntro: (f) => `Prędkościomierz ustawiony na ${f.a}, samochód na oponach ${f.b}.`,
@@ -446,6 +462,8 @@ const nl: TireComparisonText = {
     : `${f.b} heeft een ${f.diameterPct} ${f.larger === 'b' ? 'grotere' : 'kleinere'} buitendiameter dan ${f.a} (${f.diameterB} mm tegen ${f.diameterA} mm). Met een teller afgestemd op ${f.a} betekent ${f.speedShown} ${f.speedUnit} op de teller met ${f.b} in werkelijkheid ${f.speedTrue} ${f.speedUnit}.`,
   answer: { diameter: 'Diameter', speed: 'Echte snelheid', width: 'Breedte', sidewall: 'Wang' },
   specHeading: 'Afmetingen naast elkaar',
+  sectionAria: (f) => `Doorsnede op schaal van ${f.a} en ${f.b} op dezelfde as`,
+  sectionCaption: (f) => `Blauw: ${f.a}. Oranje: ${f.b}. Beide banden op schaal op dezelfde as; de velgvorm is indicatief.`,
   colDifference: 'Verschil',
   speedHeading: 'Afwijking snelheidsmeter',
   speedIntro: (f) => `Teller afgestemd op ${f.a}, auto rijdt op ${f.b}.`,
@@ -498,6 +516,8 @@ const tr: TireComparisonText = {
     : `${f.b}, ${f.a} ebadından ${f.diameterPct} daha ${f.larger === 'b' ? 'büyük' : 'küçük'} dış çapa sahip (${f.diameterA} mm yerine ${f.diameterB} mm). Kilometre saati ${f.a} için ayarlıysa, ${f.b} ile gösterge ${f.speedShown} ${f.speedUnit} derken gerçek hız ${f.speedTrue} ${f.speedUnit} olur.`,
   answer: { diameter: 'Çap farkı', speed: 'Gerçek hız', width: 'Genişlik farkı', sidewall: 'Yanak farkı' },
   specHeading: 'Ölçüler yan yana',
+  sectionAria: (f) => `${f.a} ve ${f.b} ebatlarının aynı aks üzerinde ölçekli kesiti`,
+  sectionCaption: (f) => `Mavi: ${f.a}. Turuncu: ${f.b}. İki lastik de aynı aks üzerinde ölçekli çizildi; jant biçimi temsilidir.`,
   colDifference: 'Fark',
   speedHeading: 'Kilometre saati sapması',
   speedIntro: (f) => `Kilometre saati ${f.a} için ayarlı, araç ${f.b} ile gidiyor.`,

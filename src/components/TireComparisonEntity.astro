@@ -13,6 +13,7 @@ import { comparisonModel, comparisonVehicles } from '../ui/tire-comparison';
 import { carModelLinkFor } from '../ui/car-locale';
 import { carName } from '../ui/car-pages';
 import { formatDecimal, formatMm, formatPlain } from '../ui/locale-format';
+import { renderFitmentSection } from '../ui/fitment-section';
 
 interface Props { readonly pair: TireComparisonPair; readonly locale: EntityLocale; }
 const { pair, locale } = Astro.props;
@@ -52,6 +53,13 @@ const columns = [
   { label: t.onSize(f.b), curated: vehicles.curatedB, models: vehicles.modelsB },
 ].filter((column) => column.curated.length + column.models.length > 0);
 const hasVehicles = vehicles.both.length > 0 || columns.length > 0;
+const sectionSvg = renderFitmentSection({
+  mode: 'tire',
+  current: { label: f.a, tireWidthMm: pair.a.widthMm, aspectRatio: pair.a.aspectRatio, rimInches: pair.a.rimDiameterInches },
+  next: { label: f.b, tireWidthMm: pair.b.widthMm, aspectRatio: pair.b.aspectRatio, rimInches: pair.b.rimDiameterInches },
+  labels: { current: '', next: '', aria: t.sectionAria(f) },
+  decimalComma: locale !== 'en',
+});
 ---
 <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
 <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -81,6 +89,10 @@ const hasVehicles = vehicles.both.length > 0 || columns.length > 0;
 
 <section class="entity-section" aria-labelledby="cmp-specs">
   <h2 id="cmp-specs">{t.specHeading}</h2>
+  <figure class="fitment-section-frame">
+    <div class="fitment-section-host" set:html={sectionSvg}></div>
+    <figcaption>{t.sectionCaption(f)}</figcaption>
+  </figure>
   <div class="entity-table-scroll">
     <table class="entity-table">
       <thead><tr><th scope="col">{page.specCols.measure}</th><th scope="col">{f.a}</th><th scope="col">{f.b}</th><th scope="col">{t.colDifference}</th></tr></thead>

@@ -1,3 +1,4 @@
+import { renderFitmentSection, type SectionLabels } from './fitment-section';
 import { calculateSpeedometerTool, calculateTireSizeTool, calculateWheelOffsetTool, compareTireSizesTool, speedometerTableTool, type SpeedometerTableRow, type TireToolInput } from '../features/tools/calculator-tools';
 import { plusSizeOptions, referenceTireSizeCount, tireSizeAvailability, type TireAvailability, type TireSizeSuggestion } from '../features/tools/tire-availability';
 import { localizedToolPath } from '../localization/locales';
@@ -872,6 +873,21 @@ function setTireComparisonTechnicalVisual(
   if (!visual) return;
   const text = TIRE_COMPARISON_TEXT[getPageLocale()];
 
+  // True-scale cross-section (src/ui/fitment-section.ts), re-rendered from the current inputs.
+  const sectionHost = visual.querySelector<HTMLElement>('[data-fitment-section]');
+  if (sectionHost) {
+    const locale = getPageLocale();
+    const labels = JSON.parse(sectionHost.dataset.labels ?? '{}') as SectionLabels;
+    const sizeLabel = (input: TireToolInput): string => `${input.widthMm}/${input.aspectRatio}${locale === 'en' ? 'R' : ' R'}${input.rimDiameterInches}`;
+    sectionHost.innerHTML = renderFitmentSection({
+      mode: 'tire',
+      current: { label: sizeLabel(original), tireWidthMm: original.widthMm, aspectRatio: original.aspectRatio, rimInches: original.rimDiameterInches },
+      next: { label: sizeLabel(proposed), tireWidthMm: proposed.widthMm, aspectRatio: proposed.aspectRatio, rimInches: proposed.rimDiameterInches },
+      labels,
+      decimalComma: locale !== 'en',
+    });
+  }
+
   const maxDiameter = Math.max(result.current.overallDiameterMm, result.proposed.overallDiameterMm);
   const sideScale = 76 / maxDiameter;
   const currentRadius = result.current.overallDiameterMm * sideScale;
@@ -1108,6 +1124,18 @@ function setWheelOffsetTechnicalVisual(
 ): void {
   const visual = form.querySelector<HTMLElement>('[data-offset-tech-visual]');
   if (!visual) return;
+  const sectionHost = visual.querySelector<HTMLElement>('[data-fitment-section]');
+  if (sectionHost) {
+    const decimalComma = getPageLocale() !== 'en';
+    const spec = (width: number, offset: number): string => `${decimalComma ? String(width).replace('.', ',') : width}J ET${offset}`;
+    sectionHost.innerHTML = renderFitmentSection({
+      mode: 'wheel',
+      current: { label: spec(originalWidthInches, originalOffsetMm), rimInches: 18, wheelWidthInches: originalWidthInches, offsetMm: originalOffsetMm },
+      next: { label: spec(newWidthInches, newOffsetMm), rimInches: 18, wheelWidthInches: newWidthInches, offsetMm: newOffsetMm },
+      labels: JSON.parse(sectionHost.dataset.labels ?? '{}') as SectionLabels,
+      decimalComma,
+    });
+  }
   const locale = getPageLocale();
   const direction = WHEEL_DIRECTION_TEXT[locale];
   const copy = WHEEL_OFFSET_COPY[locale];

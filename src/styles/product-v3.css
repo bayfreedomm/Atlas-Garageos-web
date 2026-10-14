@@ -380,7 +380,7 @@ main { width: min(100% - 2rem, var(--content-wide)); padding: 1.15rem 0 calc(5re
 .tire-tech-card header strong { font-size: .78rem; }
 .tire-tech-card header span { color: #7f929d; font-size: .52rem; font-weight: 850; letter-spacing: .1em; }
 .tire-tech-card svg { display: block; width: 100%; height: auto; margin-top: .25rem; }
-.tire-tech-card svg text { fill: #9eafb8; font: 750 8px var(--font-mono); }
+.tire-tech-card svg:not(.fitment-section) text { fill: #9eafb8; font: 750 8px var(--font-mono); }
 .tech-ground { fill: none; stroke: rgb(255 255 255 / 15%); stroke-width: 1; }
 .tech-side--current > circle:first-child { stroke: #4d9cff; stroke-width: 2; }
 .tech-side--current > circle:nth-child(2) { fill: #202b32; stroke: #85a5b8; stroke-width: 2; }
@@ -431,7 +431,7 @@ main { width: min(100% - 2rem, var(--content-wide)); padding: 1.15rem 0 calc(5re
 .offset-tech-card header strong { font-size: .78rem; }
 .offset-tech-card header span { color: #7f929d; font-size: .52rem; font-weight: 850; letter-spacing: .1em; }
 .offset-tech-card svg { display: block; width: 100%; height: auto; margin-top: .25rem; }
-.offset-tech-card svg text { fill: #9eafb8; font: 750 8px var(--font-mono); }
+.offset-tech-card svg:not(.fitment-section) text { fill: #9eafb8; font: 750 8px var(--font-mono); }
 .offset-body-line { fill: none; stroke: rgb(255 255 255 / 12%); stroke-width: 1; stroke-dasharray: 3 4; }
 .offset-boundary-label { fill: #71838d !important; font-size: 6.7px !important; }
 .offset-hub-plane { fill: none; stroke: #d8e1e5; stroke-width: 1.5; stroke-dasharray: 5 4; }

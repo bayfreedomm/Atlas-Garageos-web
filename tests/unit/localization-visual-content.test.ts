@@ -33,14 +33,14 @@ describe('V3 visual and localization foundation', () => {
   it('uses true-scale and magnified-difference tire visualization together', () => {
     expect(tireVisual).toContain('TRUE SCALE');
     expect(tireVisual).toContain('SMALL CHANGES MAGNIFIED');
-    expect(tireVisual).toContain('data-current-front-body');
-    expect(tireVisual).toContain('data-new-side-tire');
+    expect(tireVisual).toContain('data-fitment-section');
+    expect(tireVisual).toContain('renderFitmentSection');
   });
 
   it('uses a fixed hub plane for the live wheel-offset cutaway', () => {
     expect(offsetVisual).toContain('HUB MOUNTING FACE');
-    expect(offsetVisual).toContain('data-current-offset-body');
-    expect(offsetVisual).toContain('data-new-offset-body');
+    expect(offsetVisual).toContain('data-fitment-section');
+    expect(offsetVisual).toContain("mode: 'wheel'");
   });
 
   it('publishes a methodology page that distinguishes calculation from real-world verdicts', () => {

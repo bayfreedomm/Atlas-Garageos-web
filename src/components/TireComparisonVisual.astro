@@ -1,5 +1,6 @@
 ---
 import type { Visualization3DLocale } from '../localization/visualization-3d';
+import { renderFitmentSection } from '../ui/fitment-section';
 
 interface Props { readonly locale?: Visualization3DLocale | undefined; }
 const { locale = 'en' } = Astro.props;
@@ -140,6 +141,26 @@ const copy = {
     wet: 'Islak yol', wetText: 'Daha geniş lastik suda otomatik olarak daha güvenli değildir. Diş deseni, diş derinliği, hamur ve su yüksekliği önemlidir.',
   },
 }[locale];
+const SECTION_COPY = {
+  en: { title: 'True-scale cross-section', caption: 'Blue is the current tire, orange the new one, both on the same axle and drawn to scale. Rim and wheel-face shapes are illustrative.' },
+  de: { title: 'Maßstäblicher Querschnitt', caption: 'Blau ist der aktuelle Reifen, Orange der neue – beide auf derselben Achse und maßstabsgetreu. Felgen- und Schüsselform sind schematisch.' },
+  es: { title: 'Sección a escala real', caption: 'Azul es el neumático actual y naranja el nuevo, ambos sobre el mismo eje y a escala. La forma de la llanta y del disco es ilustrativa.' },
+  fr: { title: 'Coupe à l’échelle réelle', caption: 'Bleu : pneu actuel, orange : nouveau pneu, sur le même axe et à l’échelle. La forme de la jante et du voile est indicative.' },
+  it: { title: 'Sezione in scala reale', caption: 'Blu è il pneumatico attuale, arancione il nuovo, sullo stesso asse e in scala. La forma di cerchio e disco è indicativa.' },
+  'pt-br': { title: 'Corte em escala real', caption: 'Azul é o pneu atual e laranja o novo, no mesmo eixo e em escala. O formato da roda e do disco é ilustrativo.' },
+  pl: { title: 'Przekrój w rzeczywistej skali', caption: 'Niebieska to obecna opona, pomarańczowa – nowa, na tej samej osi i w skali. Kształt felgi i tarczy jest poglądowy.' },
+  nl: { title: 'Doorsnede op ware schaal', caption: 'Blauw is de huidige band, oranje de nieuwe, op dezelfde as en op schaal getekend. De vorm van velg en schotel is indicatief.' },
+  tr: { title: 'Gerçek ölçekli kesit', caption: 'Mavi mevcut lastik, turuncu yeni lastik; ikisi de aynı aks üzerinde ve ölçekli çizildi. Jant ve jant göbeği biçimi temsilidir.' },
+} as const;
+const section = SECTION_COPY[locale];
+const sectionLabels = { current: copy.current, next: copy.next, aria: copy.overlaySvgAria };
+const initialSection = renderFitmentSection({
+  mode: 'tire',
+  current: { label: locale === 'en' ? '225/45R18' : '225/45 R18', tireWidthMm: 225, aspectRatio: 45, rimInches: 18 },
+  next: { label: locale === 'en' ? '235/40R19' : '235/40 R19', tireWidthMm: 235, aspectRatio: 40, rimInches: 19 },
+  labels: sectionLabels,
+  decimalComma: locale !== 'en',
+});
 ---
 <figure class="tire-tech-visual" data-tire-tech-visual aria-labelledby="tire-tech-title">
   <figcaption>
@@ -148,88 +169,11 @@ const copy = {
   </figcaption>
 
   <div class="tire-tech-grid">
-    <section class="tire-tech-card tire-tech-card--overlay" aria-label={copy.overlayAria}>
-      <header><strong>{copy.overlay}</strong><span>{copy.trueScale}</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label={copy.overlaySvgAria}>
-        <defs>
-          <radialGradient id="tireShadeCurrent" cx="35%" cy="28%" r="76%"><stop offset="0" stop-color="#52636f"/><stop offset=".5" stop-color="#27333b"/><stop offset="1" stop-color="#11181d"/></radialGradient>
-          <filter id="tireShadow"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-opacity=".32"/></filter>
-        </defs>
-        <path class="tech-ground" d="M36 213H324" />
-        <ellipse class="tech-contact-shadow" cx="180" cy="212" rx="78" ry="8" />
-        <g class="tech-side tech-side--current" data-current-side transform="translate(180 116)" filter="url(#tireShadow)">
-          <circle data-current-side-tire r="76" fill="url(#tireShadeCurrent)"/>
-          <circle class="tech-sidewall-ring" r="67"/>
-          <circle data-current-side-rim r="48" />
-          <circle class="tech-rim-inner" r="36"/>
-          <circle class="tech-hub" r="8"/>
-          <path class="tech-spokes" d="M0-40V40M-40 0H40M-28-28 28 28M28-28-28 28" />
-        </g>
-        <g class="tech-side tech-side--new" data-new-side transform="translate(180 116)">
-          <circle data-new-side-tire r="72" fill="none"/>
-          <circle data-new-side-rim r="46" fill="none"/>
-        </g>
-        <g class="tech-measure tech-measure--current"><path data-current-diameter-line d="M76 40V192"/><path d="M68 40h16M68 192h16"/><text data-current-diameter-text x="51" y="119" text-anchor="middle">659.7 mm</text></g>
-        <g class="tech-measure tech-measure--new"><path data-new-diameter-line d="M284 43V189"/><path d="M276 43h16M276 189h16"/><text data-new-diameter-text x="309" y="119" text-anchor="middle">670.6 mm</text></g>
-        <g class="tech-legend-inline"><circle cx="122" cy="230" r="5" class="tech-dot-current"/><text x="133" y="234">{copy.current}</text><circle cx="219" cy="230" r="5" class="tech-dot-new"/><text x="230" y="234">{copy.next}</text></g>
-      </svg>
+    <section class="tire-tech-card tire-tech-card--section" aria-label={copy.overlayAria}>
+      <header><strong>{section.title}</strong><span>{copy.trueScale}</span></header>
+      <div class="fitment-section-host" data-fitment-section data-labels={JSON.stringify(sectionLabels)} set:html={initialSection}></div>
       <p class="tire-tech-caption" data-side-meaning>{copy.sideCaption}</p>
-    </section>
-
-    <section class="tire-tech-card tire-tech-card--front" aria-label={copy.frontAria}>
-      <header><strong>{copy.front}</strong><span>{copy.nominalWidth}</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label={copy.frontSvgAria}>
-        <defs>
-          <linearGradient id="frontTireCurrent" x1="0" x2="1"><stop offset="0" stop-color="#12191e"/><stop offset=".5" stop-color="#45535d"/><stop offset="1" stop-color="#11171c"/></linearGradient>
-          <linearGradient id="frontTireNew" x1="0" x2="1"><stop offset="0" stop-color="#18120f"/><stop offset=".5" stop-color="#714b36"/><stop offset="1" stop-color="#18120f"/></linearGradient>
-          <pattern id="treadCurrent" width="14" height="18" patternUnits="userSpaceOnUse"><path d="M2 0l8 9-8 9M12 0 4 9l8 9" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/></pattern>
-          <pattern id="treadNew" width="14" height="18" patternUnits="userSpaceOnUse"><path d="M2 0l8 9-8 9M12 0 4 9l8 9" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/></pattern>
-        </defs>
-        <path class="tech-ground" d="M28 213H332" />
-        <g data-current-front transform="translate(105 44)">
-          <rect data-current-front-body x="-47" y="0" width="94" height="166" rx="38" fill="url(#frontTireCurrent)"/>
-          <rect data-current-front-tread x="-43" y="4" width="86" height="158" rx="34" fill="url(#treadCurrent)"/>
-          <path class="front-centerline" d="M0 10v146" />
-        </g>
-        <g data-new-front transform="translate(255 44)">
-          <rect data-new-front-body x="-49" y="0" width="98" height="166" rx="38" fill="url(#frontTireNew)"/>
-          <rect data-new-front-tread x="-45" y="4" width="90" height="158" rx="34" fill="url(#treadNew)"/>
-          <path class="front-centerline front-centerline--new" d="M0 10v146" />
-        </g>
-        <g class="tech-width-measure tech-width-measure--current"><path data-current-width-line d="M58 29H152"/><path d="M58 23v12M152 23v12"/><text data-current-width-text x="105" y="18" text-anchor="middle">225 mm</text></g>
-        <g class="tech-width-measure tech-width-measure--new"><path data-new-width-line d="M206 29H304"/><path d="M206 23v12M304 23v12"/><text data-new-width-text x="255" y="18" text-anchor="middle">235 mm</text></g>
-        <text class="tech-front-label tech-front-label--current" x="105" y="232" text-anchor="middle" data-current-size-label>225/45 R18</text>
-        <text class="tech-front-label tech-front-label--new" x="255" y="232" text-anchor="middle" data-new-size-label>235/40 R19</text>
-      </svg>
-      <p class="tire-tech-caption" data-width-meaning>{copy.widthCaption}</p>
-    </section>
-
-    <section class="tire-tech-card tire-tech-card--vehicle" aria-label={copy.vehicleAria}>
-      <header><strong>{copy.vehicle}</strong><span>{copy.staticGeometry}</span></header>
-      <svg viewBox="0 0 360 250" role="img" aria-label={copy.vehicleSvgAria}>
-        <defs>
-          <linearGradient id="vehiclePanel" x1="0" x2="1"><stop offset="0" stop-color="#182a38"/><stop offset=".55" stop-color="#31546c"/><stop offset="1" stop-color="#12202a"/></linearGradient>
-        </defs>
-        <path class="tech-ground" d="M24 213H336" />
-        <g data-current-vehicle-group transform="translate(94 140)">
-          <path class="vehicle-quarter" d="M-76-42h30l21-30h65l26 28h28v28H-76Z" fill="url(#vehiclePanel)"/>
-          <path class="vehicle-fender" d="M-35-16a43 43 0 0 1 86 0"/>
-          <circle class="vehicle-tire vehicle-tire--current" data-current-vehicle-tire r="52"/>
-          <circle class="vehicle-rim" data-current-vehicle-rim r="31"/>
-          <path class="vehicle-spokes" d="M0-26V26M-26 0H26M-18-18 18 18M18-18-18 18"/>
-        </g>
-        <g data-new-vehicle-group transform="translate(266 137)">
-          <path class="vehicle-quarter vehicle-quarter--new" d="M-76-42h30l21-30h65l26 28h28v28H-76Z" fill="url(#vehiclePanel)"/>
-          <path class="vehicle-fender vehicle-fender--new" d="M-35-16a43 43 0 0 1 86 0"/>
-          <circle class="vehicle-tire vehicle-tire--new" data-new-vehicle-tire r="55"/>
-          <circle class="vehicle-rim vehicle-rim--new" data-new-vehicle-rim r="34"/>
-          <path class="vehicle-spokes vehicle-spokes--new" d="M0-26V26M-26 0H26M-18-18 18 18M18-18-18 18"/>
-        </g>
-        <text class="vehicle-label vehicle-label--current" x="94" y="232" text-anchor="middle">{copy.current}</text>
-        <text class="vehicle-label vehicle-label--new" x="266" y="232" text-anchor="middle">{copy.next}</text>
-        <g class="vehicle-ride-callout"><path data-vehicle-ride-arrow d="M173 141H183M178 141V145M173 145H183"/><text data-vehicle-ride-text x="178" y="130" text-anchor="middle">+5.5 mm</text></g>
-      </svg>
-      <p class="tire-tech-caption" data-vehicle-meaning>{copy.vehicleCaption}</p>
+      <p class="tire-tech-caption">{section.caption}</p>
     </section>
 
     <section class="tire-tech-card tire-tech-card--magnify" aria-label={copy.lensAria}>

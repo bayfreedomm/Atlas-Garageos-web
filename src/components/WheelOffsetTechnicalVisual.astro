@@ -1,5 +1,6 @@
 ---
 import type { Visualization3DLocale } from '../localization/visualization-3d';
+import { renderFitmentSection } from '../ui/fitment-section';
 interface Props { readonly locale?: Visualization3DLocale | undefined; }
 const { locale = 'en' } = Astro.props;
 const t = {
@@ -13,6 +14,15 @@ const t = {
   nl: { badge: 'Live velggeometrie', title: 'Zie waar de velg echt naartoe schuift', intro: 'Het montagevlak op de naaf blijft vast. Blauw is de originele velg; oranje de nieuwe. De tekening verandert mee met breedte en ET.', section: 'Doorsnede wielkast', proportional: 'PROPORTIONELE POSITIE', cross: 'Velgdoorsnede ten opzichte van naaf, ophanging en spatbord', diagram: 'Originele en nieuwe velgpositie ten opzichte van naaf, ophanging en spatbord', suspension: 'OPHANGING', fender: 'SPATBORD', hub: 'NAAFVLAK · VAST', current: 'HUIDIG', proposed: 'NIEUW', explanation: 'Uitleg ET (inpersdiepte)', changed: 'Wat verandert', framework: 'GETAL → VORM → BETEKENIS', top: 'Bovenaanzicht van huidige en nieuwe buitenpositie', original: 'Origineel', inner: 'Binnenrand', outer: 'Buitenrand', read: 'Lees de tekening als een doorsnede', initInner: 'De binnenrand schuift verder naar binnen.', initOuter: 'De buitenrand schuift verder richting spatbord.', note: 'Het montagevlak beweegt niet. Breedte en ET verschuiven de velg rond dat vaste vlak. Deze geometrie bevestigt geen vrije ruimte tot remmen, banden of spatbord.' },
   tr: { badge: 'Canlı jant geometrisi', title: 'Jantın gerçekte nereye kaydığını görün', intro: 'Porya montaj yüzeyi sabit kalır. Mavi orijinal jant, turuncu yeni jant. Çizim genişlik ve ET ile değişir.', section: 'Çamurluk içi kesiti', proportional: 'ORANTILI KONUM', cross: 'Porya, süspansiyon ve çamurluğa göre jant kesiti', diagram: 'Poryaya, süspansiyona ve çamurluğa göre eski ve yeni jant konumu', suspension: 'SÜSPANSİYON', fender: 'ÇAMURLUK', hub: 'PORYA YÜZEYİ · SABİT', current: 'MEVCUT', proposed: 'YENİ', explanation: 'Jant ofseti açıklaması', changed: 'Ne değişti', framework: 'SAYI → ŞEKİL → ANLAM', top: 'Mevcut ve yeni dış jant konumunun üstten görünümü', original: 'Orijinal', inner: 'İç kenar', outer: 'Dış kenar', read: 'Çizimi bir kesit gibi okuyun', initInner: 'İç kenar daha içeri kayar.', initOuter: 'Dış kenar çamurluğa doğru kayar.', note: 'Montaj yüzeyi hareket etmez. Genişlik ve ET jantı bu sabit düzlem etrafında kaydırır. Bu geometri fren, lastik veya çamurluk boşluğunu doğrulamaz.' },
 }[locale];
+const titleCase = (text: string): string => text.charAt(0) + text.slice(1).toLocaleLowerCase(locale === 'tr' ? 'tr' : locale);
+const sectionLabels = { current: t.current, next: t.proposed, hub: t.hub, suspension: t.suspension, fender: t.fender, inner: titleCase(t.inner), outer: titleCase(t.outer), aria: t.diagram };
+const initialSection = renderFitmentSection({
+  mode: 'wheel',
+  current: { label: '8J ET40', rimInches: 18, wheelWidthInches: 8, offsetMm: 40 },
+  next: { label: locale === 'en' ? '8.5J ET35' : '8,5J ET35', rimInches: 18, wheelWidthInches: 8.5, offsetMm: 35 },
+  labels: sectionLabels,
+  decimalComma: locale !== 'en',
+});
 ---
 <figure class="offset-tech-visual" data-offset-tech-visual aria-labelledby="offset-tech-title">
   <figcaption>
@@ -22,36 +32,7 @@ const t = {
   <div class="offset-tech-grid">
     <section class="offset-tech-card offset-tech-card--section" aria-label={t.cross}>
       <header><strong>{t.section}</strong><span>{t.proportional}</span></header>
-      <svg viewBox="0 0 420 250" role="img" aria-label={t.diagram}>
-        <defs>
-          <linearGradient id="wheelCurrentFill" x1="0" x2="1"><stop offset="0" stop-color="#223746"/><stop offset=".5" stop-color="#42647a"/><stop offset="1" stop-color="#1e2d36"/></linearGradient>
-          <linearGradient id="metalFill" x1="0" x2="1"><stop offset="0" stop-color="#6c7c86"/><stop offset=".5" stop-color="#c3cdd2"/><stop offset="1" stop-color="#52616b"/></linearGradient>
-        </defs>
-        <path class="offset-fender-shell" d="M320 34c44 21 66 59 69 118v42h-22v-40c-2-44-17-72-47-91Z"/>
-        <path class="offset-strut" d="M74 38l20 7-27 118-21-7Z"/>
-        <path class="offset-strut-link" d="M64 160l43 24"/>
-        <rect class="offset-brake-disc" x="202" y="68" width="16" height="118" rx="5" fill="url(#metalFill)"/>
-        <rect class="offset-brake-hat" x="205" y="91" width="10" height="72" rx="4"/>
-        <path class="offset-caliper" d="M188 93h17v67h-17c-11-18-11-49 0-67Z"/>
-        <text class="offset-boundary-label" x="34" y="25">{t.suspension}</text>
-        <text class="offset-boundary-label" x="386" y="25" text-anchor="end">{t.fender}</text>
-        <path class="offset-hub-plane" d="M210 31v168"/>
-        <text class="offset-hub-label" x="210" y="239" text-anchor="middle">{t.hub}</text>
-
-        <g class="offset-wheel offset-wheel--current" data-current-offset-wheel>
-          <rect data-current-offset-body x="102" y="88" width="183" height="74" rx="18" fill="url(#wheelCurrentFill)"/>
-          <path data-current-centerline d="M194 76v98" />
-        </g>
-        <g class="offset-wheel offset-wheel--new" data-new-offset-wheel>
-          <rect data-new-offset-body x="99" y="88" width="194" height="74" rx="18"/>
-          <path data-new-centerline d="M188 76v98" />
-        </g>
-        <circle class="offset-fixed-hub" cx="210" cy="125" r="8"/>
-        <g class="offset-overlay-legend"><circle cx="116" cy="52" r="5" class="tech-dot-current"/><text x="127" y="56">{t.current}</text><circle cx="220" cy="52" r="5" class="tech-dot-new"/><text x="231" y="56">{t.proposed}</text></g>
-
-        <g class="offset-arrow offset-arrow--inner"><path data-inner-arrow d="M102 210H99"/><path data-inner-head-left d="M102 206l-7 4 7 4"/><path data-inner-head-right d="M99 206l7 4-7 4"/><text data-inner-delta x="100.5" y="201" text-anchor="middle">1.4 mm</text></g>
-        <g class="offset-arrow offset-arrow--outer"><path data-outer-arrow d="M285 210H293"/><path data-outer-head-left d="M285 206l-7 4 7 4"/><path data-outer-head-right d="M293 206l7 4-7 4"/><text data-outer-delta x="289" y="201" text-anchor="middle">11.4 mm</text></g>
-      </svg>
+      <div class="fitment-section-host" data-fitment-section data-labels={JSON.stringify(sectionLabels)} set:html={initialSection}></div>
       <div class="offset-position-summary"><span data-inner-meaning>{t.initInner}</span><span data-outer-meaning>{t.initOuter}</span></div>
     </section>
 
