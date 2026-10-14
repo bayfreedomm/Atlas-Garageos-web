@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T00:17:11.733Z",
+  "generatedAt": "2026-10-14T08:40:54.766Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -8,31 +8,31 @@
         "id": "e5",
         "label": "Gasolina 95 E5",
         "value": 1.787,
-        "sampleSize": 10945
+        "sampleSize": 10940
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.948,
-        "sampleSize": 5500
+        "sampleSize": 5495
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.887,
-        "sampleSize": 11295
+        "value": 1.888,
+        "sampleSize": 11289
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.977,
-        "sampleSize": 5921
+        "value": 1.976,
+        "sampleSize": 5916
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-14T00:16:39.083Z",
-    "lastSuccessAt": "2026-10-14T00:16:39.083Z"
+    "lastAttemptAt": "2026-10-14T08:40:33.742Z",
+    "lastSuccessAt": "2026-10-14T08:40:33.742Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-14T00:16:39.133Z",
-    "lastSuccessAt": "2026-10-14T00:16:39.133Z",
+    "lastAttemptAt": "2026-10-14T08:40:33.793Z",
+    "lastSuccessAt": "2026-10-14T08:40:33.793Z",
     "weekOf": "2026-10-05"
   }
 }
