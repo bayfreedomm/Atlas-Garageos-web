@@ -105,3 +105,15 @@ Current local Garage storage is not presented as durable account storage. Any fu
 
 - 2026-10-08 — Vehicles are published in every entity language instead of being split by market (US → EN only, EU → DE/ES only). The page states the market; this quadruples vehicle pages without new data and keeps every vehicle link in the reader's language.
 - 2026-10-08 — Stop automated collection from any site that serves a human-verification/bot check; switch source instead.
+
+## 2026-10-14 — Value of the existing graph before more URLs
+
+Status: `ACCEPTED`.
+
+- No new pSEO route family or mass URL generation this cycle; the ~49,000-page graph is linked, enriched and measured first. Generation sections on existing car model pages are allowed because they add no URL.
+- `/sitemap.xml` is a sitemap index with one child per page type so Search Console reports indexing per cluster; IndexNow submits only new/changed/removed sitemap URLs.
+- Query-string URLs are calculator state and are disallowed in robots.txt (`Disallow: /*?`); internal hand-off links may keep using them.
+- Tire comparison pages exist only for factory-backed pairs (two factory sizes of one vehicle/wheel record, or a factory size and its closest ±1-inch manufactured alternative). Same-diameter plus-one pairs (e.g. 255/40 R19 vs 255/35 R20) are kept: rim size and sidewall differ and that is the question being searched.
+- Vehicle and model pages link sizes onward (tire page, published comparison, pre-filled speedometer/tire calculator) but never state that a size fits; ANKUSI sizes are labelled "recorded", not standard/option.
+
+Rationale: Search Console showed 6.5k indexed vs 10.4k discovered-not-indexed with ~100k crawlable parameter variants; crawl focus and per-cluster measurement are worth more than page count.

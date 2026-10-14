@@ -121,6 +121,13 @@ export function comparisonsForTireSize(notation: string): readonly TireCompariso
   return list.slice().sort((p, q) => Number(p.reason !== 'same-vehicle') - Number(q.reason !== 'same-vehicle'));
 }
 
+const pairsBySlug = new Map(tireComparisonPairs.map((pair) => [pair.slug, pair]));
+
 export function tireComparisonBySlug(slug: string): TireComparisonPair | undefined {
-  return tireComparisonPairs.find((pair) => pair.slug === slug);
+  return pairsBySlug.get(slug);
+}
+
+/** The published comparison page for two sizes, if that pair is one of the factory-backed pairs. */
+export function publishedComparison(x: TireSizeEntry, y: TireSizeEntry): TireComparisonPair | undefined {
+  return x.notation === y.notation ? undefined : pairsBySlug.get(tireComparisonSlug(x, y));
 }

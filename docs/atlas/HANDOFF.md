@@ -2,6 +2,13 @@
 
 Updated: 2026-10-14.
 
+## 2026-10-14 evening session (v7-15, v7-16)
+
+- v7-15: `src/ui/fitment-section.ts` true-scale cross-section on the tire comparison and wheel offset calculators and on all tire comparison pages; IndexNow retries while a new key is being verified.
+- v7-16: Vehicle → Tire → Compare → Calculator flow (`TireSizeFlow.astro`, `src/content/vehicle-flow-text.ts`, `src/ui/model-tire-flow.ts`) on vehicle pages and EN/localized car model pages; comparison pages link the speedometer and fit-check calculators with both sizes; `publishedComparison()` / `speedometerHref()` / `fitCheckHref()`; robots `Disallow: /*?` enforced by the SEO audit; docs reconciled to the current master (see PROJECT_STATE snapshot).
+- Verified: link crawl (0 orphans, 0 broken, depth ≤ 4), prefill of speedometer/fit-check from `?current=&new=` in Chromium, 390 px layout of the flow table, full test/check/build/audit gate.
+- Open: branch `parca-3-model-sayfalari` (generation table + 9-locale copy, not wired in); Bing Webmaster registration; Search Console per-sitemap reading after 2–3 weeks.
+
 ## 2026-10-14 session (v7-14)
 
 - Sitemap: `/sitemap.xml` is now a sitemap index with one child per page type (`src/seo/sitemap.ts` → `sitemapGroups()`; `src/pages/sitemap-[group].xml.ts`): pages, tire-sizes, tire-comparisons, bolt-patterns, vehicles, cars, car-years, cars-localized, obd-codes. `scripts/audit-seo-build.mjs` follows the index and checks the 50,000-URL / 50 MB limits.
@@ -70,4 +77,6 @@ Updated: 2026-10-14.
 
 ## Next sensible task
 
-Complete the remaining DTC cycle/retired-record tests and the route/sitemap publication projection using synthetic fixtures only. In parallel, procure/approve the source license; after that gate passes, curate the first 50 candidates and expand toward the 250-page public target.
+Current (2026-10-14): follow `ROADMAP.md` → "P0 — next three" (per-sitemap measurement, generation answers on car model pages from branch `parca-3-model-sayfalari`, tire-page CTR).
+
+Historical (pre-2026-10-14): complete the remaining DTC cycle/retired-record tests and the route/sitemap publication projection using synthetic fixtures only. In parallel, procure/approve the source license; after that gate passes, curate the first 50 candidates and expand toward the 250-page public target.

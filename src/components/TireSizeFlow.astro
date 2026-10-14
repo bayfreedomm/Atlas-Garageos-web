@@ -1,0 +1,57 @@
+---
+// Vehicle → Tire size → Compare → Calculator. One table of the sourced sizes for a vehicle or
+// car model: each row opens the tire-size page, the published comparison with the baseline size
+// (only factory-backed pairs have one; otherwise the comparison calculator, pre-filled) and the
+// speedometer calculator, pre-filled. No new URLs; no fitment verdict.
+import { publishedComparison } from '../data/tire-comparisons';
+import { tireSizeByNotation, type TireSizeEntry } from '../data/tire-size-catalog';
+import { vehicleFlowText } from '../content/vehicle-flow-text';
+import { entityDetailPath, type EntityLocale } from '../seo/entity-routes';
+import { displayTireNotation, signed, speedometerHref, tireCalculatorHref, tireComparisonHref, tireSizeMetrics } from '../ui/entity-page-model';
+import { formatDecimal } from '../ui/locale-format';
+
+import type { FlowSize } from '../ui/model-tire-flow';
+interface Props { readonly locale: EntityLocale; readonly heading: string; readonly intro: string; readonly sizes: readonly FlowSize[]; readonly id: string }
+const { locale, heading, intro, sizes, id } = Astro.props;
+const t = vehicleFlowText[locale];
+
+const seen = new Set<string>();
+const rows = sizes
+  .map((size) => ({ ...size, entry: tireSizeByNotation(size.notation) }))
+  .filter((row): row is FlowSize & { entry: TireSizeEntry } => row.entry !== undefined && !seen.has(row.notation) && Boolean(seen.add(row.notation)));
+const baseline = rows.find((row) => row.role === 'standard') ?? rows[0];
+const baseDiameter = baseline ? tireSizeMetrics(baseline.entry).overallDiameterMm : 0;
+---
+{rows.length > 0 && baseline && (
+  <section class="entity-section" aria-labelledby={id}>
+    <h2 id={id}>{heading}</h2>
+    <p class="entity-note">{intro}</p>
+    <div class="entity-table-scroll">
+      <table class="entity-table tire-flow-table">
+        <thead><tr><th scope="col">{t.cols.size}</th><th scope="col">{t.cols.fitment}</th><th scope="col" class="is-optional">{t.cols.diameter}</th><th scope="col">{baseline.role === 'standard' ? t.cols.vsStandard : `Δ Ø ${displayTireNotation(baseline.notation, locale)}`}</th><th scope="col">{t.cols.next}</th></tr></thead>
+        <tbody>
+          {rows.map((row) => {
+            const diameter = tireSizeMetrics(row.entry).overallDiameterMm;
+            const isBase = row === baseline;
+            const pair = isBase ? undefined : publishedComparison(baseline.entry, row.entry);
+            const compareHref = pair ? entityDetailPath('tire-size', locale, pair.slug) : tireComparisonHref(locale, baseline.entry, row.entry);
+            return (
+              <tr>
+                <th scope="row"><a href={entityDetailPath('tire-size', locale, row.entry.slug)}>{displayTireNotation(row.notation, locale)}</a></th>
+                <td>{row.role === 'standard' ? t.standard : row.role === 'option' ? t.option : t.recorded}</td>
+                <td class="is-optional">{formatDecimal(diameter, 0, locale)} mm</td>
+                <td>{isBase ? <span class="entity-soft">{t.baseline}</span> : signed(((diameter / baseDiameter) - 1) * 100, 1, '%', locale)}</td>
+                <td class="tire-flow-actions">
+                  {isBase
+                    ? <a class="entity-inline-link" href={tireCalculatorHref(locale, row.entry)}>{t.calculator} ›</a>
+                    : <><a class="entity-inline-link" href={compareHref}>{t.compare} ›</a> <a class="entity-inline-link" href={speedometerHref(locale, baseline.entry, row.entry)}>{t.speedometer} ›</a></>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="entity-note">{t.note}</p>
+  </section>
+)}

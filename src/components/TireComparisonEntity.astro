@@ -8,7 +8,8 @@ import { tireComparisonText } from '../content/tire-comparison-text';
 import { tireSizePageText } from '../content/entity-page-text';
 import { entityDetailPath, entityHubPath, type EntityLocale } from '../seo/entity-routes';
 import { serializeJsonLd } from '../seo/safe-json-ld';
-import { displayTireNotation, homePath, signed, tireComparisonHref, vehicleLink } from '../ui/entity-page-model';
+import { displayTireNotation, fitCheckHref, homePath, signed, speedometerHref, tireComparisonHref, vehicleLink } from '../ui/entity-page-model';
+import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { comparisonModel, comparisonVehicles } from '../ui/tire-comparison';
 import { carModelLinkFor } from '../ui/car-locale';
 import { carName } from '../ui/car-pages';
@@ -19,6 +20,7 @@ interface Props { readonly pair: TireComparisonPair; readonly locale: EntityLoca
 const { pair, locale } = Astro.props;
 
 const t = tireComparisonText[locale];
+const flow = vehicleFlowText[locale];
 const page = tireSizePageText[locale];
 const vehicles = comparisonVehicles(pair);
 const model = comparisonModel(pair, locale, vehicles);
@@ -169,6 +171,10 @@ const sectionSvg = renderFitmentSection({
     <a class="entity-link-card" href={linkA.href}><strong>{t.sizeCta(linkA.label)}</strong><span>{t.sizeCtaDetail}</span><i aria-hidden="true">›</i></a>
     <a class="entity-link-card" href={linkB.href}><strong>{t.sizeCta(linkB.label)}</strong><span>{t.sizeCtaDetail}</span><i aria-hidden="true">›</i></a>
   </div>
+  <p class="entity-hero__links">
+    <a class="entity-inline-link" href={speedometerHref(locale, pair.a, pair.b)}>{flow.speedometer} ›</a>
+    <a class="entity-inline-link" href={fitCheckHref(locale, pair.a, pair.b)}>{flow.fitCheck} ›</a>
+  </p>
 </nav>
 
 {related.length > 0 && (

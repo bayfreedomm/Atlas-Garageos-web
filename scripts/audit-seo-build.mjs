@@ -55,6 +55,8 @@ if (sitemapUrls.some((url) => !url.startsWith(`${origin}/`) || /[?#]/.test(url))
 
 const robots = await readFile(new URL('robots.txt', root), 'utf8');
 if (!robots.includes(`Sitemap: ${origin}/sitemap.xml`)) failures.push('robots.txt does not advertise the canonical sitemap.');
+// Calculator state lives in query strings; those variants must not compete for crawl budget.
+if (!/^Disallow: \/\*\?$/m.test(robots)) failures.push('robots.txt must disallow query-string (calculator state) URLs.');
 
 const htmlFiles = (await filesBelow(rootPath)).filter((file) => file.endsWith('.html'));
 const pages = new Map();

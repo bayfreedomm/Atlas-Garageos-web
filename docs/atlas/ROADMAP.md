@@ -1,11 +1,21 @@
 # Atlas GarageOS — Reconciled Roadmap
 
-Updated: 2026-10-08. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
+Updated: 2026-10-14. Priority combines user value, organic opportunity, differentiation, data trust, reuse, cost, and duplication risk.
+
+## P0 — next three (2026-10-14, ranked by Search Console signal)
+
+Rule for this cycle: no new pSEO route family or mass URL generation. Improve, link and measure the existing ~49,000-page graph.
+
+1. `PLANNED` — **Measure which cluster Google rewards.** Submit `/sitemap.xml` (index) in Search Console and Bing Webmaster; after 2–3 weeks read indexed / discovered-not-indexed per typed sitemap and per locale. Decide car-years (8,158 EN pages, weakest linking) and cars-localized depth from that data, not before. Confirm IndexNow runs green and robots `Disallow: /*?` has reduced crawled-not-indexed parameter URLs.
+2. `PLANNED` — **Generation answers on existing car model pages** (branch `parca-3-model-sayfalari`): editorial generation years for ~35 high-demand EU/TR models mapped onto ANKUSI records ("Megane 4", "Corsa F", "Passat B8" headings, FAQ and titles) plus a bolt-pattern-by-year timeline for every other model. Targets impressions already at positions 5–8 with 0 clicks ("opel corsa f lochkreis", "megane 4 bijon aralığı", "duster bijon aralığı"). No new URLs.
+3. `PLANNED` — **CTR on tire-size pages (where ~all clicks come from)**: rewrite titles/descriptions for the DE/ES/PL tire sizes with impressions but low CTR, and surface the new cross-section and comparison links above the fold. Watch 2–4 weeks before further changes.
 
 ## P0 — protect and measure the current foundation
 
-- `PARTIAL` — Finish deployed launch gates: local rendered-output canonical/hreflang/sitemap/noindex/JSON-LD/title/description checks now pass across all 1,927 HTML outputs. Search Console, Bing Webmaster/IndexNow, deployed 404/redirect/Open Graph smoke tests and Core Web Vitals remain.
-- `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 1,923 indexable canonicals with 1,923 sitemap URLs and reports zero long-title/description advisories.
+- `VERIFIED DONE` — 2026-10-14: typed sitemap index + IndexNow (v7-14), true-scale cross-section drawing (v7-15), Vehicle → Tire → Compare → Calculator flow and robots query-URL disallow (v7-16). Link crawl: 0 orphans, 0 broken internal links, max click depth 4.
+
+- `PARTIAL` — Finish deployed launch gates: local rendered-output canonical/hreflang/sitemap/noindex/JSON-LD/title/description checks pass across all 48,964 HTML outputs; IndexNow is wired. Bing Webmaster registration, deployed 404/redirect/Open Graph smoke tests and Core Web Vitals remain.
+- `VERIFIED DONE` — Keep `pnpm audit:seo` in every release gate. It currently reconciles 48,954 indexable canonicals with 48,954 sitemap URLs across the 9 typed sitemaps, requires `Disallow: /*?` in robots.txt and reports zero long-title/description advisories.
 - `PLANNED` — Analyze Cloudflare 3xx/4xx by path and status. Separate intentional language/HTTPS redirects from broken URLs, bot probes, and real user errors; do not block Googlebot/Bingbot blindly.
 - `PLANNED` — Complete visual acceptance on representative mobile widths, WebKit/Firefox, keyboard/assistive technology, reduced motion, low-power GPU, and deployed pages.
 - `VERIFIED DONE` — Local Chromium acceptance at 390 px covered all 23 English tool routes: no document-level horizontal overflow, all opened 3D studios initialized with WebGL, and no browser console error/warning was observed in the sampled live-state pass. Physical devices, WebKit/Firefox, accessibility and deployed performance remain in the broader acceptance item above.

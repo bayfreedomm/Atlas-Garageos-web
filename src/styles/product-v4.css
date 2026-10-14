@@ -1614,3 +1614,8 @@ p>.entity-confidence{white-space:normal;max-width:100%}
 .tire-tech-card--section{grid-column:1 / -1}
 .tire-tech-grid .tire-tech-card--magnify{grid-column:1 / -1}
 @media (max-width:40rem){.fitment-section text,.fitment-section .fs-dim text{font-size:30px}.fitment-section .fs-ref-label{font-size:22px}.fitment-section .fs-legend text{font-size:26px}}
+/* Vehicle → Tire → Compare → Calculator table (src/components/TireSizeFlow.astro). */
+.tire-flow-table .entity-soft{color:var(--color-ink-soft);font-style:italic}
+.tire-flow-actions{white-space:nowrap}
+.tire-flow-actions .entity-inline-link+.entity-inline-link{margin-left:.6rem}
+@media (max-width:40rem){.tire-flow-table{min-width:0;width:100%}.tire-flow-table thead{display:none}.tire-flow-table tr{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:.25rem .75rem;padding:.7rem .2rem;border-bottom:var(--border)}.tire-flow-table th,.tire-flow-table td{padding:0;border:0}.tire-flow-table td.is-optional{display:none}.tire-flow-actions{grid-column:1 / -1;white-space:normal}.tire-flow-actions .entity-inline-link{display:inline-block;margin:.15rem .9rem .15rem 0}.tire-flow-actions .entity-inline-link+.entity-inline-link{margin-left:0}}

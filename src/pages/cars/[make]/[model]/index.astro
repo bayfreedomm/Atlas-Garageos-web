@@ -22,6 +22,7 @@ const latest = years[0];
 const latestSummary = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []) : undefined;
 const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
 const curated = curatedVehiclesFor(model);
+const flowSizes = modelFlowSizes(model);
 const faqs = [
   ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the generation: ${pcds.join(', ')}. See the table for each version and year.` }] : []),
   ...(latest !== undefined && latestSummary?.best ? [{ q: `What MPG does the ${latest} ${name} get?`, a: `The EPA rates the ${latest} ${name} at up to ${latestSummary.best} ${latestSummary.electric ? 'MPGe' : 'MPG'} combined. Every model year is listed below.` }] : []),
@@ -34,6 +35,9 @@ const answer = [
   { label: 'Bolt pattern', value: pcds[0] ?? '—', href: boltHref(pcds[0]) },
   { label: 'Center bore', value: bores[0] ? `${bores[0]} mm` : '—' },
 ];
+import TireSizeFlow from '../../../../components/TireSizeFlow.astro';
+import { vehicleFlowText } from '../../../../content/vehicle-flow-text';
+import { modelFlowSizes } from '../../../../ui/model-tire-flow';
 ---
 <SiteLayout title={carModelTitle(model)} description={carModelDescription(model)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: pathname }]}>
   {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
@@ -97,6 +101,8 @@ const answer = [
       <p class="entity-note">"Flush fit" and "max wheel" are aftermarket guidance from the source, not factory approvals — check clearance, load rating and local rules before fitting.</p>
     </section>
   )}
+
+  <TireSizeFlow locale="en" id="model-tire-flow" heading={vehicleFlowText.en.modelHeading(`${model.make} ${model.model}`)} intro={vehicleFlowText.en.modelIntro} sizes={flowSizes} />
 
   {curated.length > 0 && (
     <section class="entity-section" aria-labelledby="model-curated">

@@ -1,6 +1,30 @@
 # Atlas GarageOS — Verified Project State
 
-Snapshot date: 2026-10-08. This file records what the repository proves today; it is not a wishlist.
+Snapshot date: 2026-10-14 (master after v7-16). This file records what the repository proves today; it is not a wishlist. Dated sections further down are history; where a number differs, the snapshot below wins.
+
+## Current snapshot — 2026-10-14
+
+| Measure | Value | Evidence |
+|---|---|---|
+| HTML pages built | 48,964 (48,954 indexable + 404 + 9 noindex embeds) | `pnpm build`, `pnpm audit:seo` |
+| Sitemap | `/sitemap.xml` is a sitemap index with 9 typed children | `src/seo/sitemap.ts` `sitemapGroups()` |
+| `pages` (home, hubs, 23 calculators, policies × 9 locales) | 264 | `sitemap-pages.xml` |
+| `tire-sizes` (974 sizes + 18 height groups + hub, × 9) | 8,937 | `sitemap-tire-sizes.xml` |
+| `tire-comparisons` (542 factory-backed pairs × 9) | 4,878 | `src/data/tire-comparisons.ts` |
+| `bolt-patterns` (22 patterns + 169 make charts + hub, × 9) | 1,728 | `sitemap-bolt-patterns.xml` |
+| `vehicles` (204 curated rows + hub, × 9, + 3 compare hubs) | 1,848 | `src/data/vehicle-fitment.ts` |
+| `cars` (EN directory, 246 makes, 3,133 models) | 3,380 | `src/data/cars.ts` |
+| `car-years` (EN EPA model years from 2000) | 8,158 | `yearPageYears()` |
+| `cars-localized` (169 makes, 2,298 ANKUSI models, × 8 locales) | 19,744 | `src/ui/car-locale.ts` |
+| `obd-codes` (hub + 16 guides) | 17 | `src/data/dtc-records.ts` |
+| Locales | en, de, es, fr, it, pt-br, pl, nl, tr — all `published: true`; every calculator translated | `src/localization/locales.ts` |
+| Tests | 49 files / 333 tests | `pnpm test` |
+| Internal link graph | 0 orphan pages, 0 broken internal links, every page ≤ 4 clicks from `/` | rendered-output link crawl, 2026-10-14 |
+
+- `VERIFIED DONE` — IndexNow: key file `public/719c746308ef2b913463b2443bb03c00.txt`, `/build-id.txt`, `scripts/indexnow.mjs` and `.github/workflows/indexnow.yml` submit only new/changed/removed sitemap URLs after Cloudflare serves the commit. The first live run (2026-10-14) was answered `403 SiteVerificationNotCompleted` while the engines verified the fresh key; the script now waits and retries.
+- `VERIFIED DONE` — `robots.txt` disallows query-string URLs (`Disallow: /*?`): internal hand-off links produce ~104,800 distinct calculator-state variants, all canonicalised to clean routes. Enforced by `pnpm audit:seo`.
+- `VERIFIED DONE` — Vehicle → Tire → Compare → Calculator flow (`src/components/TireSizeFlow.astro`) on curated vehicle pages and on EN/localized car model pages with tire data: each sourced size opens its tire page, the published comparison with the baseline (only factory-backed pairs; otherwise the comparison calculator pre-filled), the speedometer calculator pre-filled, or the tire calculator. Comparison pages also hand both sizes to the speedometer and fit-check calculators. No new URLs.
+- `VERIFIED DONE` — One true-scale fitment cross-section (`src/ui/fitment-section.ts`) replaces the small side/front/vehicle panels on the tire-comparison and wheel-offset calculators and appears on every tire comparison page.
 
 ## Build and architecture
 
@@ -8,14 +32,13 @@ Snapshot date: 2026-10-08. This file records what the repository proves today; i
 - `VERIFIED DONE` — `src/core` contains pure TypeScript calculation domains for tire geometry, wheel position, fitment clearance/search, drivetrain, EV energy, and units.
 - `VERIFIED DONE` — UI, localization, SEO, browser state, visualization, and storage live outside `src/core`.
 - `VERIFIED DONE` — Quality scripts are `pnpm test`, `pnpm typecheck`, and `pnpm build`.
-- `VERIFIED DONE` — Current workspace build generated 2,145 static pages (2026-10-08; 42 test files / 291 tests, 0 check errors) during the latest successful production build; the normal Vite large-chunk note remains non-fatal.
+- `VERIFIED DONE` — Current build: see the snapshot table (48,964 pages, ~3 min 10 s locally). The 2026-10-08 figure of 2,145 pages is historical. The normal Vite large-chunk note (three-3d, lazy-loaded) remains non-fatal.
 
 ## Published product surface
 
 - `VERIFIED DONE` — `src/seo/tool-registry.ts` defines the implemented calculator/data-product registry and localized route helpers.
 - `VERIFIED DONE` — 23 registry entries are `kind: 'tool'`, plus the Fitment Studio flagship and Gas Prices Today data product.
-- `VERIFIED DONE` — EN, DE, and ES are published route families. PT-BR and FR remain unpublished pending full translation QA.
-- `ACCEPTED` — FR and PT-BR are the next language families; they remain `PLANNED` until complete localized catalogues and route QA exist.
+- `VERIFIED DONE` — All nine locales (en, de, es, fr, it, pt-br, pl, nl, tr) are published route families with translated calculators, entity pages and policies (superseding the 2026-10-08 EN/DE/ES-only state).
 - `VERIFIED DONE` — Tool families include tires/wheels, fuel/trips, converters, performance, EV, fitment, vehicle reference, and gas-price history.
 - `VERIFIED DONE` — Shareable calculator state is client-side URL state; clean canonical routes remain separate from application state.
 - `VERIFIED DONE` — Page-specific quick facts, common mistakes, warnings, methodology, related tools, decision graphs, and localized copy are implemented for the current registry.
@@ -23,18 +46,18 @@ Snapshot date: 2026-10-08. This file records what the repository proves today; i
 ## Search and indexability
 
 - `VERIFIED DONE` — `scripts/audit-seo-build.mjs` now enforces the rendered-output SEO contract across all generated HTML: unique non-empty titles and descriptions per language, one indexable H1, route-matching canonical URLs, sitemap membership, valid JSON-LD, reciprocal self-referencing hreflang clusters with `x-default`, and no query/fragment URLs.
-- `VERIFIED DONE` — The latest production output (2026-10-08) contains 2,145 HTML files, 2,141 indexable canonical pages and exactly 2,141 sitemap URLs. The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
+- `VERIFIED DONE` — The latest production output (2026-10-14) contains 48,964 HTML files, 48,954 indexable canonical pages and exactly 48,954 sitemap URLs (historical: 2,145 / 2,141 on 2026-10-08). The only excluded HTML outputs are the 404 page and three embed routes, each intentionally `noindex`; none appears in the sitemap.
 - `VERIFIED DONE` — The latest length review reports zero titles over 75 characters and zero descriptions over 180 characters. Shared EN/DE/ES tire/bolt templates and the remaining page-specific outliers were shortened without changing route identity or page purpose.
 - `PARTIAL` — Local technical SEO is verified, but Google indexing, search-result rewrites, ranking, deployed Core Web Vitals and crawl behavior remain external outcomes requiring Search Console and production monitoring.
 
 ## Data and evidence
 
-- `VERIFIED DONE` — `src/data/vehicle-fitment.ts` contains 84 curated vehicle rows (15 US, 69 EU) with per-row source, confidence, optional factory sizes and EN/DE/ES notes. 2026-10-08: every row except Toyota Corolla, Nissan Rogue/Altima and Tesla Model 3/Y was re-checked against its wheel-size.com generation page (OE size, PCD, bore, wheel, torque); several earlier rows were corrected (Tiguan, Passat, Octavia, Clio, GLC, CR-V, Camry, Leon, Captur, Trafic, MG ZS). It is not a licensed exhaustive OEM feed.
+- `VERIFIED DONE` — `src/data/vehicle-fitment.ts` contains 204 curated vehicle rows (132 US, 72 EU; was 84 on 2026-10-08) with per-row source, confidence, optional factory sizes and EN/DE/ES notes. 2026-10-08: every row except Toyota Corolla, Nissan Rogue/Altima and Tesla Model 3/Y was re-checked against its wheel-size.com generation page (OE size, PCD, bore, wheel, torque); several earlier rows were corrected (Tiguan, Passat, Octavia, Clio, GLC, CR-V, Camry, Leon, Captur, Trafic, MG ZS). It is not a licensed exhaustive OEM feed.
 - `VERIFIED DONE` — Commercial (C) van sizes are first-class tire entities (`215-65-r16c` etc.) with passenger-twin links; tire pages add inch view, near-diameter alternatives by rim with speedometer reading, same-rim neighbours and Standard/Option vehicle labels; DE/ES pages use decimal commas and `205/55 R16` notation.
 - `VERIFIED DONE` — Tire/bolt/vehicle hubs are linked from home, navigation drawer, footer and tire tools in all three locales.
 - `VERIFIED DONE` — 2026-10-08 Part 1 (traffic): Search Console showed >90 % of impressions land on individual tire-size pages, so the tire catalog was expanded from 597 to ~1,000 sizes (wheel-size.com OE list incl. LT metric, tiresize.com diameter index, 10″–24″ plus 14.5/16.5/17.5/19.5/22.5″ rims, 60+ high-flotation sizes such as 33x12.50R15). Flotation sizes are a first-class entry type (`flotation` geometry in `src/data/tire-size-catalog.ts`). New "N-inch tires" height-group pages (`/tire-sizes/33-inch/`, `/de/reifengroessen/33-zoll/`, `/es/medidas-neumaticos/33-pulgadas/`) are generated by the same tire routes. EN titles now target "in inches", ES titles "en pulgadas"; DE/ES write half-inch rims with a comma (R22,5).
-- `VERIFIED DONE` — Production tire reference data and OEM merge generate 582 tire-size entities in the current source state.
-- `VERIFIED DONE` — Tire-size and bolt-pattern route families generate 1,782 localized entity URLs in the current build state; the older 20/96 counts are historical.
+- `VERIFIED DONE` — Production tire reference data and OEM merge generate 974 tire-size entities (plus 18 height groups) in the current source state; 582 was the 2026-10-08 count.
+- `VERIFIED DONE` — Tire-size and bolt-pattern route families generate 10,665 localized entity URLs (8,937 + 1,728) plus 4,878 comparison URLs; the older 1,782 / 20 / 96 counts are historical.
 - `VERIFIED DONE` — Bolt-pattern geometry is derived from canonical PCD/lug data; adjacent-hole spacing is not duplicated as hand-entered data.
 - `VERIFIED DONE` — Fuel snapshots and append-only history live in `src/data` and are updated by GitHub Actions scripts from official/public provider paths with status and provenance types.
 - `VERIFIED DONE` — Repository-level data-vault documentation and JSON schemas exist under `data/` for vehicle fitment and fuel observations.
@@ -52,7 +75,7 @@ Snapshot date: 2026-10-08. This file records what the repository proves today; i
 - `VERIFIED DONE` — All 23 published calculator tools are assigned to a relevant visual family. Fourteen result-led utility/reference/guided-entry routes again expose their tool-specific Engineering 2D view by default with optional 3D exploration; the other nine retain their native tire, offset, PCD, speed, gearing, compression, EV, and fit-check visual systems.
 - `VERIFIED DONE` — Public assets actively used are `public/atlas-hero-car.webp` for the homepage, `public/atlas-hero-car.png` for social metadata, and `public/atlas-mark.svg` / `favicon.svg` for identity. Three `design/brand-concepts/*.svg` files are reference concepts, not active UI assets.
 - `VERIFIED DONE` — 2026-10-08 Part 2 mobile redesign (63 % of search clicks are mobile): tire pages lead with an answer strip (height, width, sidewall, circumference) and a section jump bar, merge the metric and inch grids into one mm | inch spec table, put alternatives and vehicles before the explanatory sections, hide secondary table columns on phones and flatten every entity section into hairline-separated bands below 48rem. The tire hub folds its rim groups (49,555 px → ~4,000 px at 390 px) and adds a size lookup. A tire-size lookup box (`src/components/TireSizeLookup.astro`, `src/ui/tire-size-lookup.ts`, `/tire-size-index.json`) parses any spelling (205 55 16, LT285/70R17, 315/80 R22,5, 33x12.5r20) and is the first action in the home hero.
-- `PARTIAL` — 2026-10-08 Part 3 French: the reference families are published in French ahead of the full site — `/fr/dimensions-pneus/` (every tire size and tire-height page), `/fr/entraxes/` (every bolt pattern) and a French home `/fr/` with the size lookup. `entityLocales()` adds `fr` via `ENTITY_FAMILY_ONLY_LOCALES` in `src/seo/entity-routes.ts`; `fr` stays `published: false` in `locales.ts` because calculators, vehicle pages and policies are not translated, and French pages link to the English tools with an "(anglais)" label. French chrome lives in `frUiStrings` / `chromeStrings()` in `src/localization/site-catalog.ts`.
+- `REJECTED / SUPERSEDED` (history) — 2026-10-08 Part 3 French, superseded by the full nine-locale rollout: the reference families are published in French ahead of the full site — `/fr/dimensions-pneus/` (every tire size and tire-height page), `/fr/entraxes/` (every bolt pattern) and a French home `/fr/` with the size lookup. `entityLocales()` adds `fr` via `ENTITY_FAMILY_ONLY_LOCALES` in `src/seo/entity-routes.ts`; `fr` stays `published: false` in `locales.ts` because calculators, vehicle pages and policies are not translated, and French pages link to the English tools with an "(anglais)" label. French chrome lives in `frUiStrings` / `chromeStrings()` in `src/localization/site-catalog.ts`.
 - `PARTIAL` — Visual quality still needs page-by-page physical-device, WebKit/Firefox, GPU, accessibility, and deployed performance acceptance.
 - `VERIFIED DONE` — The shared 2D explainers now bind pressure needle, power level, torque lever, selected tire load/speed code, DOT week/year, towing allowance, quarter-mile motion and sourced vehicle lug count to current validated form state instead of changing only the caption.
 - `VERIFIED DONE` — Optional 3D studios on the fourteen result-led tools now resolve the sibling calculator form they belong to and rebuild from current values on `input`, `change`, and `submit`. Evidence: `src/ui/tool-3d.ts` form resolution plus the two-value coverage and controller-binding regressions in `tests/unit/all-tools-3d-coverage.test.ts`.

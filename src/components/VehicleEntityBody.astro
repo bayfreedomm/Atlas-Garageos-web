@@ -5,6 +5,8 @@ import { carLocaleText } from '../content/car-locale-text';
 // Shared mobile-first body for vehicle reference pages (EN/DE/ES/FR), matching the tire-size page:
 // answer strip → spec table → same-pattern vehicles → sources → FAQ → next decisions.
 import DecisionGraph from './DecisionGraph.astro';
+import TireSizeFlow from './TireSizeFlow.astro';
+import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { isReferenceLocale } from '../localization/reference-locales';
 import { vehiclePageText, type VehicleLocale } from '../content/vehicle-page-text';
 import { vehicleFitmentData, vehicleNote, type VehicleFitment } from '../data/vehicle-fitment';
@@ -53,6 +55,7 @@ const matchedCarModel = carModelForVehicle(vehicle);
 const carModel = matchedCarModel && (locale === 'en' || isLocalizedModel(matchedCarModel)) ? matchedCarModel : undefined;
 const carText = carLocaleText[locale];
 const carYears = carModel ? epaYears(carModel) : [];
+const flow = vehicleFlowText[locale];
 ---
 <header class="entity-hero entity-hero--tire">
   <p class="eyebrow">{t.kicker}</p>
@@ -94,6 +97,14 @@ const carYears = carModel ? epaYears(carModel) : [];
   {torque.qualifier && <p class="entity-note">{torque.qualifier}</p>}
   {note && <p class="entity-note">{t.notesLabel}: {note}</p>}
 </section>
+
+<TireSizeFlow
+  locale={locale}
+  id="vehicle-tire-flow"
+  heading={flow.heading(`${vehicle.make} ${vehicle.model}`)}
+  intro={flow.intro}
+  sizes={[{ notation: vehicle.tireSize, role: 'standard' }, ...(vehicle.optionalTireSizes ?? []).map((notation) => ({ notation, role: 'option' as const }))]}
+/>
 
 {samePattern.length > 0 && (
   <section class="entity-section" aria-labelledby="vehicle-same">

@@ -13,6 +13,9 @@ import { carName, wheelText, yearsText } from '../ui/car-pages';
 import { carHubPathFor, carMakePathFor } from '../ui/car-locale';
 import { displayTireNotation, homePath, vehiclePagePath } from '../ui/entity-page-model';
 import { formatDecimal, formatPlain } from '../ui/locale-format';
+import TireSizeFlow from './TireSizeFlow.astro';
+import { vehicleFlowText } from '../content/vehicle-flow-text';
+import { modelFlowSizes } from '../ui/model-tire-flow';
 
 interface Props { readonly model: CarModel; readonly locale: EntityLocale; }
 const { model, locale } = Astro.props;
@@ -54,6 +57,8 @@ const faqs = [
 ];
 const faqJsonLd = faqs.length ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }) : undefined;
 const hasBoltChart = boltMakeBySlug(model.makeSlug) !== undefined;
+const flow = vehicleFlowText[locale];
+const flowSizes = modelFlowSizes(model);
 ---
 {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
 <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -98,6 +103,8 @@ const hasBoltChart = boltMakeBySlug(model.makeSlug) !== undefined;
   </div>
   <p class="entity-note">{t.wheelsNote}</p>
 </section>
+
+<TireSizeFlow locale={locale} id="model-tire-flow" heading={flow.modelHeading(name)} intro={flow.modelIntro} sizes={flowSizes} />
 
 {showConsumption && (
   <section class="entity-section" aria-labelledby="model-consumption">

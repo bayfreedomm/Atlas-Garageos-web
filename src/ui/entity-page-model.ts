@@ -304,6 +304,24 @@ export function tireComparisonHref(locale: EntityLocale, current: TireSizeEntry,
   return next === undefined ? `${base}?current=${token(current)}` : `${base}?current=${token(current)}&new=${token(next)}`;
 }
 
+/** Speedometer-error calculator pre-filled with both sizes (`current`/`new`, read on load). */
+export function speedometerHref(locale: EntityLocale, current: TireSizeEntry, next: TireSizeEntry): string {
+  locale = toolLocale(locale);
+  const base = localizedToolPath(locale, 'speedometer-error-calculator', 'tool');
+  if (current.flotation || next.flotation) return base;
+  const token = (entry: TireSizeEntry): string => `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
+  return `${base}?current=${token(current)}&new=${token(next)}`;
+}
+
+/** "Can I fit this tire size?" check pre-filled with both sizes (`current`/`new`). */
+export function fitCheckHref(locale: EntityLocale, current: TireSizeEntry, next: TireSizeEntry): string {
+  locale = toolLocale(locale);
+  const base = localizedToolPath(locale, 'tire-fit-check', 'tool');
+  if (current.flotation || next.flotation) return base;
+  const token = (entry: TireSizeEntry): string => `${entry.widthMm}-${entry.aspectRatio}-${entry.rimDiameterInches}`;
+  return `${base}?current=${token(current)}&new=${token(next)}`;
+}
+
 export function boltPatternCalculatorHref(locale: EntityLocale, entry: BoltPatternEntry): string {
   locale = toolLocale(locale);
   const spacing = adjacentHoleSpacingMm(entry.pcdMm, entry.lugCount).toFixed(2);
