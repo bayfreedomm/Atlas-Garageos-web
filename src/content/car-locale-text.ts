@@ -15,7 +15,8 @@ export interface CarLocaleText {
   readonly makeLead: (make: string, models: number) => string;
   readonly makeKicker: (models: number) => string;
   readonly boltChartLink: (make: string) => string;
-  readonly modelTitles: (name: string) => readonly string[];
+  /** `pcd` is the headline pattern(s), e.g. "5x114.3", or '' — answer-first titles use it when it fits. */
+  readonly modelTitles: (name: string, pcd: string) => readonly string[];
   readonly modelDescription: (name: string, pcd: string, years: string, tires: string) => string;
   readonly modelH1: (name: string) => string;
   readonly modelLead: (name: string, records: number) => string;
@@ -62,7 +63,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Bolt pattern, center bore and wheel sizes for ${n} ${m} models from the ANKUSI open wheel fitment data.`,
     makeH1: (m) => `${m}: bolt pattern and wheel size by model`, makeLead: (m, n) => `${n} ${m} models with wheel fitment records.`,
     makeKicker: (n) => `${n} models`, boltChartLink: (m) => `${m} bolt pattern chart`,
-    modelTitles: (n) => [`${n} Bolt Pattern, Center Bore and Wheel Size`, `${n} Bolt Pattern and Wheel Size`, `${n} Bolt Pattern`],
+    modelTitles: (n, p) => [...(p ? [`${n} Bolt Pattern ${p}, Center Bore and Wheel Size`, `${n} Bolt Pattern: ${p}`] : []), `${n} Bolt Pattern, Center Bore and Wheel Size`, `${n} Bolt Pattern and Wheel Size`, `${n} Bolt Pattern`],
     modelDescription: (n, p, y, t) => `${n} bolt pattern ${p}${y ? ` (${y})` : ''}: center bore, factory wheel${t ? `, tire sizes ${t}` : ''} and maximum wheel size by version.`,
     modelH1: (n) => `${n}: bolt pattern, center bore and wheel sizes`,
     modelLead: (n, r) => `${r} wheel fitment ${r === 1 ? 'record' : 'records'} for the ${n}, by version and year.`,
@@ -98,7 +99,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Lochkreis, Nabenbohrung und Felgengrößen für ${n} ${m}-Modelle aus den offenen ANKUSI-Fitment-Daten.`,
     makeH1: (m) => `${m}: Lochkreis und Felgengröße nach Modell`, makeLead: (m, n) => `${n} ${m}-Modelle mit Fitment-Datensätzen.`,
     makeKicker: (n) => `${n} Modelle`, boltChartLink: (m) => `${m} Lochkreis-Tabelle`,
-    modelTitles: (n) => [`${n} Lochkreis, Nabenbohrung und Felgengröße`, `${n} Lochkreis und Felgengröße`, `${n} Lochkreis`],
+    modelTitles: (n, p) => [...(p ? [`${n} Lochkreis ${p}, Nabenbohrung, Felgen`, `${n} Lochkreis: ${p}`] : []), `${n} Lochkreis, Nabenbohrung und Felgengröße`, `${n} Lochkreis und Felgengröße`, `${n} Lochkreis`],
     modelDescription: (n, p, y, t) => `${n} Lochkreis ${p}${y ? ` (${y})` : ''}: Nabenbohrung, Serienfelge${t ? `, Reifengrößen ${t}` : ''} und maximale Felgengröße je Version.`,
     modelH1: (n) => `${n}: Lochkreis, Nabenbohrung und Felgengrößen`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'Fitment-Datensatz' : 'Fitment-Datensätze'} für den ${n}, nach Version und Baujahr.`,
@@ -134,7 +135,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Patrón de birlos, centro de llanta y medidas de llanta de ${n} modelos ${m}, según los datos abiertos ANKUSI.`,
     makeH1: (m) => `${m}: patrón de birlos y medida de llanta por modelo`, makeLead: (m, n) => `${n} modelos ${m} con registros de montaje de llanta.`,
     makeKicker: (n) => `${n} modelos`, boltChartLink: (m) => `Tabla de birlos de ${m}`,
-    modelTitles: (n) => [`${n}: patrón de birlos, centro y medida de llanta`, `${n}: patrón de birlos y medida de llanta`, `${n}: patrón de birlos`],
+    modelTitles: (n, p) => [...(p ? [`${n}: patrón de birlos ${p} y medida de llanta`, `${n}: patrón de birlos ${p}`] : []), `${n}: patrón de birlos, centro y medida de llanta`, `${n}: patrón de birlos y medida de llanta`, `${n}: patrón de birlos`],
     modelDescription: (n, p, y, t) => `${n}, patrón de birlos ${p}${y ? ` (${y})` : ''}: centro de llanta, llanta de serie${t ? `, neumáticos ${t}` : ''} y llanta máxima por versión.`,
     modelH1: (n) => `${n}: patrón de birlos, centro y medidas de llanta`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'registro' : 'registros'} de llanta del ${n}, por versión y año.`,
@@ -170,7 +171,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Entraxe, alésage central et tailles de jantes de ${n} modèles ${m}, d’après les données ouvertes ANKUSI.`,
     makeH1: (m) => `${m} : entraxe et taille de jante par modèle`, makeLead: (m, n) => `${n} modèles ${m} avec des données de montage de jantes.`,
     makeKicker: (n) => `${n} modèles`, boltChartLink: (m) => `Tableau des entraxes ${m}`,
-    modelTitles: (n) => [`${n} : entraxe, alésage et taille de jante`, `${n} : entraxe et taille de jante`, `${n} : entraxe`],
+    modelTitles: (n, p) => [...(p ? [`${n} : entraxe ${p}, alésage et jantes`, `${n} : entraxe ${p}`] : []), `${n} : entraxe, alésage et taille de jante`, `${n} : entraxe et taille de jante`, `${n} : entraxe`],
     modelDescription: (n, p, y, t) => `${n}, entraxe ${p}${y ? ` (${y})` : ''} : alésage central, jante d’origine${t ? `, pneus ${t}` : ''} et jante maximale par version.`,
     modelH1: (n) => `${n} : entraxe, alésage et tailles de jantes`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'fiche de montage' : 'fiches de montage'} pour la ${n}, par version et par année.`,
@@ -206,7 +207,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Foratura, foro centrale e misure dei cerchi di ${n} modelli ${m}, dai dati aperti ANKUSI.`,
     makeH1: (m) => `${m}: foratura e misura cerchi per modello`, makeLead: (m, n) => `${n} modelli ${m} con dati di montaggio dei cerchi.`,
     makeKicker: (n) => `${n} modelli`, boltChartLink: (m) => `Tabella forature ${m}`,
-    modelTitles: (n) => [`${n}: foratura, foro centrale e misura cerchi`, `${n}: foratura e misura cerchi`, `${n}: foratura`],
+    modelTitles: (n, p) => [...(p ? [`${n}: foratura ${p}, foro centrale e cerchi`, `${n}: foratura ${p}`] : []), `${n}: foratura, foro centrale e misura cerchi`, `${n}: foratura e misura cerchi`, `${n}: foratura`],
     modelDescription: (n, p, y, t) => `${n}, foratura ${p}${y ? ` (${y})` : ''}: foro centrale, cerchio di serie${t ? `, pneumatici ${t}` : ''} e cerchio massimo per versione.`,
     modelH1: (n) => `${n}: foratura, foro centrale e misure cerchi`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'scheda di montaggio' : 'schede di montaggio'} per la ${n}, per versione e anno.`,
@@ -242,7 +243,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Furação, furo central e medidas de roda de ${n} modelos ${m}, com base nos dados abertos ANKUSI.`,
     makeH1: (m) => `${m}: furação e medida de roda por modelo`, makeLead: (m, n) => `${n} modelos ${m} com registros de montagem de roda.`,
     makeKicker: (n) => `${n} modelos`, boltChartLink: (m) => `Tabela de furação ${m}`,
-    modelTitles: (n) => [`${n}: furação, furo central e medida de roda`, `${n}: furação e medida de roda`, `${n}: furação`],
+    modelTitles: (n, p) => [...(p ? [`${n}: furação ${p}, furo central e rodas`, `${n}: furação ${p}`] : []), `${n}: furação, furo central e medida de roda`, `${n}: furação e medida de roda`, `${n}: furação`],
     modelDescription: (n, p, y, t) => `${n}, furação ${p}${y ? ` (${y})` : ''}: furo central, roda original${t ? `, pneus ${t}` : ''} e roda máxima por versão.`,
     modelH1: (n) => `${n}: furação, furo central e medidas de roda`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'registro de roda' : 'registros de roda'} do ${n}, por versão e ano.`,
@@ -278,7 +279,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Rozstaw śrub, otwór centralny i rozmiary felg modeli ${m} (${n}) na podstawie otwartych danych ANKUSI.`,
     makeH1: (m) => `${m}: rozstaw śrub i rozmiar felg według modelu`, makeLead: (m, n) => `Modele ${m} z danymi o felgach: ${n}.`,
     makeKicker: (n) => `Modele: ${n}`, boltChartLink: (m) => `Tabela rozstawów śrub ${m}`,
-    modelTitles: (n) => [`${n}: rozstaw śrub, otwór centralny, felgi`, `${n}: rozstaw śrub i rozmiar felg`, `${n}: rozstaw śrub`],
+    modelTitles: (n, p) => [...(p ? [`${n}: rozstaw śrub ${p}, otwór centralny`, `${n}: rozstaw śrub ${p}`] : []), `${n}: rozstaw śrub, otwór centralny, felgi`, `${n}: rozstaw śrub i rozmiar felg`, `${n}: rozstaw śrub`],
     modelDescription: (n, p, y, t) => `${n}, rozstaw śrub ${p}${y ? ` (${y})` : ''}: otwór centralny, felga fabryczna${t ? `, opony ${t}` : ''} i maksymalna felga dla każdej wersji.`,
     modelH1: (n) => `${n}: rozstaw śrub, otwór centralny i rozmiary felg`,
     modelLead: (n, r) => `Wpisy o felgach dla ${n} według wersji i roku: ${r}.`,
@@ -314,7 +315,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `Steekmaat, naafgat en velgmaten van ${n} ${m}-modellen uit de open ANKUSI-data.`,
     makeH1: (m) => `${m}: steekmaat en velgmaat per model`, makeLead: (m, n) => `${n} ${m}-modellen met velggegevens.`,
     makeKicker: (n) => `${n} modellen`, boltChartLink: (m) => `${m} steekmaattabel`,
-    modelTitles: (n) => [`${n} steekmaat, naafgat en velgmaat`, `${n} steekmaat en velgmaat`, `${n} steekmaat`],
+    modelTitles: (n, p) => [...(p ? [`${n} steekmaat ${p}, naafgat en velgmaat`, `${n} steekmaat: ${p}`] : []), `${n} steekmaat, naafgat en velgmaat`, `${n} steekmaat en velgmaat`, `${n} steekmaat`],
     modelDescription: (n, p, y, t) => `${n} steekmaat ${p}${y ? ` (${y})` : ''}: naafgat, standaardvelg${t ? `, banden ${t}` : ''} en maximale velg per uitvoering.`,
     modelH1: (n) => `${n}: steekmaat, naafgat en velgmaten`,
     modelLead: (n, r) => `${r} ${r === 1 ? 'velgrecord' : 'velgrecords'} voor de ${n}, per uitvoering en bouwjaar.`,
@@ -350,7 +351,7 @@ export const carLocaleText: Readonly<Record<EntityLocale, CarLocaleText>> = {
     makeDescription: (m, n) => `${m} markasının ${n} modeli için bijon aralığı, göbek çapı ve jant ölçüleri; ANKUSI açık jant verilerinden.`,
     makeH1: (m) => `${m} modellerinin bijon aralığı ve jant ölçüleri`, makeLead: (m, n) => `Jant kaydı bulunan ${n} ${m} modeli.`,
     makeKicker: (n) => `${n} model`, boltChartLink: (m) => `${m} bijon aralığı tablosu`,
-    modelTitles: (n) => [`${n} bijon aralığı, göbek çapı ve jant ölçüsü`, `${n} bijon aralığı ve jant ölçüsü`, `${n} bijon aralığı`],
+    modelTitles: (n, p) => [...(p ? [`${n} bijon aralığı ${p}, göbek çapı ve jant`, `${n} bijon aralığı: ${p}`] : []), `${n} bijon aralığı, göbek çapı ve jant ölçüsü`, `${n} bijon aralığı ve jant ölçüsü`, `${n} bijon aralığı`],
     modelDescription: (n, p, y, t) => `${n} bijon aralığı ${p}${y ? ` (${y})` : ''}: göbek çapı, orijinal jant${t ? `, lastik ebatları ${t}` : ''} ve versiyona göre en büyük jant.`,
     modelH1: (n) => `${n} bijon aralığı, göbek çapı ve jant ölçüleri`,
     modelLead: (n, r) => `${n} için versiyon ve yıla göre jant kaydı sayısı: ${r}.`,

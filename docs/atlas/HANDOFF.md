@@ -9,6 +9,11 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-25, search titles)
+
+- Search Console export read (235 clicks, 26.9k impressions, 0.9 % CTR; impressions ~15× since 10 Oct). Answer-first titles/descriptions on vehicle, brand bolt-chart and car model pages in 9 languages. No URL, canonical or sitemap change.
+- Next: re-read Search Console in 2–3 weeks; compare CTR of `/tr/araclar/`, `/de/fahrzeuge/`, `/tr/bijon-araligi/` before/after.
+
 ## 2026-10-15 (v7-24, Vehicle → Change → Meaning → Remaining checks → Decision)
 
 - "Bu benim aracım" on curated vehicle pages; "Aracın" chip + prefill on 9 comparison and 9 fit-check calculators (only on an untouched form with no URL state; URL/shared state always wins).

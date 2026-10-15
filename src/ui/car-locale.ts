@@ -78,7 +78,8 @@ export function carModelLocaleMeta(model: CarModel, locale: EntityLocale): { rea
   const years = model.wheels.flatMap((row) => [row[1], row[2]]).filter((year): year is number => year !== null && year > 0);
   const span = years.length ? (Math.min(...years) === Math.max(...years) ? String(Math.min(...years)) : `${Math.min(...years)}–${Math.max(...years)}`) : '';
   const tires = frequent(model.wheels.flatMap((row) => [...(row[11] ?? '').matchAll(/(\d{3})\/(\d{2})\s?Z?R\s?(\d{2}(?:\.5)?)/g)].map((m) => `${m[1]}/${m[2]} R${m[3]}`))).slice(0, 2).join(', ');
-  return { title: fit(t.modelTitles(name)), description: fitDescription(t.modelDescription(name, pcd || '—', span, tires)) };
+  // Every pattern the model used (up to two, newest first), so older generations are not misled.
+  return { title: fit(t.modelTitles(name, pcd)), description: fitDescription(t.modelDescription(name, pcd || '—', span, tires)) };
 }
 
 /** Title and meta description of a localized make page. */

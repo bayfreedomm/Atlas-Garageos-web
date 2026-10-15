@@ -5,8 +5,11 @@ import { type CarModel, type EpaVariant, type WheelRow, epaYears, mpgSummary, ne
 
 const TITLE_BUDGET = 58; // 75 minus " — Atlas GarageOS"; '&' is never used, so no &amp; inflation.
 
+const renderedLength = (text: string): number => text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').length;
+
 export function fit(candidates: readonly string[]): string {
-  const hit = candidates.find((candidate) => candidate.length <= TITLE_BUDGET);
+  // Measured as rendered: & and " become &amp; / &quot; in the <title>.
+  const hit = candidates.find((candidate) => renderedLength(candidate) <= TITLE_BUDGET);
   if (hit) return hit;
   const last = candidates[candidates.length - 1]!;
   return `${last.slice(0, TITLE_BUDGET - 1).trimEnd()}…`;
@@ -40,7 +43,8 @@ export function carModelTitle(model: CarModel): string {
   const wheels = model.wheels.length > 0;
   if (epa && wheels) return fit([`${name} MPG by Year, Bolt Pattern and Wheel Size`, `${name} MPG by Year and Bolt Pattern`, `${name} MPG and Bolt Pattern`, `${name} Specs`]);
   if (epa) return fit([`${name} MPG and Fuel Cost by Year`, `${name} MPG by Year`, `${name} MPG`]);
-  return fit([`${name} Bolt Pattern, Center Bore and Wheel Size`, `${name} Bolt Pattern and Wheel Size`, `${name} Bolt Pattern`]);
+  const pcd = newestFirst(model.wheels, (row) => row[4]).slice(0, 2).join(' / ');
+  return fit([...(pcd ? [`${name} Bolt Pattern ${pcd}, Center Bore and Wheel Size`, `${name} Bolt Pattern: ${pcd}`] : []), `${name} Bolt Pattern, Center Bore and Wheel Size`, `${name} Bolt Pattern and Wheel Size`, `${name} Bolt Pattern`]);
 }
 
 export function carModelDescription(model: CarModel): string {

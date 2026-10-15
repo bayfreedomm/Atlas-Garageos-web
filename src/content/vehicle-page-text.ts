@@ -51,6 +51,42 @@ export interface VehiclePageText {
   readonly market: string;
 }
 
+
+/**
+ * Search-result title and description for a vehicle page: answer first. Search Console
+ * (2026-10-15) shows these pages ranking 5–9 for "<model> bolt pattern" queries with ~0 % CTR
+ * while the old titles named only the topic, so the bolt pattern and tire size now appear in
+ * the title itself. Every value comes from the curated row; nothing is added.
+ */
+interface MetaWords {
+  readonly pcd: string; readonly tire: string; readonly bore: string; readonly wheel: string; readonly and: string; readonly tail: string;
+  readonly title: (name: string, pcd: string, tire: string) => readonly string[];
+}
+// 58 + " — Atlas GarageOS" stays within the 75-character audit budget (an & renders as &amp;).
+const fitTitle = (candidates: readonly string[]): string => candidates.find((c) => c.replace(/&/g, '&amp;').length <= 58) ?? candidates[candidates.length - 1]!;
+const spacedTire = (v: VehicleFitment): string => v.tireSize.replace(/R(\d)/, ' R$1');
+const decimal = (value: number, locale: VehicleLocale): string => (locale === 'en' ? String(value) : String(value).replace('.', ','));
+function metaTitle(v: VehicleFitment, w: MetaWords): string {
+  return fitTitle(w.title(`${v.make} ${v.model}`, v.boltPattern, spacedTire(v)));
+}
+function metaDescription(v: VehicleFitment, locale: VehicleLocale, w: MetaWords): string {
+  const facts = [`${w.pcd} ${v.boltPattern}`, ...(v.centerBoreMm !== undefined ? [`${w.bore} ${decimal(v.centerBoreMm, locale)} mm`] : []), `${w.tire} ${spacedTire(v)}`, `${w.wheel} ${v.wheelSize}`];
+  const list = `${facts.slice(0, -1).join(', ')} ${w.and} ${facts[facts.length - 1]}`;
+  const withGeneration = `${v.make} ${v.model} (${v.generation}): ${list}. ${w.tail}`;
+  return withGeneration.length <= 175 ? withGeneration : `${v.make} ${v.model}: ${list}. ${w.tail}`;
+}
+const META: Readonly<Record<VehicleLocale, MetaWords>> = {
+  en: { pcd: 'bolt pattern', bore: 'center bore', tire: 'tire', wheel: 'wheel', and: 'and', tail: 'Sourced, confidence-rated.', title: (n, p, t) => [`${n} Bolt Pattern ${p}, Tire Size ${t}`, `${n} Bolt Pattern ${p}, Tires ${t}`, `${n} Bolt Pattern (PCD): ${p}`] },
+  de: { pcd: 'Lochkreis', bore: 'Nabenbohrung', tire: 'Reifen', wheel: 'Felge', and: 'und', tail: 'Mit Quellen und Verlässlichkeit.', title: (n, p, t) => [`${n} Lochkreis ${p}, Reifengröße ${t}`, `${n} Lochkreis ${p}, Reifen ${t}`, `${n} Lochkreis (PCD): ${p}`] },
+  es: { pcd: 'patrón de birlos (PCD)', bore: 'centro de rueda', tire: 'neumático', wheel: 'llanta', and: 'y', tail: 'Con fuentes y nivel de confianza.', title: (n, p, t) => [`${n}: PCD ${p} y neumáticos ${t}`, `${n}: PCD ${p}, neumático ${t}`, `${n}: patrón de birlos (PCD) ${p}`, `${n}: PCD ${p}`] },
+  fr: { pcd: 'entraxe', bore: 'alésage', tire: 'pneu', wheel: 'jante', and: 'et', tail: 'Avec sources et niveau de confiance.', title: (n, p, t) => [`${n} : entraxe ${p} et pneu ${t}`, `${n} : entraxe ${p}, pneu ${t}`, `${n} : entraxe (PCD) ${p}`] },
+  it: { pcd: 'foratura', bore: 'foro centrale', tire: 'pneumatico', wheel: 'cerchio', and: 'e', tail: 'Con fonti e livello di affidabilità.', title: (n, p, t) => [`${n}: foratura ${p} e pneumatici ${t}`, `${n}: foratura ${p}, gomme ${t}`, `${n}: foratura (PCD) ${p}`] },
+  'pt-br': { pcd: 'furação', bore: 'furo central', tire: 'pneu', wheel: 'roda', and: 'e', tail: 'Com fontes e nível de confiança.', title: (n, p, t) => [`${n}: furação ${p} e pneu ${t}`, `${n}: furação ${p}, pneu ${t}`, `${n}: furação (PCD) ${p}`] },
+  pl: { pcd: 'rozstaw śrub', bore: 'otwór centralny', tire: 'opony', wheel: 'felga', and: 'i', tail: 'Ze źródłami i poziomem pewności.', title: (n, p, t) => [`${n}: rozstaw śrub ${p} i opony ${t}`, `${n}: rozstaw śrub ${p}, opony ${t}`, `${n}: rozstaw śrub (PCD) ${p}`] },
+  nl: { pcd: 'steekmaat', bore: 'naafgat', tire: 'band', wheel: 'velg', and: 'en', tail: 'Met bronnen en betrouwbaarheid.', title: (n, p, t) => [`${n}: steekmaat ${p} en bandenmaat ${t}`, `${n}: steekmaat ${p}, banden ${t}`, `${n}: steekmaat (PCD) ${p}`] },
+  tr: { pcd: 'bijon aralığı', bore: 'göbek çapı', tire: 'lastik', wheel: 'jant', and: 've', tail: 'Kaynaklı veri.', title: (n, p, t) => [`${n} bijon aralığı ${p} ve lastik ${t}`, `${n} bijon aralığı ${p}, lastik ${t}`, `${n} bijon aralığı (PCD): ${p}`] },
+};
+
 export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
   en: {
     kicker: 'Atlas fitment reference',
@@ -99,8 +135,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     breadcrumbHome: 'Home',
     breadcrumbVehicles: 'Vehicles',
     // The audit counts '&' as '&amp;'; very long model labels fall back to the shorter 'PCD'.
-    title: (v) => `${v.make} ${v.model} Tire Size & Bolt Pattern`.length > 54 ? `${v.make} ${v.model} Tire Size & PCD` : `${v.make} ${v.model} Tire Size & Bolt Pattern`,
-    description: (v) => `Atlas tire size ${v.tireSize} and bolt pattern ${v.boltPattern} reference for the ${v.make} ${v.model} (${v.generation}), sourced and confidence-rated.`,
+    title: (v) => metaTitle(v, META['en']),
+    description: (v) => metaDescription(v, 'en', META['en']),
     market: 'Market',
   },
   de: {
@@ -149,8 +185,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Europäischer Markt',
     breadcrumbHome: 'Start',
     breadcrumbVehicles: 'Fahrzeuge',
-    title: (v) => `${v.make} ${v.model} Reifengröße & Lochkreis`,
-    description: (v) => `Atlas-Referenz für Reifengröße ${v.tireSize} und Lochkreis ${v.boltPattern} des ${v.make} ${v.model} (${v.generation}), mit Quellenangabe und Verlässlichkeitsbewertung.`,
+    title: (v) => metaTitle(v, META['de']),
+    description: (v) => metaDescription(v, 'de', META['de']),
     market: 'Markt',
   },
   es: {
@@ -199,8 +235,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Mercado europeo',
     breadcrumbHome: 'Inicio',
     breadcrumbVehicles: 'Vehículos',
-    title: (v) => `${v.make} ${v.model}: Neumáticos y Birlos`,
-    description: (v) => `Referencia Atlas de neumático ${v.tireSize} y patrón de birlos ${v.boltPattern} para el ${v.make} ${v.model} (${v.generation}), con fuentes y nivel de confianza.`,
+    title: (v) => metaTitle(v, META['es']),
+    description: (v) => metaDescription(v, 'es', META['es']),
     market: 'Mercado',
   },
   fr: {
@@ -249,8 +285,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Marché européen',
     breadcrumbHome: 'Accueil',
     breadcrumbVehicles: 'Véhicules',
-    title: (v) => `${v.make} ${v.model} : taille de pneu et entraxe`,
-    description: (v) => `Référence Atlas : pneu ${v.tireSize.replace(/R(\d)/, ' R$1')} et entraxe ${v.boltPattern} pour la ${v.make} ${v.model} (${v.generation}), avec sources et niveau de confiance.`,
+    title: (v) => metaTitle(v, META['fr']),
+    description: (v) => metaDescription(v, 'fr', META['fr']),
     market: 'Marché',
   },
   'it': {
@@ -299,8 +335,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Mercato europeo',
     breadcrumbHome: 'Home',
     breadcrumbVehicles: 'Veicoli',
-    title: (v) => `${v.make} ${v.model}: pneumatici e foratura`,
-    description: (v) => `Riferimento Atlas: pneumatici ${v.tireSize.replace(/R(\d)/, ' R$1')} e foratura ${v.boltPattern} per ${v.make} ${v.model} (${v.generation}), con fonti e livello di affidabilità.`,
+    title: (v) => metaTitle(v, META['it']),
+    description: (v) => metaDescription(v, 'it', META['it']),
     market: 'Mercato',
   },
   'pt-br': {
@@ -349,8 +385,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Mercado europeu',
     breadcrumbHome: 'Início',
     breadcrumbVehicles: 'Veículos',
-    title: (v) => `${v.make} ${v.model}: medida de pneu e furação`,
-    description: (v) => `Referência Atlas: pneu ${v.tireSize.replace(/R(\d)/, ' R$1')} e furação ${v.boltPattern} para o ${v.make} ${v.model} (${v.generation}), com fontes e nível de confiança.`,
+    title: (v) => metaTitle(v, META['pt-br']),
+    description: (v) => metaDescription(v, 'pt-br', META['pt-br']),
     market: 'Mercado',
   },
   'pl': {
@@ -399,8 +435,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Rynek europejski',
     breadcrumbHome: 'Strona główna',
     breadcrumbVehicles: 'Pojazdy',
-    title: (v) => `${v.make} ${v.model}: opony i rozstaw śrub`,
-    description: (v) => `Baza Atlas: opony ${v.tireSize.replace(/R(\d)/, ' R$1')} i rozstaw śrub ${v.boltPattern} dla ${v.make} ${v.model} (${v.generation}), ze źródłami i poziomem pewności.`,
+    title: (v) => metaTitle(v, META['pl']),
+    description: (v) => metaDescription(v, 'pl', META['pl']),
     market: 'Rynek',
   },
   'nl': {
@@ -449,8 +485,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Europese markt',
     breadcrumbHome: 'Home',
     breadcrumbVehicles: 'Voertuigen',
-    title: (v) => `${v.make} ${v.model}: bandenmaat en steekmaat`,
-    description: (v) => `Atlas-referentie: band ${v.tireSize.replace(/R(\d)/, ' R$1')} en steekmaat ${v.boltPattern} voor de ${v.make} ${v.model} (${v.generation}), met bronnen en betrouwbaarheidsniveau.`,
+    title: (v) => metaTitle(v, META['nl']),
+    description: (v) => metaDescription(v, 'nl', META['nl']),
     market: 'Markt',
   },
   'tr': {
@@ -499,8 +535,8 @@ export const vehiclePageText: Record<VehicleLocale, VehiclePageText> = {
     hubEuMarket: 'Avrupa pazarı',
     breadcrumbHome: 'Ana sayfa',
     breadcrumbVehicles: 'Araçlar',
-    title: (v) => `${v.make} ${v.model}: lastik ebadı ve PCD`,
-    description: (v) => `Atlas referansı: ${v.make} ${v.model} (${v.generation}) için lastik ${v.tireSize.replace(/R(\d)/, ' R$1')} ve bijon aralığı ${v.boltPattern}, kaynaklar ve güven düzeyiyle.`,
+    title: (v) => metaTitle(v, META['tr']),
+    description: (v) => metaDescription(v, 'tr', META['tr']),
     market: 'Pazar',
   },
 };

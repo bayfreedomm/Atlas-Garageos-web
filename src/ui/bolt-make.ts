@@ -44,7 +44,8 @@ export function boltMakeMeta(make: BoltMake, locale: EntityLocale): EntityPageMe
   const t = boltMakeText[locale];
   const b = boltPatternPageText[locale];
   const pathname = boltMakePath(locale, make.makeSlug);
-  const title = t.title(make.make);
+  // Answer-first: the most common patterns in the title, shortened until it fits.
+  const title = [make.top.slice(0, 2).join(', '), make.top.slice(0, 1).join(', '), ''].map((top) => t.title(make.make, top)).find((candidate) => candidate.replace(/&/g, '&amp;').length <= 58) ?? t.title(make.make, '');
   return Object.freeze({
     title: title.length <= 58 ? title : t.h1(make.make).slice(0, 58),
     description: t.description(make.make, make.rows.length, make.top.join(', ') || '—').slice(0, 180),

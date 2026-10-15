@@ -163,3 +163,11 @@ Status: `ACCEPTED`.
 - The decision panel supersedes the comparison page's "What should I check next?" card (V3 package 5.9); the speedometer hand-off with both sizes is kept inside the checklist.
 
 Rationale: owner brief 2026-10-15 — make the existing flow user-focused without new URLs or feature clutter.
+
+## 2026-10-15 — Answer-first titles on bolt-pattern answers
+
+Status: `ACCEPTED`.
+
+- Vehicle, brand bolt-chart and car model titles lead with the answer ("Opel Corsa (F) Lochkreis 4x108, Reifengröße 185/65 R15"), shortened step by step to fit the 75-character budget. Car model pages show up to two patterns so older generations are not misled. Descriptions list bolt pattern, center bore, tire and wheel from the curated row only.
+
+Rationale: Search Console 2026-10-15 — these pages rank 5–9 for model bolt-pattern queries with 0 clicks, while answer-first DE tire-size titles convert.

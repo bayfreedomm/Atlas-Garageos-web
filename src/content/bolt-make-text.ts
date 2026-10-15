@@ -2,7 +2,8 @@
 import type { EntityLocale } from '../seo/entity-routes';
 
 export interface BoltMakeText {
-  readonly title: (make: string) => string;
+  /** `top` is the one or two most common patterns ("4x100, 5x114.3"), or '' when unknown. */
+  readonly title: (make: string, top: string) => string;
   readonly description: (make: string, models: number, top: string) => string;
   readonly h1: (make: string) => string;
   readonly lead: (make: string, models: number) => string;
@@ -20,7 +21,7 @@ export interface BoltMakeText {
 
 export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
   en: {
-    title: (m) => `${m} Bolt Pattern Chart: All Models`,
+    title: (m, top) => top ? `${m} Bolt Pattern: ${top} & All Models` : `${m} Bolt Pattern Chart: All Models`,
     description: (m, n, top) => `Bolt pattern (PCD), center bore and factory wheel size for ${n} ${m} models — most common: ${top}. Open fitment data.`,
     h1: (m) => `${m} bolt pattern chart`,
     lead: (m, n) => `Bolt pattern, center bore and wheel sizes for ${n} ${m} models, from the ANKUSI open wheel fitment dataset.`,
@@ -36,7 +37,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m} MPG by model and year`,
   },
   de: {
-    title: (m) => `${m} Lochkreis-Tabelle: alle Modelle`,
+    title: (m, top) => top ? `${m} Lochkreis: ${top} – alle Modelle` : `${m} Lochkreis-Tabelle: alle Modelle`,
     description: (m, n, top) => `Lochkreis (PCD), Nabenbohrung und Serienfelge für ${n} ${m}-Modelle – am häufigsten: ${top}. Offene Fitment-Daten.`,
     h1: (m) => `${m} Lochkreis-Tabelle`,
     lead: (m, n) => `Lochkreis, Nabenbohrung und Felgengrößen für ${n} ${m}-Modelle aus dem offenen ANKUSI-Fitment-Datensatz.`,
@@ -52,7 +53,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: Verbrauch nach Modell (Englisch)`,
   },
   es: {
-    title: (m) => `Patrón de birlos ${m}: todos los modelos`,
+    title: (m, top) => top ? `Patrón de birlos ${m}: ${top} y todos los modelos` : `Patrón de birlos ${m}: todos los modelos`,
     description: (m, n, top) => `Patrón de birlos (PCD), centro de rueda y llanta de serie de ${n} modelos ${m}; el más común: ${top}. Datos abiertos.`,
     h1: (m) => `Patrón de birlos ${m} por modelo`,
     lead: (m, n) => `Patrón de birlos, centro de rueda y medidas de llanta de ${n} modelos ${m}, del conjunto abierto ANKUSI.`,
@@ -68,7 +69,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: consumo por modelo (inglés)`,
   },
   fr: {
-    title: (m) => `Entraxe ${m} : tous les modèles`,
+    title: (m, top) => top ? `Entraxe ${m} : ${top} et tous les modèles` : `Entraxe ${m} : tous les modèles`,
     description: (m, n, top) => `Entraxe (PCD), alésage et jante d’origine de ${n} modèles ${m} — le plus courant : ${top}. Données ouvertes.`,
     h1: (m) => `Entraxes ${m} par modèle`,
     lead: (m, n) => `Entraxe, alésage central et tailles de jante de ${n} modèles ${m}, d’après le jeu de données ouvert ANKUSI.`,
@@ -84,7 +85,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m} : consommation (anglais)`,
   },
   it: {
-    title: (m) => `Foratura cerchi ${m}: tutti i modelli`,
+    title: (m, top) => top ? `Foratura cerchi ${m}: ${top} e tutti i modelli` : `Foratura cerchi ${m}: tutti i modelli`,
     description: (m, n, top) => `Foratura (PCD), foro centrale e cerchio di serie di ${n} modelli ${m}; la più comune: ${top}. Dati aperti.`,
     h1: (m) => `Foratura cerchi ${m} per modello`,
     lead: (m, n) => `Foratura, foro centrale e misure dei cerchi di ${n} modelli ${m}, dal dataset aperto ANKUSI.`,
@@ -100,7 +101,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: consumi per modello (in inglese)`,
   },
   'pt-br': {
-    title: (m) => `Furação ${m}: todos os modelos`,
+    title: (m, top) => top ? `Furação ${m}: ${top} e todos os modelos` : `Furação ${m}: todos os modelos`,
     description: (m, n, top) => `Furação (PCD), furo central e roda original de ${n} modelos ${m}; a mais comum: ${top}. Dados abertos.`,
     h1: (m) => `Furação ${m} por modelo`,
     lead: (m, n) => `Furação, furo central e medidas de roda de ${n} modelos ${m}, do conjunto de dados aberto ANKUSI.`,
@@ -116,7 +117,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: consumo por modelo (em inglês)`,
   },
   pl: {
-    title: (m) => `Rozstaw śrub ${m}: wszystkie modele`,
+    title: (m, top) => top ? `Rozstaw śrub ${m}: ${top} i wszystkie modele` : `Rozstaw śrub ${m}: wszystkie modele`,
     description: (m, n, top) => `Rozstaw śrub (PCD), otwór centralny i felga fabryczna — modele ${m}: ${n}; najczęstszy: ${top}. Otwarte dane.`,
     h1: (m) => `Rozstaw śrub ${m} według modelu`,
     lead: (m, n) => `Rozstaw śrub, otwór centralny i rozmiary felg — modele ${m}: ${n}. Źródło: otwarty zbiór danych ANKUSI.`,
@@ -132,7 +133,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: spalanie według modelu (po angielsku)`,
   },
   nl: {
-    title: (m) => `Steekmaat ${m}: alle modellen`,
+    title: (m, top) => top ? `Steekmaat ${m}: ${top} en alle modellen` : `Steekmaat ${m}: alle modellen`,
     description: (m, n, top) => `Steekmaat (PCD), naafgat en standaardvelg van ${n} ${m}-modellen; meest gebruikt: ${top}. Open data.`,
     h1: (m) => `Steekmaat ${m} per model`,
     lead: (m, n) => `Steekmaat, naafgat en velgmaten van ${n} ${m}-modellen, uit de open ANKUSI-dataset.`,
@@ -148,7 +149,7 @@ export const boltMakeText: Readonly<Record<EntityLocale, BoltMakeText>> = {
     mpgLink: (m) => `${m}: verbruik per model (Engels)`,
   },
   tr: {
-    title: (m) => `${m} bijon aralığı: tüm modeller`,
+    title: (m, top) => top ? `${m} bijon aralığı: ${top} ve tüm modeller` : `${m} bijon aralığı: tüm modeller`,
     description: (m, n, top) => `${m} modelleri (${n}) için bijon aralığı (PCD), göbek çapı ve orijinal jant; en yaygın: ${top}. Açık veri.`,
     h1: (m) => `${m} bijon aralığı tablosu`,
     lead: (m, n) => `${m} modelleri için bijon aralığı, göbek çapı ve jant ölçüleri (model sayısı: ${n}). Kaynak: açık ANKUSI veri seti.`,
