@@ -8,18 +8,22 @@ const config = JSON.parse(read('wrangler.jsonc')) as {
   name?: string;
   main?: string;
   compatibility_date?: string;
-  assets?: { directory?: string; not_found_handling?: string; html_handling?: string };
+  assets?: { directory?: string; binding?: string; not_found_handling?: string; html_handling?: string; run_worker_first?: readonly string[] };
 };
 const packageJson = JSON.parse(read('package.json')) as { devDependencies?: Record<string, string> };
 
 describe('Cloudflare Workers static deployment contract', () => {
-  it('defines one assets-only Worker config for the Astro dist output', () => {
+  it('serves the Astro dist output and runs the Worker only for /api/*', () => {
     expect(config).toMatchObject({
       name: 'atlas-garageos-web',
       compatibility_date: '2026-09-21',
-      assets: { directory: './dist', not_found_handling: '404-page', html_handling: 'auto-trailing-slash' },
+      main: './src/worker/index.ts',
+      assets: { directory: './dist', binding: 'ASSETS', not_found_handling: '404-page', html_handling: 'auto-trailing-slash', run_worker_first: ['/api/*'] },
     });
-    expect(config.main).toBeUndefined();
+    expect((config as { d1_databases?: readonly { binding?: string; database_name?: string }[] }).d1_databases).toEqual([expect.objectContaining({ binding: 'DB', database_name: 'atlas-subscribers' })]);
+    // Named value exports become Worker entrypoints and stop workerd from starting.
+    const worker = read('src/worker/index.ts');
+    expect(worker.match(/^export (?!default|interface|type)/gm)).toBeNull();
   });
 
   it('does not pin a just-published Wrangler into the project lockfile', () => {

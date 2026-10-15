@@ -12,6 +12,7 @@ import ToolInsights from './ToolInsights.astro';
 import DecisionGraph from './DecisionGraph.astro';
 import { toolNextDecision } from '../ui/tool-next-decision';
 import { additional3DToolIds } from '../localization/tool-3d-catalog';
+import ReportActions from './ReportActions.astro';
 
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
 interface Props { definition: ToolDefinition; eyebrow: string; intro: string; limitation: string; studioCta?: string | undefined; studioHref?: string; visual?: boolean; explanationBeforeInsights?: boolean; locale?: ContentLocale | undefined; titleOverride?: string | undefined; descriptionOverride?: string | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
@@ -76,6 +77,8 @@ const breadcrumbs = [
       {visual && !hasToolVisualStudio && !hasEmbeddedStudio && <aside class="tool-visual-wrap" aria-label={visualAria}><p class="tool-visual-label">{t?.seeWhatNumbersLabel ?? 'SEE WHAT THE NUMBERS MEAN'}</p><ToolVisual {definition} locale={locale} title={displayTitle} /></aside>}
     </div>
   </article>
+
+  <ReportActions locale={journeyLocale} title={displayTitle} />
 
   {hasToolVisualStudio && <ToolVisualStudio {definition} locale={journeyLocale} />}
 

@@ -1,6 +1,7 @@
 ---
 import { platformAlternates } from '../../seo/locale-alternates';
 import SiteLayout from '../../components/SiteLayout.astro';
+import PrivacyEmailReports from '../../components/PrivacyEmailReports.astro';
 const alternates = platformAlternates('/privacy-policy/');
 ---
 <SiteLayout title="Privacy Policy" description="How Atlas GarageOS handles calculator inputs and locally saved vehicle data." pathname="/privacy-policy/" active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Privacy Policy', href: '/privacy-policy/' }]}>
@@ -9,6 +10,7 @@ const alternates = platformAlternates('/privacy-policy/');
   <div class="tool-explanation privacy-copy">
     <h2>Calculator inputs</h2>
     <p>No account, login, or email address is required to use the calculators. The values you enter are processed in your browser to produce a result and are not submitted to an Atlas GarageOS application server.</p>
+    <PrivacyEmailReports locale="en" />
     <h2>Saved data (My Garage)</h2>
     <p>Vehicles, measurements, and setups saved to My Garage are stored in your browser's local storage on that device. Clearing browser data can remove them.</p>
     <h2>Hosting and basic request data</h2>

@@ -1,6 +1,7 @@
 ---
 import { platformAlternates } from '../../../seo/locale-alternates';
 import SiteLayout from '../../../components/SiteLayout.astro';
+import PrivacyEmailReports from '../../../components/PrivacyEmailReports.astro';
 import { platformCatalog } from '../../../localization/site-catalog';
 const c = platformCatalog.tr.privacy;
 const alternates = platformAlternates('/privacy-policy/');
@@ -10,5 +11,6 @@ const alternates = platformAlternates('/privacy-policy/');
   <header class="directory-identity"><h1>{c.h1}</h1><p>{c.updated}</p></header>
   <div class="tool-explanation privacy-copy">
     {c.sections.map((s) => <><h2>{s.heading}</h2><p>{s.body}</p></>)}
+    <PrivacyEmailReports locale="tr" />
   </div>
 </SiteLayout>

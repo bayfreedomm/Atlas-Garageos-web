@@ -24,6 +24,12 @@ Rule for this cycle: no new pSEO route family or mass URL generation. Improve, l
 - `PLANNED` — Keep the current data contracts and tests green while consolidating the canonical project memory.
 - `PLANNED` — Select a licensed/permissioned automotive data strategy before adding safety-relevant specifications or large vehicle coverage.
 
+## P0 — audience (v7-19)
+
+- `BLOCKED` (owner action) — Activate email reports: owner creates D1 `atlas-subscribers` (sends the Database ID), adds `atlasgarageos.com` in Resend (DNS via Cloudflare) and sets the `RESEND_API_KEY` Worker secret; then add the `d1_databases` binding to `wrangler.jsonc` and set `EMAIL_REPORTS_ENABLED = true`.
+- `PLANNED` — First list use: fuel-price change emails for ES/DE/US from the existing fuel bot data (no Turkey price source in the repository yet). Move bulk sending to a paid tier or newsletter tool once the list outgrows Resend's free 100/day.
+- `REJECTED / SUPERSEDED` — Gate results or the PDF behind an email wall: search visitors leave instead, and pogo-sticking hurts the pages that bring all traffic.
+
 ## P0.5 — reference-data growth (Search Console proven demand)
 
 - `VERIFIED DONE` — 2026-10-08 tire-entity upgrade: C sizes, inch view, alternatives with speedometer reading, localized numbers/titles, hub links site-wide, 84 re-checked vehicle rows.
