@@ -3,4 +3,4 @@
  * and the `RESEND_API_KEY` secret exist. Until then calculator pages show only the PDF action.
  * The worker answers 503 without them, so turning this on early cannot send anything.
  */
-export const EMAIL_REPORTS_ENABLED = false;
+export const EMAIL_REPORTS_ENABLED = true;

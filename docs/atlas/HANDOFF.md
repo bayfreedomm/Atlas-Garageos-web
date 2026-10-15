@@ -9,6 +9,11 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 morning (v7-19 live)
+
+- D1 `atlas-subscribers` bound in `wrangler.jsonc`; Resend domain atlasgarageos.com verified; `RESEND_API_KEY` set as a Production runtime secret (a copy also sits in Builds → Variables, unused at runtime).
+- Live test: POST /api/report → 200, email delivered to the owner's inbox. `EMAIL_REPORTS_ENABLED = true`: "Bu raporu e-postama gönder" shows on every calculator in all 9 locales; list checkbox unticked, double opt-in.
+
 ## 2026-10-14 late session (v7-18)
 
 - Crawl graph: rendered HTML had 320,836 internal hrefs with a query string (104,755 unique: `?category` 195,879; `?current&new` 93,843; `?size` 13,951; `?current` 11,457; `?lugs&spacing` 2,034; `?a` 1,836; `?vehicle` 1,836). Now 0. `src/middleware.ts` → `cleanStateLinks()` in `src/seo/state-links.ts` moves state to `data-link-state`; `src/ui/state-link-enhancer.ts` (loaded by `SiteLayout.astro` and `EmbedTireComparison.astro`) restores it on pointer/focus/context-menu/click and cleans script-created links. Clean link total unchanged (1,622,132), 0 orphans, 0 broken, max depth 4.
