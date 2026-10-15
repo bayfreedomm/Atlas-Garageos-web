@@ -4,12 +4,14 @@ import ToolPage from '../../../components/ToolPage.astro';
 import EmbedCodePanel from '../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../components/TireInputGroup.astro';
 import TireVisualStudio from '../../../components/TireVisualStudio.astro';
-import GuidedTireDecision from '../../../components/GuidedTireDecision.astro';
+import DecisionPanel from '../../../components/DecisionPanel.astro';
+import MyVehicleBar from '../../../components/MyVehicleBar.astro';
 import { toolById } from '../../../seo/tool-registry';
 const definition = toolById('tire-size-comparison');
 ---
 <ToolPage {definition} alternates={toolAlternates('tire-size-comparison')} visual={false} eyebrow="Tires & wheels" intro="Compare an original and a new metric tire size without hidden fitment thresholds." limitation="This comparison describes nominal tire geometry only. It does not verify wheel clearance, vehicle compatibility, load rating, or road use." studioCta="Compare wheel & tire geometry">
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <MyVehicleBar locale="en" />
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="en" hidden></div>
     <div class="calculator-columns">
       <TireInputGroup prefix="original-" title="Original tire" width={225} aspect={45} rim={18} />
@@ -38,7 +40,7 @@ const definition = toolById('tire-size-comparison');
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Your comparison summary will appear here.</p>
 
     <TireVisualStudio locale="en" />
-    <GuidedTireDecision locale="en" />
+    <DecisionPanel locale="en" />
 
     <div class="tire-detail-heading" aria-hidden="true"><span>Details</span><small>Nominal geometry</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
@@ -46,4 +48,4 @@ const definition = toolById('tire-size-comparison');
   <div slot="explanation"><h2>What changes between the sizes</h2><p>Positive diameter and circumference differences mean the new tire is larger. Ride-height difference is half of the diameter change. The speedometer percentage shows the theoretical change at the same wheel rotation rate.</p><p>No percentage is treated as an automatic compatibility or safety limit.</p></div>
   <EmbedCodePanel slot="explanation" />
 </ToolPage>
-<script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>
+<script>import { initializeShareableToolState } from '../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../ui/tool-calculators'; import { initializeDecisionPanels } from '../../../ui/decision-panel'; import { initializeGarageQuickLoad } from '../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeDecisionPanels(); initializeGarageQuickLoad();</script>

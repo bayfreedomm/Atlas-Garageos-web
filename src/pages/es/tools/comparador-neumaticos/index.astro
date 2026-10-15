@@ -4,7 +4,8 @@ import ToolPage from '../../../../components/ToolPage.astro';
 import EmbedCodePanel from '../../../../components/EmbedCodePanel.astro';
 import TireInputGroup from '../../../../components/TireInputGroup.astro';
 import TireVisualStudio from '../../../../components/TireVisualStudio.astro';
-import GuidedTireDecision from '../../../../components/GuidedTireDecision.astro';
+import DecisionPanel from '../../../../components/DecisionPanel.astro';
+import MyVehicleBar from '../../../../components/MyVehicleBar.astro';
 import { toolById } from '../../../../seo/tool-registry';
 import { localizedTool } from '../../../../localization/site-catalog';
 const definition = toolById('tire-size-comparison');
@@ -12,6 +13,7 @@ const c = localizedTool('tire-size-comparison', 'es');
 ---
 <ToolPage {definition} locale="es" titleOverride={c.title} descriptionOverride={c.description} visual={false} eyebrow={c.eyebrow} intro={c.intro} limitation={c.limitation} studioCta={c.studioCta} alternates={toolAlternates('tire-size-comparison')}>
   <form slot="tool" class="calculator-form" data-calculator="tire-comparison" novalidate>
+    <MyVehicleBar locale="es" />
     <div class="garage-quick-load" data-garage-quick-load data-gql-target="tire-comparison" data-gql-locale="es" hidden></div>
     <div class="calculator-columns">
       <TireInputGroup locale="es" prefix="original-" title="Neumático original" width={225} aspect={45} rim={18} />
@@ -36,11 +38,11 @@ const c = localizedTool('tire-size-comparison', 'es');
     </section>
     <p class="result-summary is-pending" data-result-summary aria-live="polite">Su resumen de comparación aparecerá aquí.</p>
     <TireVisualStudio locale="es" />
-    <GuidedTireDecision locale="es" />
+    <DecisionPanel locale="es" />
     <div class="tire-detail-heading" aria-hidden="true"><span>Detalles</span><small>Geometría nominal</small></div>
     <dl class="tool-results" data-results aria-live="polite"></dl>
   </form>
   <div slot="explanation">{c.explanation.map((s) => <><h2>{s.heading}</h2>{s.paragraphs.map((p) => <p>{p}</p>)}</>)}</div>
   <EmbedCodePanel slot="explanation" locale="es" />
 </ToolPage>
-<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeGarageQuickLoad();</script>
+<script>import { initializeShareableToolState } from '../../../../ui/shareable-tool-state'; import { initializeToolCalculators } from '../../../../ui/tool-calculators'; import { initializeDecisionPanels } from '../../../../ui/decision-panel'; import { initializeGarageQuickLoad } from '../../../../ui/garage-quick-load'; initializeShareableToolState(); initializeToolCalculators(); initializeDecisionPanels(); initializeGarageQuickLoad();</script>

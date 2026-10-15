@@ -1,0 +1,20 @@
+---
+// "Your car" chip on calculator forms. Hidden until src/ui/decision-panel.ts finds a remembered
+// curated vehicle; then it prefills the current size (only when the form still shows its defaults
+// and the URL carries no state) and offers Change / Forget.
+import { decisionText } from '../content/decision-text';
+import { vehicleHubPath } from '../ui/entity-page-model';
+import type { AtlasLocale } from '../localization/locales';
+interface Props { readonly locale: AtlasLocale; }
+const { locale } = Astro.props;
+const t = decisionText[locale];
+---
+<div class="my-vehicle-bar" data-my-vehicle-bar hidden>
+  <span class="my-vehicle-bar__label">{t.myCar}</span>
+  <strong class="my-vehicle-bar__name" data-my-vehicle-name></strong>
+  <small class="my-vehicle-bar__note" data-my-vehicle-filled hidden>{t.filledFromCar}</small>
+  <span class="my-vehicle-bar__actions">
+    <a href={vehicleHubPath(locale)}>{t.change}</a>
+    <button type="button" class="tertiary secondary" data-my-vehicle-forget>{t.forget}</button>
+  </span>
+</div>

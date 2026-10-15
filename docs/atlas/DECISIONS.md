@@ -153,3 +153,13 @@ Status: `ACCEPTED`.
 
 Rationale: Atlas pages had no `<img>` and one generic og:image, so search engines had nothing page-specific to show as a thumbnail.
 
+
+## 2026-10-15 — Remembered car and the decision panel
+
+Status: `ACCEPTED`.
+
+- The remembered car is only a curated vehicle id in the existing browser store; sizes are always read from `src/data/vehicle-fitment.ts`, never from storage. It prefills a calculator only when the form is untouched and the URL carries no state.
+- "If you switch" explains geometry in plain words and lists what is still open; it never says a size fits. The checklist is the visitor's own ticks, kept per size change in this browser.
+- The decision panel supersedes the comparison page's "What should I check next?" card (V3 package 5.9); the speedometer hand-off with both sizes is kept inside the checklist.
+
+Rationale: owner brief 2026-10-15 — make the existing flow user-focused without new URLs or feature clutter.

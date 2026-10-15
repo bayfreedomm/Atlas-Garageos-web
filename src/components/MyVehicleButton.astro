@@ -1,0 +1,17 @@
+---
+// "This is my car" on a curated vehicle page. Stores only the vehicle id (plus make/model for the
+// header badge) in the shared vehicle store; calculators read sizes from the curated dataset.
+import { decisionText } from '../content/decision-text';
+import type { VehicleFitment } from '../data/vehicle-fitment';
+import type { AtlasLocale } from '../localization/locales';
+interface Props { readonly locale: AtlasLocale; readonly vehicle: VehicleFitment; }
+const { locale, vehicle } = Astro.props;
+const t = decisionText[locale];
+---
+<div class="my-vehicle-remember" data-my-vehicle-remember data-vehicle-id={vehicle.id} data-vehicle-make={vehicle.make} data-vehicle-model={vehicle.model}>
+  <button type="button" class="my-vehicle-remember__button secondary" aria-pressed="false" data-label-off={t.remember} data-label-on={t.remembered}>
+    <span aria-hidden="true" class="my-vehicle-remember__icon">＋</span><span data-my-vehicle-label>{t.remember}</span>
+  </button>
+  <small>{t.rememberHint}</small>
+</div>
+<script>import { initializeMyVehicleRemember } from '../ui/my-vehicle'; initializeMyVehicleRemember();</script>

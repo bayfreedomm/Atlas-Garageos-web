@@ -1,52 +1,13 @@
 import { vehicleMakes, vehiclesByMake, vehicleById } from '../data/vehicle-fitment';
 import { indexedVehicleMakes, indexedModelsForMake } from '../data/vehicle-model-index';
 
-const STORAGE_KEY = 'atlas_selected_vehicle';
+import { getSelectedVehicle, setSelectedVehicle, VEHICLE_CHANGED_EVENT, type SavedVehicle } from './vehicle-storage';
+
+export { getSelectedVehicle, VEHICLE_CHANGED_EVENT, type SavedVehicle };
+
 const UNVERIFIED_PREFIX = 'name:';
-/** Fired on `window` whenever the header's selected vehicle changes (including clear). Detail is `SavedVehicle | null`. */
-export const VEHICLE_CHANGED_EVENT = 'atlas:vehicle-changed';
-
-export interface SavedVehicle {
-  readonly make: string;
-  readonly model: string;
-  /** Present only for a verified vehicle-fitment.ts entry; absent for a name-only (unverified) pick. */
-  readonly id?: string;
-}
-
-function readSavedVehicle(): SavedVehicle | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed: unknown = JSON.parse(raw);
-    if (
-      typeof parsed === 'object' && parsed !== null &&
-      'make' in parsed && 'model' in parsed &&
-      typeof (parsed as { make: unknown }).make === 'string' &&
-      typeof (parsed as { model: unknown }).model === 'string'
-    ) {
-      const id = (parsed as { id?: unknown }).id;
-      return { make: (parsed as { make: string }).make, model: (parsed as { model: string }).model, ...(typeof id === 'string' ? { id } : {}) };
-    }
-  } catch {
-    // localStorage unavailable (private browsing, etc.) — behave as if nothing is saved.
-  }
-  return null;
-}
-
-function writeSavedVehicle(vehicle: SavedVehicle | null): void {
-  try {
-    if (vehicle) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicle));
-    else window.localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // Best-effort; the widget still works for the current page load without persistence.
-  }
-  window.dispatchEvent(new CustomEvent<SavedVehicle | null>(VEHICLE_CHANGED_EVENT, { detail: vehicle }));
-}
-
-/** Reusable read for any page (calculators) that wants to prefill from the header's saved vehicle. */
-export function getSelectedVehicle(): SavedVehicle | null {
-  return readSavedVehicle();
-}
+const readSavedVehicle = getSelectedVehicle;
+const writeSavedVehicle = setSelectedVehicle;
 
 export function initializeVehicleSelectorWidget(): void {
   document.querySelectorAll<HTMLDetailsElement>('[data-vehicle-selector]').forEach((root) => {

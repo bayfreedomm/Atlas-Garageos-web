@@ -9,6 +9,13 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-24, Vehicle → Change → Meaning → Remaining checks → Decision)
+
+- "Bu benim aracım" on curated vehicle pages; "Aracın" chip + prefill on 9 comparison and 9 fit-check calculators (only on an untouched form with no URL state; URL/shared state always wins).
+- "Değiştirirsen ne olur?" panel replaces `GuidedTireDecision` on the 9 comparison calculators (component and `src/ui/guided-tire-decision.ts` are left in place, now unused on pages; speedometer hand-off keeps both sizes; Fitment Studio carry stays in the journey nav). Checklist "Satın almadan önce kontrol et" with `{n}/6` progress, saved per size change in localStorage.
+- Verified: test 57/375, astro check 0, build, audit:seo, Playwright 390 px light/dark (remember → prefill → ticks survive reload → URL state wins → forget).
+- Next: Search Console CTR titles for tire sizes (ROADMAP P0 #3). Later (owner): share cards, affiliate, email automation.
+
 ## 2026-10-15 (v7-23, page images stage 2)
 
 - 47 generation-specific vehicle photos (Wikimedia Commons, attribution shown) on vehicle and car model pages; bolt-pattern drawing as fallback. Lookup ran from the owner's computer (Commons API rate-limits the cloud IP); images are committed, not fetched at build.

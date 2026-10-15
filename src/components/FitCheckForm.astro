@@ -7,6 +7,8 @@
  */
 import TireInputGroup from './TireInputGroup.astro';
 import Parametric3DPanel from './Parametric3DPanel.astro';
+import DecisionPanel from './DecisionPanel.astro';
+import MyVehicleBar from './MyVehicleBar.astro';
 import type { ContentLocale } from '../localization/site-catalog';
 
 interface Props { readonly locale?: ContentLocale | undefined; }
@@ -24,6 +26,7 @@ const t = {
 }[locale ?? 'en'];
 ---
 <form class="calculator-form fit-check-form" data-calculator="tire-fit-check" novalidate>
+  <MyVehicleBar locale={locale ?? 'en'} />
   <div class="calculator-columns">
     <TireInputGroup locale={locale} prefix="original-" title={t.current} width={225} aspect={45} rim={17} />
     <TireInputGroup locale={locale} prefix="new-" title={t.proposed} width={235} aspect={40} rim={18} />
@@ -52,4 +55,6 @@ const t = {
     </details>
     <section class="fit-legend" data-fit-legend></section>
   </div>
+  <DecisionPanel locale={locale ?? 'en'} mode="checklist" />
 </form>
+<script>import { initializeDecisionPanels } from '../ui/decision-panel'; initializeDecisionPanels();</script>

@@ -8,6 +8,8 @@
 const STORAGE_KEY = 'atlas_selected_vehicle';
 const MAX_SAVED_VEHICLE_LENGTH = 2_048;
 const MAX_SAVED_VEHICLE_FIELD_LENGTH = 100;
+/** Fired on `window` whenever the remembered vehicle changes (including clear). Detail is `SavedVehicle | null`. */
+export const VEHICLE_CHANGED_EVENT = 'atlas:vehicle-changed';
 
 export interface SavedVehicle {
   readonly make: string;
@@ -47,4 +49,5 @@ export function setSelectedVehicle(vehicle: SavedVehicle | null): void {
   } catch {
     // Best-effort; the picker still works for the current page load without persistence.
   }
+  window.dispatchEvent(new CustomEvent<SavedVehicle | null>(VEHICLE_CHANGED_EVENT, { detail: vehicle }));
 }

@@ -1,0 +1,56 @@
+---
+// Vehicle → Change → Meaning → Remaining checks → Decision. Lives inside a tire comparison or
+// fit-check form; src/ui/decision-panel.ts fills it from the form values on every change.
+// mode="full": plain-language meaning + open points + checklist. mode="checklist": the
+// fit-check page already explains the result, so only the before-you-buy list is added.
+import { decisionText } from '../content/decision-text';
+import { CHECKLIST_ITEMS } from '../features/decision/change-decision';
+import { localizedToolPath, type AtlasLocale } from '../localization/locales';
+interface Props { readonly locale: AtlasLocale; readonly mode?: 'full' | 'checklist'; }
+const { locale, mode = 'full' } = Astro.props;
+const t = decisionText[locale];
+const tool = {
+  diameter: undefined,
+  speedometer: localizedToolPath(locale, 'speedometer-error-calculator', 'tool'),
+  'rim-width': undefined,
+  offset: localizedToolPath(locale, 'wheel-offset-calculator', 'tool'),
+  pcd: localizedToolPath(locale, 'bolt-pattern-calculator', 'tool'),
+  registration: undefined,
+} as const;
+const id = `decision-${mode}`;
+---
+<section class={`decision-panel decision-panel--${mode}`} data-decision-panel data-mode={mode} aria-labelledby={`${id}-heading`}>
+  {mode === 'full' && (
+    <div class="decision-panel__meaning">
+      <header class="decision-panel__header">
+        <h3 id={`${id}-heading`}>{t.heading}</h3>
+        <p>{t.intro}</p>
+      </header>
+      <dl class="decision-panel__rows" data-decision-rows aria-live="polite"></dl>
+      <p class="decision-panel__rule" data-decision-rule></p>
+      <div class="decision-panel__open">
+        <h4>{t.openHeading}</h4>
+        <ul data-decision-open></ul>
+      </div>
+    </div>
+  )}
+  <div class="decision-check" data-decision-checklist>
+    <div class="decision-check__head">
+      {mode === 'full' ? <h4>{t.checklistHeading}</h4> : <h3 id={`${id}-heading`}>{t.checklistHeading}</h3>}
+      <span class="decision-check__progress" data-decision-progress aria-live="polite">{t.progress.replace('{n}', '0').replace('{t}', String(CHECKLIST_ITEMS.length))}</span>
+    </div>
+    <div class="decision-check__bar" aria-hidden="true"><span data-decision-bar></span></div>
+    <ul class="decision-check__list">
+      {CHECKLIST_ITEMS.map((item) => (
+        <li class="decision-check__item">
+          <label>
+            <input type="checkbox" data-decision-item={item} />
+            <span class="decision-check__text"><strong>{t.items[item].label}</strong><small data-decision-hint={item}>{t.items[item].hint}</small></span>
+          </label>
+          {tool[item] && <a class="decision-check__link" href={tool[item]} data-decision-link={item}>{t.open}</a>}
+        </li>
+      ))}
+    </ul>
+    <p class="decision-check__foot"><span>{t.storageNote}</span> <button type="button" class="decision-check__clear tertiary secondary" data-decision-clear>{t.clear}</button></p>
+  </div>
+</section>

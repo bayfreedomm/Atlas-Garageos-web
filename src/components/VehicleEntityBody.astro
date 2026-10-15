@@ -6,6 +6,7 @@ import { carLocaleText } from '../content/car-locale-text';
 // answer strip → spec table → same-pattern vehicles → sources → FAQ → next decisions.
 import DecisionGraph from './DecisionGraph.astro';
 import EntityImage from './EntityImage.astro';
+import MyVehicleButton from './MyVehicleButton.astro';
 import { vehicleImage } from '../seo/vehicle-images';
 import TireSizeFlow from './TireSizeFlow.astro';
 import { vehicleFlowText } from '../content/vehicle-flow-text';
@@ -72,6 +73,7 @@ const flow = vehicleFlowText[locale];
     ))}
   </dl>
   <p class="entity-hero__lead">{t.intro(vehicle)}</p>
+  <MyVehicleButton locale={locale} vehicle={vehicle} />
   {pageImage && <EntityImage image={pageImage} locale={locale} />}
   <nav class="entity-pagenav" aria-label={L.nav.specs}>
     <a href="#vehicle-specs">{L.nav.specs}</a>

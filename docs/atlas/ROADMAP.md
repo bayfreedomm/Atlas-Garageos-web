@@ -95,6 +95,8 @@ Build the first high-quality cluster, not thousands of thin pages.
 
 ## P2 — durable user context
 
+- `VERIFIED DONE` (v7-24) — Remembered car feeds the tire comparison and fit-check calculators; decision panel and before-you-buy checklist. `LATER` (owner, 2026-10-15): shareable result cards, affiliate links, email automation — not started.
+
 - `PLANNED` — Define authentication, consent, export, deletion, retention, multi-device sync, and threat model before server persistence.
 - `PLANNED` — Use D1 for active structured records and R2 for immutable/raw evidence backups only after a reviewed migration. Keep static public projections separate from private user data.
 - `PLANNED` — Turn My Garage into a shared context layer for fitment, calculations, maintenance, repairs, recalls, costs, and history; VIN is an optional resolver, not the product by itself.
