@@ -20,6 +20,7 @@ describe('Cloudflare Workers static deployment contract', () => {
       main: './src/worker/index.ts',
       assets: { directory: './dist', binding: 'ASSETS', not_found_handling: '404-page', html_handling: 'auto-trailing-slash', run_worker_first: ['/api/*'] },
     });
+    expect((config as { d1_databases?: readonly { binding?: string; database_name?: string }[] }).d1_databases).toEqual([expect.objectContaining({ binding: 'DB', database_name: 'atlas-subscribers' })]);
     // Named value exports become Worker entrypoints and stop workerd from starting.
     const worker = read('src/worker/index.ts');
     expect(worker.match(/^export (?!default|interface|type)/gm)).toBeNull();
