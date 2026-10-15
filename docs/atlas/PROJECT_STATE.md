@@ -73,7 +73,7 @@ Snapshot date: 2026-10-14 (master after v7-16). This file records what the repos
 
 ## Release gate and CI
 
-- `PARTIAL` — v7-21: `.github/workflows/ci.yml` runs `pnpm test`, `pnpm build` (includes `astro check` and the reference-CSS split) and `pnpm audit:seo` on every pull request and push to master; read-only, no secrets, no deploy. Becomes `VERIFIED DONE` after its first green run on GitHub. Before this, only the IndexNow and fuel workflows existed.
+- `VERIFIED DONE` — v7-21: `.github/workflows/ci.yml` runs `pnpm test`, `pnpm build` (includes `astro check` and the reference-CSS split) and `pnpm audit:seo` on every pull request and push to master; read-only, no secrets, no deploy. First run green on GitHub (run 38707628038: 357 tests, 48,964 pages, CSS split, audit passed, 2 min 14 s). Before this, only the IndexNow and fuel workflows existed.
 - `VERIFIED DONE` — v7-20 reference CSS split (`scripts/split-entity-css.mjs`); safety: template-prefix safelist + audit check that every linked stylesheet exists. A permanent browser smoke test of computed styles is still a backlog item (ROADMAP).
 
 ## Car model pages

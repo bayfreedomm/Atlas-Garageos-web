@@ -33,7 +33,7 @@ Rule for this cycle: no new pSEO route family or mass URL generation. Improve, l
 
 ## P0 — engineering gate
 
-- `PARTIAL` — CI release gate on PRs and master (`.github/workflows/ci.yml`, v7-21); confirm the first green run, then require it as a branch-protection status check for master (owner setting on GitHub).
+- `VERIFIED DONE` — CI release gate on PRs and master (`.github/workflows/ci.yml`, v7-21, first run green). `PLANNED`: require it as a branch-protection status check for master (owner setting on GitHub).
 - `PLANNED` — Keep a browser smoke test in the release gate: computed-style comparison (full vs reference CSS) on a fixed sample of reference pages plus menu/lookup/theme interactions, so a future runtime-built class cannot be silently purged.
 
 ## P0.5 — reference-data growth (Search Console proven demand)
