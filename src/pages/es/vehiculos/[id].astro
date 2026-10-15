@@ -1,4 +1,5 @@
 ---
+import { vehicleImage } from '../../../seo/vehicle-images';
 import SiteLayout from '../../../components/SiteLayout.astro';
 import VehicleEntityBody from '../../../components/VehicleEntityBody.astro';
 import { serializeJsonLd } from '../../../seo/safe-json-ld';
@@ -47,7 +48,7 @@ const vehicleJsonLd = serializeJsonLd({
   ],
 });
 ---
-<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="es" alternates={vehicleAlternates(vehicle.id)} breadcrumbs={[{ name: t.breadcrumbHome, href: home }, { name: t.breadcrumbVehicles, href: hub }, { name: `${vehicle.make} ${vehicle.model}`, href: pathname }]}>
+<SiteLayout title={title} description={description} pathname={pathname} active="tools" locale="es" alternates={vehicleAlternates(vehicle.id)} breadcrumbs={[{ name: t.breadcrumbHome, href: home }, { name: t.breadcrumbVehicles, href: hub }, { name: `${vehicle.make} ${vehicle.model}`, href: pathname }]} image={vehicleImage(vehicle, LOCALE)}>
   <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>
   <script is:inline type="application/ld+json" set:html={vehicleJsonLd}></script>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={home}>{t.breadcrumbHome}</a><span aria-hidden="true">/</span><a href={hub}>{t.breadcrumbVehicles}</a><span aria-hidden="true">/</span><span aria-current="page">{vehicle.make} {vehicle.model}</span></nav>

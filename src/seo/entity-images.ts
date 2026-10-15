@@ -26,6 +26,16 @@ export interface PageImage {
   readonly width: number;
   readonly height: number;
   readonly alt: string;
+  /** Third-party photo: shown under the image, as the licence requires. */
+  readonly credit?: PhotoCredit;
+}
+
+export interface PhotoCredit {
+  readonly artist: string;
+  readonly license: string;
+  readonly licenseUrl: string;
+  /** Source file page on Wikimedia Commons. */
+  readonly page: string;
 }
 
 const W = ENTITY_IMAGE_WIDTH;

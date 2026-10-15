@@ -1,5 +1,6 @@
 ---
 // Localized car model pages (fr): bolt pattern, center bore, wheel and tire sizes by version.
+import { carModelImage } from '../../../../../seo/vehicle-images';
 import SiteLayout from '../../../../../components/SiteLayout.astro';
 import CarModelLocaleBody from '../../../../../components/CarModelLocaleBody.astro';
 import { carLocaleText } from '../../../../../content/car-locale-text';
@@ -17,6 +18,6 @@ const t = carLocaleText['fr'];
 const meta = carModelLocaleMeta(model, 'fr');
 const pathname = carModelPathFor('fr', model);
 ---
-<SiteLayout title={meta.title} description={meta.description} pathname={pathname} active="tools" locale="fr" alternates={carModelAlternates(model)} breadcrumbs={[{ name: t.breadcrumbHome, href: homePath('fr') }, { name: t.hub, href: carHubPathFor('fr') }, { name: model.make, href: carMakePathFor('fr', model.makeSlug) }, { name: model.model, href: pathname }]}>
+<SiteLayout title={meta.title} description={meta.description} pathname={pathname} active="tools" locale="fr" alternates={carModelAlternates(model)} breadcrumbs={[{ name: t.breadcrumbHome, href: homePath('fr') }, { name: t.hub, href: carHubPathFor('fr') }, { name: model.make, href: carMakePathFor('fr', model.makeSlug) }, { name: model.model, href: pathname }]} image={carModelImage(model, 'fr')}>
   <CarModelLocaleBody model={model} locale="fr" />
 </SiteLayout>

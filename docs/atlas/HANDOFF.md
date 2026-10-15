@@ -9,6 +9,11 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-23, page images stage 2)
+
+- 47 generation-specific vehicle photos (Wikimedia Commons, attribution shown) on vehicle and car model pages; bolt-pattern drawing as fallback. Lookup ran from the owner's computer (Commons API rate-limits the cloud IP); images are committed, not fetched at build.
+- Next: Vehicle → Change → Meaning → Remaining checks → Decision package (owner's brief, 2026-10-15).
+
 ## 2026-10-15 (v7-22, page images stage 1)
 
 - Own technical image per tire size / comparison / bolt pattern, shared across locales; `<img>` + og/twitter + primaryImageOfPage + `max-image-preview:large`; audit checks. Build adds ~90 s (rasterizer). Verified on 205/55 R16 (EN/TR), 4x108, 205/55 R16 vs 225/45 R17 (DE).

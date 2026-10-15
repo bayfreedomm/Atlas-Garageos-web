@@ -130,7 +130,7 @@ const carModelsOnSize = carModelsForTireSize(entry.notation).slice(0, 24);
     : t.detailLead(entry.widthMm, entry.aspectRatio, entry.rimDiameterInches)}</p>
   {entry.commercial && <p class="entity-note">{t.commercialNote}</p>}
   {flotation && <p class="entity-note">{t.flotationNote}</p>}
-  <EntityImage image={tireSizeImage(entry, locale)} />
+  <EntityImage image={tireSizeImage(entry, locale)} locale={locale} />
   <div class="entity-hero__links">
     {diameterGroup && <a class="entity-inline-link" href={tireDiameterGroupPath(diameterGroup.inches, locale)}>{t.diameter.sizeLink(diameterGroup.inches)} ›</a>}
     {twin && <a class="entity-inline-link" href={entityDetailPath('tire-size', locale, twin.slug)}>{entry.commercial ? t.commercialTwinLink(displayTireNotation(twin.notation, locale)) : t.passengerTwinLink(displayTireNotation(twin.notation, locale))} ›</a>}

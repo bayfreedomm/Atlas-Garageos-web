@@ -5,6 +5,8 @@ import { carLocaleText } from '../content/car-locale-text';
 // Shared mobile-first body for vehicle reference pages (EN/DE/ES/FR), matching the tire-size page:
 // answer strip → spec table → same-pattern vehicles → sources → FAQ → next decisions.
 import DecisionGraph from './DecisionGraph.astro';
+import EntityImage from './EntityImage.astro';
+import { vehicleImage } from '../seo/vehicle-images';
 import TireSizeFlow from './TireSizeFlow.astro';
 import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { isReferenceLocale } from '../localization/reference-locales';
@@ -20,6 +22,7 @@ import { vehicleDecisionGraph } from '../ui/decision-graph';
 
 interface Props { readonly vehicle: VehicleFitment; readonly locale: VehicleLocale; readonly faqs: readonly { readonly q: string; readonly a: string }[]; }
 const { vehicle, locale, faqs } = Astro.props;
+const pageImage = vehicleImage(vehicle, locale);
 const t = vehiclePageText[locale];
 const L = {
   en: { specs: 'Wheel and tire specs', options: 'Factory option sizes', fastener: 'Fastener', sameHeading: 'Other vehicles with the same bolt pattern', sameIntro: (p: string) => `Also on ${p} in the Atlas reference. Same holes, but center bore, offset and wheel size can still differ:`, tireHeight: 'Tire height', sources: 'Sources and confidence', nav: { specs: 'Specs', same: 'Same pattern', faq: 'FAQ' } },
@@ -69,6 +72,7 @@ const flow = vehicleFlowText[locale];
     ))}
   </dl>
   <p class="entity-hero__lead">{t.intro(vehicle)}</p>
+  {pageImage && <EntityImage image={pageImage} locale={locale} />}
   <nav class="entity-pagenav" aria-label={L.nav.specs}>
     <a href="#vehicle-specs">{L.nav.specs}</a>
     {samePattern.length > 0 && <a href="#vehicle-same">{L.nav.same}</a>}

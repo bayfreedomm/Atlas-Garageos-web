@@ -1,11 +1,19 @@
 ---
-// The page's own image (src/seo/entity-images.ts) as a real <img>: the same file is the
-// og:image, twitter:image and primaryImageOfPage, so search engines can pick it as the
-// result thumbnail.
+// The page's own image (src/seo/entity-images.ts, src/seo/vehicle-images.ts) as a real <img>:
+// the same file is the og:image, twitter:image and primaryImageOfPage, so search engines can
+// pick it as the result thumbnail. Licensed photos carry their attribution underneath.
 import type { PageImage } from '../seo/entity-images';
-interface Props { readonly image: PageImage }
-const { image } = Astro.props;
+interface Props { readonly image: PageImage; readonly locale?: string; readonly eager?: boolean }
+const { image, locale = 'en', eager = false } = Astro.props;
+const WORDS: Readonly<Record<string, readonly [string, string]>> = {
+  en: ['Photo', 'cropped'], de: ['Foto', 'beschnitten'], es: ['Foto', 'recortada'], fr: ['Photo', 'recadrée'], it: ['Foto', 'ritagliata'],
+  'pt-br': ['Foto', 'recortada'], pl: ['Zdjęcie', 'przycięte'], nl: ['Foto', 'bijgesneden'], tr: ['Fotoğraf', 'kırpıldı'],
+};
+const [photo, cropped] = WORDS[locale] ?? WORDS.en!;
 ---
-<figure class="entity-figure">
-  <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" />
+<figure class={`entity-figure${image.credit ? ' entity-figure--photo' : ''}`}>
+  <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+  {image.credit && (
+    <figcaption><span class="entity-figure__subject">{image.alt}</span> · {photo}: <a href={image.credit.page} rel="noopener">{image.credit.artist}</a> · <a href={image.credit.licenseUrl} rel="noopener license">{image.credit.license}</a> · Wikimedia Commons ({cropped})</figcaption>
+  )}
 </figure>

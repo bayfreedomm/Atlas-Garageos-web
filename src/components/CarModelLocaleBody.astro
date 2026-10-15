@@ -14,6 +14,8 @@ import { carHubPathFor, carMakePathFor } from '../ui/car-locale';
 import { displayTireNotation, homePath, vehiclePagePath } from '../ui/entity-page-model';
 import { formatDecimal, formatPlain } from '../ui/locale-format';
 import TireSizeFlow from './TireSizeFlow.astro';
+import EntityImage from './EntityImage.astro';
+import { carModelImage } from '../seo/vehicle-images';
 import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { modelFlowSizes } from '../ui/model-tire-flow';
 import { patternTimeline, periodYears } from '../ui/model-pattern-timeline';
@@ -46,6 +48,7 @@ const latestBest = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?
 const boreText = bores[0] !== undefined ? mm(bores[0]) : undefined;
 
 const timeline = patternTimeline(model);
+const pageImage = carModelImage(model, locale);
 // With more than one bolt pattern on record, the headline pattern carries its own years so it is
 // never read as valid for the model's whole span (e.g. Megane: 4x100 until 2009, 5x114.3 after).
 const newestPeriod = timeline.length > 1 ? timeline[0] : undefined;
@@ -79,6 +82,7 @@ const flowSizes = modelFlowSizes(model);
   <dl class="entity-answer entity-answer--vehicle">
     {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong>{'sub' in item && item.sub && <span>{item.sub}</span>}</dd></div>)}
   </dl>
+  {pageImage && <EntityImage image={pageImage} locale={locale} />}
   <nav class="entity-pagenav" aria-label={t.nav.wheels}>
     {timeline.length > 1 && <a href="#model-timeline">{t.answer.pcd}</a>}
     <a href="#model-wheels">{t.nav.wheels}</a>

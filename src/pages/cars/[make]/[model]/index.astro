@@ -24,6 +24,7 @@ const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
 const curated = curatedVehiclesFor(model);
 const flowSizes = modelFlowSizes(model);
 const timeline = patternTimeline(model);
+const pageImage = carModelImage(model, 'en');
 const newestPeriod = timeline.length > 1 ? timeline[0] : undefined;
 const faqs = [
   ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the model year: ${[...new Map(timeline.map((period) => [period.pcd, `${period.pcd} (${periodYears(period)})`])).values()].join(', ')}. The bolt pattern by year table lists each one with its center bore.` }] : []),
@@ -41,8 +42,10 @@ import TireSizeFlow from '../../../../components/TireSizeFlow.astro';
 import { vehicleFlowText } from '../../../../content/vehicle-flow-text';
 import { modelFlowSizes } from '../../../../ui/model-tire-flow';
 import { patternTimeline, periodYears } from '../../../../ui/model-pattern-timeline';
+import { carModelImage } from '../../../../seo/vehicle-images';
+import EntityImage from '../../../../components/EntityImage.astro';
 ---
-<SiteLayout title={carModelTitle(model)} description={carModelDescription(model)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: pathname }]}>
+<SiteLayout title={carModelTitle(model)} description={carModelDescription(model)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: pathname }]} image={pageImage}>
   {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/cars/">Cars</a><span aria-hidden="true">/</span><a href={carMakePath(model.makeSlug)}>{model.make}</a><span aria-hidden="true">/</span><span aria-current="page">{model.model}</span></nav>
   <header class="entity-hero entity-hero--tire">
@@ -51,6 +54,7 @@ import { patternTimeline, periodYears } from '../../../../ui/model-pattern-timel
     <dl class="entity-answer entity-answer--vehicle">
       {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong>{'sub' in item && item.sub && <span>{item.sub}</span>}</dd></div>)}
     </dl>
+    {pageImage && <EntityImage image={pageImage} locale="en" />}
     <nav class="entity-pagenav" aria-label="On this page">
       {years.length > 0 && <a href="#model-years">MPG by year</a>}
       {timeline.length > 1 && <a href="#model-timeline">Bolt pattern by year</a>}

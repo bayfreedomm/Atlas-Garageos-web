@@ -85,7 +85,7 @@ const sectionSvg = renderFitmentSection({
   </dl>
   <p class="entity-hero__lead">{t.lead(f)}</p>
   <p class="entity-note">{pair.reason === 'same-vehicle' ? t.reasonSame : t.reasonPlus}</p>
-  <EntityImage image={tireComparisonImage(pair, locale)} />
+  <EntityImage image={tireComparisonImage(pair, locale)} locale={locale} />
   <div class="entity-hero__links">
     <a class="entity-inline-link" href={linkA.href}>{linkA.label} ›</a>
     <a class="entity-inline-link" href={linkB.href}>{linkB.label} ›</a>
