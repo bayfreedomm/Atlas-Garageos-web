@@ -9,6 +9,7 @@
     "html_handling": "auto-trailing-slash",
     "run_worker_first": ["/api/*"]
   },
+  "triggers": { "crons": ["17 3 * * *"] },
   "d1_databases": [
     { "binding": "DB", "database_name": "atlas-subscribers", "database_id": "d4712a53-6cbd-45c2-ada4-ceeb5fe40ee0" }
   ]

@@ -23,8 +23,10 @@ const latestSummary = latest !== undefined ? mpgSummary(model.epa[String(latest)
 const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
 const curated = curatedVehiclesFor(model);
 const flowSizes = modelFlowSizes(model);
+const timeline = patternTimeline(model);
+const newestPeriod = timeline.length > 1 ? timeline[0] : undefined;
 const faqs = [
-  ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the generation: ${pcds.join(', ')}. See the table for each version and year.` }] : []),
+  ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the model year: ${[...new Map(timeline.map((period) => [period.pcd, `${period.pcd} (${periodYears(period)})`])).values()].join(', ')}. The bolt pattern by year table lists each one with its center bore.` }] : []),
   ...(latest !== undefined && latestSummary?.best ? [{ q: `What MPG does the ${latest} ${name} get?`, a: `The EPA rates the ${latest} ${name} at up to ${latestSummary.best} ${latestSummary.electric ? 'MPGe' : 'MPG'} combined. Every model year is listed below.` }] : []),
 ];
 const faqJsonLd = faqs.length ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }) : undefined;
@@ -32,12 +34,13 @@ const alternates = carModelAlternates(model);
 const answer = [
   { label: 'Model years', value: years.length ? `${years[years.length - 1]}–${years[0]}` : wheels.length ? `${Math.min(...wheels.map((w) => w[1] ?? 9999))}–${Math.max(...wheels.map((w) => w[2] ?? 0))}` : '—' },
   { label: `Best MPG${latest !== undefined ? ` (${latest})` : ''}`, value: latestSummary?.best ? String(latestSummary.best) : '—' },
-  { label: 'Bolt pattern', value: pcds[0] ?? '—', href: boltHref(pcds[0]) },
+  { label: 'Bolt pattern', value: pcds[0] ?? '—', href: boltHref(pcds[0]), sub: newestPeriod && newestPeriod.pcd === pcds[0] ? periodYears(newestPeriod) : undefined },
   { label: 'Center bore', value: bores[0] ? `${bores[0]} mm` : '—' },
 ];
 import TireSizeFlow from '../../../../components/TireSizeFlow.astro';
 import { vehicleFlowText } from '../../../../content/vehicle-flow-text';
 import { modelFlowSizes } from '../../../../ui/model-tire-flow';
+import { patternTimeline, periodYears } from '../../../../ui/model-pattern-timeline';
 ---
 <SiteLayout title={carModelTitle(model)} description={carModelDescription(model)} pathname={pathname} active="tools" alternates={alternates} breadcrumbs={[{ name: 'Home', href: '/' }, { name: 'Cars', href: '/cars/' }, { name: model.make, href: carMakePath(model.makeSlug) }, { name: model.model, href: pathname }]}>
   {faqJsonLd && <script is:inline type="application/ld+json" set:html={faqJsonLd}></script>}
@@ -46,10 +49,11 @@ import { modelFlowSizes } from '../../../../ui/model-tire-flow';
     <p class="eyebrow">{model.make}</p>
     <h1 class="entity-hero__title">{name}: {years.length ? 'MPG by year' : 'wheel specs'}{years.length && wheels.length ? ', bolt pattern and wheel size' : ''}</h1>
     <dl class="entity-answer entity-answer--vehicle">
-      {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong></dd></div>)}
+      {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong>{'sub' in item && item.sub && <span>{item.sub}</span>}</dd></div>)}
     </dl>
     <nav class="entity-pagenav" aria-label="On this page">
       {years.length > 0 && <a href="#model-years">MPG by year</a>}
+      {timeline.length > 1 && <a href="#model-timeline">Bolt pattern by year</a>}
       {wheels.length > 0 && <a href="#model-wheels">Wheels</a>}
       {faqs.length > 0 && <a href="#model-faq">FAQ</a>}
     </nav>
@@ -77,9 +81,32 @@ import { modelFlowSizes } from '../../../../ui/model-tire-flow';
     </section>
   )}
 
+  {timeline.length > 1 && (
+    <section class="entity-section" aria-labelledby="model-timeline">
+      <h2 id="model-timeline">{name} bolt pattern by year</h2>
+      <p class="entity-note">Each row groups the wheel records with the same bolt pattern and center bore; years are the first and last model year recorded.</p>
+      <div class="entity-table-scroll">
+        <table class="entity-table">
+          <thead><tr><th scope="col">Years</th><th scope="col">Bolt pattern</th><th scope="col">Center bore</th><th scope="col" class="is-optional">Example versions</th><th scope="col" class="is-optional">Records</th></tr></thead>
+          <tbody>
+            {timeline.map((period) => { const href = boltHref(period.pcd); return (
+              <tr>
+                <th scope="row">{periodYears(period)}</th>
+                <td><strong>{href ? <a href={href}>{period.pcd}</a> : period.pcd}</strong></td>
+                <td>{period.bore !== undefined ? `${period.bore} mm` : '—'}</td>
+                <td class="is-optional">{period.versions.join(', ')}</td>
+                <td class="is-optional">{period.records}</td>
+              </tr>
+            ); })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
   {wheels.length > 0 && (
     <section class="entity-section" aria-labelledby="model-wheels">
-      <h2 id="model-wheels">{name} bolt pattern, center bore and wheel sizes</h2>
+      <h2 id="model-wheels">{name} wheel records by version</h2>
       <div class="entity-table-scroll">
         <table class="entity-table">
           <thead><tr><th scope="col">Version</th><th scope="col">Year</th><th scope="col">Bolt pattern</th><th scope="col">Center bore</th><th scope="col" class="is-optional">Factory wheel</th><th scope="col" class="is-optional">Flush fit</th><th scope="col" class="is-optional">Max wheel</th></tr></thead>

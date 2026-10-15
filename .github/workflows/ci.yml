@@ -1,0 +1,52 @@
+name: CI (test, typecheck, build, SEO audit)
+
+# The release gate from AGENTS.md, run automatically. Every pull request and every push to
+# master must pass unit tests, `astro check` (inside `pnpm build`), the production build with
+# the reference-CSS split, and the rendered-output SEO audit (canonicals, sitemap, robots,
+# no query-string internal links, every linked stylesheet present). Read-only: no secrets,
+# no deploy — Cloudflare Workers Builds deploys master on its own.
+
+"on":
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Test, typecheck, build, audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Typecheck and build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: pnpm build
+
+      - name: SEO audit of the built site
+        run: pnpm audit:seo

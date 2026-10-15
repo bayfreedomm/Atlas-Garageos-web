@@ -87,12 +87,24 @@ function newToken(): string {
 const isLocale = (value: string | null | undefined): value is AtlasLocale => typeof value === "string" && (LOCALE_CODES as readonly string[]).includes(value);
 const homeFor = (locale: AtlasLocale): string => (locale === 'en' ? `${ORIGIN}/` : `${ORIGIN}/${locale}/`);
 
+/**
+ * Retention: abuse-protection hashes and never-confirmed sign-ups are kept 30 days at most.
+ * Runs on every report request and from the daily cron trigger (wrangler.jsonc), so the
+ * 30-day promise in the privacy policy holds even when nobody sends a report for weeks.
+ */
+async function purgeExpired(db: D1Database, now: Date): Promise<void> {
+  const monthAgo = new Date(now.getTime() - 30 * 86_400_000).toISOString();
+  await db.prepare('DELETE FROM report_sends WHERE created_at < ?').bind(monthAgo).run();
+  await db.prepare("DELETE FROM subscribers WHERE status = 'pending' AND confirmed_at IS NULL AND consent_at < ?").bind(monthAgo).run();
+}
+
 interface SubscriberRow { readonly status: string; readonly token: string; readonly locale: string }
 
 async function handleReport(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('origin');
-  // Same-origin form posts only (production domain, or the deployment's own preview host).
-  if (origin && !ALLOWED_ORIGINS.has(origin) && origin !== new URL(request.url).origin) return json(403, { error: 'origin' });
+  // Same-origin browser posts only (production domain, or the deployment's own preview host).
+  // Browsers always send Origin on a POST fetch, so a request without it is a script, not a visitor.
+  if (!origin || (!ALLOWED_ORIGINS.has(origin) && origin !== new URL(request.url).origin)) return json(403, { error: 'origin' });
   if (!(request.headers.get('content-type') ?? '').includes('application/json')) return json(415, { error: 'content-type' });
   const raw = await request.text();
   if (raw.length > 12_000) return json(413, { error: 'too-large' });
@@ -114,10 +126,7 @@ async function handleReport(request: Request, env: Env): Promise<Response> {
   const dayAgo = new Date(now.getTime() - 86_400_000).toISOString();
   const byIp = await db.prepare('SELECT COUNT(*) AS n FROM report_sends WHERE ip_hash = ? AND created_at > ?').bind(ipHash, hourAgo).first<{ n: number }>();
   const byEmail = await db.prepare('SELECT COUNT(*) AS n FROM report_sends WHERE email_hash = ? AND created_at > ?').bind(emailHash, dayAgo).first<{ n: number }>();
-  // Retention: abuse-protection hashes and never-confirmed sign-ups are kept 30 days at most.
-  const monthAgo = new Date(now.getTime() - 30 * 86_400_000).toISOString();
-  await db.prepare('DELETE FROM report_sends WHERE created_at < ?').bind(monthAgo).run();
-  await db.prepare("DELETE FROM subscribers WHERE status = 'pending' AND confirmed_at IS NULL AND consent_at < ?").bind(monthAgo).run();
+  await purgeExpired(db, now);
   if ((byIp?.n ?? 0) >= IP_LIMIT_PER_HOUR || (byEmail?.n ?? 0) >= EMAIL_LIMIT_PER_DAY) return json(429, { error: 'rate' });
 
   let confirm: string | undefined;
@@ -197,5 +206,10 @@ export default {
       return json(500, { error: 'server' });
     }
     return env.ASSETS.fetch(request);
+  },
+  async scheduled(_controller: unknown, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }): Promise<void> {
+    if (!env.DB) return;
+    const db = env.DB;
+    ctx.waitUntil(ensureSchema(db).then(() => purgeExpired(db, new Date())));
   },
 };

@@ -26,9 +26,15 @@ Rule for this cycle: no new pSEO route family or mass URL generation. Improve, l
 
 ## P0 — audience (v7-19)
 
-- `BLOCKED` (owner action) — Activate email reports: owner creates D1 `atlas-subscribers` (sends the Database ID), adds `atlasgarageos.com` in Resend (DNS via Cloudflare) and sets the `RESEND_API_KEY` Worker secret; then add the `d1_databases` binding to `wrangler.jsonc` and set `EMAIL_REPORTS_ENABLED = true`.
+- `VERIFIED DONE` — 2026-10-15: email reports live (D1 bound, Resend domain verified, runtime secret set, live send test passed, `EMAIL_REPORTS_ENABLED = true`). v7-21: Origin header required, daily retention cron.
+- `PLANNED` (backlog, before traffic grows) — Bot protection for `/api/report` beyond IP/address limits: Cloudflare Turnstile on the email form or an edge rate-limiting rule, so distributed bots cannot wear down the Resend sending reputation.
 - `PLANNED` — First list use: fuel-price change emails for ES/DE/US from the existing fuel bot data (no Turkey price source in the repository yet). Move bulk sending to a paid tier or newsletter tool once the list outgrows Resend's free 100/day.
 - `REJECTED / SUPERSEDED` — Gate results or the PDF behind an email wall: search visitors leave instead, and pogo-sticking hurts the pages that bring all traffic.
+
+## P0 — engineering gate
+
+- `PARTIAL` — CI release gate on PRs and master (`.github/workflows/ci.yml`, v7-21); confirm the first green run, then require it as a branch-protection status check for master (owner setting on GitHub).
+- `PLANNED` — Keep a browser smoke test in the release gate: computed-style comparison (full vs reference CSS) on a fixed sample of reference pages plus menu/lookup/theme interactions, so a future runtime-built class cannot be silently purged.
 
 ## P0.5 — reference-data growth (Search Console proven demand)
 

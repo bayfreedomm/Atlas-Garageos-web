@@ -16,6 +16,7 @@ import { formatDecimal, formatPlain } from '../ui/locale-format';
 import TireSizeFlow from './TireSizeFlow.astro';
 import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { modelFlowSizes } from '../ui/model-tire-flow';
+import { patternTimeline, periodYears } from '../ui/model-pattern-timeline';
 
 interface Props { readonly model: CarModel; readonly locale: EntityLocale; }
 const { model, locale } = Astro.props;
@@ -44,14 +45,18 @@ const latest = years[0];
 const latestBest = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?? []).best : null;
 const boreText = bores[0] !== undefined ? mm(bores[0]) : undefined;
 
+const timeline = patternTimeline(model);
+// With more than one bolt pattern on record, the headline pattern carries its own years so it is
+// never read as valid for the model's whole span (e.g. Megane: 4x100 until 2009, 5x114.3 after).
+const newestPeriod = timeline.length > 1 ? timeline[0] : undefined;
 const answer = [
-  { label: t.answer.pcd, value: pcds[0] ?? '—', href: pcdHref(pcds[0]) },
+  { label: t.answer.pcd, value: pcds[0] ?? '—', href: pcdHref(pcds[0]), sub: newestPeriod && newestPeriod.pcd === pcds[0] ? periodYears(newestPeriod) : undefined },
   { label: t.answer.bore, value: boreText ?? '—' },
   { label: t.answer.tire, value: allTires[0] ? displayTireNotation(allTires[0], locale) : '—', href: allTires[0] ? tireHref(allTires[0]) : undefined },
   showConsumption && latest !== undefined ? { label: `${t.answer.consumption} (${latest})`, value: l100(latestBest) } : { label: t.answer.years, value: span || '—' },
 ];
 const faqs = [
-  ...(pcds.length ? [{ q: t.faqPcdQ(name), a: pcds.length === 1 ? t.faqPcdA(name, pcds[0]!, boreText) : t.faqPcdMultiA(pcds.join(', ')) }] : []),
+  ...(pcds.length ? [{ q: t.faqPcdQ(name), a: pcds.length === 1 ? t.faqPcdA(name, pcds[0]!, boreText) : t.faqPcdMultiA(timeline.length ? [...new Map(timeline.map((period) => [period.pcd, `${period.pcd} (${periodYears(period)})`])).values()].join(', ') : pcds.join(', ')) }] : []),
   ...(allTires.length ? [{ q: t.faqTireQ(name), a: t.faqTireA(name, allTires.slice(0, 6).map((notation) => displayTireNotation(notation, locale)).join(', ')) }] : []),
   ...(bores.length === 1 && boreText ? [{ q: t.faqBoreQ(name), a: t.faqBoreA(name, boreText) }] : []),
 ];
@@ -72,14 +77,38 @@ const flowSizes = modelFlowSizes(model);
   <h1 class="entity-hero__title">{t.modelH1(name)}</h1>
   <p class="entity-hero__lead">{t.modelLead(name, wheels.length)}</p>
   <dl class="entity-answer entity-answer--vehicle">
-    {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong></dd></div>)}
+    {answer.map((item) => <div class="entity-answer__item"><dt>{item.label}</dt><dd><strong>{'href' in item && item.href ? <a href={item.href}>{item.value}</a> : item.value}</strong>{'sub' in item && item.sub && <span>{item.sub}</span>}</dd></div>)}
   </dl>
   <nav class="entity-pagenav" aria-label={t.nav.wheels}>
+    {timeline.length > 1 && <a href="#model-timeline">{t.answer.pcd}</a>}
     <a href="#model-wheels">{t.nav.wheels}</a>
     {showConsumption && <a href="#model-consumption">{t.nav.consumption}</a>}
     {faqs.length > 0 && <a href="#model-faq">{t.nav.faq}</a>}
   </nav>
 </header>
+
+{timeline.length > 1 && (
+  <section class="entity-section" aria-labelledby="model-timeline">
+    <h2 id="model-timeline">{t.timelineHeading(name)}</h2>
+    <p class="entity-note">{t.timelineIntro}</p>
+    <div class="entity-table-scroll">
+      <table class="entity-table">
+        <thead><tr><th scope="col">{t.cols.years}</th><th scope="col">{t.cols.pcd}</th><th scope="col">{t.cols.bore}</th><th scope="col" class="is-optional">{t.timelineCols.examples}</th><th scope="col" class="is-optional">{t.timelineCols.records}</th></tr></thead>
+        <tbody>
+          {timeline.map((period) => { const href = pcdHref(period.pcd); return (
+            <tr>
+              <th scope="row">{periodYears(period)}</th>
+              <td><strong>{href ? <a href={href}>{period.pcd}</a> : period.pcd}</strong></td>
+              <td>{mm(period.bore)}</td>
+              <td class="is-optional">{period.versions.join(', ')}</td>
+              <td class="is-optional">{period.records}</td>
+            </tr>
+          ); })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
 
 <section class="entity-section" aria-labelledby="model-wheels">
   <h2 id="model-wheels">{t.wheelsHeading(name)}</h2>

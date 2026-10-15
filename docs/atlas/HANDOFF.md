@@ -9,6 +9,13 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-21)
+
+- Car model pages: bolt pattern by year table (data-only), headline pattern with its years, de-duplicated wheels heading, curated vehicle named next to Standard/Option sizes (EN + 8 locales).
+- Email endpoint: Origin required; daily cron purge for 30-day retention. CI workflow added. Docs: email status, CI, backlog (Turnstile/rate limit, browser smoke test).
+- Part B rest evaluated and dropped: tool-page JS is deferred modules (no render blocking; ~10–20 KB gain possible), hero image is object-fit cover at up to 3× DPR so a smaller file would be picked only on 1× screens.
+- Generation branch `parca-3-model-sayfalari` still unmerged (behind master); sourcing plan unchanged.
+
 ## 2026-10-15 (v7-20, Part B step 1)
 
 - `scripts/split-entity-css.mjs` runs after `astro build` (package.json `build`): the 48,690 reference pages (every typed sitemap except `pages`) load `/_astro/reference.<hash>.css` with only the rules their HTML and scripts can use (purgecss 6.0.0, dev dependency). Tool pages and home keep the full sheet. Tire page transfer 67 KB → 36 KB (CSS 54 → 23 KB gzip).

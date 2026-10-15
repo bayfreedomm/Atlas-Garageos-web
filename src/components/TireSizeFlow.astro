@@ -38,7 +38,7 @@ const baseDiameter = baseline ? tireSizeMetrics(baseline.entry).overallDiameterM
             return (
               <tr>
                 <th scope="row"><a href={entityDetailPath('tire-size', locale, row.entry.slug)}>{displayTireNotation(row.notation, locale)}</a></th>
-                <td>{row.role === 'standard' ? t.standard : row.role === 'option' ? t.option : t.recorded}</td>
+                <td>{row.role === 'standard' ? t.standard : row.role === 'option' ? t.option : t.recorded}{row.source && <span class="entity-subvalue">{row.source}</span>}</td>
                 <td class="is-optional">{formatDecimal(diameter, 0, locale)} mm</td>
                 <td>{isBase ? <span class="entity-soft">{t.baseline}</span> : signed(((diameter / baseDiameter) - 1) * 100, 1, '%', locale)}</td>
                 <td class="tire-flow-actions">
