@@ -59,6 +59,8 @@ if (!robots.includes(`Sitemap: ${origin}/sitemap.xml`)) failures.push('robots.tx
 // from shares and bookmarks. They must stay crawlable so Google can read their clean canonical.
 if (/^Disallow: \/\*\?/m.test(robots)) failures.push('robots.txt must not block query URLs: shared calculator URLs need their canonical read.');
 let queryHrefs = 0;
+const stylesheetChecked = new Map();
+const { existsSync } = await import('node:fs');
 const queryHrefSamples = [];
 
 const htmlFiles = (await filesBelow(rootPath)).filter((file) => file.endsWith('.html'));
@@ -70,6 +72,10 @@ const descriptionOwners = new Map();
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
   const pathname = pathForFile(file);
+  for (const match of html.matchAll(/<link rel="stylesheet" href="(\/_astro\/[^"]+\.css)"/g)) {
+    if (!stylesheetChecked.has(match[1])) stylesheetChecked.set(match[1], existsSync(new URL(`.${match[1]}`, root)));
+    if (!stylesheetChecked.get(match[1])) failures.push(`${pathname}: stylesheet ${match[1]} is missing from dist.`);
+  }
   for (const match of html.matchAll(/<a\b[^>]*?\shref="((?:\/(?!\/)|\?|https:\/\/atlasgarageos\.com)[^"]*\?[^"]*)"/gi)) {
     queryHrefs += 1;
     if (queryHrefSamples.length < 5) queryHrefSamples.push(`${pathname} → ${match[1]}`);

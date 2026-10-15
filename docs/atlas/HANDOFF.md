@@ -9,6 +9,12 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-20, Part B step 1)
+
+- `scripts/split-entity-css.mjs` runs after `astro build` (package.json `build`): the 48,690 reference pages (every typed sitemap except `pages`) load `/_astro/reference.<hash>.css` with only the rules their HTML and scripts can use (purgecss 6.0.0, dev dependency). Tool pages and home keep the full sheet. Tire page transfer 67 KB → 36 KB (CSS 54 → 23 KB gzip).
+- Verified: computed styles of every element identical (full vs slim) on 32 sample pages × desktop/mobile × light/dark, plus menu, lookup, details, theme, compare and OBD search interactions; audit now fails if any page links a missing stylesheet.
+- Also: report buttons readable in dark mode/hover; drawings redraw after a saved currency is restored; `public/BingSiteAuth.xml` for Bing Webmaster.
+
 ## 2026-10-15 morning (v7-19 live)
 
 - D1 `atlas-subscribers` bound in `wrangler.jsonc`; Resend domain atlasgarageos.com verified; `RESEND_API_KEY` set as a Production runtime secret (a copy also sits in Builds → Variables, unused at runtime).
