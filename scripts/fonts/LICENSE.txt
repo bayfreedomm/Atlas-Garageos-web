@@ -1,0 +1,4 @@
+Inter typeface (Inter-Regular.otf, Inter-SemiBold.otf, Inter-Bold.otf)
+Copyright 2016-2023 The Inter Project Authors (https://github.com/rsms/inter)
+Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+Used only at build time to render Atlas entity images (scripts/build-entity-images.mjs).

@@ -1,5 +1,6 @@
 ---
 // Localized bolt-pattern detail pages (fr): one page per row of boltPatternCatalog.
+import { boltPatternImage } from '../../../../seo/entity-images';
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import BoltPatternEntity from '../../../../components/BoltPatternEntity.astro';
 import { boltPatternCatalog, type BoltPatternEntry } from '../../../../data/bolt-pattern-catalog';
@@ -18,6 +19,6 @@ interface Props { entry: BoltPatternEntry | undefined; make: BoltMake | undefine
 const { entry, make } = Astro.props as Props;
 const meta = entry ? boltPatternDetailMeta(entry, 'fr') : boltMakeMeta(make!, 'fr');
 ---
-<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="fr" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="fr" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs} image={entry ? boltPatternImage(entry, 'fr') : undefined}>
   {entry ? <BoltPatternEntity entry={entry} locale="fr" /> : <BoltMakeBody make={make!} locale="fr" />}
 </SiteLayout>

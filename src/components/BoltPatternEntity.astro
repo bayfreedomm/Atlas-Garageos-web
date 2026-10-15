@@ -14,6 +14,8 @@ import { toolLocaleFor } from '../seo/entity-routes';
 // common reason someone buys a wheel that does not fit, so it is rendered as a first-class
 // section on every one of these pages, above the tool CTA rather than buried under it.
 import BoltPatternDiagram from './BoltPatternDiagram.astro';
+import EntityImage from './EntityImage.astro';
+import { boltPatternImage } from '../seo/entity-images';
 import Parametric3DPanel from './Parametric3DPanel.astro';
 import DecisionGraph from './DecisionGraph.astro';
 import { vehiclesForBoltPattern, type BoltPatternEntry } from '../data/bolt-pattern-catalog';
@@ -79,6 +81,7 @@ const makeText = boltMakeText[locale];
     {metricRows.slice(0, 4).map((row) => <div class="entity-answer__item"><dt>{row.label}</dt><dd><strong>{row.value}</strong></dd></div>)}
   </dl>
   <p class="entity-hero__lead">{t.detailLead(entry.lugCount, entry.pcdMm)}</p>
+  <EntityImage image={boltPatternImage(entry, locale)} />
   <nav class="entity-pagenav" aria-label={t.metricsHeading}>
     <a href="#entity-metrics">{t.metricsHeading}</a>
     <a href="#entity-vehicles">{t.vehiclesHeading}</a>

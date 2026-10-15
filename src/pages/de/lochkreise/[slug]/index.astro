@@ -4,6 +4,7 @@
 // One route file generates every page in this locale: getStaticPaths() returns one entry per
 // row of boltPatternCatalog, which is itself derived from vehicleFitmentData. Adding a vehicle with a
 // new bolt pattern publishes a new page here on the next build with no new file.
+import { boltPatternImage } from '../../../../seo/entity-images';
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import BoltPatternEntity from '../../../../components/BoltPatternEntity.astro';
 import { boltPatternCatalog, type BoltPatternEntry } from '../../../../data/bolt-pattern-catalog';
@@ -24,6 +25,6 @@ interface Props { entry: BoltPatternEntry | undefined; make: BoltMake | undefine
 const { entry, make } = Astro.props as Props;
 const meta = entry ? boltPatternDetailMeta(entry, 'de') : boltMakeMeta(make!, 'de');
 ---
-<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="de" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="de" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs} image={entry ? boltPatternImage(entry, 'de') : undefined}>
   {entry ? <BoltPatternEntity entry={entry} locale="de" /> : <BoltMakeBody make={make!} locale="de" />}
 </SiteLayout>

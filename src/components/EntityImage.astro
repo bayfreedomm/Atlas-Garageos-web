@@ -1,0 +1,11 @@
+---
+// The page's own image (src/seo/entity-images.ts) as a real <img>: the same file is the
+// og:image, twitter:image and primaryImageOfPage, so search engines can pick it as the
+// result thumbnail.
+import type { PageImage } from '../seo/entity-images';
+interface Props { readonly image: PageImage }
+const { image } = Astro.props;
+---
+<figure class="entity-figure">
+  <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" />
+</figure>

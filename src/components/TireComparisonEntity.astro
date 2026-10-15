@@ -13,6 +13,8 @@ import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { comparisonModel, comparisonVehicles } from '../ui/tire-comparison';
 import { carModelLinkFor } from '../ui/car-locale';
 import { carName } from '../ui/car-pages';
+import EntityImage from './EntityImage.astro';
+import { tireComparisonImage } from '../seo/entity-images';
 import { formatDecimal, formatMm, formatPlain } from '../ui/locale-format';
 import { renderFitmentSection } from '../ui/fitment-section';
 
@@ -83,6 +85,7 @@ const sectionSvg = renderFitmentSection({
   </dl>
   <p class="entity-hero__lead">{t.lead(f)}</p>
   <p class="entity-note">{pair.reason === 'same-vehicle' ? t.reasonSame : t.reasonPlus}</p>
+  <EntityImage image={tireComparisonImage(pair, locale)} />
   <div class="entity-hero__links">
     <a class="entity-inline-link" href={linkA.href}>{linkA.label} ›</a>
     <a class="entity-inline-link" href={linkB.href}>{linkB.label} ›</a>

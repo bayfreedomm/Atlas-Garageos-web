@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && node scripts/split-entity-css.mjs",
+    "build": "astro check && astro build && node scripts/rasterize-entity-images.mjs && node scripts/split-entity-css.mjs",
     "preview": "astro preview",
     "audit:seo": "node scripts/audit-seo-build.mjs",
     "test": "vitest run",
@@ -18,9 +18,11 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@resvg/resvg-js": "2.6.2",
     "@types/node": "^24.13.6",
     "@types/three": "^0.186.0",
     "purgecss": "6.0.0",
+    "sharp": "0.35.4",
     "typescript": "6.0.3",
     "vitest": "5.0.0"
   },

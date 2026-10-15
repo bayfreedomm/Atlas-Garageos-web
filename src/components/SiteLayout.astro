@@ -7,6 +7,7 @@ import { REFERENCE_LOCALE_META, REFERENCE_LOCALES, isReferenceLocale } from '../
 import { referenceChromeText } from '../content/reference-locale-text';
 import { entityHubPath } from '../seo/entity-routes';
 import type { AtlasLocale } from '../localization/locales';
+import type { PageImage } from '../seo/entity-images';
 import Brand from './Brand.astro';
 import ThemeBoot from './ThemeBoot.astro';
 import NavigationDrawer from './NavigationDrawer.astro';
@@ -19,7 +20,7 @@ import '../styles/product-v4.css';
 
 interface Breadcrumb { readonly name: string; readonly href: string; }
 interface HreflangAlternate { readonly hreflang: string; readonly href: string; }
-interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ChromeLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; }
+interface Props { definition?: ToolDefinition; title?: string; description?: string; pathname?: string | undefined; active?: 'home' | 'garage' | 'fitment' | 'tools' | 'diagnostics'; breadcrumbs?: readonly Breadcrumb[]; locale?: ChromeLocale | undefined; alternates?: readonly HreflangAlternate[] | undefined; image?: PageImage | undefined; }
 const props = Astro.props;
 const definition = props.definition;
 const title = props.title ?? definition?.title;
@@ -62,6 +63,13 @@ const applicationJsonLd = definition && definition.kind === 'tool' ? serializeJs
 const breadcrumbs = props.breadcrumbs ?? (definition?.kind === 'flagship'
   ? [{ name: definition.title, href: pathname }]
   : definition ? [{ name: 'Home', href: '/' }, { name: 'Tools', href: '/tools/' }, { name: definition.title, href: pathname }] : [{ name: title, href: pathname }]);
+// Page-specific image (reference pages): the same file is the visible <img>, og:image,
+// twitter:image and primaryImageOfPage. Other pages keep the brand image for social cards only.
+const pageImage = props.image;
+const shareImage = pageImage
+  ? { url: canonicalForPath(pageImage.src), width: pageImage.width, height: pageImage.height, alt: pageImage.alt }
+  : { url: `${SITE_ORIGIN}/atlas-hero-car.png`, width: 1672, height: 941, alt: 'Atlas GarageOS' };
+const webPageJsonLd = pageImage ? serializeJsonLd({ '@context': 'https://schema.org', '@type': 'WebPage', name: title, url: canonical, primaryImageOfPage: { '@type': 'ImageObject', url: shareImage.url, width: shareImage.width, height: shareImage.height, caption: shareImage.alt } }) : undefined;
 const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: breadcrumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: canonicalForPath(item.href) })) });
 ---
 <!doctype html>
@@ -71,19 +79,21 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="robots" content="index,follow" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Atlas GarageOS" />
     <meta property="og:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={`${SITE_ORIGIN}/atlas-hero-car.png`} />
-    <meta property="og:image:width" content="1672" />
-    <meta property="og:image:height" content="941" />
+    <meta property="og:image" content={shareImage.url} />
+    <meta property="og:image:width" content={String(shareImage.width)} />
+    <meta property="og:image:height" content={String(shareImage.height)} />
+    <meta property="og:image:alt" content={shareImage.alt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${SITE_ORIGIN}/atlas-hero-car.png`} />
+    <meta name="twitter:image" content={shareImage.url} />
+    <meta name="twitter:image:alt" content={shareImage.alt} />
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
     <link rel="icon" href="/atlas-mark.svg" type="image/svg+xml" />
@@ -91,6 +101,7 @@ const breadcrumbJsonLd = serializeJsonLd({ '@context': 'https://schema.org', '@t
     <meta name="theme-color" content="#f7f8f5" />
     <script is:inline type="application/ld+json" set:html={websiteJsonLd}></script>
     <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd}></script>
+    {webPageJsonLd && <script is:inline type="application/ld+json" set:html={webPageJsonLd}></script>}
     {applicationJsonLd && <script is:inline type="application/ld+json" set:html={applicationJsonLd}></script>}
     <title>{title === 'Atlas GarageOS' ? title : `${title} — Atlas GarageOS`}</title>
   </head>

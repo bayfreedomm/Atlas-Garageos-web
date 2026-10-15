@@ -1,5 +1,6 @@
 ---
 // Localized tire-size detail pages (pt-br): one page per catalog size plus one page per tire-height group.
+import { tireComparisonImage, tireSizeImage } from '../../../../seo/entity-images';
 import SiteLayout from '../../../../components/SiteLayout.astro';
 import TireSizeEntity from '../../../../components/TireSizeEntity.astro';
 import TireComparisonEntity from '../../../../components/TireComparisonEntity.astro';
@@ -22,6 +23,6 @@ interface Props { entry: TireSizeEntry | undefined; group: DiameterGroup | undef
 const { entry, group, pair } = Astro.props as Props;
 const meta = entry ? tireSizeDetailMeta(entry, 'pt-br') : pair ? tireComparisonMeta(pair, 'pt-br') : tireDiameterGroupMeta(group!, 'pt-br');
 ---
-<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="pt-br" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs}>
+<SiteLayout title={meta.title} description={meta.description} pathname={meta.pathname} active="tools" locale="pt-br" alternates={meta.alternates} breadcrumbs={meta.breadcrumbs} image={entry ? tireSizeImage(entry, 'pt-br') : pair ? tireComparisonImage(pair, 'pt-br') : undefined}>
   {entry ? <TireSizeEntity entry={entry} locale="pt-br" /> : pair ? <TireComparisonEntity pair={pair} locale="pt-br" /> : <TireDiameterGroup group={group!} locale="pt-br" />}
 </SiteLayout>

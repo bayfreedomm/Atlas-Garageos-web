@@ -9,6 +9,11 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-22, page images stage 1)
+
+- Own technical image per tire size / comparison / bolt pattern, shared across locales; `<img>` + og/twitter + primaryImageOfPage + `max-image-preview:large`; audit checks. Build adds ~90 s (rasterizer). Verified on 205/55 R16 (EN/TR), 4x108, 205/55 R16 vs 225/45 R17 (DE).
+- Next: stage 2 car photos (Corsa F first), then tire-page CTR from Search Console.
+
 ## 2026-10-15 (v7-21)
 
 - Car model pages: bolt pattern by year table (data-only), headline pattern with its years, de-duplicated wheels heading, curated vehicle named next to Standard/Option sizes (EN + 8 locales).

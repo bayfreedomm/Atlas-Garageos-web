@@ -72,6 +72,14 @@ const descriptionOwners = new Map();
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
   const pathname = pathForFile(file);
+  // Page-specific images: og:image must exist in dist and be the page's own visible <img>.
+  const ogImage = /<meta property="og:image" content="([^"]+)"/.exec(html)?.[1] ?? '';
+  if (ogImage.startsWith(`${origin}/img/`)) {
+    const imagePath = ogImage.slice(origin.length);
+    if (!existsSync(new URL(`.${imagePath}`, root))) failures.push(`${pathname}: og:image ${imagePath} is missing from dist.`);
+    if (!html.includes(`<img src="${imagePath}"`)) failures.push(`${pathname}: og:image ${imagePath} is not shown as an <img> on the page.`);
+    if (!html.includes(`"primaryImageOfPage"`)) failures.push(`${pathname}: page image missing from structured data.`);
+  }
   for (const match of html.matchAll(/<link rel="stylesheet" href="(\/_astro\/[^"]+\.css)"/g)) {
     if (!stylesheetChecked.has(match[1])) stylesheetChecked.set(match[1], existsSync(new URL(`.${match[1]}`, root)));
     if (!stylesheetChecked.get(match[1])) failures.push(`${pathname}: stylesheet ${match[1]} is missing from dist.`);

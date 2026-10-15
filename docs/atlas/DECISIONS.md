@@ -144,3 +144,12 @@ Status: `ACCEPTED`.
 
 Rationale: all traffic is search traffic; a wall loses the visit, an opt-in keeps the visit and still builds a list.
 
+## 2026-10-15 — Page-specific images for search thumbnails
+
+Status: `ACCEPTED`.
+
+- Reference pages use Atlas's own technical drawings (no licence to track); car photos come only from sources with explicit reuse rights (Wikimedia Commons CC BY / CC BY-SA / public domain), are copied to Atlas (never hotlinked), optimized, and carry recorded and visible attribution. A photo must match the generation the page describes; otherwise the technical image is used.
+- One image file per entity for all locales; the visible `<img>`, og:image, twitter:image and structured data use the same file.
+
+Rationale: Atlas pages had no `<img>` and one generic og:image, so search engines had nothing page-specific to show as a thumbnail.
+
