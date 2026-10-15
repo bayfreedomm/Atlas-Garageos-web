@@ -1,0 +1,48 @@
+---
+// Privacy-policy section for the optional email reports. Shown only while the feature is on.
+import { EMAIL_REPORTS_ENABLED } from '../config/lead-capture';
+import type { AtlasLocale } from '../localization/locales';
+
+interface Props { readonly locale: AtlasLocale }
+const { locale } = Astro.props;
+const copy: Readonly<Record<AtlasLocale, { heading: string; body: readonly string[] }>> = {
+  en: { heading: 'Email reports (optional)', body: [
+    'If you choose “Email me this report”, your email address, the values and results shown on the page and the calculator link are sent to our Cloudflare worker and delivered through our email provider, Resend.',
+    'If you do not tick the list box, we keep no copy of your address: only a one-way hash and the time of the request are stored for abuse protection, and deleted after 30 days.',
+    'If you tick the box, we store your address, language and the dates of your consent and confirmation, and send further email only after you confirm. Unconfirmed sign-ups are deleted after 30 days. Every email has an unsubscribe link; to have your address removed entirely, contact us.' ] },
+  de: { heading: 'Berichte per E-Mail (optional)', body: [
+    'Wenn Sie „Bericht per E-Mail senden“ wählen, werden Ihre E-Mail-Adresse, die auf der Seite angezeigten Eingaben und Ergebnisse sowie der Link zum Rechner an unseren Cloudflare-Worker übermittelt und über unseren E-Mail-Dienstleister Resend zugestellt.',
+    'Ohne Häkchen bei der Liste speichern wir Ihre Adresse nicht: Zum Schutz vor Missbrauch werden nur ein Einweg-Hash und der Zeitpunkt der Anfrage gespeichert und nach 30 Tagen gelöscht.',
+    'Mit Häkchen speichern wir Ihre Adresse, Sprache sowie Zeitpunkt von Einwilligung und Bestätigung und schreiben Ihnen erst nach Ihrer Bestätigung. Unbestätigte Anmeldungen werden nach 30 Tagen gelöscht. Jede E-Mail enthält einen Abmeldelink; für die vollständige Löschung Ihrer Adresse kontaktieren Sie uns.' ] },
+  es: { heading: 'Informes por correo (opcional)', body: [
+    'Si eliges «Enviarme este informe por correo», tu dirección, los valores y resultados que muestra la página y el enlace a la calculadora se envían a nuestro worker de Cloudflare y se entregan mediante nuestro proveedor de correo, Resend.',
+    'Si no marcas la casilla de la lista, no guardamos tu dirección: solo se almacenan un hash irreversible y la hora de la solicitud para evitar abusos, y se borran a los 30 días.',
+    'Si la marcas, guardamos tu dirección, idioma y las fechas de consentimiento y confirmación, y solo te escribimos después de que confirmes. Las suscripciones sin confirmar se borran a los 30 días. Cada correo incluye un enlace para darte de baja; para eliminar tu dirección por completo, contáctanos.' ] },
+  fr: { heading: 'Rapports par e-mail (facultatif)', body: [
+    'Si vous choisissez « M’envoyer ce rapport par e-mail », votre adresse, les valeurs et résultats affichés sur la page et le lien vers le calculateur sont transmis à notre worker Cloudflare et envoyés par notre prestataire e-mail, Resend.',
+    'Si vous ne cochez pas la case de la liste, nous ne conservons pas votre adresse : seuls une empreinte irréversible et l’heure de la demande sont stockés contre les abus, puis supprimés après 30 jours.',
+    'Si vous la cochez, nous conservons votre adresse, votre langue et les dates de consentement et de confirmation, et ne vous écrivons qu’après votre confirmation. Les inscriptions non confirmées sont supprimées après 30 jours. Chaque e-mail contient un lien de désabonnement ; pour supprimer entièrement votre adresse, contactez-nous.' ] },
+  it: { heading: 'Report via e-mail (facoltativo)', body: [
+    'Se scegli «Inviami questo report via e-mail», il tuo indirizzo, i valori e i risultati mostrati nella pagina e il link al calcolatore vengono inviati al nostro worker Cloudflare e recapitati tramite il nostro fornitore e-mail, Resend.',
+    'Se non selezioni la casella della lista, non conserviamo il tuo indirizzo: per prevenire abusi vengono salvati solo un hash irreversibile e l’ora della richiesta, eliminati dopo 30 giorni.',
+    'Se la selezioni, conserviamo indirizzo, lingua e le date di consenso e conferma, e ti scriviamo solo dopo la conferma. Le iscrizioni non confermate vengono eliminate dopo 30 giorni. Ogni e-mail contiene un link per disiscriverti; per cancellare del tutto il tuo indirizzo, contattaci.' ] },
+  'pt-br': { heading: 'Relatórios por e-mail (opcional)', body: [
+    'Se você escolher “Enviar este relatório para meu e-mail”, seu endereço, os valores e resultados mostrados na página e o link da calculadora são enviados ao nosso worker da Cloudflare e entregues pelo nosso provedor de e-mail, Resend.',
+    'Se você não marcar a caixa da lista, não guardamos seu endereço: apenas um hash irreversível e o horário da solicitação ficam armazenados contra abusos e são apagados após 30 dias.',
+    'Se marcar, guardamos seu endereço, idioma e as datas de consentimento e confirmação, e só enviamos outros e-mails depois da sua confirmação. Inscrições não confirmadas são apagadas após 30 dias. Todo e-mail tem um link para cancelar; para remover seu endereço por completo, fale conosco.' ] },
+  pl: { heading: 'Raporty e-mailem (opcjonalnie)', body: [
+    'Jeśli wybierzesz „Wyślij mi ten raport e-mailem”, Twój adres, wartości i wyniki widoczne na stronie oraz link do kalkulatora trafiają do naszego workera Cloudflare i są dostarczane przez naszego dostawcę poczty, Resend.',
+    'Jeśli nie zaznaczysz pola listy, nie przechowujemy Twojego adresu: dla ochrony przed nadużyciami zapisujemy tylko nieodwracalny skrót i czas żądania, usuwane po 30 dniach.',
+    'Jeśli je zaznaczysz, przechowujemy adres, język oraz daty zgody i potwierdzenia, a kolejne wiadomości wysyłamy dopiero po potwierdzeniu. Niepotwierdzone zapisy usuwamy po 30 dniach. Każdy e-mail zawiera link do wypisania się; aby całkowicie usunąć adres, skontaktuj się z nami.' ] },
+  nl: { heading: 'Rapporten per e-mail (optioneel)', body: [
+    'Als je kiest voor „Stuur dit rapport naar mijn e-mail”, worden je e-mailadres, de waarden en resultaten op de pagina en de link naar de calculator naar onze Cloudflare-worker gestuurd en bezorgd via onze e-mailprovider, Resend.',
+    'Vink je het lijstvakje niet aan, dan bewaren we je adres niet: alleen een onomkeerbare hash en het tijdstip van het verzoek worden opgeslagen tegen misbruik en na 30 dagen verwijderd.',
+    'Vink je het wel aan, dan bewaren we je adres, taal en de data van toestemming en bevestiging, en mailen we pas na je bevestiging. Onbevestigde aanmeldingen worden na 30 dagen verwijderd. Elke e-mail bevat een afmeldlink; neem contact op om je adres volledig te laten verwijderen.' ] },
+  tr: { heading: 'E-posta raporları (isteğe bağlı)', body: [
+    '“Bu raporu e-postama gönder”i seçerseniz e-posta adresiniz, sayfada görünen değerler ve sonuçlar ile hesaplayıcı bağlantısı Cloudflare worker’ımıza iletilir ve e-posta sağlayıcımız Resend üzerinden gönderilir.',
+    'Liste kutusunu işaretlemezseniz adresinizi saklamayız: kötüye kullanımı önlemek için yalnızca geri döndürülemez bir özet (hash) ve isteğin zamanı tutulur, 30 gün sonra silinir.',
+    'Kutuyu işaretlerseniz adresinizi, dilinizi, onay ve doğrulama tarihlerini saklarız; başka e-postayı yalnızca siz onayladıktan sonra göndeririz. Onaylanmayan kayıtlar 30 gün sonra silinir. Her e-postada abonelikten çıkma bağlantısı vardır; adresinizin tamamen silinmesi için bize ulaşın.' ] },
+};
+const t = copy[locale];
+---
+{EMAIL_REPORTS_ENABLED && <><h2>{t.heading}</h2>{t.body.map((paragraph) => <p>{paragraph}</p>)}</>}

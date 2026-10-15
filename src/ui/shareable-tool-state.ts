@@ -211,6 +211,21 @@ function initializeBoltPatternPrefill(form: HTMLFormElement): void {
   form.requestSubmit();
 }
 
+/** Query string (no "?") that reopens this calculator in its current state; same format as the share button. */
+export function shareQueryFor(form: HTMLFormElement): string {
+  const output = new URLSearchParams();
+  if (form.dataset.calculator === 'tire-comparison') {
+    output.set('current', `${value(form, 'original-widthMm')}-${value(form, 'original-aspectRatio')}-${value(form, 'original-rimDiameterInches')}`);
+    output.set('new', `${value(form, 'new-widthMm')}-${value(form, 'new-aspectRatio')}-${value(form, 'new-rimDiameterInches')}`);
+  } else if (form.dataset.calculator === 'wheel-offset') {
+    (['originalWidthInches', 'originalOffsetMm', 'newWidthInches', 'newOffsetMm'] as const).forEach((field, index) => output.set((['ow', 'oe', 'nw', 'ne'] as const)[index]!, value(form, field)));
+  } else {
+    output.set('tool', toolKey(form));
+    output.set('state', JSON.stringify(readState(form)));
+  }
+  return output.toString();
+}
+
 export function initializeShareableToolState(): void {
   document.querySelectorAll<HTMLFormElement>('[data-calculator], [data-utility-calculator]').forEach((form) => {
     if (form.dataset[INITIALIZED] === 'true') return;

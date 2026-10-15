@@ -1,6 +1,13 @@
 # Atlas GarageOS — Session Handoff
 
-Updated: 2026-10-14.
+Updated: 2026-10-15.
+
+## 2026-10-15 session (v7-19)
+
+- Calculator report actions on every tool page: PDF (print) always; email report + double opt-in list built but off (`src/config/lead-capture.ts`).
+- Worker added (`src/worker/index.ts`, wrangler `main`, `run_worker_first: ["/api/*"]`); static pages never invoke it. Only `default` may be exported from it (workerd entrypoint rule; guarded by `tests/unit/cloudflare-deploy-config.test.ts`).
+- Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
+- To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
 ## 2026-10-14 late session (v7-18)
 

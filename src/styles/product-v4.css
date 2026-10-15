@@ -1731,3 +1731,42 @@ p>.entity-confidence{white-space:normal;max-width:100%}
 .gear-technical-visual .gear-wheel-assembly::before{inset:22%!important;border:1.25px solid var(--color-ink-muted)!important;background:var(--color-surface)!important}
 .gear-technical-visual .gear-wheel-assembly>i{width:22%!important;height:22%!important;background:var(--color-surface)!important;box-shadow:inset 0 0 0 1.25px var(--color-ink-muted)!important}
 .gear-technical-visual .gear-wheel-assembly>b{width:6%!important;height:6%!important;background:var(--color-ink-muted)!important;box-shadow:none!important}
+
+/* ── Report actions: PDF download + email report (src/components/ReportActions.astro) ───────── */
+.report-actions{margin:var(--space-4) 0 0;display:grid;gap:var(--space-3)}
+.report-actions__row{display:flex;flex-wrap:wrap;gap:.6rem}
+.report-actions__button{display:inline-flex;align-items:center;gap:.45rem;min-height:2.75rem;padding:.55rem 1.1rem;border:1px solid var(--color-line-strong);border-radius:980px;background:var(--color-surface);color:var(--color-ink);font:inherit;font-size:var(--text-sm);font-weight:600;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+.report-actions__button:hover{border-color:#2f7cf6;color:#1d63d6}
+.report-actions__button:focus-visible,.report-actions__send:focus-visible{outline:2px solid #2f7cf6;outline-offset:2px}
+.report-actions__button[aria-expanded="true"]{border-color:#2f7cf6;background:color-mix(in srgb,#2f7cf6 7%,var(--color-surface))}
+.report-actions__form{display:grid;gap:.8rem;max-width:34rem;padding:var(--space-4);border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-surface)}
+.report-actions__field{display:grid;gap:.35rem;font-size:var(--text-sm);font-weight:600}
+.report-actions__field input{min-height:2.75rem;padding:.55rem .8rem;border:1px solid var(--color-line-strong);border-radius:.7rem;background:var(--color-surface);color:var(--color-ink);font:inherit;font-size:1rem}
+.report-actions__check{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start;font-size:var(--text-sm);line-height:1.45;color:var(--color-ink)}
+.report-actions__check input{width:1.15rem;height:1.15rem;margin:.1rem 0 0;accent-color:#2f7cf6}
+.report-actions__privacy{margin:0;font-size:.8rem;line-height:1.45;color:var(--color-ink-muted)}
+.report-actions__submit{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem}
+.report-actions__send{min-height:2.75rem;padding:.55rem 1.4rem;border:0;border-radius:980px;background:#0a66d8;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.report-actions__send:disabled{opacity:.6;cursor:progress}
+.report-actions__status{margin:0;font-size:var(--text-sm);color:var(--color-ink-muted)}
+.report-actions__status[data-tone="ok"]{color:#1e7b34}
+.report-actions__status[data-tone="error"]{color:#b3261e}
+.report-actions__hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.report-print-header{display:none}
+@media print{
+  body.is-printing-report{background:#fff!important;color:#000!important}
+  html:has(body.is-printing-report){background:#fff!important;color-scheme:light!important}
+  body.is-printing-report .skip-link,body.is-printing-report .app-header,body.is-printing-report footer,body.is-printing-report .site-footer{display:none!important}
+  body.is-printing-report main>*:not(.tool-machine):not(.report-actions):not(.tool-visual-studio){display:none!important}
+  body.is-printing-report .report-actions{order:-1}
+  body.is-printing-report .report-actions__row,body.is-printing-report .report-actions__form{display:none!important}
+  body.is-printing-report .report-print-header{display:block;margin:0 0 6mm;padding:0 0 3mm;border-bottom:1px solid #999;font:10pt/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#000}
+  body.is-printing-report .report-print-header p{margin:0 0 1mm;max-width:none}
+  body.is-printing-report .report-print-header__brand{font-size:8.5pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  body.is-printing-report .report-print-header__title{font-size:16pt;font-weight:700}
+  body.is-printing-report .report-print-header__url{word-break:break-all;font-size:8.5pt}
+  body.is-printing-report main{display:flex;flex-direction:column}
+  body.is-printing-report .tool-machine button,body.is-printing-report .tool-visual-studio [role="tablist"],body.is-printing-report .tool-visual-studio button{display:none!important}
+  body.is-printing-report .tool-machine,body.is-printing-report .tool-visual-studio{break-inside:avoid-page;box-shadow:none!important}
+  @page{margin:14mm}
+}

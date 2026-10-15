@@ -134,3 +134,13 @@ Status: `ACCEPTED`.
 
 Editorial generation names and year spans (e.g. "Megane IV 2016–2024") are factual claims that appear in titles and FAQ. Branch `parca-3-model-sayfalari` stays unmerged until every generation row carries a source (manufacturer press release or homologation/EU type-approval data first; two independent references otherwise) and the ANKUSI year mapping is checked per row. Unsourced rows are dropped, not guessed.
 
+## 2026-10-15 — Audience by opt-in, not by wall (v7-19)
+
+Status: `ACCEPTED`.
+
+- Results and the PDF stay free and ungated. Email is offered as "email me this report" plus a separate, unticked list checkbox with double opt-in (GET shows a button, POST confirms, so mail scanners cannot confirm or unsubscribe anyone).
+- The list lives in our own Cloudflare D1 database (portable, no subscriber cap); Resend sends. Telegram was not chosen.
+- Reports can only describe our own calculator routes with short label/value lines (no links, markup or free text), rate limited per IP (6/h) and per address (3/day), with a honeypot and a same-origin check.
+
+Rationale: all traffic is search traffic; a wall loses the visit, an opt-in keeps the visit and still builds a list.
+
