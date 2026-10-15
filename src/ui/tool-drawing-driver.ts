@@ -39,10 +39,27 @@ export function bindToolDrawing(frame: HTMLElement, form: HTMLFormElement | null
     host.innerHTML = drawing.svg;
     if (reading) { reading.textContent = drawing.readout; if (reading.parentElement) reading.parentElement.hidden = drawing.readout === ''; }
   };
+  let lastKey = '';
   const schedule = (): void => { void render(); };
   form?.addEventListener('input', schedule);
   form?.addEventListener('change', schedule);
   form?.addEventListener('submit', () => window.setTimeout(schedule, 0));
+  // Scripts that restore saved or shared values (and the market's default currency) set fields
+  // without firing events. When the calculator repaints its results, re-read the form and
+  // redraw if anything changed, so the drawing never shows defaults next to a different result.
+  if (form) {
+    let pending = 0;
+    new MutationObserver((records) => {
+      if (records.every((record) => frame.contains(record.target))) return;
+      if (pending) return;
+      pending = window.requestAnimationFrame(() => {
+        pending = 0;
+        const key = JSON.stringify(readFormValues(form));
+        if (key !== lastKey) { lastKey = key; schedule(); }
+      });
+    }).observe(form, { subtree: true, childList: true, characterData: true });
+    lastKey = JSON.stringify(readFormValues(form));
+  }
   schedule();
 }
 

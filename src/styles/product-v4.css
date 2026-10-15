@@ -1770,3 +1770,9 @@ p>.entity-confidence{white-space:normal;max-width:100%}
   body.is-printing-report .tool-machine,body.is-printing-report .tool-visual-studio{break-inside:avoid-page;box-shadow:none!important}
   @page{margin:14mm}
 }
+/* The legacy global button rules (light and dark) paint every <button> as a filled brand button;
+   the report actions are outline buttons, so they pin their own colours in every state. */
+.report-actions .report-actions__button,.report-actions .report-actions__button:hover,.report-actions .report-actions__button:focus{background:var(--color-surface)!important;color:var(--color-ink)!important;box-shadow:none!important}
+.report-actions .report-actions__button:hover,.report-actions .report-actions__button[aria-expanded="true"]{border-color:#2f7cf6!important;background:color-mix(in srgb,#2f7cf6 10%,var(--color-surface))!important}
+.report-actions .report-actions__send,.report-actions .report-actions__send:hover{background:#0a66d8!important;color:#fff!important}
+.report-actions .report-actions__send:hover{background:#0858bd!important}
