@@ -1,6 +1,8 @@
 /** Titles, descriptions and shared view helpers for the /cars/ page family (English). */
 import { boltPatternCatalog } from '../data/bolt-pattern-catalog';
 import { entityDetailPath } from '../seo/entity-routes';
+import { carGenerationText } from '../content/car-generation-text';
+import { generationView } from './car-generation-view';
 import { type CarModel, type EpaVariant, type WheelRow, epaYears, mpgSummary, newestFirst } from '../data/cars';
 
 const TITLE_BUDGET = 58; // 75 minus " — Atlas GarageOS"; '&' is never used, so no &amp; inflation.
@@ -43,11 +45,15 @@ export function carModelTitle(model: CarModel): string {
   const wheels = model.wheels.length > 0;
   if (epa && wheels) return fit([`${name} MPG by Year, Bolt Pattern and Wheel Size`, `${name} MPG by Year and Bolt Pattern`, `${name} MPG and Bolt Pattern`, `${name} Specs`]);
   if (epa) return fit([`${name} MPG and Fuel Cost by Year`, `${name} MPG by Year`, `${name} MPG`]);
-  const pcd = newestFirst(model.wheels, (row) => row[4]).slice(0, 2).join(' / ');
+  const pcd = newestFirst(model.wheels, (row) => row[4]).filter((value) => /^\d+x\d+(?:\.\d+)?$/.test(value)).slice(0, 2).join(' / ');
+  const generations = generationView(model, 'en');
+  if (generations?.titleLabels) return fit([...carGenerationText.en.titles(name, generations.titleLabels), `${name} Bolt Pattern`]);
   return fit([...(pcd ? [`${name} Bolt Pattern ${pcd}, Center Bore and Wheel Size`, `${name} Bolt Pattern: ${pcd}`] : []), `${name} Bolt Pattern, Center Bore and Wheel Size`, `${name} Bolt Pattern and Wheel Size`, `${name} Bolt Pattern`]);
 }
 
 export function carModelDescription(model: CarModel): string {
+  const generations = Object.keys(model.epa).length === 0 ? generationView(model, 'en') : undefined;
+  if (generations?.descriptionList) return fitDescription(carGenerationText.en.description(carName(model), generations.descriptionList));
   const years = epaYears(model);
   const pcd = newestFirst(model.wheels, (row) => row[4]);
   const parts: string[] = [];

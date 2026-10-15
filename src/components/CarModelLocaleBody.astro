@@ -19,6 +19,8 @@ import { carModelImage } from '../seo/vehicle-images';
 import { vehicleFlowText } from '../content/vehicle-flow-text';
 import { modelFlowSizes } from '../ui/model-tire-flow';
 import { patternTimeline, periodYears } from '../ui/model-pattern-timeline';
+import { generationView } from '../ui/car-generation-view';
+import CarGenerations from './CarGenerations.astro';
 
 interface Props { readonly model: CarModel; readonly locale: EntityLocale; }
 const { model, locale } = Astro.props;
@@ -48,6 +50,7 @@ const latestBest = latest !== undefined ? mpgSummary(model.epa[String(latest)] ?
 const boreText = bores[0] !== undefined ? mm(bores[0]) : undefined;
 
 const timeline = patternTimeline(model);
+const generations = generationView(model, locale);
 const pageImage = carModelImage(model, locale);
 // With more than one bolt pattern on record, the headline pattern carries its own years so it is
 // never read as valid for the model's whole span (e.g. Megane: 4x100 until 2009, 5x114.3 after).
@@ -59,6 +62,7 @@ const answer = [
   showConsumption && latest !== undefined ? { label: `${t.answer.consumption} (${latest})`, value: l100(latestBest) } : { label: t.answer.years, value: span || '—' },
 ];
 const faqs = [
+  ...(generations?.faqs ?? []),
   ...(pcds.length ? [{ q: t.faqPcdQ(name), a: pcds.length === 1 ? t.faqPcdA(name, pcds[0]!, boreText) : t.faqPcdMultiA(timeline.length ? [...new Map(timeline.map((period) => [period.pcd, `${period.pcd} (${periodYears(period)})`])).values()].join(', ') : pcds.join(', ')) }] : []),
   ...(allTires.length ? [{ q: t.faqTireQ(name), a: t.faqTireA(name, allTires.slice(0, 6).map((notation) => displayTireNotation(notation, locale)).join(', ')) }] : []),
   ...(bores.length === 1 && boreText ? [{ q: t.faqBoreQ(name), a: t.faqBoreA(name, boreText) }] : []),
@@ -84,12 +88,15 @@ const flowSizes = modelFlowSizes(model);
   </dl>
   {pageImage && <EntityImage image={pageImage} locale={locale} />}
   <nav class="entity-pagenav" aria-label={t.nav.wheels}>
-    {timeline.length > 1 && <a href="#model-timeline">{t.answer.pcd}</a>}
+    {generations && <a href="#model-generations">{t.answer.pcd}</a>}
+    {!generations && timeline.length > 1 && <a href="#model-timeline">{t.answer.pcd}</a>}
     <a href="#model-wheels">{t.nav.wheels}</a>
     {showConsumption && <a href="#model-consumption">{t.nav.consumption}</a>}
     {faqs.length > 0 && <a href="#model-faq">{t.nav.faq}</a>}
   </nav>
 </header>
+
+{generations && <CarGenerations view={generations} name={name} locale={locale} pcdHref={(pcd: string) => pcdHref(pcd)} />}
 
 {timeline.length > 1 && (
   <section class="entity-section" aria-labelledby="model-timeline">

@@ -1,0 +1,42 @@
+---
+// "Bolt pattern by generation" on car model pages (EN + 8 locales). Data: src/ui/car-generation-view.ts.
+import type { GenerationView } from '../ui/car-generation-view';
+import { carGenerationText } from '../content/car-generation-text';
+import type { EntityLocale } from '../seo/entity-routes';
+interface Props { readonly view: GenerationView; readonly name: string; readonly locale: EntityLocale; readonly pcdHref: (pcd: string) => string | undefined; }
+const { view, name, locale, pcdHref } = Astro.props;
+const t = carGenerationText[locale];
+const host = (url: string): string => (url.includes('://de.') ? 'Wikipedia (DE)' : 'Wikipedia (EN)');
+---
+<section class="entity-section" aria-labelledby="model-generations">
+  <h2 id="model-generations">{t.genHeading(name)}</h2>
+  <p class="entity-note">{t.genIntro}</p>
+  <div class="entity-table-scroll">
+    <table class="entity-table car-generations">
+      <thead><tr><th scope="col">{t.generation}</th><th scope="col">{t.cols.pcd}</th><th scope="col">{t.cols.bore}</th><th scope="col" class="is-optional">{t.wheels}</th></tr></thead>
+      <tbody>
+        {view.rows.map((row) => (
+          <tr id={row.id}>
+            <th scope="row">{row.name}<span class="entity-card__meta"> · {row.years}</span></th>
+            {row.records === 0 ? (
+              <td colspan="3" class="entity-soft">{t.noRecord}</td>
+            ) : (
+              <>
+                <td>
+                  {row.pcd ? (() => { const href = pcdHref(row.pcd); return <strong>{href ? <a href={href}>{row.pcd}</a> : row.pcd}</strong>; })() : <span class="entity-soft">{t.varies}: </span>}
+                  {(row.pcd ? row.patterns.slice(1) : row.patterns).map((pattern, index) => {
+                    const href = pcdHref(pattern.pcd);
+                    return <span class="car-generations__also">{row.pcd || index > 0 ? ' · ' : ''}{href ? <a href={href}>{pattern.pcd}</a> : pattern.pcd}{pattern.versions.length ? ` (${pattern.versions.join(', ')})` : ''}</span>;
+                  })}
+                </td>
+                <td>{row.bore ?? '—'}</td>
+                <td class="is-optional">{row.wheels ?? '—'}</td>
+              </>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {view.sources.length > 0 && <p class="entity-note">{t.sourcesLabel}: {view.sources.map((url, index) => <>{index > 0 ? ', ' : ''}<a href={url} rel="nofollow noopener" target="_blank">{host(url)}</a></>)}</p>}
+</section>

@@ -8,6 +8,8 @@
  * Server-only: it reads the 8 MB cars dataset.
  */
 import { carLocaleText } from '../content/car-locale-text';
+import { carGenerationText } from '../content/car-generation-text';
+import { generationView } from './car-generation-view';
 import { type CarMake, type CarModel, carMakePath, carMakes, carModelPath, frequent, newestFirst, publishedCarModels } from '../data/cars';
 import { carName, fit, fitDescription } from './car-pages';
 import { entityHreflang, entityLocales, type EntityLocale, type HreflangAlternate } from '../seo/entity-routes';
@@ -74,11 +76,17 @@ export function localizedCarRoutes(): readonly string[] {
 export function carModelLocaleMeta(model: CarModel, locale: EntityLocale): { readonly title: string; readonly description: string } {
   const t = carLocaleText[locale];
   const name = carName(model);
-  const pcd = newestFirst(model.wheels, (row) => row[4]).slice(0, 2).join(' / ');
+  const pcd = newestFirst(model.wheels, (row) => row[4]).filter((value) => /^\d+x\d+(?:\.\d+)?$/.test(value)).slice(0, 2).join(' / ');
   const years = model.wheels.flatMap((row) => [row[1], row[2]]).filter((year): year is number => year !== null && year > 0);
   const span = years.length ? (Math.min(...years) === Math.max(...years) ? String(Math.min(...years)) : `${Math.min(...years)}–${Math.max(...years)}`) : '';
   const tires = frequent(model.wheels.flatMap((row) => [...(row[11] ?? '').matchAll(/(\d{3})\/(\d{2})\s?Z?R\s?(\d{2}(?:\.5)?)/g)].map((m) => `${m[1]}/${m[2]} R${m[3]}`))).slice(0, 2).join(', ');
   // Every pattern the model used (up to two, newest first), so older generations are not misled.
+  // Sourced generations first: people search "megane 4 bijon aralığı", not the model alone.
+  const generations = generationView(model, locale);
+  const g = carGenerationText[locale];
+  if (generations?.titleLabels) {
+    return { title: fit([...g.titles(name, generations.titleLabels), ...t.modelTitles(name, pcd)]), description: fitDescription(g.description(name, generations.descriptionList)) };
+  }
   return { title: fit(t.modelTitles(name, pcd)), description: fitDescription(t.modelDescription(name, pcd || '—', span, tires)) };
 }
 

@@ -24,9 +24,11 @@ const wheels = model.wheels.slice().sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
 const curated = curatedVehiclesFor(model);
 const flowSizes = modelFlowSizes(model);
 const timeline = patternTimeline(model);
+const generations = generationView(model, 'en');
 const pageImage = carModelImage(model, 'en');
 const newestPeriod = timeline.length > 1 ? timeline[0] : undefined;
 const faqs = [
+  ...(generations?.faqs ?? []),
   ...(pcds.length ? [{ q: `What is the bolt pattern of the ${name}?`, a: pcds.length === 1 ? `The ${name} uses a ${pcds[0]} bolt pattern${bores[0] ? ` with a ${bores[0]} mm center bore` : ''} in every record of the ANKUSI wheel fitment data.` : `It depends on the model year: ${[...new Map(timeline.map((period) => [period.pcd, `${period.pcd} (${periodYears(period)})`])).values()].join(', ')}. The bolt pattern by year table lists each one with its center bore.` }] : []),
   ...(latest !== undefined && latestSummary?.best ? [{ q: `What MPG does the ${latest} ${name} get?`, a: `The EPA rates the ${latest} ${name} at up to ${latestSummary.best} ${latestSummary.electric ? 'MPGe' : 'MPG'} combined. Every model year is listed below.` }] : []),
 ];
@@ -42,6 +44,8 @@ import TireSizeFlow from '../../../../components/TireSizeFlow.astro';
 import { vehicleFlowText } from '../../../../content/vehicle-flow-text';
 import { modelFlowSizes } from '../../../../ui/model-tire-flow';
 import { patternTimeline, periodYears } from '../../../../ui/model-pattern-timeline';
+import { generationView } from '../../../../ui/car-generation-view';
+import CarGenerations from '../../../../components/CarGenerations.astro';
 import { carModelImage } from '../../../../seo/vehicle-images';
 import EntityImage from '../../../../components/EntityImage.astro';
 ---
@@ -57,6 +61,7 @@ import EntityImage from '../../../../components/EntityImage.astro';
     {pageImage && <EntityImage image={pageImage} locale="en" />}
     <nav class="entity-pagenav" aria-label="On this page">
       {years.length > 0 && <a href="#model-years">MPG by year</a>}
+      {generations && <a href="#model-generations">By generation</a>}
       {timeline.length > 1 && <a href="#model-timeline">Bolt pattern by year</a>}
       {wheels.length > 0 && <a href="#model-wheels">Wheels</a>}
       {faqs.length > 0 && <a href="#model-faq">FAQ</a>}
@@ -84,6 +89,8 @@ import EntityImage from '../../../../components/EntityImage.astro';
       <p class="entity-note">EPA combined {latestSummary?.electric ? 'MPGe' : 'MPG'} for the most efficient version of each year. Each year links to every version with engine, drive and annual fuel cost.</p>
     </section>
   )}
+
+  {generations && <CarGenerations view={generations} name={name} locale="en" pcdHref={(pcd: string) => boltHref(pcd)} />}
 
   {timeline.length > 1 && (
     <section class="entity-section" aria-labelledby="model-timeline">

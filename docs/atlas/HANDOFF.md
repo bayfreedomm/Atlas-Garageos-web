@@ -9,6 +9,11 @@ Updated: 2026-10-15.
 - Verified locally with wrangler 4.151 `dev --local` + D1 + a mail sink: report send, list sign-up, confirm, RFC 8058 unsubscribe, rate limits, honeypot, origin check; Chromium form flow in TR and EN; print layout.
 - To activate: owner creates D1 `atlas-subscribers` and the Resend domain/secret → add `"d1_databases": [{ "binding": "DB", "database_name": "atlas-subscribers", "database_id": "<id>" }]` to `wrangler.jsonc` → `EMAIL_REPORTS_ENABLED = true` → build, deploy, send one live test.
 
+## 2026-10-15 (v7-26, generations)
+
+- Generation package shipped: 35 models, sourced generation years (EN + DE Wikipedia), per-generation bolt pattern from ANKUSI only when unambiguous; titles carry the generation names people search ("Megane 4", "Corsa F", "Passat B8"). WIP branch `parca-3-model-sayfalari` is superseded (kept, not merged).
+- Next: no GarageOS feature work until the ~5 Nov Search Console read; then compare model-page CTR.
+
 ## 2026-10-15 (v7-25, search titles)
 
 - Search Console export read (235 clicks, 26.9k impressions, 0.9 % CTR; impressions ~15× since 10 Oct). Answer-first titles/descriptions on vehicle, brand bolt-chart and car model pages in 9 languages. No URL, canonical or sitemap change.

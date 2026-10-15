@@ -171,3 +171,14 @@ Status: `ACCEPTED`.
 - Vehicle, brand bolt-chart and car model titles lead with the answer ("Opel Corsa (F) Lochkreis 4x108, Reifengröße 185/65 R15"), shortened step by step to fit the 75-character budget. Car model pages show up to two patterns so older generations are not misled. Descriptions list bolt pattern, center bore, tire and wheel from the curated row only.
 
 Rationale: Search Console 2026-10-15 — these pages rank 5–9 for model bolt-pattern queries with 0 clicks, while answer-first DE tire-size titles convert.
+
+## 2026-10-15 — Generation names sourced and published (v7-26)
+
+Status: `ACCEPTED` (closes "Generation names need sources before production", 2026-10-14).
+
+- 35 European/Turkish models, 130 generations. Each model's generation names and European production years were read from English and German Wikipedia generation articles (`GENERATION_SOURCES` in `src/data/car-generations.ts`); a generation is kept only when both agree on the start year within one year. Wikipedia counts as the "two independent references" route; no manufacturer data was used. Dropped as single-source: Clio 6, Megane E-Tech, RAV4 6, i20 4.
+- Each ANKUSI wheel record belongs to exactly one generation (the newest that had started by its first year), so overlap years never double-count.
+- A generation names one bolt pattern (title, FAQ, short answer) only when it has at least two records and all regular versions agree; performance trims (Type R, RS, OPC, N, AMG …) are listed but never set the headline. Otherwise the page shows every recorded pattern with its versions and makes no single claim (e.g. Ford Focus 2, where the records mix markets).
+- Generation sections show the source links. No new URLs.
+
+Rationale: Search Console shows generation queries ("megane 4 bijon aralığı", "corsa f lochkreis", "passat b8 lochkreis") ranking 5–9 with 0 clicks.
