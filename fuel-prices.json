@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T13:57:05.037Z",
+  "generatedAt": "2026-10-16T18:48:36.424Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.779,
-        "sampleSize": 10906
+        "value": 1.778,
+        "sampleSize": 10904
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.944,
-        "sampleSize": 5483
+        "sampleSize": 5484
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.891,
-        "sampleSize": 11247
+        "value": 1.89,
+        "sampleSize": 11245
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.984,
-        "sampleSize": 5890
+        "value": 1.983,
+        "sampleSize": 5887
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-16T13:56:33.708Z",
-    "lastSuccessAt": "2026-10-16T13:56:33.708Z"
+    "lastAttemptAt": "2026-10-16T18:48:06.912Z",
+    "lastSuccessAt": "2026-10-16T18:48:06.912Z"
   },
   "de": {
     "status": "fresh",
@@ -62,7 +62,7 @@
     "lastSuccessAt": "2026-09-21T19:46:32.446Z"
   },
   "us": {
-    "status": "stale",
+    "status": "fresh",
     "products": [
       {
         "id": "regular",
@@ -79,9 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-16T13:56:33.843Z",
-    "lastSuccessAt": "2026-10-16T08:07:51.965Z",
-    "note": "Refresh failed (This operation was aborted); showing last known value from 2026-10-16T08:07:51.965Z",
+    "lastAttemptAt": "2026-10-16T18:48:06.955Z",
+    "lastSuccessAt": "2026-10-16T18:48:06.955Z",
     "weekOf": "2026-10-12"
   }
 }
