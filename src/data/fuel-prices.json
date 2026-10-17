@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T07:45:32.968Z",
+  "generatedAt": "2026-10-17T12:57:54.593Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.775,
-        "sampleSize": 10890
+        "value": 1.774,
+        "sampleSize": 10892
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.937,
-        "sampleSize": 5479
+        "sampleSize": 5478
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
         "value": 1.89,
-        "sampleSize": 11232
+        "sampleSize": 11234
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
         "value": 1.982,
-        "sampleSize": 5882
+        "sampleSize": 5893
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-17T07:45:11.516Z",
-    "lastSuccessAt": "2026-10-17T07:45:11.516Z"
+    "lastAttemptAt": "2026-10-17T12:57:31.559Z",
+    "lastSuccessAt": "2026-10-17T12:57:31.559Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-17T07:45:11.566Z",
-    "lastSuccessAt": "2026-10-17T07:45:11.566Z",
+    "lastAttemptAt": "2026-10-17T12:57:31.606Z",
+    "lastSuccessAt": "2026-10-17T12:57:31.606Z",
     "weekOf": "2026-10-12"
   }
 }
