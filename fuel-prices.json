@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T19:14:27.195Z",
+  "generatedAt": "2026-10-20T23:52:03.248Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.763,
-        "sampleSize": 10872
+        "value": 1.762,
+        "sampleSize": 10874
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.927,
-        "sampleSize": 5477
+        "value": 1.925,
+        "sampleSize": 5476
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
         "value": 1.886,
-        "sampleSize": 11211
+        "sampleSize": 11212
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.978,
+        "value": 1.975,
         "sampleSize": 5886
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-20T19:13:59.826Z",
-    "lastSuccessAt": "2026-10-20T19:13:59.826Z"
+    "lastAttemptAt": "2026-10-20T23:51:40.742Z",
+    "lastSuccessAt": "2026-10-20T23:51:40.742Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-20T19:13:59.867Z",
-    "lastSuccessAt": "2026-10-20T19:13:59.867Z",
+    "lastAttemptAt": "2026-10-20T23:51:40.794Z",
+    "lastSuccessAt": "2026-10-20T23:51:40.794Z",
     "weekOf": "2026-10-19"
   }
 }
