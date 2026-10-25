@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-25T08:23:01.682Z",
+  "generatedAt": "2026-10-25T13:42:21.663Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -14,7 +14,7 @@
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.911,
-        "sampleSize": 5468
+        "sampleSize": 5467
       },
       {
         "id": "diesel",
@@ -25,14 +25,14 @@
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.979,
-        "sampleSize": 5858
+        "value": 1.98,
+        "sampleSize": 5857
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-25T08:22:38.873Z",
-    "lastSuccessAt": "2026-10-25T08:22:38.873Z"
+    "lastAttemptAt": "2026-10-25T13:41:53.795Z",
+    "lastSuccessAt": "2026-10-25T13:41:53.795Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-25T08:22:39.001Z",
-    "lastSuccessAt": "2026-10-25T08:22:39.001Z",
+    "lastAttemptAt": "2026-10-25T13:41:53.834Z",
+    "lastSuccessAt": "2026-10-25T13:41:53.834Z",
     "weekOf": "2026-10-19"
   }
 }
