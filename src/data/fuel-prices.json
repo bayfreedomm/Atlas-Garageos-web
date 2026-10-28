@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T09:37:12.000Z",
+  "generatedAt": "2026-10-28T20:15:17.237Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.739,
-        "sampleSize": 10868
+        "value": 1.738,
+        "sampleSize": 10865
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.908,
-        "sampleSize": 5478
+        "sampleSize": 5477
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
         "value": 1.899,
-        "sampleSize": 11205
+        "sampleSize": 11200
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.987,
-        "sampleSize": 5882
+        "value": 1.988,
+        "sampleSize": 5868
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-28T09:36:43.711Z",
-    "lastSuccessAt": "2026-10-28T09:36:43.711Z"
+    "lastAttemptAt": "2026-10-28T20:14:49.286Z",
+    "lastSuccessAt": "2026-10-28T20:14:49.286Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-28T09:36:43.740Z",
-    "lastSuccessAt": "2026-10-28T09:36:43.740Z",
+    "lastAttemptAt": "2026-10-28T20:14:49.329Z",
+    "lastSuccessAt": "2026-10-28T20:14:49.329Z",
     "weekOf": "2026-10-26"
   }
 }
