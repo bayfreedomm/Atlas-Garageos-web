@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T20:16:30.345Z",
+  "generatedAt": "2026-10-30T00:57:54.504Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.732,
-        "sampleSize": 10865
+        "value": 1.731,
+        "sampleSize": 10869
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.902,
-        "sampleSize": 5475
+        "value": 1.904,
+        "sampleSize": 5477
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
         "value": 1.899,
-        "sampleSize": 11201
+        "sampleSize": 11205
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.991,
-        "sampleSize": 5864
+        "value": 1.993,
+        "sampleSize": 5867
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-29T20:15:56.588Z",
-    "lastSuccessAt": "2026-10-29T20:15:56.588Z"
+    "lastAttemptAt": "2026-10-30T00:57:26.603Z",
+    "lastSuccessAt": "2026-10-30T00:57:26.603Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-29T20:15:56.645Z",
-    "lastSuccessAt": "2026-10-29T20:15:56.645Z",
+    "lastAttemptAt": "2026-10-30T00:57:26.642Z",
+    "lastSuccessAt": "2026-10-30T00:57:26.642Z",
     "weekOf": "2026-10-26"
   }
 }
