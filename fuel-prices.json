@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T19:56:11.912Z",
+  "generatedAt": "2026-10-31T00:46:53.649Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.728,
-        "sampleSize": 10871
+        "value": 1.725,
+        "sampleSize": 10868
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.903,
-        "sampleSize": 5476
+        "value": 1.896,
+        "sampleSize": 5475
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.899,
-        "sampleSize": 11206
+        "value": 1.897,
+        "sampleSize": 11203
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.994,
-        "sampleSize": 5864
+        "value": 1.991,
+        "sampleSize": 5863
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-10-30T19:55:48.097Z",
-    "lastSuccessAt": "2026-10-30T19:55:48.097Z"
+    "lastAttemptAt": "2026-10-31T00:46:21.127Z",
+    "lastSuccessAt": "2026-10-31T00:46:21.127Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-10-30T19:55:48.243Z",
-    "lastSuccessAt": "2026-10-30T19:55:48.243Z",
+    "lastAttemptAt": "2026-10-31T00:46:21.171Z",
+    "lastSuccessAt": "2026-10-31T00:46:21.171Z",
     "weekOf": "2026-10-26"
   }
 }
