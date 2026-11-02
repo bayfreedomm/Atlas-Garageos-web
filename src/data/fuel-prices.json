@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T00:42:49.957Z",
+  "generatedAt": "2026-11-02T10:59:22.572Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.724,
-        "sampleSize": 10868
+        "value": 1.723,
+        "sampleSize": 10872
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
         "value": 1.895,
-        "sampleSize": 5477
+        "sampleSize": 5479
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
         "value": 1.897,
-        "sampleSize": 11204
+        "sampleSize": 11209
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
         "value": 1.989,
-        "sampleSize": 5888
+        "sampleSize": 5892
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-11-02T00:42:19.115Z",
-    "lastSuccessAt": "2026-11-02T00:42:19.115Z"
+    "lastAttemptAt": "2026-11-02T10:59:00.978Z",
+    "lastSuccessAt": "2026-11-02T10:59:00.978Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-11-02T00:42:19.253Z",
-    "lastSuccessAt": "2026-11-02T00:42:19.253Z",
+    "lastAttemptAt": "2026-11-02T10:59:01.029Z",
+    "lastSuccessAt": "2026-11-02T10:59:01.029Z",
     "weekOf": "2026-10-26"
   }
 }
