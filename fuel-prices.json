@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T20:58:42.609Z",
+  "generatedAt": "2026-11-04T01:19:50.501Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.718,
+        "value": 1.713,
         "sampleSize": 10895
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.891,
-        "sampleSize": 5490
+        "value": 1.883,
+        "sampleSize": 5492
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.895,
+        "value": 1.892,
         "sampleSize": 11242
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.987,
-        "sampleSize": 5900
+        "value": 1.984,
+        "sampleSize": 5901
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-11-03T20:58:06.416Z",
-    "lastSuccessAt": "2026-11-03T20:58:06.416Z"
+    "lastAttemptAt": "2026-11-04T01:19:17.892Z",
+    "lastSuccessAt": "2026-11-04T01:19:17.892Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-11-03T20:58:06.520Z",
-    "lastSuccessAt": "2026-11-03T20:58:06.520Z",
+    "lastAttemptAt": "2026-11-04T01:19:17.929Z",
+    "lastSuccessAt": "2026-11-04T01:19:17.929Z",
     "weekOf": "2026-11-02"
   }
 }
