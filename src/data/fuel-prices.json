@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T21:28:10.549Z",
+  "generatedAt": "2026-11-06T10:49:53.285Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.695,
-        "sampleSize": 10909
+        "value": 1.688,
+        "sampleSize": 10910
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.871,
-        "sampleSize": 5495
+        "value": 1.867,
+        "sampleSize": 5497
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.886,
+        "value": 1.878,
         "sampleSize": 11253
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.978,
-        "sampleSize": 5865
+        "value": 1.97,
+        "sampleSize": 5904
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-11-05T21:27:42.901Z",
-    "lastSuccessAt": "2026-11-05T21:27:42.901Z"
+    "lastAttemptAt": "2026-11-06T10:49:31.138Z",
+    "lastSuccessAt": "2026-11-06T10:49:31.138Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-11-05T21:27:42.938Z",
-    "lastSuccessAt": "2026-11-05T21:27:42.938Z",
+    "lastAttemptAt": "2026-11-06T10:49:31.185Z",
+    "lastSuccessAt": "2026-11-06T10:49:31.185Z",
     "weekOf": "2026-11-02"
   }
 }
