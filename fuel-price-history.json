@@ -673,6 +673,19 @@
           "perGallon": 6.127
         }
       }
+    },
+    {
+      "weekOf": "2026-11-16",
+      "products": {
+        "regular": {
+          "perLitre": 1.005,
+          "perGallon": 3.805
+        },
+        "diesel": {
+          "perLitre": 1.568,
+          "perGallon": 5.937
+        }
+      }
     }
   ]
 }
