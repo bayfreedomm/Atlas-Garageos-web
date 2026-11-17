@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T23:44:35.572Z",
+  "generatedAt": "2026-11-17T11:48:25.820Z",
   "disclaimer": "Prices are averages from public or official sources — a national dataset where the source says so, an Atlas monitored sample of selected stations otherwise. They are a reference figure, never a live quote for a specific station.",
   "es": {
     "status": "fresh",
@@ -7,32 +7,32 @@
       {
         "id": "e5",
         "label": "Gasolina 95 E5",
-        "value": 1.602,
+        "value": 1.599,
         "sampleSize": 10962
       },
       {
         "id": "e5_98",
         "label": "Gasolina 98 E5",
-        "value": 1.791,
+        "value": 1.789,
         "sampleSize": 5506
       },
       {
         "id": "diesel",
         "label": "Gasóleo A",
-        "value": 1.823,
-        "sampleSize": 11309
+        "value": 1.822,
+        "sampleSize": 11311
       },
       {
         "id": "dieselPremium",
         "label": "Gasóleo Premium",
-        "value": 1.916,
-        "sampleSize": 5908
+        "value": 1.914,
+        "sampleSize": 5917
       }
     ],
     "source": "Ministerio para la Transición Ecológica (official national dataset, no key)",
     "sourceUrl": "https://sedeaplicaciones.minetur.gob.es/ServiciosRestCarburantes/PreciosCarburantes/EstacionesTerrestres/",
-    "lastAttemptAt": "2026-11-16T23:44:07.916Z",
-    "lastSuccessAt": "2026-11-16T23:44:07.916Z"
+    "lastAttemptAt": "2026-11-17T11:47:57.665Z",
+    "lastSuccessAt": "2026-11-17T11:47:57.665Z"
   },
   "de": {
     "status": "fresh",
@@ -79,8 +79,8 @@
     ],
     "source": "U.S. Energy Information Administration (EIA), Weekly Retail Gasoline and Diesel Prices (official, weekly average) — public weekly table (regular and diesel)",
     "sourceUrl": "https://www.eia.gov/petroleum/gasdiesel/",
-    "lastAttemptAt": "2026-11-16T23:44:07.951Z",
-    "lastSuccessAt": "2026-11-16T23:44:07.951Z",
+    "lastAttemptAt": "2026-11-17T11:47:57.715Z",
+    "lastSuccessAt": "2026-11-17T11:47:57.715Z",
     "weekOf": "2026-11-09"
   }
 }
