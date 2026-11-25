@@ -620,6 +620,15 @@
         "diesel": 1.77,
         "dieselPremium": 1.865
       }
+    },
+    {
+      "date": "2026-11-25",
+      "products": {
+        "e5": 1.522,
+        "e5_98": 1.716,
+        "diesel": 1.754,
+        "dieselPremium": 1.849
+      }
     }
   ],
   "de": [
